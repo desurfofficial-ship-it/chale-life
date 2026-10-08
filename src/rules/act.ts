@@ -6,10 +6,10 @@
  * `actPromptFor` what the button should say (every HUD notify), and on a
  * press calls `resolveAct` and commits the returned session back.
  *
- * Behaviour map (Task G-004, "earn-first at Aunty Ba's"):
- *   - At LOC-001 (Aunty Ba's waakye joint), starter hustle NOT yet worked
+ * Behaviour map (Task G-005, "earn-first at Daavi's" — G-004 logic, Daavi name):
+ *   - At LOC-001 (Daavi's waakye joint), starter hustle NOT yet worked
  *       this run (JobState.completedIds): start HUSTLE_AUNTY_BA_STARTER —
- *       label "Help Aunty Ba". One anti-soft-lock exception: too hungry to
+ *       label "Help Daavi". One anti-soft-lock exception: too hungry to
  *       work (energy fine, hunger < CAN_WORK_MIN_HUNGER) with ₵12 in
  *       pocket → waakye first, so hunger can never wall the hustle off.
  *   - At LOC-001 with that hustle active: advance one step; the final
@@ -73,10 +73,12 @@ export interface ActResolution {
   readonly toast: string | null;
 }
 
-/** Aunty Ba's zero-capital starter hustle — the only job act.ts starts. */
+/** Daavi's zero-capital starter hustle — the only job act.ts starts.
+ *  G-005: display name is Daavi; the id keeps AUNTY_BA so the store and
+ *  completedIds never churn. */
 export const AUNTY_BA_HUSTLE_ID = 'HUSTLE_AUNTY_BA_STARTER';
 
-/** Aunty Ba's waakye joint (src/data/locations.ts) — hustle + waakye meal. */
+/** Daavi's waakye joint (LOC-001 in src/data/locations.ts) — hustle + waakye meal. */
 export const WAAKYE_LOCATION_ID = 'LOC-001';
 
 /** Maame Effia's provisions store (src/data/locations.ts) — sachet water. */
@@ -135,28 +137,28 @@ function decideAtWaakyeJoint(session: ActSession): Decision {
       }
       return {
         kind: 'start',
-        label: 'Help Aunty Ba',
+        label: 'Help Daavi',
         enabled: false,
         reason: work.reason,
       };
     }
-    return { kind: 'start', label: 'Help Aunty Ba', enabled: true };
+    return { kind: 'start', label: 'Help Daavi', enabled: true };
   }
 
   // Hustle already worked this run — the joint sells waakye when it makes
-  // sense (affordable, room to eat); otherwise Aunty Ba re-hires you.
+  // sense (affordable, room to eat); otherwise Daavi re-hires you.
   if (canAfford(wallet, WAAKYE.priceGHS) && needs.hunger < 100) {
     return waakyeOffer;
   }
   if (!work.ok) {
     return {
       kind: 'start',
-      label: 'Help Aunty Ba',
+      label: 'Help Daavi',
       enabled: false,
       reason: work.reason,
     };
   }
-  return { kind: 'start', label: 'Help Aunty Ba', enabled: true };
+  return { kind: 'start', label: 'Help Daavi', enabled: true };
 }
 
 function decideAtProvisions(session: ActSession): Decision {

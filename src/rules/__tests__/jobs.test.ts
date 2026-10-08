@@ -7,6 +7,7 @@ import {
   completedIdsOf,
   createStarterJobState,
   evaluateRequirements,
+  idleObjectiveFor,
   isJobCompleted,
   objectiveFor,
   startJob,
@@ -45,7 +46,7 @@ describe('jobs: registry integrity', () => {
 });
 
 describe('jobs: start', () => {
-  it('startJob activates the Aunty Ba starter hustle at step 0', () => {
+  it('startJob activates the Daavi starter hustle at step 0', () => {
     const result = startJob(createStarterJobState(), starterWallet(), 'HUSTLE_AUNTY_BA_STARTER');
     expect(result.ok).toBe(true);
     expect(result.job).toEqual({
@@ -111,7 +112,7 @@ describe('jobs: start', () => {
 });
 
 describe('jobs: advance step', () => {
-  it('advanceStep walks through each Aunty Ba step (0 → 1 → 2)', () => {
+  it('advanceStep walks through each Daavi step (0 → 1 → 2)', () => {
     let job = startJob(createStarterJobState(), starterWallet(), 'HUSTLE_AUNTY_BA_STARTER').job;
     const first = advanceStep(job);
     expect(first.ok).toBe(true);
@@ -156,7 +157,7 @@ describe('jobs: advance step', () => {
 });
 
 describe('jobs: complete with payout', () => {
-  it('completeJob pays ₵15 after all three Aunty Ba steps', () => {
+  it('completeJob pays ₵15 after all three Daavi steps', () => {
     let job = startJob(createStarterJobState(), starterWallet(), 'HUSTLE_AUNTY_BA_STARTER').job;
     job = advanceStep(job).job;
     job = advanceStep(job).job;
@@ -219,7 +220,7 @@ describe('jobs: completed-run history (G-004 completedIds)', () => {
     expect(first.ok).toBe(true);
     expect(first.job.completedIds).toEqual(['HUSTLE_AUNTY_BA_STARTER']);
 
-    // Aunty Ba re-hires; a second full shift must NOT grow the set.
+    // Daavi re-hires; a second full shift must NOT grow the set.
     let again = startJob(first.job, starterWallet(), 'HUSTLE_AUNTY_BA_STARTER').job;
     again = advanceStep(again).job;
     again = advanceStep(again).job;
@@ -248,6 +249,38 @@ describe('jobs: completed-run history (G-004 completedIds)', () => {
     expect(started.job.completedIds).toBeUndefined();
     const advanced = advanceStep(started.job);
     expect(advanced.job.completedIds).toBeUndefined();
+  });
+});
+
+describe('jobs: idle objective line (G-005 Daavi)', () => {
+  it('fresh run points the guest at Daavi’s waakye joint', () => {
+    expect(idleObjectiveFor(createStarterJobState())).toBe(
+      'No job yet — find work at Daavi’s waakye joint.'
+    );
+  });
+
+  it('legacy slice without completedIds reads as an empty history', () => {
+    expect(idleObjectiveFor({ activeId: null, step: 0 })).toBe(
+      'No job yet — find work at Daavi’s waakye joint.'
+    );
+  });
+
+  it('after the hustle the card nudges to the waakye loop at the data price', () => {
+    const done: JobState = {
+      activeId: null,
+      step: 0,
+      completedIds: ['HUSTLE_AUNTY_BA_STARTER'],
+    };
+    expect(idleObjectiveFor(done)).toBe(
+      'Hungry? Buy waakye at Daavi’s (₵12), or work another shift.'
+    );
+  });
+
+  it('history without the hustle still points at the joint (not the meal nudge)', () => {
+    const other: JobState = { activeId: null, step: 0, completedIds: ['JOB_TROTRO_MATE'] };
+    expect(idleObjectiveFor(other)).toBe(
+      'No job yet — find work at Daavi’s waakye joint.'
+    );
   });
 });
 

@@ -35,7 +35,7 @@ export const FOODS: ReadonlyArray<FoodItem> = [
     hungerRestore: 45,
     energyRestore: 6,
     vendorInteractableId: 'food_vendor',
-    summary: 'Aunty Ba’s rice and beans — the proper meal. +45 hunger.',
+    summary: 'Daavi’s rice and beans — the proper meal. +45 hunger.',
   },
   {
     id: 'FOOD_KELEWELE',
