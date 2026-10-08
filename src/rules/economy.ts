@@ -50,7 +50,7 @@ export function buy(wallet: WalletState, costGHS: number): BuyResult {
     return {
       ok: false,
       wallet,
-      reason: `Not enough cash — need ₵${formatGHS(costGHS)}, have ₵${formatGHS(wallet.balanceGHS)}.`,
+      reason: `Not enough cash — need ${formatGHS(costGHS)}, have ${formatGHS(wallet.balanceGHS)}.`,
     };
   }
   return { ok: true, wallet: { balanceGHS: round2(wallet.balanceGHS - costGHS) } };

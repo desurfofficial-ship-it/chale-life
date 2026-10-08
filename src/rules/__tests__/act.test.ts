@@ -1,0 +1,278 @@
+import { describe, expect, it } from 'vitest';
+import { findFoodById, FOOD_SACHET_WATER_ID, FOOD_WAAKYE_ID } from '../../data/foods';
+import { findJobById } from '../../data/jobs';
+import { locations } from '../../data/locations';
+import { createStarterWallet, formatGHS } from '../economy';
+import { createStarterNeeds } from '../needs';
+import { createStarterJobState } from '../jobs';
+import {
+  actPromptFor,
+  AUNTY_BA_HUSTLE_ID,
+  resolveAct,
+  WATER_LOCATION_ID,
+  WAAKYE_LOCATION_ID,
+  type ActSession,
+} from '../act';
+
+const starterSession = (): ActSession => ({
+  wallet: createStarterWallet(),
+  needs: createStarterNeeds(),
+  job: createStarterJobState(),
+});
+
+/** The session right after the starter hustle paid out (₵35, work toll taken). */
+const paidSession = (): ActSession => ({
+  wallet: { balanceGHS: 35 },
+  needs: { hunger: 64, energy: 62 },
+  job: { activeId: null, step: 0 },
+});
+
+describe('act: data contract (G-002 item 2)', () => {
+  it('every Aunty Ba step happens at LOC-001, a real location, for a ₵15 payout', () => {
+    const hustle = findJobById(AUNTY_BA_HUSTLE_ID)!;
+    expect(hustle.payGHS).toBe(15);
+    expect(hustle.steps.length).toBe(3);
+    for (const step of hustle.steps) {
+      expect(step.locationId).toBe(WAAKYE_LOCATION_ID);
+      expect(locations.some((l) => l.id === WAAKYE_LOCATION_ID)).toBe(true);
+    }
+  });
+
+  it('LOC-001 is the waakye joint and LOC-003 is the provisions shop', () => {
+    const joint = locations.find((l) => l.id === WAAKYE_LOCATION_ID)!;
+    const shop = locations.find((l) => l.id === WATER_LOCATION_ID)!;
+    expect(joint.type).toBe('food');
+    expect(shop.type).toBe('shop');
+    expect(findFoodById(FOOD_WAAKYE_ID)!.priceGHS).toBe(12);
+    expect(findFoodById(FOOD_SACHET_WATER_ID)!.priceGHS).toBe(1);
+  });
+});
+
+describe('act: the first earn-and-eat loop (₵20 → ₵35 → ₵23)', () => {
+  it('starts fresh: "Help Aunty Ba" offered at the waakye joint', () => {
+    const prompt = actPromptFor(starterSession(), WAAKYE_LOCATION_ID);
+    expect(prompt.label).toBe('Help Aunty Ba');
+    expect(prompt.enabled).toBe(true);
+  });
+
+  it('three Acts after accepting pay ₵35 with the work toll applied', () => {
+    let session = starterSession();
+
+    // Act 1 — accept the hustle.
+    const started = resolveAct(session, WAAKYE_LOCATION_ID);
+    expect(started.toast).toContain('Job accepted');
+    session = started.session;
+    expect(session.job).toEqual({ activeId: AUNTY_BA_HUSTLE_ID, step: 0 });
+    expect(session.wallet.balanceGHS).toBe(20);
+
+    // Acts 2 and 3 — carry two stacks of pans.
+    const lift1 = resolveAct(session, WAAKYE_LOCATION_ID);
+    expect(lift1.toast).toContain('Two more lifts');
+    session = lift1.session;
+    expect(session.job.step).toBe(1);
+
+    const lift2 = resolveAct(session, WAAKYE_LOCATION_ID);
+    expect(lift2.toast).toContain('One more lift');
+    session = lift2.session;
+    expect(session.job.step).toBe(2);
+
+    // The button reads the step verb while the hustle is active.
+    expect(actPromptFor(session, WAAKYE_LOCATION_ID).label).toBe('Carry Pans');
+
+    // Act 4 — final lift: Aunty Ba pays ₵15 and the shift takes its toll.
+    const final = resolveAct(session, WAAKYE_LOCATION_ID);
+    expect(final.toast).toContain('+₵15');
+    session = final.session;
+    expect(session.wallet.balanceGHS).toBe(35);
+    expect(session.needs).toEqual({ hunger: 64, energy: 62 }); // −8 hunger / −18 energy
+    expect(session.job).toEqual({ activeId: null, step: 0 });
+  });
+
+  it('after the payout, the joint sells waakye: −₵12, hunger up 45 (clamped)', () => {
+    const prompt = actPromptFor(paidSession(), WAAKYE_LOCATION_ID);
+    expect(prompt.label).toBe(`Buy waakye ${formatGHS(12)}`);
+    expect(prompt.enabled).toBe(true);
+
+    const result = resolveAct(paidSession(), WAAKYE_LOCATION_ID);
+    expect(result.toast).toContain('Waakye');
+    expect(result.session.wallet.balanceGHS).toBe(23);
+    expect(result.session.needs.hunger).toBe(100); // 64 + 45, clamped
+    expect(result.session.needs.energy).toBe(62); // applyMeal touches hunger only
+    expect(result.session.job).toEqual({ activeId: null, step: 0 });
+  });
+
+  it('never lets the wallet go negative across the whole loop', () => {
+    let session = starterSession();
+    for (let i = 0; i < 6; i++) {
+      session = resolveAct(session, WAAKYE_LOCATION_ID).session;
+      expect(session.wallet.balanceGHS).toBeGreaterThanOrEqual(0);
+    }
+    expect(session.wallet.balanceGHS).toBe(23);
+  });
+});
+
+describe('act: water at the provisions store (LOC-003)', () => {
+  it('sells sachet water for ₵1 with drinkWater effects', () => {
+    const session: ActSession = {
+      wallet: { balanceGHS: 5 },
+      needs: { hunger: 40, energy: 30 },
+      job: createStarterJobState(),
+    };
+    const prompt = actPromptFor(session, WATER_LOCATION_ID);
+    expect(prompt.label).toBe('Buy water ₵1');
+    expect(prompt.enabled).toBe(true);
+
+    const result = resolveAct(session, WATER_LOCATION_ID);
+    expect(result.toast).toContain('+10 energy');
+    expect(result.session.wallet.balanceGHS).toBe(4);
+    expect(result.session.needs).toEqual({ hunger: 46, energy: 40 });
+  });
+
+  it('refuses water without ₵1 and leaves the session untouched', () => {
+    const session: ActSession = {
+      wallet: { balanceGHS: 0.5 },
+      needs: { hunger: 40, energy: 30 },
+      job: createStarterJobState(),
+    };
+    const prompt = actPromptFor(session, WATER_LOCATION_ID);
+    expect(prompt.enabled).toBe(false);
+    expect(prompt.reason).toContain('water');
+
+    const result = resolveAct(session, WATER_LOCATION_ID);
+    expect(result.session).toBe(session);
+    expect(result.toast).toBeNull();
+  });
+});
+
+describe('act: disabled cases', () => {
+  it('refuses to work the hustle while too tired', () => {
+    const session: ActSession = {
+      wallet: createStarterWallet(),
+      needs: { hunger: 80, energy: 5 },
+      job: { activeId: AUNTY_BA_HUSTLE_ID, step: 0 },
+    };
+    const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
+    expect(prompt.enabled).toBe(false);
+    expect(prompt.reason).toContain('Too tired');
+
+    const result = resolveAct(session, WAAKYE_LOCATION_ID);
+    expect(result.session).toBe(session);
+    expect(result.toast).toBeNull();
+  });
+
+  it('refuses to work the hustle while too hungry', () => {
+    const session: ActSession = {
+      wallet: createStarterWallet(),
+      needs: { hunger: 5, energy: 80 },
+      job: { activeId: AUNTY_BA_HUSTLE_ID, step: 0 },
+    };
+    const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
+    expect(prompt.enabled).toBe(false);
+    expect(prompt.reason).toContain('Too hungry');
+  });
+
+  it('refuses to start while too tired, even with cash', () => {
+    const session: ActSession = {
+      wallet: { balanceGHS: 35 },
+      needs: { hunger: 80, energy: 5 },
+      job: createStarterJobState(),
+    };
+    const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
+    expect(prompt.label).toBe('Help Aunty Ba');
+    expect(prompt.enabled).toBe(false);
+    expect(prompt.reason).toContain('Too tired');
+  });
+
+  it('hungry and broke cannot start either — with the reason why', () => {
+    const session: ActSession = {
+      wallet: { balanceGHS: 5 },
+      needs: { hunger: 5, energy: 80 },
+      job: createStarterJobState(),
+    };
+    const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
+    expect(prompt.enabled).toBe(false);
+    expect(prompt.reason).toContain('Too hungry');
+  });
+
+  it('broke after the hustle? Aunty Ba still offers the hustle (work-when-broke)', () => {
+    const session: ActSession = {
+      wallet: { balanceGHS: 5 },
+      needs: { hunger: 64, energy: 62 },
+      job: createStarterJobState(),
+    };
+    const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
+    expect(prompt.label).toBe('Help Aunty Ba');
+    expect(prompt.enabled).toBe(true);
+
+    const result = resolveAct(session, WAAKYE_LOCATION_ID);
+    expect(result.session.job.activeId).toBe(AUNTY_BA_HUSTLE_ID);
+    expect(result.session.wallet.balanceGHS).toBe(5); // zero-capital hustle
+  });
+
+  it('another shift in progress blocks the waakye-joint act', () => {
+    const session: ActSession = {
+      wallet: { balanceGHS: 35 },
+      needs: { hunger: 64, energy: 62 },
+      job: { activeId: 'JOB_TROTRO_MATE', step: 0 },
+    };
+    const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
+    expect(prompt.enabled).toBe(false);
+    expect(prompt.reason).toContain('Finish your current shift');
+  });
+});
+
+describe('act: nothing happens away from act locations', () => {
+  it('not near anything: label "Act", disabled, resolve is a no-op', () => {
+    const session = paidSession();
+    const prompt = actPromptFor(session, null);
+    expect(prompt.label).toBe('Act');
+    expect(prompt.enabled).toBe(false);
+
+    const result = resolveAct(session, null);
+    expect(result.session).toBe(session);
+    expect(result.toast).toBeNull();
+  });
+
+  it('known locations without an act yet are also idle', () => {
+    for (const near of ['LOC-002', 'LOC-004', 'LOC-005', 'LOC-006', 'LOC-999']) {
+      const prompt = actPromptFor(paidSession(), near);
+      expect(prompt.enabled).toBe(false);
+      expect(prompt.reason).toContain('Nothing to do here');
+      const result = resolveAct(paidSession(), near);
+      expect(result.toast).toBeNull();
+    }
+  });
+});
+
+describe('act: prompt and resolution agree', () => {
+  it('a press only does something when the prompt is enabled', () => {
+    const scenarios: Array<[ActSession, string | null]> = [
+      [starterSession(), WAAKYE_LOCATION_ID],
+      [paidSession(), WAAKYE_LOCATION_ID],
+      [paidSession(), null],
+      [paidSession(), 'LOC-004'],
+      [
+        {
+          wallet: { balanceGHS: 5 },
+          needs: { hunger: 80, energy: 5 },
+          job: { activeId: AUNTY_BA_HUSTLE_ID, step: 0 },
+        },
+        WAAKYE_LOCATION_ID,
+      ],
+      [
+        {
+          wallet: { balanceGHS: 0.5 },
+          needs: { hunger: 40, energy: 30 },
+          job: createStarterJobState(),
+        },
+        WATER_LOCATION_ID,
+      ],
+    ];
+    for (const [session, near] of scenarios) {
+      const prompt = actPromptFor(session, near);
+      const result = resolveAct(session, near);
+      expect(result.toast !== null).toBe(prompt.enabled);
+      if (!prompt.enabled) expect(result.session).toBe(session);
+    }
+  });
+});
