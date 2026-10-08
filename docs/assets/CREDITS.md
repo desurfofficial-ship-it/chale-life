@@ -66,3 +66,13 @@ Every **CC-BY-4.0** asset shipped in `public/assets/` and the creator it must be
 - `public/assets/glb/residential/scene.gltf` — licence OK (CC-BY-4.0, credited above) but the referenced `scene.bin` buffer is missing, so the model cannot load. Re-import or remove.
 
 Assets with a licence but unclear terms: none besides the Sketchfab Standard model above.
+
+## public/models/ — optimised GLBs (W-003 asset pipeline)
+
+Every file under `public/models/` is ledger-tracked in [LICENSES.csv](./LICENSES.csv) and size-budgeted by `scripts/check-models.sh`. Raw download sources live in gitignored `asset-sources/`.
+
+| Asset | Creator | Licence | Files |
+|---|---|---|---|
+| City Kit (Roads) v2.1 (road-straight, road-crossroad) | Kenney (kenney.nl) | CC0 1.0 (credit voluntary) | `public/models/roads/*.glb` |
+
+Pipeline: `npm run assets` (scripts/optimize-assets.mjs, @gltf-transform: dedup → weld → scale normalised to metres → meshopt + KTX2 ≤1024 px). `public/basis/` holds the Basis Universal KTX2 transcoder shipped with three.js (Apache-2.0, © three.js authors, Konsolas & Ben Houston / Basis Univeral, Binomial LLC).

@@ -1,0 +1,15 @@
+{
+  "$comment": "W-003 asset pipeline manifest. 'in' = raw source under gitignored asset-sources/ (never committed); 'out' = optimised game GLB under public/models/; 'sizeMetres' = target real-world XZ footprint the optimiser normalises to (1 unit in these Kenney packs represents a 4 m street tile). Every 'out' file needs a matching row in docs/assets/LICENSES.csv — CI enforces it.",
+  "entries": [
+    {
+      "in": "asset-sources/kenney_city-kit-roads/Models/GLB format/road-straight.glb",
+      "out": "public/models/roads/road-straight-4m.glb",
+      "sizeMetres": 4
+    },
+    {
+      "in": "asset-sources/kenney_city-kit-roads/Models/GLB format/road-crossroad.glb",
+      "out": "public/models/roads/road-crossroad-4m.glb",
+      "sizeMetres": 4
+    }
+  ]
+}
