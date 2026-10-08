@@ -16,3 +16,12 @@
 `src/world/colliders.ts` (`colliders`, `worldBounds`), 1 unit = 1 m. Engine reads
 that file every frame; World never imports engine code. The current file is a
 placeholder (60 × 60 m bounds, no obstacles) until W-001 lands.
+- `ObjectiveMarker.tsx` — glowing ground ring + faint beam (2 draw calls when
+  visible, 0 when hidden, no `<Html>`, no re-renders) at the active job step's
+  location; falls back to LOC-001 until the player's first completed shift
+  (`hasWorked`). Step→location comes from `JobStep.locationId`, with a small
+  interactable-id fallback map for untagged steps.
+- `spawn.ts` — resolveSpawn/initializePlayerSpawn (E-002): picks the starter
+  compound gate (LOC-002), guarantees not-inside-collider, commits at boot.
+- GameLoop systems (E-003): nearest-location probe (≤2.5 m, write-on-change)
+  and the ~1 Hz starter needs drain (`tickNeedsDrain`, paused when hidden).
