@@ -5,7 +5,7 @@
  *   - active job → the active step's location (steps carry `locationId`
  *     from src/data/jobs.ts; the starter hustle is fully tagged)
  *   - no job and nothing worked this run (job.completedIds empty, E-004 —
- *     the retired hasWorked latch's replacement) → LOC-001, Aunty Ba's
+ *     the retired hasWorked latch's replacement) → LOC-001, the waakye
  *     joint (the "go find work" beacon a brand-new guest walks towards)
  *   - otherwise → hidden (a completed shift sits in completedIds).
  *
@@ -36,7 +36,9 @@ import { getState } from '../store/gameStore';
  * targetLocationName). Steps outside this map hide the marker.
  */
 const INTERACTABLE_TO_LOCATION: Readonly<Record<string, string>> = {
-  food_vendor: 'LOC-001', // Waakye Joint / Aunty Ba
+  // Display names live in the data (locations.ts / jobs.ts) — this file
+  // never hardcodes an employer name, so data renames can't touch it.
+  food_vendor: 'LOC-001', // the waakye joint
   provision_shop: 'LOC-003', // Provision Store
   trotro_stop: 'LOC-004', // Trotro Stop
 };

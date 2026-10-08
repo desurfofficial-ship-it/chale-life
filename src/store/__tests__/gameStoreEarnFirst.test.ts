@@ -6,16 +6,18 @@
  * runs its own pristine ordered session:
  *
  *   drain hunger 72 → 60 (four spawn minutes of starter drain, 240 × 1 s)
- *   → walk to LOC-001 → the FIRST Act starts the hustle (not waakye — the
- *   E-003 hunger-proxy bug this kills) → the loop still reaches ₵35 →
- *   waakye lands ₵23 → completedIds latched exactly once.
+ *   → walk to the waakye joint (LOC-001) → the FIRST Act starts the hustle
+ *   (not waakye — the E-003 hunger-proxy bug this kills; the button reads
+ *   the employer prompt from the rules, never a hardcoded name) → the loop
+ *   still reaches ₵35 → waakye lands ₵23 → completedIds latched exactly once.
  *
  * This is the store-level mirror of the live E-004 check: spawn, wait 60 s,
- * walk to Aunty Ba — the button must read "Help Aunty Ba", not waakye.
+ * walk to the joint — the button must read the hustle prompt, not waakye.
  */
 
 import { describe, expect, it } from 'vitest';
 import { actPromptFor } from '../../rules/act';
+import { findJobById } from '../../data/jobs';
 import { DECAY_PER_SECOND } from '../../rules/needs';
 import {
   getState,
@@ -24,7 +26,10 @@ import {
   tickNeedsDrain,
 } from '../gameStore';
 
-const AUNTY_BA = 'HUSTLE_AUNTY_BA_STARTER';
+/** The data key — the only hustle identifier this file writes (no NPC names). */
+const HUSTLE_ID = 'HUSTLE_AUNTY_BA_STARTER';
+/** Read from the rules/data, never hardcoded: the hustle prompt label. */
+const HELP_LABEL = `Help ${findJobById(HUSTLE_ID)!.employerName}`;
 
 /** One spawn minute of starter drain = 60 × 1 s store commits (~1 Hz). */
 function drainOneMinute(): void {
@@ -46,9 +51,9 @@ describe('gameStore (E-004): earn-first survives the spawn drain', () => {
     expect(needs.hunger).toBeCloseTo(60, 5); // 72 − 3/min × 4 min
     expect(needs.energy).toBeCloseTo(80 - DECAY_PER_SECOND.starter.energy * 240, 10);
 
-    // Walk to Aunty Ba's joint. The E-003 hunger proxy would have flipped
-    // the Act to waakye right here; G-004's completedIds flag keeps it
-    // earn-first — the store-level projection says "Help Aunty Ba".
+    // Walk to the waakye joint (LOC-001). The E-003 hunger proxy would have
+    // flipped the Act to waakye right here; G-004's completedIds flag keeps
+    // it earn-first — the store-level projection says "Help <employer>".
     setNearLocationId('LOC-001');
     const s = getState();
     const prompt = actPromptFor(
@@ -59,14 +64,14 @@ describe('gameStore (E-004): earn-first survives the spawn drain', () => {
       },
       s.nearLocationId
     );
-    expect(prompt.label).toBe('Help Aunty Ba');
+    expect(prompt.label).toBe(HELP_LABEL);
     expect(prompt.enabled).toBe(true);
 
     // The first Act STARTS the hustle — nothing spent, history still empty.
     requestAct();
     const afterStart = getState();
     expect(afterStart.job).toEqual({
-      activeId: AUNTY_BA,
+      activeId: HUSTLE_ID,
       step: 0,
       completedIds: [],
     });
@@ -77,9 +82,9 @@ describe('gameStore (E-004): earn-first survives the spawn drain', () => {
   it('the drained loop still pays out ₵35 and waakye lands ₵23', () => {
     // Acts 2 and 3 — steps 1/3 and 2/3, history rides along untouched.
     requestAct();
-    expect(getState().job).toEqual({ activeId: AUNTY_BA, step: 1, completedIds: [] });
+    expect(getState().job).toEqual({ activeId: HUSTLE_ID, step: 1, completedIds: [] });
     requestAct();
-    expect(getState().job).toEqual({ activeId: AUNTY_BA, step: 2, completedIds: [] });
+    expect(getState().job).toEqual({ activeId: HUSTLE_ID, step: 2, completedIds: [] });
     expect(getState().wallet.balanceGHS).toBe(20); // pay only on completion
 
     // Final Act — +₵15 payout and the work toll on the drained needs.
@@ -92,7 +97,7 @@ describe('gameStore (E-004): earn-first survives the spawn drain', () => {
       10
     );
     // The payout latches the run history — the ONE earn-first source of truth.
-    expect(paid.job).toEqual({ activeId: null, step: 0, completedIds: [AUNTY_BA] });
+    expect(paid.job).toEqual({ activeId: null, step: 0, completedIds: [HUSTLE_ID] });
     expect(paid.toast.message).toContain('+₵15');
 
     // Next Act at the joint sells waakye (earn-first satisfied): ₵35 → ₵23.
@@ -100,7 +105,7 @@ describe('gameStore (E-004): earn-first survives the spawn drain', () => {
     const fed = getState();
     expect(fed.wallet.balanceGHS).toBe(23); // 35 − 12
     expect(fed.needs.hunger).toBeCloseTo(97, 5); // 52 + 45 — no clamp this time
-    expect(fed.job.completedIds).toEqual([AUNTY_BA]); // unchanged by eating
+    expect(fed.job.completedIds).toEqual([HUSTLE_ID]); // unchanged by eating
     expect(fed.toast.message).toContain('Waakye');
   });
 });

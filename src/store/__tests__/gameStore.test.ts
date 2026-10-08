@@ -26,7 +26,7 @@ import {
   TOAST_LINGER_MS,
 } from '../gameStore';
 
-const AUNTY_BA = 'HUSTLE_AUNTY_BA_STARTER';
+const HUSTLE_ID = 'HUSTLE_AUNTY_BA_STARTER';
 
 describe('gameStore: E-003 defaults', () => {
   it('starts exactly like the product session: ₵20 / 72 / 80, no job, nothing near', () => {
@@ -73,11 +73,11 @@ describe('gameStore: E-003 defaults', () => {
   });
 });
 
-describe('gameStore: the ₵20 → ₵35 → ₵23 loop at Aunty Ba’s joint', () => {
+describe('gameStore: the ₵20 → ₵35 → ₵23 loop at the waakye joint (LOC-001)', () => {
   it('Act 1 starts the starter hustle at step 0 for ₵0 capital', () => {
     requestAct();
     const s = getState();
-    expect(s.job).toEqual({ activeId: AUNTY_BA, step: 0, completedIds: [] });
+    expect(s.job).toEqual({ activeId: HUSTLE_ID, step: 0, completedIds: [] });
     expect(s.wallet.balanceGHS).toBe(20); // zero-capital hustle
     expect(s.toast.message).toContain('Job accepted');
     expect(s.toast.at).toBeGreaterThan(0);
@@ -86,12 +86,12 @@ describe('gameStore: the ₵20 → ₵35 → ₵23 loop at Aunty Ba’s joint', 
   it('Act 2 and Act 3 advance steps 1/3 → 2/3 with step toasts', () => {
     requestAct();
     let s = getState();
-    expect(s.job).toEqual({ activeId: AUNTY_BA, step: 1, completedIds: [] });
+    expect(s.job).toEqual({ activeId: HUSTLE_ID, step: 1, completedIds: [] });
     expect(s.toast.message).toContain('Two more lifts');
 
     requestAct();
     s = getState();
-    expect(s.job).toEqual({ activeId: AUNTY_BA, step: 2, completedIds: [] });
+    expect(s.job).toEqual({ activeId: HUSTLE_ID, step: 2, completedIds: [] });
     expect(s.toast.message).toContain('One more lift');
     expect(s.wallet.balanceGHS).toBe(20); // pay only on completion
   });
@@ -105,7 +105,7 @@ describe('gameStore: the ₵20 → ₵35 → ₵23 loop at Aunty Ba’s joint', 
     expect(s.needs).toEqual({ hunger: 64, energy: 62 });
     // shift cleared, the run latched the completed hustle (G-004 earn-first
     // flag — the ONE "worked before" source of truth since E-004)
-    expect(s.job).toEqual({ activeId: null, step: 0, completedIds: [AUNTY_BA] });
+    expect(s.job).toEqual({ activeId: null, step: 0, completedIds: [HUSTLE_ID] });
     expect(s.toast.message).toContain('+₵15');
   });
 
@@ -117,7 +117,7 @@ describe('gameStore: the ₵20 → ₵35 → ₵23 loop at Aunty Ba’s joint', 
     expect(s.needs.hunger).toBe(100);
     expect(s.needs.energy).toBe(62);
     expect(s.toast.message).toContain('Waakye');
-    expect(s.job.completedIds).toEqual([AUNTY_BA]); // unchanged by eating
+    expect(s.job.completedIds).toEqual([HUSTLE_ID]); // unchanged by eating
   });
 });
 
