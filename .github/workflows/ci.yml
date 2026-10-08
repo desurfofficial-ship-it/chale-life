@@ -19,3 +19,18 @@ jobs:
       - run: npm run checks
       - run: npm run build
       - run: npm run lint
+      # E-005 robot playtest: the BUILT app driven end-to-end under Chromium
+      # with software WebGL (SwiftShader) at 390x844. Runs LAST — after the
+      # typecheck → test → checks → build gates it exists to protect.
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('package-lock.json') }}
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-playtest-screenshots
+          path: test-results/**/*.png
+          if-no-files-found: warn

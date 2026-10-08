@@ -16,10 +16,9 @@
  *        fails outside it, and the objective target getters/flash work.
  *
  *   3. FIRST EARNINGS (src/game/Jobs/* starter hustle):
- *      - Completing the free starter hustle ("Help Aunty Ba carry pans")
- *        credits the wallet (+₵15), after which the ₵5 trotro fare
- *        purchase succeeds — the reviewer's "first cedis → food/fare"
- *        chain, headlessly.
+ *      - Completing the free starter hustle credits the wallet (+₵15),
+ *        after which the ₵5 trotro fare purchase succeeds — the reviewer's
+ *        "first cedis → food/fare" chain, headlessly.
  *      - A wrong assetId does NOT advance a step (guard intact).
  *
  *   4. CANCEL IS POSITION-NEUTRAL: cancelling a hustle clears the
@@ -32,6 +31,13 @@
  *      - Level-1 starter profile drains ~3/min hunger + ~2/min energy;
  *        the survival profile drains ~21/min + ~13.2/min.
  *      - drinkWater() is free and restores energy/hunger.
+ *
+ * LEGACY PROBE (E-005 note): this file imports the RETIRED `src/game/`
+ * tree from the v2 scaffold and no longer runs against the live code —
+ * the contracts it pinned are superseded by the vitest suites
+ * (src/rules, src/store) and the Playwright playtest (tests/e2e).
+ * NPC display names are neutral placeholders so a data rename never
+ * touches this file; identity strings (job ids) stay as data keys.
  *
  * Run via: npm run test:playability
  */
@@ -58,7 +64,7 @@ console.log('\n[1] Act decision matrix (no hub escape hatch)');
 ok('in-range target → interact', () => {
   const d = resolveActDecision({
     hasActiveTarget: true,
-    objective: { targetInteractableId: 'food_vendor', targetTitle: 'Aunty Ba', stepTag: 'Step 1/3' },
+    objective: { targetInteractableId: 'food_vendor', targetTitle: 'Starter Vendor', stepTag: 'Step 1/3' },
     objectiveTargetPosition: { x: 0, z: -16 },
     playerPosition: { x: 0, z: -17 }
   });
@@ -67,13 +73,13 @@ ok('in-range target → interact', () => {
 ok('objective active at 50 m → walk toast decision with distance', () => {
   const d = resolveActDecision({
     hasActiveTarget: false,
-    objective: { targetInteractableId: 'food_vendor', targetTitle: 'Aunty Ba (Waakye Joint)', stepTag: 'Step 1/3' },
+    objective: { targetInteractableId: 'food_vendor', targetTitle: 'Starter Vendor (Waakye Joint)', stepTag: 'Step 1/3' },
     objectiveTargetPosition: { x: 0, z: -16 },
     playerPosition: { x: 0, z: 34 } // exactly 50 m south of the target
   });
   assert.equal(d.kind, 'walk');
   assert.equal(d.kind === 'walk' ? d.distanceM : -2, 50);
-  assert.equal(d.kind === 'walk' ? d.targetTitle : '', 'Aunty Ba (Waakye Joint)');
+  assert.equal(d.kind === 'walk' ? d.targetTitle : '', 'Starter Vendor (Waakye Joint)');
 });
 ok('objective with unregistered target still guides (no menu)', () => {
   const d = resolveActDecision({
@@ -119,7 +125,7 @@ ok('triggerCurrentInteraction succeeds inside the radius', () => {
   system.registerTarget({
     id: 'food_vendor',
     assetId: 'ACC_RESTAURANT_001',
-    title: 'Aunty Ba',
+    title: 'Starter Vendor',
     promptLabel: 'Waakye',
     interactionResponse: '',
     position: new THREE.Vector3(0, 0, -16),
@@ -137,7 +143,7 @@ ok('triggerCurrentInteraction fails 50 m away (no hub fallthrough upstream)', ()
   system.registerTarget({
     id: 'food_vendor',
     assetId: 'ACC_RESTAURANT_001',
-    title: 'Aunty Ba',
+    title: 'Starter Vendor',
     promptLabel: 'Waakye',
     interactionResponse: '',
     position: new THREE.Vector3(0, 0, -16),
@@ -154,7 +160,7 @@ ok('objective target getter + flash lifecycle', () => {
   system.registerTarget({
     id: 'food_vendor',
     assetId: 'ACC_RESTAURANT_001',
-    title: 'Aunty Ba',
+    title: 'Starter Vendor',
     promptLabel: 'Waakye',
     interactionResponse: '',
     position: new THREE.Vector3(0, 0, -16),
@@ -171,7 +177,7 @@ ok('objective target getter + flash lifecycle', () => {
 
 // ── 3. First earnings: starter hustle → wallet → trotro fare ────────────────
 console.log('\n[3] Starter hustle pays, fare purchase succeeds');
-ok('completing "Help Aunty Ba carry pans" credits +₵15, then ₵5 fare buys', () => {
+ok('completing the starter hustle credits +₵15, then ₵5 fare buys', () => {
   const economy = new EconomyManager();
   const jobs = new JobManager(economy);
   const wallet = economy.wallet;

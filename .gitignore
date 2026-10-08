@@ -6,3 +6,7 @@ dist/
 .env.*
 !.env.example
 node_modules/
+
+# Playwright e2e (E-005)
+test-results/
+playwright-report/
