@@ -12,14 +12,19 @@ body {
   overscroll-behavior: none;
 }
 
-/* ── On-screen joystick (bottom-left, touch) ── */
+/* ── On-screen joystick (bottom-left, touch) ──
+   Geometry contract with src/input/Joystick.tsx (BASE_SIZE / KNOB_SIZE) and
+   with the HUD's centred Act pill: on a 390 × 844 viewport the pill's box
+   starts at x = 121 (width 148 centred), so this ring (left 10, 108 px →
+   right edge 118) keeps a 3 px bounding-box clearance — no overlap, boxes or
+   arcs. Keep the numbers in sync. */
 
 .joystick {
   position: fixed;
-  left: calc(18px + env(safe-area-inset-left));
-  bottom: calc(18px + env(safe-area-inset-bottom));
-  width: 124px;
-  height: 124px;
+  left: calc(10px + env(safe-area-inset-left));
+  bottom: calc(14px + env(safe-area-inset-bottom));
+  width: 108px;
+  height: 108px;
   border-radius: 50%;
   background: rgba(248, 250, 252, 0.08);
   border: 2px solid rgba(248, 250, 252, 0.28);
@@ -35,9 +40,9 @@ body {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 56px;
-  height: 56px;
-  margin: -28px 0 0 -28px;
+  width: 48px;
+  height: 48px;
+  margin: -24px 0 0 -24px;
   border-radius: 50%;
   background: rgba(248, 250, 252, 0.82);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -65,11 +70,13 @@ body {
   transform: scale(0.96);
 }
 
-/* ── Debug overlay (?debug=1) ── */
+/* ── Debug overlay (?debug=1) ──
+   Parked BELOW the HUD's top-left stack (wallet ≈53 px + needs ≈57 px + gaps
+   end ≈ y 130) so the numbers never hide under the glass cards. */
 
 .debug-overlay {
   position: fixed;
-  top: calc(14px + env(safe-area-inset-top));
+  top: calc(152px + env(safe-area-inset-top));
   left: calc(14px + env(safe-area-inset-left));
   z-index: 10;
   padding: 10px 12px;

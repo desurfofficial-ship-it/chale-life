@@ -1,7 +1,9 @@
 /**
  * Debug overlay — mounted only when the URL has ?debug=1. Shows FPS, player
- * position and the merged input vector, refreshed from the throttled HUD
- * channel (≤10 Hz), never from per-frame state.
+ * position, the merged input vector, zoom and the renderer's draw-call count,
+ * refreshed from the throttled HUD channel (≤10 Hz), never from per-frame
+ * state. Parked BELOW the HUD's top-left wallet/needs cards so the numbers
+ * stay readable on a 390 × 844 phone viewport.
  */
 
 import { useMemo, useSyncExternalStore } from 'react';
@@ -24,6 +26,7 @@ export function DebugOverlay() {
       <div>pos  {hud.x.toFixed(2)} / {hud.z.toFixed(2)}</div>
       <div>in   {hud.inputX.toFixed(2)} / {hud.inputZ.toFixed(2)}</div>
       <div>zoom {hud.zoom.toFixed(1)}</div>
+      <div>dc   {hud.drawCalls}</div>
     </div>
   );
 }

@@ -3,13 +3,19 @@
  * (mouse works too for desktop testing). Captures its pointer so dragging
  * outside the base keeps steering. Writes through inputManager, never to the
  * store directly. Plain DOM overlay — no drei <Html> under the ortho camera.
+ *
+ * Geometry (108 px base) is sized so the ring's bounding box stays clear of
+ * the HUD's centred Act pill on a 390 × 844 viewport (E-002): the pill's box
+ * starts at x = 121, this ring's box ends at x = 10 + 108 = 118 (3 px box
+ * clearance; ~7 px between the rounded arcs). (see styles.css — same numbers
+ * live there; keep them in sync).
  */
 
 import { useRef, useState } from 'react';
 import { JOYSTICK_DEAD_ZONE, setJoystickVector } from './inputManager';
 
-const BASE_SIZE = 124; // px
-const KNOB_SIZE = 56; // px
+const BASE_SIZE = 108; // px — must match .joystick width/height in styles.css
+const KNOB_SIZE = 48; // px — must match .joystick__knob in styles.css
 const MAX_DEFLECTION = (BASE_SIZE - KNOB_SIZE) / 2;
 
 interface KnobOffset {
