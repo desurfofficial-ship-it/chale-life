@@ -184,7 +184,7 @@ function buildingSpecs(): GeomSpec[] {
     pushIronRoof(b, cx, cz, w, d, shop.height + 0.28, -0.1); // slopes down to street
   }
 
-  // Aunty Ba's waakye kiosk — MTN-style yellow boards on block feet
+  // Daavi's waakye kiosk — MTN-style yellow boards on block feet
   {
     const { cx, cz } = footprintSize(WAAKYE_KIOSK.footprint);
     const k = WAAKYE_KIOSK.footprint;
@@ -297,7 +297,9 @@ function trotroSpecs(): GeomSpec[] {
   const bcz = (bench.z0 + bench.z1) / 2;
   t.push(box([bench.x1 - bench.x0, 0.07, bench.z1 - bench.z0], [bcx, 0.52, bcz], P.wood));
   for (const lx of [bcx - 1.45, bcx + 1.45]) t.push(box([0.08, 0.5, 0.4], [lx, 0.25, bcz], P.woodDark));
-  t.push(cyl(0.05, 0.05, 2.7, [TROTRO_STOP.sign.x, 1.35, TROTRO_STOP.sign.z], P.iron, 6));
+  // sign post: nudged +x so it sits BEHIND the sign plane (which faces west);
+  // at the exact sign x/z the cylinder's west face painted over the board.
+  t.push(cyl(0.05, 0.05, 2.7, [TROTRO_STOP.sign.x + 0.07, 1.35, TROTRO_STOP.sign.z], P.iron, 6));
   return t;
 }
 
