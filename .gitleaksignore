@@ -1,0 +1,11 @@
+# Known historical findings that the owner has opted to leave in git history
+# pending a decision on a history purge (S-001 — no history rewrite was
+# performed). Everything listed here is REMOVED from the working tree and is
+# reported in PR "S-001: secrets + asset hygiene".
+#
+# Format: <commit>:<file>:<rule-id>:<line>
+#
+# 1) Google API key (gcp-api-key) in firebase-applet-config.json — file
+#    deleted from the repo in S-001; the key itself must be deleted or
+#    restricted in Google Cloud Console (owner action, tracked in the PR).
+a4fe60e8dc2468fb4b2997e6f9048e4c11aef60f:firebase-applet-config.json:gcp-api-key:4
