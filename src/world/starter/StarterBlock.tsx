@@ -12,7 +12,8 @@
  *   - repeated props via InstancedMesh (1 call per prop type)   → 8 draw calls
  *   - sagging power wires as one LineSegments                   → 1 draw call
  *   - canvas-textured signs                                     → 4 draw calls
- *   ≈ 14 draw calls and ≈ 8k triangles total — far under the 150 / 100k budget.
+ *   - Kenney road tiles, instanced GLBs (W-003 proof)           → ~2 draw calls
+ *   ≈ 16 draw calls and ≈ 9k triangles total — far under the 150 / 100k budget.
  *
  * Mounts in one line from the engine:  <StarterBlock />
  *
@@ -22,6 +23,7 @@ import { Lighting } from './Lighting';
 import { InstancedProps } from './InstancedProps';
 import { Signs } from './Signs';
 import { Wires } from './Wires';
+import { RoadTiles } from './RoadTiles';
 import { staticGeometry } from './buildStatic';
 
 function StaticArchitecture() {
@@ -39,6 +41,7 @@ export function StarterBlock() {
       <StaticArchitecture />
       <InstancedProps />
       <Wires />
+      <RoadTiles />
       <Signs />
     </group>
   );

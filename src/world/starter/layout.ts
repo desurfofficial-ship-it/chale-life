@@ -232,6 +232,42 @@ export const DIRT_PATCHES: Box2D[] = [
   box(-21, 0.8, 4.5, 2.2), // laterite street beside the main road
 ];
 
+// ------------------------------------------------------ kenney road tiles --
+/**
+ * W-003 pipeline proof: optimised Kenney City Kit (Roads) tiles (CC0,
+ * public/models/roads/, meshopt + KTX2 via `npm run assets`), rendered
+ * instanced ON TOP of the existing procedural road — the procedural road
+ * stays and is not replaced by them.
+ *
+ * Kenney tiles ship as 1×1 units representing 4 m street sections; the
+ * pipeline normalises each GLB to a 4 × 4 m footprint. A 4 m tile fits
+ * inside the 7 m main road (z 4.5..11.5, centre z 8). The crossroad marks
+ * the laterite side-street junction (x -24..-18), straights continue east
+ * of it edge-to-edge on the 4 m grid.
+ */
+export type KenneyRoadTile = 'straight' | 'crossroad';
+
+export interface KenneyTileSpot {
+  tile: KenneyRoadTile;
+  x: number;
+  z: number;
+  /** Y rotation (radians). */
+  ry: number;
+}
+
+export const KENNEY_TILE_METRES = 4;
+export const KENNEY_TILE_Y = 0.012; // lift above the procedural asphalt (z-fight guard)
+
+export const KENNEY_ROAD_TILES: KenneyTileSpot[] = [
+  { tile: 'crossroad', x: -21, z: 8, ry: 0 },
+  { tile: 'straight', x: -25, z: 8, ry: 0 },
+  { tile: 'straight', x: -17, z: 8, ry: 0 },
+  { tile: 'straight', x: -13, z: 8, ry: 0 },
+  { tile: 'straight', x: -9, z: 8, ry: 0 },
+  { tile: 'straight', x: -5, z: 8, ry: 0 },
+  { tile: 'straight', x: -1, z: 8, ry: 0 },
+];
+
 // ------------------------------------------------------------- colliders ---
 /** Building + wall footprints that block movement (AABBs, metres). */
 export const SOLID_FOOTPRINTS: Box2D[] = [
