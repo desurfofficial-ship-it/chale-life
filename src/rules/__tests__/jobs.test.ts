@@ -1,4 +1,4 @@
-import { describe, expect, it } from './testKit';
+import { describe, expect, it } from 'vitest';
 import { ACCRA_LEGAL_JOBS, findJobById } from '../../data/jobs';
 import { type WalletState } from '../economy';
 import {

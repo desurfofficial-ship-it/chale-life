@@ -1,4 +1,4 @@
-import { describe, expect, it } from './testKit';
+import { describe, expect, it } from 'vitest';
 import { findFoodById } from '../../data/foods';
 import {
   advanceStep,
