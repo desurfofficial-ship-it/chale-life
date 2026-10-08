@@ -6,7 +6,8 @@
  * `actPromptFor` what the button should say (every HUD notify), and on a
  * press calls `resolveAct` and commits the returned session back.
  *
- * Behaviour map (Task G-005, "earn-first at Daavi's" — G-004 logic, Daavi name):
+ * Behaviour map (Task G-006 — sleep closes the work → eat → rest loop;
+ * earn-first at Daavi's is G-004 logic, Daavi name from G-005):
  *   - At LOC-001 (Daavi's waakye joint), starter hustle NOT yet worked
  *       this run (JobState.completedIds): start HUSTLE_AUNTY_BA_STARTER —
  *       label "Help Daavi". One anti-soft-lock exception: too hungry to
@@ -19,6 +20,11 @@
  *       FOOD_WAAKYE (−₵12, applyMeal) when affordable and hunger < 100 —
  *       label "Buy waakye ₵12"; otherwise offer the hustle again
  *       (work-when-broke, full belly, hungry-but-cashless).
+ *   - At LOC-002 (the Starter Compound, G-006): sleep — free, +55 energy
+ *       (applySleep) and −8 hunger (you wake up hungry), label "Sleep".
+ *       Disabled with "Not tired yet" at energy ≥ SLEEP_GATE_ENERGY (90).
+ *       If a shift's next step ever targets the compound, Act stays on
+ *       the job track — sleep never steals a live step.
  *   - At LOC-003 (Maame Effia's provisions): buy FOOD_SACHET_WATER for
  *       ₵1 with drinkWater — label "Buy water ₵1".
  *   - Too tired / too hungry (canWork gates) or short of cash:
@@ -44,11 +50,14 @@ import {
 } from './jobs';
 import {
   applyMeal,
+  applySleep,
   applyWorkCost,
   CAN_WORK_MIN_ENERGY,
   CAN_WORK_MIN_HUNGER,
   canWork,
   drinkWater,
+  SLEEP_ENERGY_RESTORE,
+  SLEEP_GATE_ENERGY,
   type NeedsState,
 } from './needs';
 
@@ -84,14 +93,37 @@ export const WAAKYE_LOCATION_ID = 'LOC-001';
 /** Maame Effia's provisions store (src/data/locations.ts) — sachet water. */
 export const WATER_LOCATION_ID = 'LOC-003';
 
+/** The Starter Compound (src/data/locations.ts) — free sleep since G-006. */
+export const SLEEP_LOCATION_ID = 'LOC-002';
+
 const WAAKYE = findFoodById(FOOD_WAAKYE_ID)!;
 const SACHET_WATER = findFoodById(FOOD_SACHET_WATER_ID)!;
 
 interface Decision {
-  readonly kind: 'idle' | 'start' | 'advance' | 'waakye' | 'water';
+  readonly kind: 'idle' | 'start' | 'advance' | 'waakye' | 'water' | 'sleep';
   readonly label: string;
   readonly enabled: boolean;
   readonly reason?: string;
+}
+
+/** The live shift's next step — advance it when the body allows. */
+function decideAdvance(session: ActSession): Decision {
+  const verb = objectiveFor(session.job)?.actionVerb ?? 'Act';
+  const work = canWork(session.needs);
+  return work.ok
+    ? { kind: 'advance', label: verb, enabled: true }
+    : { kind: 'advance', label: verb, enabled: false, reason: work.reason };
+}
+
+/**
+ * True when the active shift's next step happens at this location
+ * (G-006: such a step outranks the location's own act — sleep never
+ * steals a live job step).
+ */
+function activeStepAt(session: ActSession, locationId: string): boolean {
+  if (session.job.activeId === null) return false;
+  const def = findJobById(session.job.activeId);
+  return def?.steps[session.job.step]?.locationId === locationId;
 }
 
 function decideAtWaakyeJoint(session: ActSession): Decision {
@@ -99,11 +131,7 @@ function decideAtWaakyeJoint(session: ActSession): Decision {
   const work = canWork(needs);
 
   if (job.activeId === AUNTY_BA_HUSTLE_ID) {
-    const verb = objectiveFor(job)?.actionVerb ?? 'Act';
-    if (!work.ok) {
-      return { kind: 'advance', label: verb, enabled: false, reason: work.reason };
-    }
-    return { kind: 'advance', label: verb, enabled: true };
+    return decideAdvance(session);
   }
 
   if (job.activeId) {
@@ -150,7 +178,7 @@ function decideAtWaakyeJoint(session: ActSession): Decision {
   if (canAfford(wallet, WAAKYE.priceGHS) && needs.hunger < 100) {
     return waakyeOffer;
   }
-  if (!work.ok) {
+  if (!canWork(needs).ok) {
     return {
       kind: 'start',
       label: 'Help Daavi',
@@ -174,9 +202,27 @@ function decideAtProvisions(session: ActSession): Decision {
   return { kind: 'water', label, enabled: true };
 }
 
+/**
+ * The Starter Compound (home): sleep is free and always on offer — even
+ * mid-shift (a nap between lifts never touches the job) — unless a shift
+ * step targets the compound itself, in which case Act works the step.
+ */
+function decideAtCompound(session: ActSession): Decision {
+  if (activeStepAt(session, SLEEP_LOCATION_ID)) {
+    return decideAdvance(session);
+  }
+  if (session.needs.energy >= SLEEP_GATE_ENERGY) {
+    return { kind: 'sleep', label: 'Sleep', enabled: false, reason: 'Not tired yet' };
+  }
+  return { kind: 'sleep', label: 'Sleep', enabled: true };
+}
+
 function decideAct(session: ActSession, nearLocationId: string | null): Decision {
   if (nearLocationId === WAAKYE_LOCATION_ID) {
     return decideAtWaakyeJoint(session);
+  }
+  if (nearLocationId === SLEEP_LOCATION_ID) {
+    return decideAtCompound(session);
   }
   if (nearLocationId === WATER_LOCATION_ID) {
     return decideAtProvisions(session);
@@ -275,6 +321,19 @@ export function resolveAct(
           job: session.job,
         },
         toast: `Sachet water — +${SACHET_WATER.energyRestore} energy (−${formatGHS(SACHET_WATER.priceGHS)})`,
+      };
+    }
+
+    case 'sleep': {
+      // Free, and the job (even a live one) rides through untouched —
+      // the store's identity check skips the wallet/job slices.
+      return {
+        session: {
+          wallet: session.wallet,
+          needs: applySleep(session.needs),
+          job: session.job,
+        },
+        toast: `Slept at the compound — +${SLEEP_ENERGY_RESTORE} energy`,
       };
     }
 
