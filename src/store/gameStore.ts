@@ -14,9 +14,18 @@
  *  - Gameplay rules (Agent 4) are pure `(state, input) => newState` functions;
  *    Engine wires them into this store when asked (G-001 handshake).
  *  - E-002: the HUD (src/ui) is mounted by src/app/App.tsx and fed from the
- *    slices below; the Act button calls `requestAct()` (no-op until the
- *    Earn-and-eat wiring task).
+ *    slices below.
+ *  - E-003: Earn-and-eat is wired. `requestAct()` samples the store into a
+ *    rules/act.ts ActSession, calls the pure `resolveAct` and commits the
+ *    result back; `nearLocationId` is the ≤2.5 m location probe the GameLoop
+ *    maintains; `toast` carries the last Act toast + its arrival timestamp
+ *    (auto-expires); `hasWorked` remembers a completed shift for the
+ *    objective marker. `tickNeedsDrain` is the store-side drain commit the
+ *    GameLoop calls ~1 Hz with the starter profile.
  */
+
+import { resolveAct, type ActSession } from '../rules/act';
+import { drainNeeds } from '../rules/needs';
 
 export interface Vec3 {
   x: number;
@@ -34,6 +43,12 @@ export interface GameState {
   job: { activeId: string | null; step: number };
   home: { tierId: string };
   time: { hour: number };
+  /** E-003: id of the location within NEAR_LOCATION_RADIUS_M, else null. */
+  nearLocationId: string | null;
+  /** E-003: last Act toast and the Date.now() it arrived (auto-expires). */
+  toast: { message: string | null; at: number };
+  /** E-003: true once any shift has been completed (objective marker). */
+  hasWorked: boolean;
 }
 
 type Listener = () => void;
@@ -49,6 +64,9 @@ const state: GameState = {
   job: { activeId: null, step: 0 },
   home: { tierId: 'single_room' },
   time: { hour: 7 },
+  nearLocationId: null,
+  toast: { message: null, at: 0 },
+  hasWorked: false,
 };
 
 const listeners = new Set<Listener>();
@@ -125,15 +143,105 @@ export function requestRecenter(): void {
   recenterToken += 1;
 }
 
+/* ───────────────────────── E-003 additions (Engine) ─────────────────────── */
+
+/** A location is "near" while the player stands within this radius (E-003). */
+export const NEAR_LOCATION_RADIUS_M = 2.5;
 /**
- * HUD Act button → Engine handshake (E-002). Deliberately a NO-OP: the
- * Earn-and-eat wiring (startJob / advanceStep / applyMeal from src/rules,
- * committed here) is the NEXT task and will replace this body. Wiring the
- * button to a named store action now means that task touches only this
- * function — the HUD contract (`<Hud onAct={...} />`) stays frozen.
+ * Needs drain cadence: the GameLoop accumulates clamped dt and commits at
+ * most once per this many seconds (E-003: "commit at most ~1 Hz").
+ */
+export const NEEDS_DRAIN_INTERVAL_S = 1;
+/**
+ * Store-side toast linger. The HUD hides the toast after its own 2 s; the
+ * store clears a little later so a REPEATED identical message re-triggers
+ * the HUD's timer (null → message flip) instead of being swallowed.
+ */
+export const TOAST_LINGER_MS = 2200;
+
+/**
+ * Proximity write (E-003, called every frame by the GameLoop). No-op while
+ * the value is unchanged, so walking around never spams notifications —
+ * App's actPromptFor selectors only re-render on enter/leave.
+ */
+export function setNearLocationId(id: string | null): void {
+  if (state.nearLocationId === id) return;
+  state.nearLocationId = id;
+  notify();
+}
+
+let toastTimer: ReturnType<typeof setTimeout> | null = null;
+
+/** Commit an Act toast + arrival timestamp; schedule the store-side clear. */
+function pushToast(message: string): void {
+  const at = Date.now();
+  state.toast = { message, at };
+  if (toastTimer !== null) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toastTimer = null;
+    // Only clear OUR toast — a newer pushToast replaced the payload.
+    if (state.toast.at === at && state.toast.message !== null) {
+      state.toast = { message: null, at };
+      notify();
+    }
+  }, TOAST_LINGER_MS);
+}
+
+/**
+ * HUD Act button / keyboard Act key → Earn-and-eat handshake (E-003).
+ * Samples the store into a pure rules/act.ts ActSession, runs resolveAct
+ * against the current nearLocationId, and commits the returned wallet,
+ * needs and job slices back (identity-checked: resolveAct returns the SAME
+ * session when the act was disabled/refused, so a no-op press never
+ * notifies). Completing a shift latches `hasWorked` for the marker.
  */
 export function requestAct(): void {
-  // intentionally empty — see E-002 PR report (NEXT STEP)
+  const session: ActSession = {
+    wallet: { balanceGHS: state.wallet.balanceGHS },
+    needs: { hunger: state.needs.hunger, energy: state.needs.energy },
+    job: { activeId: state.job.activeId, step: state.job.step },
+  };
+  const hadActiveJob = session.job.activeId !== null;
+
+  const { session: next, toast } = resolveAct(session, state.nearLocationId);
+
+  let changed = false;
+  if (next.wallet !== session.wallet) {
+    state.wallet.balanceGHS = next.wallet.balanceGHS;
+    changed = true;
+  }
+  if (next.needs !== session.needs) {
+    state.needs.hunger = next.needs.hunger;
+    state.needs.energy = next.needs.energy;
+    changed = true;
+  }
+  if (next.job !== session.job) {
+    state.job.activeId = next.job.activeId;
+    state.job.step = next.job.step;
+    changed = true;
+  }
+  if (hadActiveJob && next.job.activeId === null) {
+    state.hasWorked = true;
+  }
+  if (toast) {
+    pushToast(toast);
+    changed = true;
+  }
+  if (changed) notify();
+}
+
+/**
+ * Store-side needs drain commit (E-003): the GameLoop accumulates clamped
+ * dt and calls this ~1 Hz with the starter profile (3 hunger / 2 energy per
+ * minute). dt ≤ 0 or > MAX_TICK_SECONDS leaves the state untouched (same
+ * frame-spike guard as drainNeeds), so a stuck clock can't nuke the needs.
+ */
+export function tickNeedsDrain(dtSeconds: number): void {
+  const next = drainNeeds(state.needs, dtSeconds, 'starter');
+  if (next === state.needs) return; // guard tripped — nothing to commit
+  state.needs.hunger = next.hunger;
+  state.needs.energy = next.energy;
+  notify();
 }
 
 export interface HudSnapshot {

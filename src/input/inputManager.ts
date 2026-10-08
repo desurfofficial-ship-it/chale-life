@@ -10,7 +10,7 @@
  * place. No window globals: only event listeners, cleaned up on dispose.
  */
 
-import { movementInput } from '../store/gameStore';
+import { movementInput, requestAct } from '../store/gameStore';
 
 /** Fraction of full deflection ignored before the stick reports movement. */
 export const JOYSTICK_DEAD_ZONE = 0.12;
@@ -37,6 +37,14 @@ const KEY_MAP: Record<string, 'up' | 'down' | 'left' | 'right'> = {
   ArrowRight: 'right',
 };
 
+/* ── Keyboard Act (E-003): E / Space fire requestAct for desktop testing ── */
+
+const ACT_KEYS: ReadonlySet<string> = new Set(['KeyE', 'Space']);
+/** Ignore key ghosts / double taps: one Act per this window (button taps are
+ * handled by the HUD itself; this path is keyboard-only). */
+const ACT_DEBOUNCE_MS = 250;
+let lastActAt = 0;
+
 const pressed = new Set<string>();
 
 function syncKeyboard(): void {
@@ -57,6 +65,16 @@ function syncKeyboard(): void {
 }
 
 function onKeyDown(e: KeyboardEvent): void {
+  if (ACT_KEYS.has(e.code)) {
+    // Space would scroll the page or re-click a focused button — eat it.
+    e.preventDefault();
+    if (e.repeat) return; // held-key auto-repeat never spams Acts
+    const now = performance.now();
+    if (now - lastActAt < ACT_DEBOUNCE_MS) return;
+    lastActAt = now;
+    requestAct();
+    return;
+  }
   const dir = KEY_MAP[e.code];
   if (!dir) return;
   if (e.code.startsWith('Arrow')) e.preventDefault(); // stop page scrolling
