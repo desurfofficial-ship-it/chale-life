@@ -19,9 +19,13 @@
  *    rules/act.ts ActSession, calls the pure `resolveAct` and commits the
  *    result back; `nearLocationId` is the ≤2.5 m location probe the GameLoop
  *    maintains; `toast` carries the last Act toast + its arrival timestamp
- *    (auto-expires); `hasWorked` remembers a completed shift for the
- *    objective marker. `tickNeedsDrain` is the store-side drain commit the
+ *    (auto-expires). `tickNeedsDrain` is the store-side drain commit the
  *    GameLoop calls ~1 Hz with the starter profile.
+ *  - E-004: the job slice is `{ activeId, step, completedIds }` —
+ *    completedIds is the run's completed-shift history (G-004 earn-first
+ *    flag) and the ONE source of truth for "worked before"; the E-003
+ *    `hasWorked` latch is retired (the objective marker reads
+ *    completedIds.length).
  */
 
 import { resolveAct, type ActSession } from '../rules/act';
@@ -40,15 +44,18 @@ export interface GameState {
   };
   wallet: { balanceGHS: number };
   needs: { hunger: number; energy: number };
-  job: { activeId: string | null; step: number };
+  /**
+   * E-004: completedIds = ids of shifts fully worked this run (G-004).
+   * readonly like the rules' JobState — the store replaces the reference,
+   * it never mutates the array in place.
+   */
+  job: { activeId: string | null; step: number; completedIds: readonly string[] };
   home: { tierId: string };
   time: { hour: number };
   /** E-003: id of the location within NEAR_LOCATION_RADIUS_M, else null. */
   nearLocationId: string | null;
   /** E-003: last Act toast and the Date.now() it arrived (auto-expires). */
   toast: { message: string | null; at: number };
-  /** E-003: true once any shift has been completed (objective marker). */
-  hasWorked: boolean;
 }
 
 type Listener = () => void;
@@ -61,12 +68,11 @@ const state: GameState = {
   // the waakye loop matters. Engine spawns the player onto LOC-002 at boot
   // via src/engine/spawn.ts; the origin here is just the pre-spawn neutral.
   needs: { hunger: 72, energy: 80 },
-  job: { activeId: null, step: 0 },
+  job: { activeId: null, step: 0, completedIds: [] },
   home: { tierId: 'single_room' },
   time: { hour: 7 },
   nearLocationId: null,
   toast: { message: null, at: 0 },
-  hasWorked: false,
 };
 
 const listeners = new Set<Listener>();
@@ -189,19 +195,25 @@ function pushToast(message: string): void {
 
 /**
  * HUD Act button / keyboard Act key → Earn-and-eat handshake (E-003).
- * Samples the store into a pure rules/act.ts ActSession, runs resolveAct
- * against the current nearLocationId, and commits the returned wallet,
- * needs and job slices back (identity-checked: resolveAct returns the SAME
- * session when the act was disabled/refused, so a no-op press never
- * notifies). Completing a shift latches `hasWorked` for the marker.
+ * Samples the store into a pure rules/act.ts ActSession (including the
+ * completedIds run history — G-004 earn-first), runs resolveAct against the
+ * current nearLocationId, and commits the returned wallet, needs and job
+ * slices back (identity-checked: resolveAct returns the SAME session when
+ * the act was disabled/refused, so a no-op press never notifies). The
+ * returned completedIds array is stored by reference: rules hand back the
+ * SAME array while a shift just advances (no re-render churn) and a fresh,
+ * deduped array only when a payout latches a shift (E-004).
  */
 export function requestAct(): void {
   const session: ActSession = {
     wallet: { balanceGHS: state.wallet.balanceGHS },
     needs: { hunger: state.needs.hunger, energy: state.needs.energy },
-    job: { activeId: state.job.activeId, step: state.job.step },
+    job: {
+      activeId: state.job.activeId,
+      step: state.job.step,
+      completedIds: state.job.completedIds,
+    },
   };
-  const hadActiveJob = session.job.activeId !== null;
 
   const { session: next, toast } = resolveAct(session, state.nearLocationId);
 
@@ -218,10 +230,10 @@ export function requestAct(): void {
   if (next.job !== session.job) {
     state.job.activeId = next.job.activeId;
     state.job.step = next.job.step;
+    // G-004 run history: rules return the same array while a shift advances
+    // and a fresh deduped array when completeJob latches a payout.
+    state.job.completedIds = next.job.completedIds ?? [];
     changed = true;
-  }
-  if (hadActiveJob && next.job.activeId === null) {
-    state.hasWorked = true;
   }
   if (toast) {
     pushToast(toast);

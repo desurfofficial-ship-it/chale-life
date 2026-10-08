@@ -19,8 +19,9 @@ placeholder (60 × 60 m bounds, no obstacles) until W-001 lands.
 - `ObjectiveMarker.tsx` — glowing ground ring + faint beam (2 draw calls when
   visible, 0 when hidden, no `<Html>`, no re-renders) at the active job step's
   location; falls back to LOC-001 until the player's first completed shift
-  (`hasWorked`). Step→location comes from `JobStep.locationId`, with a small
-  interactable-id fallback map for untagged steps.
+  (empty `job.completedIds` — E-004's run history, the retired `hasWorked`
+  latch's replacement). Step→location comes from `JobStep.locationId`, with a
+  small interactable-id fallback map for untagged steps.
 - `spawn.ts` — resolveSpawn/initializePlayerSpawn (E-002): picks the starter
   compound gate (LOC-002), guarantees not-inside-collider, commits at boot.
 - GameLoop systems (E-003): nearest-location probe (≤2.5 m, write-on-change)

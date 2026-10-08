@@ -1,11 +1,14 @@
 /**
- * Store-level Earn-and-eat tests (E-003). The store is a module singleton,
- * so this file runs ONE deliberately ordered session:
+ * Store-level Earn-and-eat tests (E-003, updated for the E-004 job slice).
+ * The store is a module singleton, so this file runs ONE deliberately
+ * ordered session:
  *
  *   defaults → Act far from any location (no-op) → proximity notify-on-change
  *   → the ₵20 → ₵35 → ₵23 loop at LOC-001 → sachet water at LOC-003 with
  *   toast timestamp + expiry → needs drain (guards, starter rate, zero clamp)
  *
+ * The drain-to-60 earn-first session lives in its own file
+ * (`gameStoreEarnFirst.test.ts`) so both start from a pristine store.
  * Vitest isolates module registries per FILE, so importing gameStore here
  * starts pristine: ₵20 / hunger 72 / energy 80 / no job / near null.
  */
@@ -30,10 +33,9 @@ describe('gameStore: E-003 defaults', () => {
     const s = getState();
     expect(s.wallet.balanceGHS).toBe(20);
     expect(s.needs).toEqual({ hunger: 72, energy: 80 });
-    expect(s.job).toEqual({ activeId: null, step: 0 });
+    expect(s.job).toEqual({ activeId: null, step: 0, completedIds: [] });
     expect(s.nearLocationId).toBeNull();
     expect(s.toast).toEqual({ message: null, at: 0 });
-    expect(s.hasWorked).toBe(false);
   });
 
   it('requestAct far from any location is a full no-op (no commit, no notify, no toast)', () => {
@@ -48,9 +50,8 @@ describe('gameStore: E-003 defaults', () => {
 
     const s = getState();
     expect(s.wallet.balanceGHS).toBe(20);
-    expect(s.job).toEqual({ activeId: null, step: 0 });
+    expect(s.job).toEqual({ activeId: null, step: 0, completedIds: [] });
     expect(s.toast.message).toBeNull();
-    expect(s.hasWorked).toBe(false);
   });
 
   it('setNearLocationId notifies only when the value CHANGES', () => {
@@ -76,22 +77,21 @@ describe('gameStore: the ₵20 → ₵35 → ₵23 loop at Aunty Ba’s joint', 
   it('Act 1 starts the starter hustle at step 0 for ₵0 capital', () => {
     requestAct();
     const s = getState();
-    expect(s.job).toEqual({ activeId: AUNTY_BA, step: 0 });
+    expect(s.job).toEqual({ activeId: AUNTY_BA, step: 0, completedIds: [] });
     expect(s.wallet.balanceGHS).toBe(20); // zero-capital hustle
     expect(s.toast.message).toContain('Job accepted');
     expect(s.toast.at).toBeGreaterThan(0);
-    expect(s.hasWorked).toBe(false);
   });
 
   it('Act 2 and Act 3 advance steps 1/3 → 2/3 with step toasts', () => {
     requestAct();
     let s = getState();
-    expect(s.job).toEqual({ activeId: AUNTY_BA, step: 1 });
+    expect(s.job).toEqual({ activeId: AUNTY_BA, step: 1, completedIds: [] });
     expect(s.toast.message).toContain('Two more lifts');
 
     requestAct();
     s = getState();
-    expect(s.job).toEqual({ activeId: AUNTY_BA, step: 2 });
+    expect(s.job).toEqual({ activeId: AUNTY_BA, step: 2, completedIds: [] });
     expect(s.toast.message).toContain('One more lift');
     expect(s.wallet.balanceGHS).toBe(20); // pay only on completion
   });
@@ -103,9 +103,9 @@ describe('gameStore: the ₵20 → ₵35 → ₵23 loop at Aunty Ba’s joint', 
     expect(s.wallet.balanceGHS).toBe(35);
     // work cost: −8 hunger, −18 energy from the starter 72/80
     expect(s.needs).toEqual({ hunger: 64, energy: 62 });
-    // shift cleared, hasWorked latched for the objective marker
-    expect(s.job).toEqual({ activeId: null, step: 0 });
-    expect(s.hasWorked).toBe(true);
+    // shift cleared, the run latched the completed hustle (G-004 earn-first
+    // flag — the ONE "worked before" source of truth since E-004)
+    expect(s.job).toEqual({ activeId: null, step: 0, completedIds: [AUNTY_BA] });
     expect(s.toast.message).toContain('+₵15');
   });
 
@@ -117,7 +117,7 @@ describe('gameStore: the ₵20 → ₵35 → ₵23 loop at Aunty Ba’s joint', 
     expect(s.needs.hunger).toBe(100);
     expect(s.needs.energy).toBe(62);
     expect(s.toast.message).toContain('Waakye');
-    expect(s.hasWorked).toBe(true); // unchanged by eating
+    expect(s.job.completedIds).toEqual([AUNTY_BA]); // unchanged by eating
   });
 });
 

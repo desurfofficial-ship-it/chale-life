@@ -4,9 +4,10 @@
  * objective:
  *   - active job → the active step's location (steps carry `locationId`
  *     from src/data/jobs.ts; the starter hustle is fully tagged)
- *   - no job and the player has NEVER worked → LOC-001, Aunty Ba's joint
- *     (the "go find work" beacon a brand-new guest walks towards)
- *   - otherwise → hidden (worked already, nothing pending).
+ *   - no job and nothing worked this run (job.completedIds empty, E-004 —
+ *     the retired hasWorked latch's replacement) → LOC-001, Aunty Ba's
+ *     joint (the "go find work" beacon a brand-new guest walks towards)
+ *   - otherwise → hidden (a completed shift sits in completedIds).
  *
  * Budget & rules:
  *   - exactly 2 draw calls when visible (ring + beam), 0 when hidden
@@ -59,7 +60,8 @@ export function ObjectiveMarker() {
         target =
           step.locationId ?? INTERACTABLE_TO_LOCATION[step.targetInteractableId] ?? null;
       }
-    } else if (!s.hasWorked) {
+    } else if (s.job.completedIds.length === 0) {
+      // E-004: nothing worked this run — keep the "find work" beacon on.
       target = WAAKYE_LOCATION_ID;
     }
 
