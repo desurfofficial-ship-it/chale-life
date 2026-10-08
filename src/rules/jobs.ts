@@ -2,9 +2,11 @@
  * Job state-machine rules — start, advance step, complete with payout.
  *
  * CONTRACT: pure TypeScript. No three.js, no React, no store imports.
- * JobState mirrors the store's `job: { activeId, step }` slice; WalletState
- * comes from economy.ts. All functions return new state — the Engine owns
- * the store and decides when to commit.
+ * JobState mirrors the store's `job: { activeId, step }` slice plus an
+ * optional `completedIds` run-history flag (G-004) that the store threads
+ * from E-004 on — undefined reads as [] so the current store slice keeps
+ * compiling. WalletState comes from economy.ts. All functions return new
+ * state — the Engine owns the store and decides when to commit.
  *
  * Step semantics: `step` is the 0-based index of the NEXT step to perform
  * (matches the store's job.step starting at 0). When `step` reaches
@@ -24,11 +26,37 @@ import {
 export interface JobState {
   readonly activeId: string | null;
   readonly step: number;
+  /**
+   * Ids of shifts fully worked this run — deduped by completeJob.
+   * Optional so the store's current `{ activeId, step }` slice keeps
+   * compiling until E-004 threads the flag; undefined reads as [].
+   */
+  readonly completedIds?: readonly string[];
 }
 
-/** Starter job state — matches the store default (nothing active). */
+/** Starter job state — matches the store default (nothing active, nothing done). */
 export function createStarterJobState(): JobState {
-  return { activeId: null, step: 0 };
+  return { activeId: null, step: 0, completedIds: [] };
+}
+
+/** This run's completed shift ids — undefined counts as []. */
+export function completedIdsOf(state: JobState): readonly string[] {
+  return state.completedIds ?? [];
+}
+
+/** true when this job has already been fully worked this run (G-004). */
+export function isJobCompleted(state: JobState, jobId: string): boolean {
+  return completedIdsOf(state).includes(jobId);
+}
+
+/** Carry the run's completed-shift history onto the next JobState (optional-safe). */
+function withHistory(
+  state: JobState,
+  next: { activeId: string | null; step: number }
+): JobState {
+  return state.completedIds === undefined
+    ? next
+    : { ...next, completedIds: state.completedIds };
 }
 
 export interface WorkContext {
@@ -128,7 +156,7 @@ export function startJob(
   }
   return {
     ok: true,
-    job: { activeId: def.id, step: 0 },
+    job: withHistory(state, { activeId: def.id, step: 0 }),
     wallet: nextWallet,
     message: `Job Accepted: ${def.title} (Pay: ${formatGHS(def.payGHS)}). Step 1/${def.steps.length}: ${def.steps[0].instruction}`,
   };
@@ -173,14 +201,14 @@ export function advanceStep(state: JobState, interactableId?: string): AdvanceSt
   if (nextStep < def.steps.length) {
     return {
       ok: true,
-      job: { activeId: def.id, step: nextStep },
+      job: withHistory(state, { activeId: def.id, step: nextStep }),
       completed: false,
       message: `Step ${nextStep + 1}/${def.steps.length}: ${currentStep.completionMessage}`,
     };
   }
   return {
     ok: true,
-    job: { activeId: def.id, step: nextStep },
+    job: withHistory(state, { activeId: def.id, step: nextStep }),
     completed: true,
     message: currentStep.completionMessage,
   };
@@ -195,8 +223,10 @@ export interface CompleteJobResult {
 }
 
 /**
- * Pay out a fully-worked shift exactly once and clear the active job.
- * Refuses while steps are still pending (wallet untouched).
+ * Pay out a fully-worked shift exactly once, clear the active job and
+ * latch the finished id into `completedIds` (no duplicates) so the run
+ * remembers the shift was done (G-004 earn-first). Refuses while steps
+ * are still pending (wallet untouched).
  */
 export function completeJob(state: JobState, wallet: WalletState): CompleteJobResult {
   const def = state.activeId ? findJobById(state.activeId) : undefined;
@@ -218,9 +248,13 @@ export function completeJob(state: JobState, wallet: WalletState): CompleteJobRe
       message: `Shift not finished — step ${state.step + 1}/${def.steps.length} pending.`,
     };
   }
+  const completed = completedIdsOf(state);
+  const nextCompleted = completed.includes(def.id)
+    ? completed
+    : [...completed, def.id];
   return {
     ok: true,
-    job: createStarterJobState(),
+    job: { ...createStarterJobState(), completedIds: nextCompleted },
     wallet: pay(wallet, def.payGHS),
     payoutGHS: def.payGHS,
     message: `${def.steps[def.steps.length - 1].completionMessage} (+${formatGHS(def.payGHS)} Cash Paid!)`,

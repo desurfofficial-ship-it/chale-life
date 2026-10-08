@@ -20,11 +20,12 @@ const starterSession = (): ActSession => ({
   job: createStarterJobState(),
 });
 
-/** The session right after the starter hustle paid out (₵35, work toll taken). */
+/** The session right after the starter hustle paid out (₵35, work toll taken,
+ *   the run remembers the shift — G-004 completedIds). */
 const paidSession = (): ActSession => ({
   wallet: { balanceGHS: 35 },
   needs: { hunger: 64, energy: 62 },
-  job: { activeId: null, step: 0 },
+  job: { activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] },
 });
 
 describe('act: data contract (G-002 item 2)', () => {
@@ -62,7 +63,11 @@ describe('act: the first earn-and-eat loop (₵20 → ₵35 → ₵23)', () => {
     const started = resolveAct(session, WAAKYE_LOCATION_ID);
     expect(started.toast).toContain('Job accepted');
     session = started.session;
-    expect(session.job).toEqual({ activeId: AUNTY_BA_HUSTLE_ID, step: 0 });
+    expect(session.job).toEqual({
+      activeId: AUNTY_BA_HUSTLE_ID,
+      step: 0,
+      completedIds: [], // run history rides along through the shift
+    });
     expect(session.wallet.balanceGHS).toBe(20);
 
     // Acts 2 and 3 — carry two stacks of pans.
@@ -85,7 +90,11 @@ describe('act: the first earn-and-eat loop (₵20 → ₵35 → ₵23)', () => {
     session = final.session;
     expect(session.wallet.balanceGHS).toBe(35);
     expect(session.needs).toEqual({ hunger: 64, energy: 62 }); // −8 hunger / −18 energy
-    expect(session.job).toEqual({ activeId: null, step: 0 });
+    expect(session.job).toEqual({
+      activeId: null,
+      step: 0,
+      completedIds: [AUNTY_BA_HUSTLE_ID], // the run now remembers the hustle
+    });
   });
 
   it('after the payout, the joint sells waakye: −₵12, hunger up 45 (clamped)', () => {
@@ -98,7 +107,11 @@ describe('act: the first earn-and-eat loop (₵20 → ₵35 → ₵23)', () => {
     expect(result.session.wallet.balanceGHS).toBe(23);
     expect(result.session.needs.hunger).toBe(100); // 64 + 45, clamped
     expect(result.session.needs.energy).toBe(62); // applyMeal touches hunger only
-    expect(result.session.job).toEqual({ activeId: null, step: 0 });
+    expect(result.session.job).toEqual({
+      activeId: null,
+      step: 0,
+      completedIds: [AUNTY_BA_HUSTLE_ID],
+    });
   });
 
   it('never lets the wallet go negative across the whole loop', () => {
@@ -108,6 +121,102 @@ describe('act: the first earn-and-eat loop (₵20 → ₵35 → ₵23)', () => {
       expect(session.wallet.balanceGHS).toBeGreaterThanOrEqual(0);
     }
     expect(session.wallet.balanceGHS).toBe(23);
+  });
+});
+
+describe('act: earn-first at Aunty Ba\u2019s (G-004)', () => {
+  it('spawn-drained hunger (60) still gets the hustle FIRST — no hunger proxy', () => {
+    // A few spawn minutes of starter drain: hunger 72 -> 60. The old
+    // HUNGER_TOPUP_BELOW proxy flipped the joint to waakye here, so a live
+    // player could never see ₵35. With the completedIds flag it must not.
+    const session: ActSession = {
+      wallet: createStarterWallet(),
+      needs: { hunger: 60, energy: 76 },
+      job: createStarterJobState(),
+    };
+    const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
+    expect(prompt.label).toBe('Help Aunty Ba');
+    expect(prompt.enabled).toBe(true);
+
+    const result = resolveAct(session, WAAKYE_LOCATION_ID);
+    expect(result.session.job.activeId).toBe(AUNTY_BA_HUSTLE_ID);
+    expect(result.session.wallet.balanceGHS).toBe(20); // nothing spent
+  });
+
+  it('undefined completedIds (pre-E-004 store slice) reads as [] — hustle first', () => {
+    const session: ActSession = {
+      wallet: createStarterWallet(),
+      needs: { hunger: 60, energy: 76 },
+      job: { activeId: null, step: 0 }, // no completedIds key at all
+    };
+    const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
+    expect(prompt.label).toBe('Help Aunty Ba');
+    expect(prompt.enabled).toBe(true);
+  });
+
+  it('starving at ₵20 before any hustle gets waakye — the anti-soft-lock', () => {
+    const session: ActSession = {
+      wallet: { balanceGHS: 20 },
+      needs: { hunger: 5, energy: 80 }, // energy clears canWork, hunger does not
+      job: createStarterJobState(),
+    };
+    const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
+    expect(prompt.label).toBe(`Buy waakye ${formatGHS(12)}`);
+    expect(prompt.enabled).toBe(true);
+
+    const result = resolveAct(session, WAAKYE_LOCATION_ID);
+    expect(result.toast).toContain('Waakye');
+    expect(result.session.wallet.balanceGHS).toBe(8);
+    expect(result.session.needs.hunger).toBe(50); // 5 + 45
+
+    // Fed, the hustle is offered again — the escape actually unblocks work.
+    const next = actPromptFor(result.session, WAAKYE_LOCATION_ID);
+    expect(next.label).toBe('Help Aunty Ba');
+    expect(next.enabled).toBe(true);
+  });
+
+  it('starving and broke still refuses the hustle with the reason (no free meal)', () => {
+    const session: ActSession = {
+      wallet: { balanceGHS: 5 },
+      needs: { hunger: 5, energy: 80 },
+      job: createStarterJobState(),
+    };
+    const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
+    expect(prompt.enabled).toBe(false);
+    expect(prompt.reason).toContain('Too hungry');
+  });
+
+  it('completed + full belly (hunger 100) offers the hustle again, not waakye', () => {
+    const session: ActSession = {
+      wallet: { balanceGHS: 35 },
+      needs: { hunger: 100, energy: 62 },
+      job: { activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] },
+    };
+    const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
+    expect(prompt.label).toBe('Help Aunty Ba');
+    expect(prompt.enabled).toBe(true);
+  });
+
+  it('working the hustle again after completion keeps completedIds deduped', () => {
+    // Broke after the first shift — Aunty Ba re-hires, and a second full
+    // shift must NOT grow completedIds to two entries.
+    let session: ActSession = {
+      wallet: { balanceGHS: 5 },
+      needs: { hunger: 64, energy: 62 },
+      job: { activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] },
+    };
+    expect(actPromptFor(session, WAAKYE_LOCATION_ID).label).toBe('Help Aunty Ba');
+
+    session = resolveAct(session, WAAKYE_LOCATION_ID).session; // re-accept
+    expect(session.job.activeId).toBe(AUNTY_BA_HUSTLE_ID);
+    expect(session.job.completedIds).toEqual([AUNTY_BA_HUSTLE_ID]); // preserved
+
+    for (let i = 0; i < 3; i++) {
+      session = resolveAct(session, WAAKYE_LOCATION_ID).session;
+    }
+    expect(session.wallet.balanceGHS).toBe(20); // 5 + ₵15, zero-capital loop
+    expect(session.job.activeId).toBeNull();
+    expect(session.job.completedIds).toEqual([AUNTY_BA_HUSTLE_ID]); // still ONE
   });
 });
 
@@ -198,7 +307,7 @@ describe('act: disabled cases', () => {
     const session: ActSession = {
       wallet: { balanceGHS: 5 },
       needs: { hunger: 64, energy: 62 },
-      job: createStarterJobState(),
+      job: { activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] },
     };
     const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
     expect(prompt.label).toBe('Help Aunty Ba');
@@ -251,6 +360,15 @@ describe('act: prompt and resolution agree', () => {
       [paidSession(), WAAKYE_LOCATION_ID],
       [paidSession(), null],
       [paidSession(), 'LOC-004'],
+      [
+        // G-004 anti-soft-lock: starving with cash before any hustle.
+        {
+          wallet: { balanceGHS: 20 },
+          needs: { hunger: 5, energy: 80 },
+          job: createStarterJobState(),
+        },
+        WAAKYE_LOCATION_ID,
+      ],
       [
         {
           wallet: { balanceGHS: 5 },
