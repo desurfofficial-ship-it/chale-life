@@ -6,14 +6,19 @@
  * `actPromptFor` what the button should say (every HUD notify), and on a
  * press calls `resolveAct` and commits the returned session back.
  *
- * Behaviour map (Task G-002):
- *   - At LOC-001 (Aunty Ba's waakye joint), hustle not started:
- *       start HUSTLE_AUNTY_BA_STARTER — label "Help Aunty Ba".
+ * Behaviour map (Task G-004, "earn-first at Aunty Ba's"):
+ *   - At LOC-001 (Aunty Ba's waakye joint), starter hustle NOT yet worked
+ *       this run (JobState.completedIds): start HUSTLE_AUNTY_BA_STARTER —
+ *       label "Help Aunty Ba". One anti-soft-lock exception: too hungry to
+ *       work (energy fine, hunger < CAN_WORK_MIN_HUNGER) with ₵12 in
+ *       pocket → waakye first, so hunger can never wall the hustle off.
  *   - At LOC-001 with that hustle active: advance one step; the final
  *       advance also completes the shift — +₵15 and the work
  *       energy/hunger cost (applyWorkCost).
- *   - At LOC-001 after the hustle, with ₵12: buy FOOD_WAAKYE (−₵12,
- *       applyMeal) — label "Buy waakye ₵12".
+ *   - At LOC-001 with the hustle already completed this run: buy
+ *       FOOD_WAAKYE (−₵12, applyMeal) when affordable and hunger < 100 —
+ *       label "Buy waakye ₵12"; otherwise offer the hustle again
+ *       (work-when-broke, full belly, hungry-but-cashless).
  *   - At LOC-003 (Maame Effia's provisions): buy FOOD_SACHET_WATER for
  *       ₵1 with drinkWater — label "Buy water ₵1".
  *   - Too tired / too hungry (canWork gates) or short of cash:
@@ -32,6 +37,7 @@ import { buy, canAfford, formatGHS, type WalletState } from './economy';
 import {
   advanceStep,
   completeJob,
+  isJobCompleted,
   objectiveFor,
   startJob,
   type JobState,
@@ -39,8 +45,9 @@ import {
 import {
   applyMeal,
   applyWorkCost,
+  CAN_WORK_MIN_ENERGY,
+  CAN_WORK_MIN_HUNGER,
   canWork,
-  createStarterNeeds,
   drinkWater,
   type NeedsState,
 } from './needs';
@@ -75,19 +82,6 @@ export const WAAKYE_LOCATION_ID = 'LOC-001';
 /** Maame Effia's provisions store (src/data/locations.ts) — sachet water. */
 export const WATER_LOCATION_ID = 'LOC-003';
 
-/**
- * Eat-first threshold: hunger below the starter level (72). "After the
- * hustle" needs a proxy because resolveAct is a stateless pure function —
- * completeJob clears JobState to the SAME { activeId: null, step: 0 } as a
- * fresh session, so a finished hustle is indistinguishable from an
- * unstarted one. "Has burned fuel since spawn" (hunger < starter hunger)
- * is that proxy: right after the ₵15 payout (hunger 72 − 8 = 64) the joint
- * sells waakye instead of restarting the hustle. Without it a guest at the
- * waakye joint could never eat — hunger death. Tune here if the design
- * ever grows real hustle history in the store.
- */
-const HUNGER_TOPUP_BELOW = createStarterNeeds().hunger;
-
 const WAAKYE = findFoodById(FOOD_WAAKYE_ID)!;
 const SACHET_WATER = findFoodById(FOOD_SACHET_WATER_ID)!;
 
@@ -120,16 +114,40 @@ function decideAtWaakyeJoint(session: ActSession): Decision {
     };
   }
 
-  // Eat-first: hunger below the starter level and cash in pocket —
-  // recover before the next shift (this is the "after the hustle" Act).
-  if (needs.hunger < HUNGER_TOPUP_BELOW && canAfford(wallet, WAAKYE.priceGHS)) {
-    return {
-      kind: 'waakye',
-      label: `Buy waakye ${formatGHS(WAAKYE.priceGHS)}`,
-      enabled: true,
-    };
+  const waakyeOffer: Decision = {
+    kind: 'waakye',
+    label: `Buy waakye ${formatGHS(WAAKYE.priceGHS)}`,
+    enabled: true,
+  };
+
+  // Earn-first (G-004): the starter hustle comes before food — tracked by
+  // JobState.completedIds, never by a hunger proxy (spawn drain used to
+  // push hunger under the old threshold within minutes, hiding ₵35).
+  if (!isJobCompleted(job, AUNTY_BA_HUSTLE_ID)) {
+    if (!work.ok) {
+      // canWork fails BECAUSE of hunger (energy clears its own gate) and
+      // waakye is in reach — eat, or hunger walls the hustle off forever.
+      const hungerBlocked =
+        needs.energy >= CAN_WORK_MIN_ENERGY &&
+        needs.hunger < CAN_WORK_MIN_HUNGER;
+      if (hungerBlocked && canAfford(wallet, WAAKYE.priceGHS)) {
+        return waakyeOffer;
+      }
+      return {
+        kind: 'start',
+        label: 'Help Aunty Ba',
+        enabled: false,
+        reason: work.reason,
+      };
+    }
+    return { kind: 'start', label: 'Help Aunty Ba', enabled: true };
   }
 
+  // Hustle already worked this run — the joint sells waakye when it makes
+  // sense (affordable, room to eat); otherwise Aunty Ba re-hires you.
+  if (canAfford(wallet, WAAKYE.priceGHS) && needs.hunger < 100) {
+    return waakyeOffer;
+  }
   if (!work.ok) {
     return {
       kind: 'start',

@@ -28,6 +28,11 @@
  * re-rendering unless one of its props actually changed (needs drain
  * commits ~1 Hz; hunger is a Hud-internal selector, not a prop, so a drain
  * tick alone does not re-render this component at all).
+ *
+ * E-004: the ActSession projection carries the job's `completedIds` run
+ * history, so the G-004 earn-first rules see a completed shift — after the
+ * payout the Act offers waakye instead of re-hiring. The array identity is
+ * stable while a shift advances; it flips only when a payout latches.
  */
 
 import { Canvas } from '@react-three/fiber';
@@ -78,6 +83,9 @@ export function App() {
   const energy = useStoreValue((s) => s.needs.energy);
   const activeId = useStoreValue((s) => s.job.activeId);
   const step = useStoreValue((s) => s.job.step);
+  // E-004: array identity is stable while a shift advances; it flips only on
+  // a payout latch, so this selector re-renders exactly when history changes.
+  const completedIds = useStoreValue((s) => s.job.completedIds);
   const nearLocationId = useStoreValue((s) => s.nearLocationId);
   const toastMessage = useStoreValue((s) => s.toast.message);
 
@@ -86,7 +94,7 @@ export function App() {
     {
       wallet: { balanceGHS: balance },
       needs: { hunger, energy },
-      job: { activeId, step },
+      job: { activeId, step, completedIds },
     },
     nearLocationId
   );

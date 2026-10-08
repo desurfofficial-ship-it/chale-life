@@ -4,8 +4,10 @@ import { type WalletState } from '../economy';
 import {
   advanceStep,
   completeJob,
+  completedIdsOf,
   createStarterJobState,
   evaluateRequirements,
+  isJobCompleted,
   objectiveFor,
   startJob,
   type JobState,
@@ -46,7 +48,11 @@ describe('jobs: start', () => {
   it('startJob activates the Aunty Ba starter hustle at step 0', () => {
     const result = startJob(createStarterJobState(), starterWallet(), 'HUSTLE_AUNTY_BA_STARTER');
     expect(result.ok).toBe(true);
-    expect(result.job).toEqual({ activeId: 'HUSTLE_AUNTY_BA_STARTER', step: 0 });
+    expect(result.job).toEqual({
+      activeId: 'HUSTLE_AUNTY_BA_STARTER',
+      step: 0,
+      completedIds: [], // starter history rides along (G-004)
+    });
     expect(result.message).toContain('Job Accepted');
   });
 
@@ -170,7 +176,11 @@ describe('jobs: complete with payout', () => {
     job = advanceStep(job).job;
     job = advanceStep(job).job;
     const result = completeJob(job, starterWallet());
-    expect(result.job).toEqual({ activeId: null, step: 0 });
+    expect(result.job).toEqual({
+      activeId: null,
+      step: 0,
+      completedIds: ['HUSTLE_AUNTY_BA_STARTER'], // run history latched (G-004)
+    });
   });
 
   it('completeJob refuses before all steps are done and leaves the wallet alone', () => {
@@ -187,6 +197,57 @@ describe('jobs: complete with payout', () => {
     const result = completeJob(createStarterJobState(), starterWallet());
     expect(result.ok).toBe(false);
     expect(result.message).toContain('No active job');
+  });
+});
+
+describe('jobs: completed-run history (G-004 completedIds)', () => {
+  it('starter state ships an empty history; helpers treat undefined as []', () => {
+    expect(createStarterJobState().completedIds).toEqual([]);
+    expect(completedIdsOf(createStarterJobState())).toEqual([]);
+    expect(completedIdsOf({ activeId: null, step: 0 })).toEqual([]); // pre-E-004 slice
+    expect(
+      isJobCompleted({ activeId: null, step: 0 }, 'HUSTLE_AUNTY_BA_STARTER')
+    ).toBe(false);
+  });
+
+  it('completeJob latches the finished id; working the same shift twice dedupes', () => {
+    let job = startJob(createStarterJobState(), starterWallet(), 'HUSTLE_AUNTY_BA_STARTER').job;
+    job = advanceStep(job).job;
+    job = advanceStep(job).job;
+    job = advanceStep(job).job;
+    const first = completeJob(job, starterWallet());
+    expect(first.ok).toBe(true);
+    expect(first.job.completedIds).toEqual(['HUSTLE_AUNTY_BA_STARTER']);
+
+    // Aunty Ba re-hires; a second full shift must NOT grow the set.
+    let again = startJob(first.job, starterWallet(), 'HUSTLE_AUNTY_BA_STARTER').job;
+    again = advanceStep(again).job;
+    again = advanceStep(again).job;
+    again = advanceStep(again).job;
+    const second = completeJob(again, starterWallet());
+    expect(second.ok).toBe(true);
+    expect(second.job.completedIds).toEqual(['HUSTLE_AUNTY_BA_STARTER']); // still ONE
+    expect(isJobCompleted(second.job, 'HUSTLE_AUNTY_BA_STARTER')).toBe(true);
+  });
+
+  it('startJob and advanceStep preserve the run history while a shift is live', () => {
+    const withHistory: JobState = {
+      activeId: null,
+      step: 0,
+      completedIds: ['JOB_TROTRO_MATE'],
+    };
+    const started = startJob(withHistory, starterWallet(), 'HUSTLE_AUNTY_BA_STARTER');
+    expect(started.job.completedIds).toEqual(['JOB_TROTRO_MATE']);
+    const advanced = advanceStep(started.job);
+    expect(advanced.job.completedIds).toEqual(['JOB_TROTRO_MATE']);
+  });
+
+  it('startJob and advanceStep keep undefined history undefined (optional-safe)', () => {
+    const legacy: JobState = { activeId: null, step: 0 }; // pre-E-004 store slice
+    const started = startJob(legacy, starterWallet(), 'HUSTLE_AUNTY_BA_STARTER');
+    expect(started.job.completedIds).toBeUndefined();
+    const advanced = advanceStep(started.job);
+    expect(advanced.job.completedIds).toBeUndefined();
   });
 });
 
