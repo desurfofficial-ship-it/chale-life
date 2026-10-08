@@ -29,7 +29,7 @@ const paidSession = (): ActSession => ({
 });
 
 describe('act: data contract (G-002 item 2)', () => {
-  it('every Aunty Ba step happens at LOC-001, a real location, for a ₵15 payout', () => {
+  it('every Daavi step happens at LOC-001, a real location, for a ₵15 payout', () => {
     const hustle = findJobById(AUNTY_BA_HUSTLE_ID)!;
     expect(hustle.payGHS).toBe(15);
     expect(hustle.steps.length).toBe(3);
@@ -47,12 +47,22 @@ describe('act: data contract (G-002 item 2)', () => {
     expect(findFoodById(FOOD_WAAKYE_ID)!.priceGHS).toBe(12);
     expect(findFoodById(FOOD_SACHET_WATER_ID)!.priceGHS).toBe(1);
   });
+
+  it('the waakye seller is Daavi (G-005 rename) — ids stay stable for the store', () => {
+    const hustle = findJobById(AUNTY_BA_HUSTLE_ID)!;
+    expect(hustle.employerName).toBe('Daavi');
+    expect(hustle.title).toBe('Help Daavi carry pans');
+    // The data keys never churn — store slices and completedIds survive.
+    expect(hustle.id).toBe('HUSTLE_AUNTY_BA_STARTER');
+    expect(hustle.steps.every((s) => s.stepId.startsWith('aunty_ba_'))).toBe(true);
+    expect(findFoodById(FOOD_WAAKYE_ID)!.summary).toContain('Daavi');
+  });
 });
 
 describe('act: the first earn-and-eat loop (₵20 → ₵35 → ₵23)', () => {
-  it('starts fresh: "Help Aunty Ba" offered at the waakye joint', () => {
+  it('starts fresh: "Help Daavi" offered at the waakye joint', () => {
     const prompt = actPromptFor(starterSession(), WAAKYE_LOCATION_ID);
-    expect(prompt.label).toBe('Help Aunty Ba');
+    expect(prompt.label).toBe('Help Daavi');
     expect(prompt.enabled).toBe(true);
   });
 
@@ -84,7 +94,7 @@ describe('act: the first earn-and-eat loop (₵20 → ₵35 → ₵23)', () => {
     // The button reads the step verb while the hustle is active.
     expect(actPromptFor(session, WAAKYE_LOCATION_ID).label).toBe('Carry Pans');
 
-    // Act 4 — final lift: Aunty Ba pays ₵15 and the shift takes its toll.
+    // Act 4 — final lift: Daavi pays ₵15 and the shift takes its toll.
     const final = resolveAct(session, WAAKYE_LOCATION_ID);
     expect(final.toast).toContain('+₵15');
     session = final.session;
@@ -124,7 +134,7 @@ describe('act: the first earn-and-eat loop (₵20 → ₵35 → ₵23)', () => {
   });
 });
 
-describe('act: earn-first at Aunty Ba\u2019s (G-004)', () => {
+describe('act: earn-first at Daavi\u2019s (G-004)', () => {
   it('spawn-drained hunger (60) still gets the hustle FIRST — no hunger proxy', () => {
     // A few spawn minutes of starter drain: hunger 72 -> 60. The old
     // HUNGER_TOPUP_BELOW proxy flipped the joint to waakye here, so a live
@@ -135,7 +145,7 @@ describe('act: earn-first at Aunty Ba\u2019s (G-004)', () => {
       job: createStarterJobState(),
     };
     const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
-    expect(prompt.label).toBe('Help Aunty Ba');
+    expect(prompt.label).toBe('Help Daavi');
     expect(prompt.enabled).toBe(true);
 
     const result = resolveAct(session, WAAKYE_LOCATION_ID);
@@ -150,7 +160,7 @@ describe('act: earn-first at Aunty Ba\u2019s (G-004)', () => {
       job: { activeId: null, step: 0 }, // no completedIds key at all
     };
     const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
-    expect(prompt.label).toBe('Help Aunty Ba');
+    expect(prompt.label).toBe('Help Daavi');
     expect(prompt.enabled).toBe(true);
   });
 
@@ -171,7 +181,7 @@ describe('act: earn-first at Aunty Ba\u2019s (G-004)', () => {
 
     // Fed, the hustle is offered again — the escape actually unblocks work.
     const next = actPromptFor(result.session, WAAKYE_LOCATION_ID);
-    expect(next.label).toBe('Help Aunty Ba');
+    expect(next.label).toBe('Help Daavi');
     expect(next.enabled).toBe(true);
   });
 
@@ -193,19 +203,19 @@ describe('act: earn-first at Aunty Ba\u2019s (G-004)', () => {
       job: { activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] },
     };
     const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
-    expect(prompt.label).toBe('Help Aunty Ba');
+    expect(prompt.label).toBe('Help Daavi');
     expect(prompt.enabled).toBe(true);
   });
 
   it('working the hustle again after completion keeps completedIds deduped', () => {
-    // Broke after the first shift — Aunty Ba re-hires, and a second full
+    // Broke after the first shift — Daavi re-hires, and a second full
     // shift must NOT grow completedIds to two entries.
     let session: ActSession = {
       wallet: { balanceGHS: 5 },
       needs: { hunger: 64, energy: 62 },
       job: { activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] },
     };
-    expect(actPromptFor(session, WAAKYE_LOCATION_ID).label).toBe('Help Aunty Ba');
+    expect(actPromptFor(session, WAAKYE_LOCATION_ID).label).toBe('Help Daavi');
 
     session = resolveAct(session, WAAKYE_LOCATION_ID).session; // re-accept
     expect(session.job.activeId).toBe(AUNTY_BA_HUSTLE_ID);
@@ -287,7 +297,7 @@ describe('act: disabled cases', () => {
       job: createStarterJobState(),
     };
     const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
-    expect(prompt.label).toBe('Help Aunty Ba');
+    expect(prompt.label).toBe('Help Daavi');
     expect(prompt.enabled).toBe(false);
     expect(prompt.reason).toContain('Too tired');
   });
@@ -303,14 +313,14 @@ describe('act: disabled cases', () => {
     expect(prompt.reason).toContain('Too hungry');
   });
 
-  it('broke after the hustle? Aunty Ba still offers the hustle (work-when-broke)', () => {
+  it('broke after the hustle? Daavi still offers the hustle (work-when-broke)', () => {
     const session: ActSession = {
       wallet: { balanceGHS: 5 },
       needs: { hunger: 64, energy: 62 },
       job: { activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] },
     };
     const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
-    expect(prompt.label).toBe('Help Aunty Ba');
+    expect(prompt.label).toBe('Help Daavi');
     expect(prompt.enabled).toBe(true);
 
     const result = resolveAct(session, WAAKYE_LOCATION_ID);

@@ -14,6 +14,7 @@
  * `payGHS` once and clears the active job.
  */
 
+import { findFoodById, FOOD_WAAKYE_ID } from '../data/foods';
 import { findJobById, type JobDefinition } from '../data/jobs';
 import {
   buy,
@@ -282,4 +283,25 @@ export function objectiveFor(state: JobState): ObjectiveInfo | null {
     actionVerb: step.actionVerb,
     targetInteractableId: step.targetInteractableId,
   };
+}
+
+/**
+ * Idle-state objective line — what the HUD card shows while no shift is
+ * active (i.e. whenever objectiveFor(state) is null). Pure text; the HUD
+ * renders it verbatim.
+ *
+ * G-005: the seller is "Daavi" (display rename only — the job id stays
+ * HUSTLE_AUNTY_BA_STARTER and LOC-001 is untouched, so the store and
+ * completedIds don't churn).
+ *
+ *   - Starter hustle not yet worked this run (completedIds empty or without
+ *       the hustle — undefined reads as []) → point the guest at the joint.
+ *   - Hustle already worked → nudge toward the waakye loop (price derived
+ *       from the data, not hardcoded) or another shift of the same hustle.
+ */
+export function idleObjectiveFor(state: JobState): string {
+  const waakye = findFoodById(FOOD_WAAKYE_ID)!;
+  return isJobCompleted(state, 'HUSTLE_AUNTY_BA_STARTER')
+    ? `Hungry? Buy waakye at Daavi’s (${formatGHS(waakye.priceGHS)}), or work another shift.`
+    : 'No job yet — find work at Daavi’s waakye joint.';
 }

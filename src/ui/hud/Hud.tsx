@@ -24,7 +24,7 @@
 import { useEffect, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import { getState, subscribe, type GameState } from '../../store/gameStore';
 import { formatGHS } from '../../rules/economy';
-import { objectiveFor } from '../../rules/jobs';
+import { idleObjectiveFor, objectiveFor } from '../../rules/jobs';
 import { isLow, LOW_THRESHOLD } from '../../rules/needs';
 
 export interface HudProps {
@@ -164,7 +164,13 @@ function NeedsCard() {
 function ObjectiveCard() {
   const activeId = useStoreValue((s) => s.job.activeId);
   const step = useStoreValue((s) => s.job.step);
-  const objective = objectiveFor({ activeId, step });
+  // E-004 store slice carries the run history (reference replaced, never
+  // mutated — a safe useSyncExternalStore snapshot).
+  const completedIds = useStoreValue((s) => s.job.completedIds);
+  const objective = objectiveFor({ activeId, step, completedIds });
+  // G-005: the idle line is a pure rules helper — Daavi-aware and
+  // completedIds-aware (fresh guest vs. hungry-after-the-hustle nudge).
+  const idleLine = idleObjectiveFor({ activeId, step, completedIds });
   return (
     <div
       style={{
@@ -193,7 +199,7 @@ function ObjectiveCard() {
         )}
       </div>
       <div style={{ fontSize: 12, color: MUTED, marginTop: 2, lineHeight: 1.35 }}>
-        {objective ? objective.instruction : 'No job yet — find work at Aunty Ba’s waakye joint.'}
+        {objective ? objective.instruction : idleLine}
       </div>
     </div>
   );

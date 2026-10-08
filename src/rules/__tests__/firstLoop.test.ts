@@ -18,11 +18,11 @@ import {
 
 /**
  * THE FIRST LOOP — the exact session a brand-new guest plays:
- * start with ₵20 → work Aunty Ba's 3-step starter hustle → +₵15 →
+ * start with ₵20 → work Daavi's 3-step starter hustle → +₵15 →
  * buy waakye → hunger rises, wallet drops.
  * This is the integration test for rules + data working together.
  */
-describe('the first loop (₵20 → Aunty Ba → waakye)', () => {
+describe('the first loop (₵20 → Daavi → waakye)', () => {
   it('pays ₵15 for three Acts, then waakye fills hunger and drains the wallet', () => {
     // Fresh session: store defaults — ₵20, 72 hunger, 80 energy
     // (E-002 product start values, mirrored by createStarterNeeds).
@@ -32,7 +32,7 @@ describe('the first loop (₵20 → Aunty Ba → waakye)', () => {
     expect(wallet.balanceGHS).toBe(20);
     expect(needs).toEqual({ hunger: 72, energy: 80 });
 
-    // Aunty Ba offers the zero-capital starter hustle at the waakye joint.
+    // Daavi offers the zero-capital starter hustle at the waakye joint.
     const started = startJob(job, wallet, 'HUSTLE_AUNTY_BA_STARTER');
     expect(started.ok).toBe(true);
     job = started.job;
@@ -54,7 +54,7 @@ describe('the first loop (₵20 → Aunty Ba → waakye)', () => {
     expect(step3.completed).toBe(true);
     job = step3.job;
 
-    // Aunty Ba pays ₵15 on the spot.
+    // Daavi pays ₵15 on the spot.
     const paid = completeJob(job, wallet);
     expect(paid.ok).toBe(true);
     expect(paid.payoutGHS).toBe(15);

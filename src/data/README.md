@@ -4,7 +4,9 @@ Purpose: static game data as data files (jobs, foods, furniture, tiers — see
 `salvage/` for the legacy references to re-integrate).
 
 **Exception:** `src/data/locations.ts` is owned by Agent 3 (World & Art) and
-must export `{ id, name, type, x, z }[]` (e.g. LOC-001 Aunty Ba's Waakye
+must export `{ id, name, type, x, z }[]` (e.g. LOC-001 Daavi's Waakye
 Joint) — that is the World → Gameplay contract.
+(G-005: the seller is now "Daavi" — display rename only; Agent 3/W-002 owns
+the `locations.ts` name field itself.)
 
 Created empty by Agent 2 in E-001 (skeleton).
