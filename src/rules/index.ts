@@ -8,3 +8,4 @@ export * from './needs';
 export * from './economy';
 export * from './jobs';
 export * from './housing';
+export * from './act';

@@ -14,11 +14,14 @@
  *    accent) — visual reference only, no salvage imports.
  *  - Phone-first: one-thumb reach (Act at the bottom, in the thumb
  *    zone), iPhone safe-area aware via env(safe-area-inset-*).
+ *  - G-002: the Engine drives the Act button through props —
+ *    `actEnabled` (grey the button out) and `toast` (a ~2 s message
+ *    above Act) come from rules/act.ts actPromptFor/resolveAct via E-003.
  *
  * Engine mounts this in one line:  import { Hud } from '../ui';
  */
 
-import { useSyncExternalStore, type CSSProperties } from 'react';
+import { useEffect, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import { getState, subscribe, type GameState } from '../../store/gameStore';
 import { formatGHS } from '../../rules/economy';
 import { objectiveFor } from '../../rules/jobs';
@@ -29,6 +32,10 @@ export interface HudProps {
   onAct: () => void;
   /** Optional label override (defaults to the step verb or "Act"). */
   actLabel?: string;
+  /** false greys the Act button out (Engine computed actPromptFor). */
+  actEnabled?: boolean;
+  /** Transient message shown above Act for ~2 s (resolveAct toast). */
+  toast?: string | null;
 }
 
 // ── Store plumbing (subscribe-only) ─────────────────────────────────────────
@@ -194,7 +201,18 @@ function ObjectiveCard() {
 
 // ── Act button (one-thumb zone) ─────────────────────────────────────────────
 
-function ActButton({ onAct, actLabel }: { onAct: () => void; actLabel?: string }) {
+/** How long a toast stays up (G-002: "about 2 s"). */
+const TOAST_MS = 2000;
+
+function ActButton({
+  onAct,
+  actLabel,
+  enabled,
+}: {
+  onAct: () => void;
+  actLabel?: string;
+  enabled: boolean;
+}) {
   const activeId = useStoreValue((s) => s.job.activeId);
   const step = useStoreValue((s) => s.job.step);
   const objective = objectiveFor({ activeId, step });
@@ -202,8 +220,10 @@ function ActButton({ onAct, actLabel }: { onAct: () => void; actLabel?: string }
   return (
     <button
       type="button"
+      aria-disabled={!enabled}
       onPointerDown={(e) => {
         e.preventDefault();
+        if (!enabled) return;
         onAct();
       }}
       style={{
@@ -212,17 +232,18 @@ function ActButton({ onAct, actLabel }: { onAct: () => void; actLabel?: string }
         minHeight: 56,
         padding: '0 26px',
         borderRadius: 999,
-        border: '1px solid rgba(250,204,21,0.65)',
-        background: YELLOW,
-        color: '#0a0f1a',
+        border: enabled ? '1px solid rgba(250,204,21,0.65)' : '1px solid rgba(148,163,184,0.4)',
+        background: enabled ? YELLOW : 'rgba(100,116,139,0.3)',
+        color: enabled ? '#0a0f1a' : MUTED,
         fontSize: 17,
         fontWeight: 800,
         letterSpacing: '0.02em',
         fontFamily: FONT,
-        boxShadow: '0 6px 20px rgba(250,204,21,0.28)',
+        boxShadow: enabled ? '0 6px 20px rgba(250,204,21,0.28)' : 'none',
         touchAction: 'manipulation',
         WebkitTapHighlightColor: 'transparent',
-        cursor: 'pointer',
+        cursor: enabled ? 'pointer' : 'default',
+        transition: 'background 200ms linear, color 200ms linear, border-color 200ms linear',
       }}
     >
       {label}
@@ -232,7 +253,20 @@ function ActButton({ onAct, actLabel }: { onAct: () => void; actLabel?: string }
 
 // ── Root ─────────────────────────────────────────────────────────────────────
 
-export function Hud({ onAct, actLabel }: HudProps) {
+export function Hud({ onAct, actLabel, actEnabled = true, toast = null }: HudProps) {
+  // Toast lifetime is component-local (never touches the store): visible
+  // while `toast` is set, hidden TOAST_MS after the latest message arrived.
+  const [toastVisible, setToastVisible] = useState(false);
+  useEffect(() => {
+    if (!toast) {
+      setToastVisible(false);
+      return;
+    }
+    setToastVisible(true);
+    const timer = setTimeout(() => setToastVisible(false), TOAST_MS);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
   return (
     <div
       style={{
@@ -259,9 +293,10 @@ export function Hud({ onAct, actLabel }: HudProps) {
       </div>
 
       {/* Bottom: objective line sits just above the thumb-zone Act button.
-          The card is left-inset (JOYSTICK_CLEAR_PX) so its box never reaches
-          over the joystick ring's top arc — measured 0 px² overlap on
-          390×844 in G-001c; the Act pill keeps its own 3 px ring clearance. */}
+          The card and toast share the left-inset wrapper (JOYSTICK_CLEAR_PX)
+          so neither box ever reaches over the joystick ring's top arc —
+          measured 0 px² overlap on 390×844 in G-001c; the Act pill keeps
+          its own 3 px ring clearance. */}
       <div
         style={{
           display: 'flex',
@@ -275,13 +310,32 @@ export function Hud({ onAct, actLabel }: HudProps) {
           style={{
             alignSelf: 'stretch',
             display: 'flex',
-            justifyContent: 'flex-start',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            gap: 10,
             paddingLeft: JOYSTICK_CLEAR_PX,
           }}
         >
           <ObjectiveCard />
+          {toast !== null && toastVisible && (
+            <div
+              role="status"
+              aria-live="polite"
+              style={{
+                ...GLASS,
+                padding: '8px 12px',
+                borderRadius: 10,
+                fontSize: 12,
+                lineHeight: 1.35,
+                color: TEXT,
+                maxWidth: 'min(64vw, 300px)',
+              }}
+            >
+              {toast}
+            </div>
+          )}
         </div>
-        <ActButton onAct={onAct} actLabel={actLabel} />
+        <ActButton onAct={onAct} actLabel={actLabel} enabled={actEnabled} />
       </div>
     </div>
   );
