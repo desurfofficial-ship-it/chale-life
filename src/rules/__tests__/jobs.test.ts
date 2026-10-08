@@ -284,6 +284,51 @@ describe('jobs: idle objective line (G-005 Daavi)', () => {
   });
 });
 
+describe('jobs: idle objective priority (G-006 tired hint)', () => {
+  const done: JobState = {
+    activeId: null,
+    step: 0,
+    completedIds: ['HUSTLE_AUNTY_BA_STARTER'],
+  };
+
+  it('low energy (below the 25 LOW threshold) with OK hunger sends the guest home to sleep', () => {
+    expect(
+      idleObjectiveFor(createStarterJobState(), { hunger: 50, energy: 24 })
+    ).toBe('Tired — head home to the compound and sleep.');
+  });
+
+  it('energy exactly at the threshold (25) is not tired yet', () => {
+    expect(
+      idleObjectiveFor(createStarterJobState(), { hunger: 50, energy: 25 })
+    ).toBe('No job yet — find work at Daavi’s waakye joint.');
+  });
+
+  it('the tired hint outranks the waakye nudge when hunger is OK', () => {
+    expect(idleObjectiveFor(done, { hunger: 40, energy: 10 })).toBe(
+      'Tired — head home to the compound and sleep.'
+    );
+  });
+
+  it('a starving guest eats first — the food line wins when hunger < the work gate', () => {
+    // Sleep costs 8 hunger, so sleeping while starving digs the hole deeper.
+    expect(idleObjectiveFor(done, { hunger: 8, energy: 10 })).toBe(
+      'Hungry? Buy waakye at Daavi’s (₵12), or work another shift.'
+    );
+    expect(idleObjectiveFor(createStarterJobState(), { hunger: 5, energy: 10 })).toBe(
+      'No job yet — find work at Daavi’s waakye joint.'
+    );
+  });
+
+  it('calling without needs keeps the G-005 behaviour (legacy HUD callers)', () => {
+    expect(idleObjectiveFor(createStarterJobState())).toBe(
+      'No job yet — find work at Daavi’s waakye joint.'
+    );
+    expect(idleObjectiveFor(done)).toBe(
+      'Hungry? Buy waakye at Daavi’s (₵12), or work another shift.'
+    );
+  });
+});
+
 describe('jobs: requirements + objective helper', () => {
   it('evaluateRequirements passes zero-requirement hustles automatically', () => {
     const hustle = findJobById('HUSTLE_AUNTY_BA_STARTER')!;

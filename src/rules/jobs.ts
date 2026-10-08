@@ -23,6 +23,7 @@ import {
   pay,
   type WalletState,
 } from './economy';
+import { CAN_WORK_MIN_HUNGER, isTired, type NeedsState } from './needs';
 
 export interface JobState {
   readonly activeId: string | null;
@@ -294,12 +295,20 @@ export function objectiveFor(state: JobState): ObjectiveInfo | null {
  * HUSTLE_AUNTY_BA_STARTER and LOC-001 is untouched, so the store and
  * completedIds don't churn).
  *
+ *   - G-006 (checked first): low energy (`needs` passed and isTired —
+ *       energy < LOW_THRESHOLD 25) with hunger still above the work gate
+ *       → point the guest home to sleep. Sleep costs 8 hunger, so a
+ *       starving guest (hunger < CAN_WORK_MIN_HUNGER) eats first: the
+ *       tired hint deliberately yields to the food lines below.
  *   - Starter hustle not yet worked this run (completedIds empty or without
  *       the hustle — undefined reads as []) → point the guest at the joint.
  *   - Hustle already worked → nudge toward the waakye loop (price derived
  *       from the data, not hardcoded) or another shift of the same hustle.
  */
-export function idleObjectiveFor(state: JobState): string {
+export function idleObjectiveFor(state: JobState, needs?: NeedsState): string {
+  if (needs && isTired(needs) && needs.hunger >= CAN_WORK_MIN_HUNGER) {
+    return 'Tired — head home to the compound and sleep.';
+  }
   const waakye = findFoodById(FOOD_WAAKYE_ID)!;
   return isJobCompleted(state, 'HUSTLE_AUNTY_BA_STARTER')
     ? `Hungry? Buy waakye at Daavi’s (${formatGHS(waakye.priceGHS)}), or work another shift.`

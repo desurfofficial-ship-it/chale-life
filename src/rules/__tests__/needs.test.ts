@@ -16,6 +16,8 @@ import {
   MAX_TICK_SECONDS,
   MEAL_HUNGER_RESTORE,
   SLEEP_ENERGY_RESTORE,
+  SLEEP_GATE_ENERGY,
+  SLEEP_HUNGER_COST,
   WATER_ENERGY_RESTORE,
   WATER_HUNGER_RESTORE,
   WORK_ENERGY_COST,
@@ -102,18 +104,25 @@ describe('needs: restores', () => {
     expect(sipped.energy).toBe(60);
   });
 
-  it('sleep restores +55 energy capped at 100 (and leaves hunger alone)', () => {
+  it('sleep restores +55 energy capped at 100 and wakes you hungry (−8, G-006)', () => {
     expect(SLEEP_ENERGY_RESTORE).toBe(55);
+    expect(SLEEP_HUNGER_COST).toBe(8);
+    expect(SLEEP_GATE_ENERGY).toBe(90); // the “Not tired yet” gate
     const rested = applySleep(at(50, 30));
     expect(rested.energy).toBe(85);
-    expect(rested.hunger).toBe(50);
+    expect(rested.hunger).toBe(42); // 50 − 8 — you wake up hungry
     const capped = applySleep(at(50, 80));
-    expect(capped.energy).toBe(100);
+    expect(capped.energy).toBe(100); // 80 + 55, capped
+    expect(capped.hunger).toBe(42);
   });
 
-  it('sleep accepts a bed bonus on top of the base +55', () => {
+  it('sleep floors hunger at zero and still honours the bed bonus', () => {
+    const starving = applySleep(at(3, 30));
+    expect(starving.hunger).toBe(0); // floored, never negative
+    expect(starving.energy).toBe(85);
     const withBed = applySleep(at(50, 30), 20);
     expect(withBed.energy).toBe(100); // 30 + 55 + 20, capped
+    expect(withBed.hunger).toBe(42);
   });
 
   it('work costs 18 energy (and salvage’s 8 hunger), floored at zero', () => {

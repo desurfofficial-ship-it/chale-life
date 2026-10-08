@@ -167,10 +167,14 @@ function ObjectiveCard() {
   // E-004 store slice carries the run history (reference replaced, never
   // mutated — a safe useSyncExternalStore snapshot).
   const completedIds = useStoreValue((s) => s.job.completedIds);
+  const hunger = useStoreValue((s) => s.needs.hunger);
+  const energy = useStoreValue((s) => s.needs.energy);
   const objective = objectiveFor({ activeId, step, completedIds });
   // G-005: the idle line is a pure rules helper — Daavi-aware and
   // completedIds-aware (fresh guest vs. hungry-after-the-hustle nudge).
-  const idleLine = idleObjectiveFor({ activeId, step, completedIds });
+  // G-006: it is also needs-aware — low energy swaps the line for the
+  // sleep hint (unless hunger needs the waakye nudge more).
+  const idleLine = idleObjectiveFor({ activeId, step, completedIds }, { hunger, energy });
   return (
     <div
       style={{

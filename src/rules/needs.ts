@@ -12,7 +12,8 @@
  *     (~3/min + ~2/min — the playability patch that keeps a ₵0 guest
  *     from soft-locking before the first payout)
  *   - low threshold 25, meal +45 hunger, water +6 hunger / +10 energy,
- *     sleep +55 energy, work −18 energy (and −8 hunger, as in salvage)
+ *     sleep +55 energy / −8 hunger (G-006: you wake up hungry),
+ *     work −18 energy (and −8 hunger, as in salvage)
  */
 
 export interface NeedsState {
@@ -42,6 +43,15 @@ export const WATER_ENERGY_RESTORE = 10;
 
 /** Energy restored by sleeping at the compound (no bed bonus). */
 export const SLEEP_ENERGY_RESTORE = 55;
+
+/** Sleeping costs this much hunger — you wake up hungry (G-006). */
+export const SLEEP_HUNGER_COST = 8;
+
+/**
+ * At or above this energy the compound bed refuses you — the Act button
+ * greys out with the hint "Not tired yet" (G-006).
+ */
+export const SLEEP_GATE_ENERGY = 90;
 
 /** Energy cost of finishing a work shift. */
 export const WORK_ENERGY_COST = 18;
@@ -110,9 +120,15 @@ export function drinkWater(state: NeedsState): NeedsState {
   });
 }
 
-/** Sleep at the compound: +55 energy, plus any bed/tier bonus. */
+/**
+ * Sleep at the compound: +55 energy (plus any bed/tier bonus), and —
+ * since G-006 — −8 hunger (you wake up hungry). Free.
+ */
 export function applySleep(state: NeedsState, bonusEnergy = 0): NeedsState {
-  return applyRestore(state, { energy: SLEEP_ENERGY_RESTORE + Math.max(0, bonusEnergy) });
+  return applyRestore(state, {
+    energy: SLEEP_ENERGY_RESTORE + Math.max(0, bonusEnergy),
+    hunger: -SLEEP_HUNGER_COST,
+  });
 }
 
 /** After finishing a work shift: −18 energy (and −8 hunger, as salvage). */

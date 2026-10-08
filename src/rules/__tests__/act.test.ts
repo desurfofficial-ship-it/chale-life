@@ -9,6 +9,7 @@ import {
   actPromptFor,
   AUNTY_BA_HUSTLE_ID,
   resolveAct,
+  SLEEP_LOCATION_ID,
   WATER_LOCATION_ID,
   WAAKYE_LOCATION_ID,
   type ActSession,
@@ -118,6 +119,29 @@ describe('act: the first earn-and-eat loop (₵20 → ₵35 → ₵23)', () => {
     expect(result.session.needs.hunger).toBe(100); // 64 + 45, clamped
     expect(result.session.needs.energy).toBe(62); // applyMeal touches hunger only
     expect(result.session.job).toEqual({
+      activeId: null,
+      step: 0,
+      completedIds: [AUNTY_BA_HUSTLE_ID],
+    });
+  });
+
+  it('closes the loop: after waakye (₵23) the compound sleeps the toll off', () => {
+    // ₵20 → work x3 → ₵35 → waakye → ₵23 — hunger clamped at 100, energy 62.
+    const fed = resolveAct(paidSession(), WAAKYE_LOCATION_ID);
+    expect(fed.session.wallet.balanceGHS).toBe(23);
+    expect(fed.session.needs).toEqual({ hunger: 100, energy: 62 });
+
+    // …then the walk home ends at the compound gate: the Act button reads
+    // "Sleep", the press is free, and energy clears the 100 cap exactly.
+    const prompt = actPromptFor(fed.session, SLEEP_LOCATION_ID);
+    expect(prompt.label).toBe('Sleep');
+    expect(prompt.enabled).toBe(true);
+
+    const slept = resolveAct(fed.session, SLEEP_LOCATION_ID);
+    expect(slept.toast).toBe('Slept at the compound — +55 energy');
+    expect(slept.session.needs).toEqual({ hunger: 92, energy: 100 }); // 100−8 / 62+55 capped
+    expect(slept.session.wallet.balanceGHS).toBe(23); // sleep is free
+    expect(slept.session.job).toEqual({
       activeId: null,
       step: 0,
       completedIds: [AUNTY_BA_HUSTLE_ID],
@@ -263,6 +287,84 @@ describe('act: water at the provisions store (LOC-003)', () => {
   });
 });
 
+describe('act: sleep at the Starter Compound (LOC-002, G-006)', () => {
+  const tiredSession = (): ActSession => ({
+    wallet: { balanceGHS: 23 },
+    needs: { hunger: 50, energy: 30 },
+    job: createStarterJobState(),
+  });
+
+  it('offers free sleep: +55 energy, −8 hunger, wallet untouched', () => {
+    const prompt = actPromptFor(tiredSession(), SLEEP_LOCATION_ID);
+    expect(prompt.label).toBe('Sleep');
+    expect(prompt.enabled).toBe(true);
+
+    const result = resolveAct(tiredSession(), SLEEP_LOCATION_ID);
+    expect(result.toast).toBe('Slept at the compound — +55 energy');
+    expect(result.session.needs).toEqual({ hunger: 42, energy: 85 });
+    expect(result.session.wallet.balanceGHS).toBe(23); // free
+  });
+
+  it('caps energy at 100 (post-waakye 62 → 100, not 117)', () => {
+    const result = resolveAct(paidSession(), SLEEP_LOCATION_ID);
+    expect(result.session.needs.energy).toBe(100);
+    expect(result.session.needs.hunger).toBe(56); // 64 − 8
+  });
+
+  it('floors hunger at zero — sleep never drives a need negative', () => {
+    const session: ActSession = {
+      wallet: { balanceGHS: 0 },
+      needs: { hunger: 3, energy: 40 },
+      job: createStarterJobState(),
+    };
+    const result = resolveAct(session, SLEEP_LOCATION_ID);
+    expect(result.session.needs.hunger).toBe(0);
+    expect(result.session.needs.energy).toBe(95);
+  });
+
+  it('greys out with "Not tired yet" at energy ≥ 90 (89 still sleeps)', () => {
+    const rested: ActSession = {
+      wallet: { balanceGHS: 23 },
+      needs: { hunger: 50, energy: 90 },
+      job: createStarterJobState(),
+    };
+    const prompt = actPromptFor(rested, SLEEP_LOCATION_ID);
+    expect(prompt.label).toBe('Sleep');
+    expect(prompt.enabled).toBe(false);
+    expect(prompt.reason).toBe('Not tired yet');
+
+    const refused = resolveAct(rested, SLEEP_LOCATION_ID);
+    expect(refused.session).toBe(rested); // no-op commit
+    expect(refused.toast).toBeNull();
+
+    const borderline: ActSession = { ...rested, needs: { hunger: 50, energy: 89 } };
+    expect(actPromptFor(borderline, SLEEP_LOCATION_ID).enabled).toBe(true);
+  });
+
+  it('sleep stays on offer mid-shift — a nap never touches the live job', () => {
+    const session: ActSession = {
+      wallet: { balanceGHS: 20 },
+      needs: { hunger: 50, energy: 30 },
+      job: { activeId: AUNTY_BA_HUSTLE_ID, step: 1, completedIds: [] },
+    };
+    const prompt = actPromptFor(session, SLEEP_LOCATION_ID);
+    expect(prompt.label).toBe('Sleep');
+    expect(prompt.enabled).toBe(true);
+
+    const result = resolveAct(session, SLEEP_LOCATION_ID);
+    expect(result.session.job).toBe(session.job); // identity preserved
+    expect(result.session.job.activeId).toBe(AUNTY_BA_HUSTLE_ID);
+    expect(result.session.job.step).toBe(1);
+    expect(result.session.needs.energy).toBe(85);
+  });
+
+  it('LOC-002 is the compound: a real home location', () => {
+    const compound = locations.find((l) => l.id === SLEEP_LOCATION_ID)!;
+    expect(compound.type).toBe('home');
+    expect(compound.name).toBe('Starter Compound');
+  });
+});
+
 describe('act: disabled cases', () => {
   it('refuses to work the hustle while too tired', () => {
     const session: ActSession = {
@@ -353,7 +455,8 @@ describe('act: nothing happens away from act locations', () => {
   });
 
   it('known locations without an act yet are also idle', () => {
-    for (const near of ['LOC-002', 'LOC-004', 'LOC-005', 'LOC-006', 'LOC-999']) {
+    // LOC-002 sleeps since G-006 — covered in the compound suite above.
+    for (const near of ['LOC-004', 'LOC-005', 'LOC-006', 'LOC-999']) {
       const prompt = actPromptFor(paidSession(), near);
       expect(prompt.enabled).toBe(false);
       expect(prompt.reason).toContain('Nothing to do here');
@@ -394,6 +497,24 @@ describe('act: prompt and resolution agree', () => {
           job: createStarterJobState(),
         },
         WATER_LOCATION_ID,
+      ],
+      [
+        // G-006: tired guest at the compound — enabled sleep.
+        {
+          wallet: { balanceGHS: 23 },
+          needs: { hunger: 50, energy: 30 },
+          job: createStarterJobState(),
+        },
+        SLEEP_LOCATION_ID,
+      ],
+      [
+        // G-006: rested guest refuses the bed — disabled no-op sleep.
+        {
+          wallet: { balanceGHS: 23 },
+          needs: { hunger: 50, energy: 95 },
+          job: createStarterJobState(),
+        },
+        SLEEP_LOCATION_ID,
       ],
     ];
     for (const [session, near] of scenarios) {
