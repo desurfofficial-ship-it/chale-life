@@ -21,7 +21,7 @@ export interface Location {
 export const locations: Location[] = [
   {
     id: 'LOC-001',
-    name: "Aunty Ba's Waakye Joint",
+    name: "Daavi's Waakye Joint",
     type: 'food',
     x: 15.5, // front of the yellow kiosk, north pavement
     z: 2.4,
