@@ -14,6 +14,7 @@ import { movementStep, type Kinematics } from './movement';
 import { colliders, worldBounds } from '../world/colliders';
 import {
   getZoom,
+  getState,
   HUD_INTERVAL_S,
   movementInput,
   publishHud,
@@ -23,11 +24,22 @@ import {
 const MAX_DT = 1 / 20;
 
 export function GameLoop() {
-  const kin = useRef<Kinematics>({ x: 0, z: 0, vx: 0, vz: 0, yaw: 0 });
+  // Start from the store transform — src/engine/spawn.ts has already placed
+  // the player at the starter compound gate before App rendered, so frame 1
+  // continues from the spawn instead of telekinetically dragging the capsule
+  // from the world origin.
+  const start = getState().player;
+  const kin = useRef<Kinematics>({
+    x: start.position.x,
+    z: start.position.z,
+    vx: 0,
+    vz: 0,
+    yaw: start.yaw,
+  });
   const hudTimer = useRef(0);
   const fps = useRef(60);
 
-  useFrame((_, rawDt) => {
+  useFrame((state, rawDt) => {
     const dt = Math.min(rawDt, MAX_DT);
 
     kin.current = movementStep(kin.current, movementInput, dt, colliders, {
@@ -51,6 +63,9 @@ export function GameLoop() {
         inputX: movementInput.x,
         inputZ: movementInput.z,
         zoom: getZoom(),
+        // Draw calls of the LAST completed render (info auto-resets each
+        // frame) — the ?debug=1 perf number for the ≤150 budget.
+        drawCalls: state.gl.info.render.calls,
       });
     }
   });

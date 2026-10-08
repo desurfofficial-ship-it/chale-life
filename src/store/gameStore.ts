@@ -13,6 +13,9 @@
  *    teleports / gameplay wiring; the frame loop must not use them.
  *  - Gameplay rules (Agent 4) are pure `(state, input) => newState` functions;
  *    Engine wires them into this store when asked (G-001 handshake).
+ *  - E-002: the HUD (src/ui) is mounted by src/app/App.tsx and fed from the
+ *    slices below; the Act button calls `requestAct()` (no-op until the
+ *    Earn-and-eat wiring task).
  */
 
 export interface Vec3 {
@@ -38,7 +41,11 @@ type Listener = () => void;
 const state: GameState = {
   player: { position: { x: 0, y: 0, z: 0 }, yaw: 0 },
   wallet: { balanceGHS: 20 },
-  needs: { hunger: 80, energy: 80 },
+  // Product start values (E-002): hunger begins at 72 (salvage NeedsSystem's
+  // `hunger = 72`), energy full — full enough to hustle, hungry enough that
+  // the waakye loop matters. Engine spawns the player onto LOC-002 at boot
+  // via src/engine/spawn.ts; the origin here is just the pre-spawn neutral.
+  needs: { hunger: 72, energy: 80 },
   job: { activeId: null, step: 0 },
   home: { tierId: 'single_room' },
   time: { hour: 7 },
@@ -118,6 +125,17 @@ export function requestRecenter(): void {
   recenterToken += 1;
 }
 
+/**
+ * HUD Act button → Engine handshake (E-002). Deliberately a NO-OP: the
+ * Earn-and-eat wiring (startJob / advanceStep / applyMeal from src/rules,
+ * committed here) is the NEXT task and will replace this body. Wiring the
+ * button to a named store action now means that task touches only this
+ * function — the HUD contract (`<Hud onAct={...} />`) stays frozen.
+ */
+export function requestAct(): void {
+  // intentionally empty — see E-002 PR report (NEXT STEP)
+}
+
 export interface HudSnapshot {
   fps: number;
   x: number;
@@ -126,6 +144,8 @@ export interface HudSnapshot {
   inputX: number;
   inputZ: number;
   zoom: number;
+  /** renderer.info.render.calls from the previous frame (perf budget ≤150). */
+  drawCalls: number;
 }
 
 let hud: Readonly<HudSnapshot> = {
@@ -136,6 +156,7 @@ let hud: Readonly<HudSnapshot> = {
   inputX: 0,
   inputZ: 0,
   zoom: INITIAL_ZOOM,
+  drawCalls: 0,
 };
 
 const hudListeners = new Set<(snapshot: Readonly<HudSnapshot>) => void>();

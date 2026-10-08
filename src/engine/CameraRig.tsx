@@ -37,7 +37,10 @@ const PAN_SUSPEND_PX = 6;
 export function CameraRig() {
   const camera = useThree((s) => s.camera) as THREE.OrthographicCamera;
   const gl = useThree((s) => s.gl);
-  const target = useRef(new THREE.Vector3(0, 0, 0));
+  // Start on the player (store is spawn-initialized by src/engine/spawn.ts
+  // before App renders) — no glide from the world origin on frame 1.
+  const spawn = getState().player.position;
+  const target = useRef(new THREE.Vector3(spawn.x, 0, spawn.z));
   const follow = useRef(true);
   const appliedZoom = useRef(getZoom());
   const lastRecenter = useRef(getRecenterToken());
