@@ -1,0 +1,32 @@
+{
+  "name": "chale-life",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 3000 --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview --port 3000 --host 0.0.0.0",
+    "check:html-labels": "bash scripts/check-html-labels.sh",
+    "check:asset-paths": "bash scripts/check-asset-paths.sh",
+    "check:asset-budget": "bash scripts/check-asset-budget.sh",
+    "test:all": "npm run check:html-labels && npm run check:asset-paths && npm run check:asset-budget",
+    "lint": "echo 'lint: ok (no eslint config yet)'"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.186.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "typescript": "^5.8.2",
+    "vite": "^8.3.2"
+  }
+}

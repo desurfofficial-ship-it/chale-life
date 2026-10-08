@@ -1,0 +1,233 @@
+{
+  "entities": {
+    "Player": {
+      "title": "Player",
+      "description": "Private cloud save document for an authenticated player in Life in Accra.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the player."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Player display name."
+        },
+        "state": {
+          "type": "object",
+          "description": "Structured game state map."
+        },
+        "hunger": {
+          "type": "integer",
+          "description": "Player hunger stat (0-100)."
+        },
+        "energy": {
+          "type": "integer",
+          "description": "Player energy stat (0-100)."
+        },
+        "housingTier": {
+          "type": "string",
+          "description": "Current housing progression tier."
+        },
+        "unlockedTiers": {
+          "type": "array",
+          "description": "List of unlocked housing tier IDs."
+        },
+        "owned": {
+          "type": "array",
+          "description": "List of owned catalog furniture IDs."
+        },
+        "placedFurniture": {
+          "type": "array",
+          "description": "List of placed furniture instances with coordinates."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when save was last updated."
+        }
+      },
+      "required": ["displayName", "state", "updatedAt"]
+    },
+    "FriendEntry": {
+      "title": "FriendEntry",
+      "description": "A real player added to a player's friends subcollection.",
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "Friend display name."
+        },
+        "addedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when friend was added."
+        }
+      },
+      "required": ["displayName"]
+    },
+    "InboxMessage": {
+      "title": "InboxMessage",
+      "description": "Incoming money transfer or chat notification in a player's inbox subcollection.",
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string",
+          "description": "Sender UID."
+        },
+        "fromName": {
+          "type": "string",
+          "description": "Sender display name."
+        },
+        "amount": {
+          "type": "integer",
+          "description": "Amount of ₵ transferred (for money type)."
+        },
+        "text": {
+          "type": "string",
+          "description": "Message preview (for chat type)."
+        },
+        "type": {
+          "type": "string",
+          "description": "Message type (money or chat)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when item was created."
+        }
+      },
+      "required": ["from", "type"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Real-time text message between two added friends.",
+      "type": "object",
+      "properties": {
+        "chatId": {
+          "type": "string",
+          "description": "Deterministic sorted UID pair (uidA_uidB)."
+        },
+        "senderId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the message sender."
+        },
+        "senderName": {
+          "type": "string",
+          "description": "Display name of the message sender."
+        },
+        "recipientId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the message recipient."
+        },
+        "text": {
+          "type": "string",
+          "description": "Message text content (1-500 characters)."
+        },
+        "read": {
+          "type": "boolean",
+          "description": "Whether the message has been seen by the recipient."
+        },
+        "type": {
+          "type": "string",
+          "description": "Message type: text or money transfer."
+        },
+        "amount": {
+          "type": "integer",
+          "description": "Optional Cedis (₵) amount transferred in chat."
+        },
+        "readAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the message was marked as read."
+        },
+        "createdAtMs": {
+          "type": "integer",
+          "description": "Epoch milliseconds for ordering."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when message was sent."
+        }
+      },
+      "required": ["senderId", "senderName", "recipientId", "text", "read", "createdAtMs"]
+    },
+    "Profile": {
+      "title": "Profile",
+      "description": "Public resident profile summary in Accra.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the resident."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Resident display name."
+        },
+        "day": {
+          "type": "integer",
+          "description": "Current day reached by resident."
+        },
+        "career": {
+          "type": "string",
+          "description": "Resident current career."
+        },
+        "money": {
+          "type": "integer",
+          "description": "Public wallet balance."
+        },
+        "location": {
+          "type": "string",
+          "description": "Last known area in Accra."
+        },
+        "homeDesign": {
+          "type": "object",
+          "description": "Player custom isometric room design (wallColor, floorStyle, activeFurniture, outfitColor, visits)."
+        },
+        "online": {
+          "type": "boolean",
+          "description": "Whether the player is currently active in the app."
+        },
+        "lastActiveMs": {
+          "type": "integer",
+          "description": "Epoch milliseconds of the latest presence heartbeat."
+        },
+        "lastActive": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last active timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last updated timestamp."
+        }
+      },
+      "required": ["displayName", "day", "career"]
+    }
+  },
+  "firestore": {
+    "/players/{userId}": {
+      "schema": "Player",
+      "description": "Private cloud game saves keyed by Firebase Auth UID."
+    },
+    "/players/{userId}/friends/{friendId}": {
+      "schema": "FriendEntry",
+      "description": "Real player friends list for a player."
+    },
+    "/players/{userId}/inbox/{msgId}": {
+      "schema": "InboxMessage",
+      "description": "Incoming player-to-player transfers and notifications."
+    },
+    "/chats/{chatId}/messages/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "Real-time direct messages between two friends."
+    },
+    "/profiles/{userId}": {
+      "schema": "Profile",
+      "description": "Public resident profiles keyed by Firebase Auth UID."
+    }
+  }
+}
