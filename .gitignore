@@ -10,3 +10,7 @@ node_modules/
 # Playwright e2e (E-005)
 test-results/
 playwright-report/
+
+# Firebase applet config carried a live Google API key — removed in S-001
+# (the game does not use Firebase). Never re-commit it.
+firebase-applet-config.json
