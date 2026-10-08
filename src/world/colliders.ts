@@ -1,23 +1,44 @@
 /**
- * PLACEHOLDER — owned by Agent 3 (World & Art), to be replaced by ticket W-001.
- * Created by Agent 2 (E-001) so the engine could ship against the contract.
+ * colliders.ts — CONTRACT MODULE (do not break).
  *
- * World → Engine contract (do not change the export shapes):
- *   colliders: { minX; minZ; maxX; maxZ }[]  — metres, 1 unit = 1 m
- *   worldBounds: { minX; minZ; maxX; maxZ }
- * Engine (src/engine) reads this file for collision every frame.
- * World never imports engine code.
+ * Exports axis-aligned collider boxes in world metres (1 unit = 1 m):
+ *   - `colliders`: building + compound-wall footprints players cannot cross
+ *   - `worldBounds`: the playable 60 × 60 m block limit
+ *
+ * Boxes are { minX, minZ, maxX, maxZ } — NO three.js / engine imports, so
+ * engine and rules code can consume this module from anywhere.
+ *
+ * Data flows from starter/layout.ts, which is also the source of truth for
+ * the visible geometry — colliders and visuals cannot drift apart.
+ *
+ * Owned by Agent 3 (World & Art).
  */
+import { SOLID_FOOTPRINTS, WORLD_MAX, WORLD_MIN } from './starter/layout';
 
-export interface Box {
+export interface ColliderBox {
   minX: number;
   minZ: number;
   maxX: number;
   maxZ: number;
 }
 
-/** 60 × 60 m playable area centred on the origin. */
-export const worldBounds: Box = { minX: -30, minZ: -30, maxX: 30, maxZ: 30 };
+export const colliders: ColliderBox[] = SOLID_FOOTPRINTS.map((f) => ({
+  minX: f.x0,
+  minZ: f.z0,
+  maxX: f.x1,
+  maxZ: f.z1,
+}));
 
-/** No obstacles yet — W-001 authors these alongside the world geometry. */
-export const colliders: Box[] = [];
+export const worldBounds: ColliderBox = {
+  minX: WORLD_MIN,
+  minZ: WORLD_MIN,
+  maxX: WORLD_MAX,
+  maxZ: WORLD_MAX,
+};
+
+/**
+ * Alias kept from the E-001 placeholder so either type name resolves to the
+ * same shape. Engine keeps its own `Box` in src/engine/collision.ts — the two
+ * are structurally identical.
+ */
+export type Box = ColliderBox;
