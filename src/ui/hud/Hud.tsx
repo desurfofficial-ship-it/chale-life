@@ -62,6 +62,16 @@ const labelStyle: CSSProperties = {
   color: MUTED,
 };
 
+/**
+ * Clearance contract with the Engine's joystick (E-002 geometry, see
+ * src/styles.css): on 390×844 the ring's bounding box is left 10 + 108 px
+ * wide → right edge x = 118, top y = 722. The HUD root already pads 12 px,
+ * so indenting the objective card's wrapper by 118 − 12 + 6 = 112 keeps its
+ * left edge at x ≥ 124 — ≥ 6 px clear of the ring's top arc at any viewport
+ * (G-001c, fixes PR #5 ISSUES #1). Do not shrink below 112.
+ */
+const JOYSTICK_CLEAR_PX = 112;
+
 // ── Cards ────────────────────────────────────────────────────────────────────
 
 function WalletCard() {
@@ -153,7 +163,9 @@ function ObjectiveCard() {
       style={{
         ...GLASS,
         padding: '9px 14px',
-        maxWidth: 'min(78vw, 340px)',
+        // 64vw / 300px cap (PR #5 ISSUES #1): keeps the card inside the
+        // right-of-joystick zone on small phones and proportionate on desktop.
+        maxWidth: 'min(64vw, 300px)',
         borderColor: objective ? 'rgba(250,204,21,0.55)' : 'rgba(250,204,21,0.35)',
       }}
     >
@@ -246,7 +258,10 @@ export function Hud({ onAct, actLabel }: HudProps) {
         <NeedsCard />
       </div>
 
-      {/* Bottom: objective line sits just above the thumb-zone Act button */}
+      {/* Bottom: objective line sits just above the thumb-zone Act button.
+          The card is left-inset (JOYSTICK_CLEAR_PX) so its box never reaches
+          over the joystick ring's top arc — measured 0 px² overlap on
+          390×844 in G-001c; the Act pill keeps its own 3 px ring clearance. */}
       <div
         style={{
           display: 'flex',
@@ -256,7 +271,16 @@ export function Hud({ onAct, actLabel }: HudProps) {
           paddingBottom: 'env(safe-area-inset-bottom)',
         }}
       >
-        <ObjectiveCard />
+        <div
+          style={{
+            alignSelf: 'stretch',
+            display: 'flex',
+            justifyContent: 'flex-start',
+            paddingLeft: JOYSTICK_CLEAR_PX,
+          }}
+        >
+          <ObjectiveCard />
+        </div>
         <ActButton onAct={onAct} actLabel={actLabel} />
       </div>
     </div>

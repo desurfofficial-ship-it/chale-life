@@ -55,9 +55,14 @@ export const CAN_WORK_MIN_HUNGER = 10;
 /** Frame-spike guard: ticks longer than 2 s are ignored (salvage tick). */
 export const MAX_TICK_SECONDS = 2;
 
-/** Starter profile matching the store's initial needs (80 / 80). */
+/**
+ * Starter needs — matches the store's initial values (G-001c alignment):
+ * hunger 72 (salvage NeedsSystem's start — full enough to hustle, hungry
+ * enough that the waakye loop matters), energy 80. The store commits these
+ * same numbers (src/store/gameStore.ts, E-002); the two must not drift.
+ */
 export function createStarterNeeds(): NeedsState {
-  return { hunger: 80, energy: 80 };
+  return { hunger: 72, energy: 80 };
 }
 
 export function clampNeed(value: number): number {

@@ -24,12 +24,13 @@ import {
  */
 describe('the first loop (₵20 → Aunty Ba → waakye)', () => {
   it('pays ₵15 for three Acts, then waakye fills hunger and drains the wallet', () => {
-    // Fresh session: store defaults — ₵20, 80 hunger, 80 energy.
+    // Fresh session: store defaults — ₵20, 72 hunger, 80 energy
+    // (E-002 product start values, mirrored by createStarterNeeds).
     let wallet = { balanceGHS: 20 };
     let needs = createStarterNeeds();
     let job = createStarterJobState();
     expect(wallet.balanceGHS).toBe(20);
-    expect(needs).toEqual({ hunger: 80, energy: 80 });
+    expect(needs).toEqual({ hunger: 72, energy: 80 });
 
     // Aunty Ba offers the zero-capital starter hustle at the waakye joint.
     const started = startJob(job, wallet, 'HUSTLE_AUNTY_BA_STARTER');
@@ -63,11 +64,12 @@ describe('the first loop (₵20 → Aunty Ba → waakye)', () => {
     expect(job.activeId).toBeNull();
 
     // Time passes: 10 minutes of starter-profile decay (~3/min hunger),
-    // ticked per-frame in legal ≤2s steps.
+    // ticked per-frame in legal ≤2s steps. 72 − 0.05 × 600 = 42;
+    // 80 − 0.0333 × 600 = 60.02.
     for (let i = 0; i < 300; i++) {
       needs = drainNeeds(needs, 2, 'starter');
     }
-    expect(needs.hunger).toBeCloseTo(50, 3);
+    expect(needs.hunger).toBeCloseTo(42, 3);
     expect(needs.energy).toBeCloseTo(60.02, 3);
 
     // Buy waakye for ₵12 — wallet drops.
@@ -77,10 +79,10 @@ describe('the first loop (₵20 → Aunty Ba → waakye)', () => {
     wallet = purchase.wallet;
     expect(wallet.balanceGHS).toBe(23);
 
-    // Eat: hunger RISES by the meal restore (no cap hit from 50).
+    // Eat: hunger RISES by the meal restore (no cap hit from 42).
     expect(waakye.hungerRestore).toBe(MEAL_HUNGER_RESTORE);
     const fed = applyMeal(needs);
-    expect(fed.hunger).toBeCloseTo(95, 6);
+    expect(fed.hunger).toBeCloseTo(87, 6);
     expect(fed.hunger).toBeGreaterThan(needs.hunger);
     expect(wallet.balanceGHS).toBeLessThan(35);
   });

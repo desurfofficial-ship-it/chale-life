@@ -25,8 +25,8 @@ import {
 const at = (hunger: number, energy: number): NeedsState => ({ hunger, energy });
 
 describe('needs: starter profile', () => {
-  it('starter needs begin at 80 hunger / 80 energy matching the store defaults', () => {
-    expect(createStarterNeeds()).toEqual({ hunger: 80, energy: 80 });
+  it('starter needs begin at 72 hunger / 80 energy matching the store defaults (E-002)', () => {
+    expect(createStarterNeeds()).toEqual({ hunger: 72, energy: 80 });
   });
 
   it('survival drain removes 0.35 hunger and 0.22 energy per second', () => {
