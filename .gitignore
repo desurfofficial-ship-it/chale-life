@@ -14,3 +14,8 @@ playwright-report/
 # Firebase applet config carried a live Google API key — removed in S-001
 # (the game does not use Firebase). Never re-commit it.
 firebase-applet-config.json
+
+# W-003 asset pipeline: raw downloaded packs stay OUT of the repo.
+# Only optimised output (public/models/) is committed, with a row in
+# docs/assets/LICENSES.csv per file (checked in CI).
+asset-sources/
