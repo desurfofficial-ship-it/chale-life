@@ -5,8 +5,9 @@
  * shadow map over the 60 × 60 m block keeps the phone budget healthy;
  * soft PCF radius avoids hard cartoon edges.
  *
- * W-005: also owns the warm haze background + fog so the outer apron fades
+ * B-002: also owns the warm haze background + fog so the outer apron fades
  * into atmosphere instead of a navy void (scene.background / scene.fog).
+ * Sole owner — App.tsx must not set a duplicate <color attach="background">.
  *
  * Owned by Agent 3 (World & Art).
  */
