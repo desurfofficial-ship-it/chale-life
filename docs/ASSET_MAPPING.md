@@ -76,7 +76,6 @@ table is a reading aid, not the authority.
 |---|---|---|---|---|
 | **Trotro van ACC_TROTRO_001 (PRIMARY)** | `/assets/glb/vehicles/small_van.glb` | 2.7 MB | `LivingTrotro.tsx` `GLBVan` (useGLTF) | Station cell; scale 0.5; tinted MTN yellow `#f59e0b`; door mesh auto-detected by name (`door`/`slide`/`passenger`), swung open in IDLE_AT_STOP/BOARDING; preloaded |
 | Trotro van alt variant | `/assets/glb/vehicles/european_delivery_van.glb` | 35 MB | same, `vanModel="european_delivery_van"` | on-demand only (NOT preloaded); scale 0.3 |
-| Trotro van alt variant | `/assets/glb/vehicles/retro_anime_vintage_volkswagen_van.glb` | 2.6 MB | same, `vanModel="retro_vw"` | scale 0.4; preloaded |
 | Van loading fallback | — procedural — | — | `LivingTrotro.tsx` `ProceduralVan` | Suspense fallback ONLY (box van, same door animation) |
 
 ## 2. Buildings & interiors (GLB)

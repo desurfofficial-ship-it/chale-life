@@ -4,9 +4,11 @@
  * the BUILT app (vite preview of dist/).
  *
  * Flow (one ordered robot session — the store is session state):
- *   load → HUD shows ₵20 → walk to LOC-001 on the keyboard → the Act button
- *   reads the hustle prompt → Act until the payout lands (₵35) → the button
- *   flips to the waakye offer → Act → ₵23 with hunger up → walk away →
+ *   load → HUD shows ₵20 → G-006 sleep beat at the compound (spawn IS
+ *   LOC-002): Sleep → energy up, hunger −8, then the bed refuses at
+ *   energy ≥ 90 ("Not tired yet") → walk to LOC-001 on the keyboard → the Act
+ *   button reads the hustle prompt → Act until the payout lands (₵35) → the
+ *   button flips to the waakye offer → Act → ₵23 with hunger up → walk away →
  *   Act disabled.
  *
  * NAME-AGNOSTIC BY CONSTRUCTION: every expected button label is derived at
@@ -20,27 +22,30 @@
  */
 
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
-import { actPromptFor } from '../../src/rules/act';
+import { actPromptFor, resolveAct } from '../../src/rules/act';
 import { findJobById } from '../../src/data/jobs';
 import { formatGHS } from '../../src/rules/economy';
 import { createStarterJobState, objectiveFor } from '../../src/rules/jobs';
+import { SLEEP_GATE_ENERGY } from '../../src/rules/needs';
 
 /** Data key of the starter hustle (an id, not an NPC name). */
 const HUSTLE_ID = 'HUSTLE_AUNTY_BA_STARTER';
 /** The waakye joint (src/data/locations.ts). */
 const WAAKYE_LOCATION_ID = 'LOC-001';
+/** The Starter Compound (src/data/locations.ts) — spawn point, G-006 sleep. */
+const SLEEP_LOCATION_ID = 'LOC-002';
+
+/** A fresh guest at spawn — the derivation input for the sleep-beat labels. */
+const FRESH_SESSION = {
+  wallet: { balanceGHS: 20 },
+  needs: { hunger: 72, energy: 80 },
+  job: createStarterJobState(),
+} as const;
 
 // ── Rule-derived expectations (the name-agnostic contract) ──────────────────
 
 /** The Act prompt for a fresh guest standing at the joint: "Help <employer>". */
-const HELP_LABEL = actPromptFor(
-  {
-    wallet: { balanceGHS: 20 },
-    needs: { hunger: 72, energy: 80 },
-    job: createStarterJobState(),
-  },
-  WAAKYE_LOCATION_ID
-).label;
+const HELP_LABEL = actPromptFor(FRESH_SESSION, WAAKYE_LOCATION_ID).label;
 
 /** The per-step Act verb while the shift is live (all starter steps share it). */
 const WORK_VERB = objectiveFor({ activeId: HUSTLE_ID, step: 0 })!.actionVerb;
@@ -55,6 +60,20 @@ const WAAKYE_LABEL = actPromptFor(
   },
   WAAKYE_LOCATION_ID
 ).label;
+
+/** G-006 sleep beat: a fresh guest (energy 80 < 90) is offered "Sleep". */
+const SLEEP_PROMPT = actPromptFor(FRESH_SESSION, SLEEP_LOCATION_ID);
+/** The sleep toast is exactly what the app's Act press commits — resolveAct
+ *  on the same synthetic session the HUD will be in when the button fires. */
+const SLEEP_TOAST = resolveAct(FRESH_SESSION, SLEEP_LOCATION_ID).toast ?? '';
+/** At energy ≥ SLEEP_GATE_ENERGY the compound bed refuses: the button keeps
+ *  the Sleep label but greys out, with the rule-side reason "Not tired yet".
+ *  The HUD has no reason slot, so the reason is asserted on the rules object
+ *  and the DOM gets the aria-disabled state. */
+const NOT_TIRED_PROMPT = actPromptFor(
+  { ...FRESH_SESSION, needs: { hunger: 64, energy: 100 } },
+  SLEEP_LOCATION_ID
+);
 
 const EMPLOYER_NAME = findJobById(HUSTLE_ID)!.employerName;
 
@@ -84,6 +103,14 @@ async function readPos(page: Page): Promise<{ x: number; z: number }> {
 async function hungerNow(page: Page): Promise<number> {
   const now = await page
     .getByRole('progressbar', { name: 'Hunger' })
+    .getAttribute('aria-valuenow');
+  return Number(now);
+}
+
+/** Rounded energy value from the HUD's progressbar. */
+async function energyNow(page: Page): Promise<number> {
+  const now = await page
+    .getByRole('progressbar', { name: 'Energy' })
     .getAttribute('aria-valuenow');
   return Number(now);
 }
@@ -128,6 +155,15 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
 
   const pageErrors: string[] = [];
   page.on('pageerror', (error) => pageErrors.push(String(error)));
+  // E-007: shipped assets must never 404 — the W-003/W-004 GLBs silently
+  // 404ed in every built deploy (hard '/models/…' paths vs the vite base)
+  // and only a console.warn noticed. Any failed asset fetch fails the test.
+  const failedAssets: string[] = [];
+  page.on('response', (res) => {
+    if (res.status() >= 400 && /\/(models|basis|assets)\//.test(res.url())) {
+      failedAssets.push(`${res.status()} ${res.url()}`);
+    }
+  });
   const shot = (name: string) => testInfo.outputPath(name);
 
   // ── 1. Load: HUD shows the starter wallet ────────────────────────────────
@@ -142,7 +178,35 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
 
   await page.screenshot({ path: shot('01-start-390x844.png') });
 
-  // ── 2. Walk east, then north, to the waakye joint (LOC-001) ─────────────
+  // ── 2. G-006 sleep beat at the compound (spawn IS LOC-002) ──────────────
+  // Fresh guest: energy 80 < 90 → the bed offers Sleep for free. The press
+  // restores energy (+55) at the cost of hunger (−8, you wake up hungry).
+  const energyBeforeSleep = await energyNow(page);
+  const hungerBeforeSleep = await hungerNow(page);
+  expect(SLEEP_PROMPT.enabled, 'rules must offer Sleep to a fresh guest').toBe(true);
+  const sleepButton = page.getByRole('button', { name: SLEEP_PROMPT.label, exact: true });
+  await expect(sleepButton).toHaveAttribute('aria-disabled', 'false');
+  await sleepButton.click();
+  await expect(page.getByText(SLEEP_TOAST)).toBeVisible();
+  await expect
+    .poll(() => energyNow(page), { timeout: 10_000 })
+    .toBeGreaterThan(energyBeforeSleep); // energy actually went up
+  await expect
+    .poll(() => hungerNow(page), { timeout: 10_000 })
+    .toBeLessThan(hungerBeforeSleep); // you wake up hungry (−8)
+
+  // Right after sleeping the energy sits above the SLEEP_GATE_ENERGY (90):
+  // the button keeps its label but the bed refuses a second nap.
+  expect(await energyNow(page)).toBeGreaterThanOrEqual(SLEEP_GATE_ENERGY);
+  expect(NOT_TIRED_PROMPT.enabled).toBe(false);
+  expect(NOT_TIRED_PROMPT.reason).toBe('Not tired yet');
+  await expect(sleepButton).toHaveAttribute('aria-disabled', 'true');
+  // The pill also settles into its greyed style (200ms background
+  // transition — polling it here makes the screenshot below truthful).
+  await expect(sleepButton).toHaveCSS('background-color', 'rgba(100, 116, 139, 0.3)');
+  await page.screenshot({ path: shot('02-sleep-not-tired-390x844.png') });
+
+  // ── 3. Walk east, then north, to the waakye joint (LOC-001) ─────────────
   await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 15.0, 'eastbound');
   // The proximity probe (≤2.5 m) flips the Act prompt to the hustle offer.
   const helpButton = page.getByRole('button', { name: HELP_LABEL });
@@ -151,7 +215,7 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
   // The prompt is rule-derived: it MUST name the employer from the data.
   expect(HELP_LABEL).toContain(EMPLOYER_NAME);
 
-  // ── 3. Act: accept the hustle, work all steps until the payout ──────────
+  // ── 4. Act: accept the hustle, work all steps until the payout ──────────
   await helpButton.click();
   await expect(page.getByText('Job accepted')).toBeVisible();
   await expect(page.getByText(formatGHS(20), { exact: true })).toBeVisible(); // zero-capital
@@ -163,9 +227,9 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
     await workButton.click();
   }
   await expect(page.getByText(formatGHS(35), { exact: true })).toBeVisible();
-  await page.screenshot({ path: shot('02-wallet-35-390x844.png') });
+  await page.screenshot({ path: shot('03-wallet-35-390x844.png') });
 
-  // ── 4. Earn-first: the joint now sells waakye (not a re-hire) ───────────
+  // ── 5. Earn-first: the joint now sells waakye (not a re-hire) ───────────
   const waakyeButton = page.getByRole('button', { name: WAAKYE_LABEL });
   await expect(waakyeButton).toHaveAttribute('aria-disabled', 'false');
   const hungerBeforeMeal = await hungerNow(page);
@@ -177,15 +241,16 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
     .poll(() => hungerNow(page), { timeout: 15_000 })
     .toBeGreaterThan(hungerBeforeMeal); // the meal actually fed the player
 
-  await page.screenshot({ path: shot('03-wallet-23-390x844.png') });
+  await page.screenshot({ path: shot('04-wallet-23-390x844.png') });
 
-  // ── 5. Walk away: no location nearby → Act disabled, wallet untouched ───
+  // ── 6. Walk away: no location nearby → Act disabled, wallet untouched ───
   const idleButton = page.getByRole('button', { name: 'Act', exact: true });
   await holdUntil(page, 'ArrowDown', async () => idleButton.isVisible(), 'away from the joint');
   await expect(idleButton).toHaveAttribute('aria-disabled', 'true');
   await expect(page.getByText(formatGHS(23), { exact: true })).toBeVisible();
 
-  // ── 6. Perf budget + a clean console ─────────────────────────────────────
-  expect(await drawCalls(page)).toBeLessThan(150);
+  // ── 7. Perf budget + a clean console ───────────────────────────────
+  expect(await drawCalls(page)).toBeLessThan(60);
+  expect(failedAssets, 'every shipped asset must resolve').toEqual([]);
   expect(pageErrors, 'the playtest must run without page errors').toEqual([]);
 });

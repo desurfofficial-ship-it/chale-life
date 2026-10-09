@@ -25,14 +25,16 @@
 import { useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { useThree } from '@react-three/fiber';
-import { createModelLoader } from '../gltfSupport';
+import { createModelLoader, publicUrl } from '../gltfSupport';
 import { VEHICLE_SPOTS, type VehicleModel } from './layout';
 
-/** Optimised GLBs under public/models/ (see docs/assets/LICENSES.csv). */
+/** Optimised GLBs under public/models/ (see docs/assets/LICENSES.csv).
+ *  publicUrl() keeps them base-aware — hard '/models/…' 404ed in every
+ *  built deploy (E-007 fix; preview + Pages serve under /chale-life/). */
 const VEHICLE_URLS: Record<VehicleModel, string> = {
-  trotro: '/models/vehicles/trotro_car_rapide.glb',
-  okada: '/models/vehicles/okada_motorbike.glb',
-  van: '/models/vehicles/vintage_van.glb',
+  trotro: publicUrl('/models/vehicles/trotro_car_rapide.glb'),
+  okada: publicUrl('/models/vehicles/okada_motorbike.glb'),
+  van: publicUrl('/models/vehicles/vintage_van.glb'),
 };
 
 function prepareScene(scene: THREE.Object3D, name: string): THREE.Object3D {

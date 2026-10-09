@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$comment": "Accra Life — Asset Registry. Single source of truth for every visual asset in the project. Update this whenever a new asset is added, replaced, or retired. Schema fields are documented in assets/README.md.",
   "version": 2,
-  "updated_at": "2026-10-08",
+  "updated_at": "2026-10-09",
   "strategy": {
     "principle": "Use generic CC0 assets to build the system first, then replace/augment with culturally specific Accra art as the product develops. Do not allow generic asset packs to define Accra Life's visual identity. Priority: playable + coherent Accra Life over an enormous asset collection.",
     "approved_sources": [
@@ -263,7 +263,7 @@
   },
   "runtime_assets": {
     "$comment": "v2 — the shipped model packs under public/ that src/ actually loads at runtime (URL /assets/...). The per-object mapping (object -> file -> loader -> placement) lives in docs/ASSET_MAPPING.md; keep the two in sync.",
-    "glb_vehicles": { "root": "public/assets/glb/vehicles/", "loaded_by": "src/r3f/LivingTrotro.tsx", "files_in_use": ["small_van.glb (PRIMARY trotro, scale 0.5)", "retro_anime_vintage_volkswagen_van.glb (alt, preloaded)", "european_delivery_van.glb (alt, on-demand)"] },
+    "models_vehicles": { "root": "public/models/vehicles/", "loaded_by": "src/world/starter/Vehicles.tsx", "files_in_use": ["trotro_car_rapide.glb (trotro)", "okada_motorbike.glb (okada)", "vintage_van.glb (van)"], "notes": "W-004 producer-optimised pack (meshopt geometry + WebP textures, trademark-scrubbed) placed via VEHICLE_SPOTS in src/world/starter/layout.ts; per-file licence rows in docs/assets/LICENSES.csv are enforced in CI (check:models). The pre-W-003 public/assets/glb/vehicles/ packs were purged in S-001." },
     "glb_buildings_interior_props": { "root": "public/assets/glb/{buildings,interior,props}/", "loaded_by": "src/r3f/BuildingAssets.tsx", "files_in_use": ["house_exterior.glb", "room_apartment_furniture.glb", "room_bathroom.glb", "house_1f_interior.glb", "building_office_room_window.glb", "building_office_room_curtain.glb", "cinemamovie_theater_seat.glb", "plastic_water_bottle.glb"] },
     "glb_food": { "root": "public/assets/glb/food/", "loaded_by": "src/r3f/MarketStalls.tsx", "files_in_use": ["banana.glb", "apple.glb", "bread.glb", "beet.glb", "avocado.glb", "barrel.glb", "bowl.glb", "bottle-ketchup.glb", "bag.glb"], "notes": "~200 models shipped, 9 wired; every food GLB internally references Textures/colormap.png — the folder must stay together." },
     "glb_furniture": { "root": "public/assets/glb/furniture/", "loaded_by": "src/r3f/InteriorFurniture.tsx", "files_in_use": ["furniture_set.glb", "some_furniture.glb", "chair_table_wardrobe_suitcase_furniture.glb"], "notes": "Box3 auto-fitted to 7/10/6 m yard lineups." },

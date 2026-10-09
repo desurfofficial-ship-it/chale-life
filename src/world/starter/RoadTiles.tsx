@@ -24,13 +24,15 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useThree } from '@react-three/fiber';
-import { createModelLoader } from '../gltfSupport';
+import { createModelLoader, publicUrl } from '../gltfSupport';
 import { KENNEY_ROAD_TILES, KENNEY_TILE_Y, type KenneyRoadTile } from './layout';
 
-/** Optimised GLBs under public/models/ (see docs/assets/LICENSES.csv). */
+/** Optimised GLBs under public/models/ (see docs/assets/LICENSES.csv).
+ *  publicUrl() keeps them base-aware — hard '/models/…' 404ed in every
+ *  built deploy (E-007 fix; preview + Pages serve under /chale-life/). */
 const TILE_URLS: Record<KenneyRoadTile, string> = {
-  straight: '/models/roads/road-straight-4m.glb',
-  crossroad: '/models/roads/road-crossroad-4m.glb',
+  straight: publicUrl('/models/roads/road-straight-4m.glb'),
+  crossroad: publicUrl('/models/roads/road-crossroad-4m.glb'),
 };
 
 interface TilePart {
