@@ -13,7 +13,8 @@
  *   - sagging power wires as one LineSegments                   → 1 draw call
  *   - canvas-textured signs                                     → 4 draw calls
  *   - Kenney road tiles, instanced GLBs (W-003 proof)           → ~2 draw calls
- *   ≈ 16 draw calls and ≈ 9k triangles total — far under the 150 / 100k budget.
+ *   - parked vehicles, producer GLBs (W-004, trademark-scrubbed) → 5 draw calls
+ *   ≈ 21 draw calls and ≈ 42k triangles total — far under the 150 / 100k budget.
  *
  * Mounts in one line from the engine:  <StarterBlock />
  *
@@ -24,6 +25,7 @@ import { InstancedProps } from './InstancedProps';
 import { Signs } from './Signs';
 import { Wires } from './Wires';
 import { RoadTiles } from './RoadTiles';
+import { Vehicles } from './Vehicles';
 import { staticGeometry } from './buildStatic';
 
 function StaticArchitecture() {
@@ -42,6 +44,7 @@ export function StarterBlock() {
       <InstancedProps />
       <Wires />
       <RoadTiles />
+      <Vehicles />
       <Signs />
     </group>
   );

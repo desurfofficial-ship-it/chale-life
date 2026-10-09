@@ -268,8 +268,38 @@ export const KENNEY_ROAD_TILES: KenneyTileSpot[] = [
   { tile: 'straight', x: -1, z: 8, ry: 0 },
 ];
 
+// --------------------------------------------------------------- vehicles --
+/**
+ * W-004 vehicle pack (producer-optimised GLBs, public/models/vehicles/).
+ * Trademark scrub applied: no brand names/logos in metadata or textures
+ * (see docs/assets/LICENSES.csv). Sizes (W×H×L m) from the producer brief:
+ *   trotro 2.48×2.39×5.00, okada 1.02×1.54×2.30, van 2.46×1.80×4.30.
+ * "ry" is the yaw applied on top of each model's native forward axis
+ * (trotro/okada natively face -z, van faces -x — calibrated from renders).
+ * Rotations stay axis-aligned (0/±π/2/π) so the collider AABBs below match
+ * the visible footprints exactly (yaw swaps W×L for the rotated models).
+ */
+export type VehicleModel = 'trotro' | 'okada' | 'van';
+
+export interface VehicleSpot {
+  model: VehicleModel;
+  x: number;
+  z: number;
+  /** Yaw in radians (native-forward + this). */
+  ry: number;
+}
+
+export const VEHICLE_SPOTS: VehicleSpot[] = [
+  // Native forward axes (from render calibration): trotro + okada face -z,
+  // van faces -x. Yaws below park each vehicle parallel to its curb,
+  // matching left-hand traffic (south lane = westbound, north = eastbound).
+  { model: 'trotro', x: 22.5, z: 9.9, ry: Math.PI / 2 }, // westbound at the trotro stop
+  { model: 'okada', x: 18.3, z: 2.85, ry: 0 }, // parked by the waakye kiosk, nose to the road
+  { model: 'van', x: 3.5, z: 5.9, ry: Math.PI }, // eastbound, north curb lane
+];
+
 // ------------------------------------------------------------- colliders ---
-/** Building + wall footprints that block movement (AABBs, metres). */
+/** Building + wall + parked-vehicle footprints that block movement (AABBs, metres). */
 export const SOLID_FOOTPRINTS: Box2D[] = [
   PROVISIONS.footprint,
   ...BLOCK_SHOPS.map((s) => s.footprint),
@@ -281,4 +311,8 @@ export const SOLID_FOOTPRINTS: Box2D[] = [
   CHOP_BAR.footprint,
   BLUE_HOUSE.footprint,
   TROTRO_STOP.bench,
+  // parked vehicles (W-004) — AABBs from the producer brief dimensions
+  box(22.5, 9.9, 5.0, 2.48), // trotro at the stop
+  box(18.3, 2.85, 2.3, 1.02), // okada by the kiosk
+  box(3.5, 5.9, 4.3, 2.46), // vintage van, north curb
 ];

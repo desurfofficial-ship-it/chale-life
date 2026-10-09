@@ -1,10 +1,14 @@
 /**
  * gltfSupport.ts — runtime decoder support for optimised GLBs (W-003).
  *
- * public/models/*.glb are produced by `npm run assets` (scripts/optimize-
- * assets.mjs) with meshopt geometry compression and KTX2/Basis textures.
- * A plain GLTFLoader cannot read them: both decoders must be registered
- * before load. This module owns that wiring, once, for the whole app.
+ * public/models/*.glb are compressed model files in two flavours:
+ *   - `npm run assets` output (scripts/optimize-assets.mjs): meshopt
+ *     geometry + KTX2/Basis textures (the Kenney road tiles), and
+ *   - producer-optimised packs (W-004 vehicles): meshopt geometry + WebP
+ *     textures (WebP decodes natively in the browser — no loader needed).
+ * A plain GLTFLoader cannot read either flavour's geometry: the meshopt
+ * decoder must be registered before load (KTX2 likewise for the KTX2
+ * flavour). This module owns that wiring, once, for the whole app.
  *
  *   - MeshoptDecoder (EXT_meshopt_compression) — wasm, from three's addons
  *   - KTX2Loader (KHR_texture_basisu) — Basis Universal transcoder served
