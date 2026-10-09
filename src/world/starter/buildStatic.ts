@@ -15,7 +15,9 @@ import {
   COMPOUND,
   COMPOUND_HOUSE,
   CROSSOVERS,
+  DAAVI_BENCH_MESH,
   DIRT_PATCHES,
+  JOB_SPOT_PROPS,
   LATERITE_STREET,
   NORTH_GUTTER,
   NORTH_PAVEMENT,
@@ -319,6 +321,48 @@ function chopBarSpecs(): GeomSpec[] {
   return s;
 }
 
+// ------------------------------------------------- daavi job spot / bench --
+/**
+ * G-008d world props for Daavi's split zones, all merged into the static
+ * mesh (zero extra draw calls). Footprints live in layout.ts and are the
+ * same boxes the colliders use — visuals and physics cannot drift.
+ */
+function daaviSpecs(): GeomSpec[] {
+  const d: GeomSpec[] = [];
+
+  // -- Daavi's bench: wooden, faces south (the road / the player) --
+  // Seat + backrest fill DAAVI_BENCH_MESH exactly; the waypoint
+  // (21.5, 2.9) sits 0.25 m south of the seat's front face.
+  const b = DAAVI_BENCH_MESH;
+  const bcx = (b.x0 + b.x1) / 2;
+  const bcz = (b.z0 + b.z1) / 2;
+  const seatW = b.x1 - b.x0;
+  const seatD = b.z1 - b.z0;
+  for (const lx of [bcx - seatW / 2 + 0.15, bcx + seatW / 2 - 0.15]) {
+    d.push(box([0.09, 0.42, seatD - 0.06], [lx, 0.21, bcz], P.woodDark)); // legs
+  }
+  d.push(box([seatW, 0.07, seatD], [bcx, 0.455, bcz], P.wood)); // seat
+  for (const px of [bcx - seatW / 2 + 0.2, bcx + seatW / 2 - 0.2]) {
+    d.push(box([0.07, 0.55, 0.06], [px, 0.66, b.z1 - 0.04], P.woodDark)); // back posts
+  }
+  d.push(box([seatW - 0.1, 0.09, 0.05], [bcx, 0.84, b.z1 - 0.04], P.wood)); // backrest
+  d.push(box([seatW - 0.1, 0.09, 0.05], [bcx, 0.64, b.z1 - 0.04], P.wood));
+
+  // -- crate + pan stack against the kiosk's east wall (the job spot) --
+  // The solid footprint (JOB_SPOT_PROPS) ends at x 17.62 so the standing
+  // point (18.0, 0.0) stays walkable — see layout.ts.
+  d.push(box([0.4, 0.3, 0.42], [17.31, 0.15, -0.27], P.plasticRed)); // crate A
+  d.push(box([0.4, 0.3, 0.42], [17.31, 0.15, 0.19], P.plasticBlue)); // crate B
+  d.push(box([0.36, 0.26, 0.38], [17.31, 0.43, 0.19], P.plasticGreen)); // crate C on B
+  // Aluminium pans: two stacked on crate A, one on crate C, one leaning.
+  d.push(cyl(0.13, 0.11, 0.1, [17.3, 0.35, -0.27], P.iron, 10));
+  d.push(cyl(0.11, 0.09, 0.09, [17.3, 0.445, -0.27], P.iron, 10));
+  d.push(cyl(0.1, 0.08, 0.1, [17.31, 0.61, 0.19], P.iron, 10));
+  d.push(box([0.02, 0.34, 0.26], [17.53, 0.16, 0.19], P.iron, [0, 0, -0.3]));
+
+  return d;
+}
+
 // ---------------------------------------------------------------- build ----
 /** All static architecture of the block, merged into one geometry. */
 export function buildStarterBlockGeometry(): GeomSpec[] {
@@ -329,6 +373,7 @@ export function buildStarterBlockGeometry(): GeomSpec[] {
     ...polytankSpecs(),
     ...trotroSpecs(),
     ...chopBarSpecs(),
+    ...daaviSpecs(),
   ];
 }
 

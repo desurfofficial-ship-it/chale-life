@@ -6,7 +6,7 @@
  * Agent 3 (World & Art) owns this file; other data files belong to Agent 4.
  */
 
-export type LocationType = 'food' | 'home' | 'shop' | 'transport' | 'landmark';
+export type LocationType = 'food' | 'home' | 'shop' | 'transport' | 'landmark' | 'job';
 
 export interface Location {
   id: string;
@@ -23,8 +23,25 @@ export const locations: Location[] = [
     id: 'LOC-001',
     name: "Daavi's Waakye Joint",
     type: 'food',
-    x: 15.5, // front of the yellow kiosk, north pavement
+    x: 15.5, // front of the yellow kiosk, north pavement — FOOD COUNTER only
     z: 2.4,
+  },
+  {
+    id: 'LOC-001-JOB',
+    name: "Daavi's Job Spot",
+    type: 'job',
+    // G-008d: the kiosk's east side, just off the east wall (kiosk
+    // x 13.9–17.1), beside the crate/pan stack (world props ~x ≤ 17.62).
+    // WORK only — hire, "grab pans" (step 1) and "get paid" (step 3) happen
+    // here; food never does. Zones must not overlap: this spot is
+    // √(2.5² + 2.5²) ≈ 3.54 m from LOC-001, so with the counter's default
+    // 2.5 m reach the job-spot zone radius must stay ≤ 0.9 m (Agent 4's
+    // DAAVI_JOB_SPOT in rules/proximity.ts). z sits 0.1 south of the
+    // (18.0, 0.0) design point so the whole bench-approach band (z ≥ 2.4,
+    // e.g. 18.6, 2.4) stays outside this zone's default 2.5 m point reach —
+    // the special small-radius DAAVI_JOB_SPOT zone is unaffected.
+    x: 18.0,
+    z: -0.1,
   },
   {
     id: 'LOC-002',
@@ -58,7 +75,12 @@ export const locations: Location[] = [
     id: 'LOC-006',
     name: 'Laterite Junction',
     type: 'landmark',
-    x: -21, // where the laterite street meets the main road
-    z: 8,
+    // G-008d: moved off the carriageway to the north pavement at the
+    // junction (was (-21, 8), mid-road). It still marks where the laterite
+    // street meets the main road — the player now stands beside it, not in
+    // it — so every location passes the world clearance test
+    // (src/world/clearance.test.ts: no location inside MAIN_ROAD/gutters).
+    x: -21,
+    z: 3.2,
   },
 ];
