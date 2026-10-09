@@ -1,5 +1,5 @@
 /**
- * ApronMesh — outer 25 m ring past WORLD_MIN/MAX (W-005).
+ * ApronMesh — outer 25 m ring past WORLD_MIN/MAX (B-002 / B-003b). One draw call.
  * Merged vertex-coloured geometry, one draw call.
  */
 import { useMemo } from 'react';
