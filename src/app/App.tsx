@@ -120,8 +120,7 @@ export function App() {
         camera={{ position: [0, 30, 30], zoom: INITIAL_ZOOM, near: 0.1, far: 200 }}
         style={{ position: 'absolute', inset: 0 }}
       >
-        {/* Warm coastal haze (W-005). */}
-        <color attach="background" args={['#c8b89a']} />
+        {/* Background + fog owned by Lighting (B-003b — no duplicate). */}
         <GameLoop />
         <StarterBlock />
         <Player />
