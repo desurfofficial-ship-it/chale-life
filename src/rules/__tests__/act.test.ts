@@ -3,8 +3,8 @@ import { findFoodById, FOOD_SACHET_WATER_ID, FOOD_WAAKYE_ID } from '../../data/f
 import { findJobById } from '../../data/jobs';
 import { locations } from '../../data/locations';
 import { createStarterWallet, formatGHS } from '../economy';
-import { createStarterNeeds, drainNeeds } from '../needs';
-import { createStarterJobState } from '../jobs';
+import { createStarterNeeds, drainNeeds, WAAKYE_MAX_HUNGER } from '../needs';
+import { createStarterJobState, idleObjectiveFor, type JobState } from '../jobs';
 import {
   actPromptFor,
   AUNTY_BA_HUSTLE_ID,
@@ -351,8 +351,8 @@ describe('act: earn-first at Daavi\u2019s (G-004)', () => {
   });
 });
 
-describe('act: water at the provisions store (LOC-003)', () => {
-  it('sells sachet water for ₵1 with drinkWater effects', () => {
+describe('act: water at the provisions store (LOC-003, G-008c round 2 nerf)', () => {
+  it('sells sachet water for ₵1 with the sip effects (+4 hunger / +2 energy)', () => {
     const session: ActSession = {
       wallet: { balanceGHS: 5 },
       needs: { hunger: 40, energy: 30 },
@@ -363,9 +363,9 @@ describe('act: water at the provisions store (LOC-003)', () => {
     expect(prompt.enabled).toBe(true);
 
     const result = resolveAct(session, WATER_LOCATION_ID);
-    expect(result.toast).toContain('+10 energy');
+    expect(result.toast).toContain('+2 energy');
     expect(result.session.wallet.balanceGHS).toBe(4);
-    expect(result.session.needs).toEqual({ hunger: 46, energy: 40 });
+    expect(result.session.needs).toEqual({ hunger: 44, energy: 32 });
   });
 
   it('refuses water without ₵1 and leaves the session untouched', () => {
@@ -381,6 +381,134 @@ describe('act: water at the provisions store (LOC-003)', () => {
     const result = resolveAct(session, WATER_LOCATION_ID);
     expect(result.session).toBe(session);
     expect(result.toast).toBeNull();
+  });
+
+  it('a purchase stamps lastWaterAt from the press clock (pure data)', () => {
+    const session: ActSession = {
+      wallet: { balanceGHS: 5 },
+      needs: { hunger: 40, energy: 30 },
+      job: createStarterJobState(),
+      nowMs: 1_000_000,
+    };
+    const result = resolveAct(session, WATER_LOCATION_ID);
+    expect(result.purchased).toBe(true);
+    expect(result.session.needs.lastWaterAt).toBe(1_000_000);
+  });
+});
+
+describe('act: the water gates (G-008c round 2 — Not thirsty + 20 s rest)', () => {
+  const waterSession = (
+    needs: { hunger: number; energy: number },
+    extra?: Partial<ActSession>
+  ): ActSession => ({
+    wallet: { balanceGHS: 5 },
+    needs,
+    job: createStarterJobState(),
+    ...extra,
+  });
+
+  it('refuses with "Not thirsty" at hunger ≥ 80 (79 still buys)', () => {
+    const quenched = waterSession({ hunger: 80, energy: 30 });
+    const prompt = actPromptFor(quenched, WATER_LOCATION_ID);
+    expect(prompt.label).toBe('Buy water ₵1');
+    expect(prompt.enabled).toBe(false);
+    expect(prompt.reason).toBe('Not thirsty');
+    const refused = resolveAct(quenched, WATER_LOCATION_ID);
+    expect(refused.session).toBe(quenched); // identity — the guards never stamp it
+    expect(refused.toast).toBeNull();
+    expect(refused.kind).toBe('water');
+
+    // Boundary below the gate is open (the mirror of the sleep 89/90 pin).
+    expect(actPromptFor(waterSession({ hunger: 79, energy: 30 }), WATER_LOCATION_ID).enabled).toBe(true);
+  });
+
+  it('the gate rounds like the Full gate: 79.6 → 80 refuses, 79.4 → 79 buys', () => {
+    expect(
+      actPromptFor(waterSession({ hunger: 79.6, energy: 30 }), WATER_LOCATION_ID).enabled
+    ).toBe(false);
+    expect(
+      actPromptFor(waterSession({ hunger: 79.4, energy: 30 }), WATER_LOCATION_ID).enabled
+    ).toBe(true);
+  });
+
+  it('enforces the 20 s per-sachet rest from the purchase stamp', () => {
+    const bought = resolveAct(waterSession({ hunger: 40, energy: 30 }, { nowMs: 100_000 }), WATER_LOCATION_ID);
+    expect(bought.purchased).toBe(true);
+
+    // 5 s later: still resting — "Water again in 15s".
+    const resting: ActSession = { ...bought.session, nowMs: 105_000 };
+    const prompt = actPromptFor(resting, WATER_LOCATION_ID);
+    expect(prompt.enabled).toBe(false);
+    expect(prompt.reason).toBe('Water again in 15s');
+    const refused = resolveAct(resting, WATER_LOCATION_ID);
+    expect(refused.session).toBe(resting);
+    expect(refused.toast).toBeNull();
+
+    // The exact boundary is READY — 20 s elapsed leaves 0 ms remaining.
+    expect(
+      actPromptFor({ ...bought.session, nowMs: 120_000 }, WATER_LOCATION_ID).enabled
+    ).toBe(true);
+    expect(
+      actPromptFor({ ...bought.session, nowMs: 119_999 }, WATER_LOCATION_ID).reason
+    ).toBe('Water again in 1s');
+  });
+
+  it('5 waters give at most +10 energy and +20 hunger — the 6th is "Not thirsty"', () => {
+    // The exploit, replayed with the nerf: hunger 60 / energy 60, one
+    // sachet every 20 s (the fastest legal cadence). The old +10/+6
+    // numbers turned ₵5 into energy 60→100 and hunger 60→90.
+    let session = waterSession({ hunger: 60, energy: 60 }, { nowMs: 0 });
+    for (let i = 0; i < 5; i++) {
+      session = { ...session, nowMs: i * 20_000 };
+      expect(actPromptFor(session, WATER_LOCATION_ID).enabled, `sip ${i + 1}`).toBe(true);
+      session = resolveAct(session, WATER_LOCATION_ID).session;
+    }
+    expect(session.needs.energy).toBe(70); // 60 + 5 × 2 — at most +10, ever
+    expect(session.needs.hunger).toBe(80); // 60 + 5 × 4 — the gate lands exactly
+    // The 6th press is refused — no clock, no wallet trick past the gate.
+    const prompt = actPromptFor(session, WATER_LOCATION_ID);
+    expect(prompt.enabled).toBe(false);
+    expect(prompt.reason).toBe('Not thirsty');
+    expect(resolveAct(session, WATER_LOCATION_ID).session).toBe(session);
+  });
+
+  it('reason order: "Not thirsty" first, then the rest, then the purse', () => {
+    // Thirsty-but-broke shows the purse (thirst gate open); quenched
+    // shows thirst even when broke; quenched AND resting still shows
+    // thirst — the gate outranks the countdown by design.
+    expect(
+      actPromptFor(
+        { ...waterSession({ hunger: 40, energy: 30 }), wallet: { balanceGHS: 0 } },
+        WATER_LOCATION_ID
+      ).reason
+    ).toContain('Not enough cash');
+    expect(
+      actPromptFor(waterSession({ hunger: 90, energy: 30 }), WATER_LOCATION_ID).reason
+    ).toBe('Not thirsty');
+    const quenchedRestingBroke: ActSession = {
+      wallet: { balanceGHS: 0 },
+      needs: { hunger: 90, energy: 30, lastWaterAt: 100_000 },
+      job: createStarterJobState(),
+      nowMs: 105_000,
+    };
+    expect(actPromptFor(quenchedRestingBroke, WATER_LOCATION_ID).reason).toBe('Not thirsty');
+    // Thirsty + resting + broke: the countdown is the useful truth.
+    const thirstyRestingBroke: ActSession = {
+      ...quenchedRestingBroke,
+      needs: { hunger: 40, energy: 30, lastWaterAt: 100_000 },
+    };
+    expect(actPromptFor(thirstyRestingBroke, WATER_LOCATION_ID).reason).toBe('Water again in 15s');
+  });
+
+  it('a session without the press clock never rests (legacy callers)', () => {
+    // lastWaterAt without nowMs cannot count — optional-safe like the job
+    // cooldown, so pre-round-2 sessions keep compiling and keep buying.
+    const stamped: ActSession = {
+      wallet: { balanceGHS: 5 },
+      needs: { hunger: 40, energy: 30, lastWaterAt: 100_000 },
+      job: createStarterJobState(),
+    };
+    expect(actPromptFor(stamped, WATER_LOCATION_ID).enabled).toBe(true);
   });
 });
 
@@ -1035,5 +1163,73 @@ describe('act: objective marker target (G-008b item 7)', () => {
     expect(
       objectiveMarkerTarget({ activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] }, { hunger: 72, energy: 10 })
     ).toBe(SLEEP_LOCATION_ID);
+  });
+});
+
+// ── G-008c round 2 item 4: the idle line never contradicts the button ────────
+
+describe('act: the idle objective line agrees with the Act button (property)', () => {
+  const done: JobState = { activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] };
+  const WAAKYE_LINE = `Hungry? Buy waakye at Daavi’s (${formatGHS(12)}).`;
+  const TIRED_LINE = 'Tired — head home to the compound and sleep.';
+  const WORK_LINE = 'Work another shift at Daavi’s.';
+
+  /**
+   * G-008c round 2 item 8, over a hunger × energy grid (0..100 step 5 —
+   * 441 cells). The canonical session behind the grid: the shift worked,
+   * the meal affordable (the line quotes the data price), the job off
+   * cooldown (the needs-less clock — ready, like the legacy callers).
+   * The property: whatever the line suggests, the Act button OFFERS at
+   * the location where that action happens — the copy can never send a
+   * guest somewhere the button refuses them (the hunger-89 "Full"
+   * contradiction from the review can never reproduce).
+   */
+  it('every suggested action is enabled at its location across the grid', () => {
+    for (let hunger = 0; hunger <= 100; hunger += 5) {
+      for (let energy = 0; energy <= 100; energy += 5) {
+        const needs = { hunger, energy };
+        const line = idleObjectiveFor(done, needs);
+        const where = `hunger ${hunger} / energy ${energy}`;
+
+        if (line === WAAKYE_LINE) {
+          // The mapping: hunger ≤ 55 owns the meal line — and the joint
+          // really offers the meal at these needs.
+          expect(hunger, where).toBeLessThanOrEqual(WAAKYE_MAX_HUNGER);
+          const prompt = actPromptFor({ wallet: { balanceGHS: 100 }, needs, job: done }, WAAKYE_LOCATION_ID);
+          expect(prompt.enabled, where).toBe(true);
+          expect(prompt.label, where).toContain('waakye');
+        } else if (line === TIRED_LINE) {
+          // hunger above the meal gate + energy below the low line → the
+          // tired line — and the compound's bed takes anyone under 90.
+          expect(hunger, where).toBeGreaterThan(WAAKYE_MAX_HUNGER);
+          expect(energy, where).toBeLessThan(25);
+          const prompt = actPromptFor({ wallet: { balanceGHS: 100 }, needs, job: done }, SLEEP_LOCATION_ID);
+          expect(prompt.enabled, where).toBe(true);
+          expect(prompt.label, where).toBe('Sleep');
+        } else if (line === WORK_LINE) {
+          // Both gates above their lines → canWork passes and the joint
+          // really offers another shift.
+          expect(hunger, where).toBeGreaterThan(WAAKYE_MAX_HUNGER);
+          expect(energy, where).toBeGreaterThanOrEqual(25);
+          const prompt = actPromptFor({ wallet: { balanceGHS: 100 }, needs, job: done }, WAAKYE_LOCATION_ID);
+          expect(prompt.enabled, where).toBe(true);
+          expect(prompt.label, where).toBe('Help Daavi');
+        } else {
+          throw new Error(`unexpected idle line at ${where}: ${line}`);
+        }
+      }
+    }
+  });
+
+  it('the exact boundaries hold: 55/56 hunger and 24/25 energy flip the line', () => {
+    expect(idleObjectiveFor(done, { hunger: 55, energy: 80 })).toBe(WAAKYE_LINE);
+    expect(idleObjectiveFor(done, { hunger: 56, energy: 80 })).toBe(WORK_LINE);
+    expect(idleObjectiveFor(done, { hunger: 60, energy: 24 })).toBe(TIRED_LINE);
+    expect(idleObjectiveFor(done, { hunger: 60, energy: 25 })).toBe(WORK_LINE);
+    // The old contradicting cell from the review — hunger 89, where the
+    // combined line still sang "Buy waakye" — now reads the work truth
+    // and never suggests the meal the joint would refuse.
+    expect(idleObjectiveFor(done, { hunger: 89, energy: 62 })).toBe(WORK_LINE);
+    expect(idleObjectiveFor(done, { hunger: 89, energy: 62 })).not.toContain('waakye');
   });
 });

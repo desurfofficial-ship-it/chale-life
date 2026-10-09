@@ -7,6 +7,7 @@ import {
   advanceStep,
   completeJob,
   completedIdsOf,
+  cooldownRemaining,
   cooldownStatus,
   createStarterJobState,
   evaluateRequirements,
@@ -263,6 +264,21 @@ describe('jobs: payout stamp + cooldown (G-008c item 2)', () => {
     const negative = { ...hustle, cooldownSeconds: -5 };
     expect(cooldownStatus(negative, 10_000, 0).onCooldown).toBe(false);
   });
+
+  it('cooldownRemaining is the generic primitive (the sachet rest shares it)', () => {
+    // The water rest (20 s) rides the same math as the job shifts.
+    expect(cooldownRemaining(20, 10_000, 0)).toEqual({ onCooldown: true, remainingMs: 10_000 });
+    expect(cooldownRemaining(20, 20_000, 0)).toEqual({ onCooldown: false, remainingMs: 0 });
+    expect(cooldownRemaining(20, 19_999, 0)).toEqual({ onCooldown: true, remainingMs: 1 });
+    // Missing clocks / zero / negative data read ready — never gates.
+    expect(cooldownRemaining(20, undefined, 0).onCooldown).toBe(false);
+    expect(cooldownRemaining(20, 10_000, undefined).onCooldown).toBe(false);
+    expect(cooldownRemaining(0, 10_000, 0).onCooldown).toBe(false);
+    expect(cooldownRemaining(-3, 10_000, 0).onCooldown).toBe(false);
+    // And the job wrapper delegates to it.
+    const hustle = findJobById('HUSTLE_AUNTY_BA_STARTER')!;
+    expect(cooldownStatus(hustle, 10_000, 0)).toEqual(cooldownRemaining(45, 10_000, 0));
+  });
 });
 
 describe('jobs: completed-run history (G-004 completedIds)', () => {
@@ -329,15 +345,16 @@ describe('jobs: idle objective line (G-005 Daavi)', () => {
     );
   });
 
-  it('after the hustle the card nudges to the waakye loop at the data price', () => {
+  it('after the hustle the needs-less legacy call gets the neutral work nudge', () => {
+    // G-008c round 2: the needs-based mapping needs needs — without them
+    // the card falls back to the neutral post-shift line (never the old
+    // combined waakye-or-work sentence that contradicted a "Full" button).
     const done: JobState = {
       activeId: null,
       step: 0,
       completedIds: ['HUSTLE_AUNTY_BA_STARTER'],
     };
-    expect(idleObjectiveFor(done)).toBe(
-      'Hungry? Buy waakye at Daavi’s (₵12), or work another shift.'
-    );
+    expect(idleObjectiveFor(done)).toBe('Work another shift at Daavi’s.');
   });
 
   it('history without the hustle still points at the joint (not the meal nudge)', () => {
@@ -348,48 +365,63 @@ describe('jobs: idle objective line (G-005 Daavi)', () => {
   });
 });
 
-describe('jobs: idle objective priority (G-006 tired hint)', () => {
+describe('jobs: idle objective priority (G-006 tired hint, G-008c round 2 needs-based)', () => {
   const done: JobState = {
     activeId: null,
     step: 0,
     completedIds: ['HUSTLE_AUNTY_BA_STARTER'],
   };
 
-  it('low energy (below the 25 LOW threshold) with OK hunger sends the guest home to sleep', () => {
+  it('fresh run, low energy with OK hunger: the guest is sent home to sleep', () => {
     expect(
       idleObjectiveFor(createStarterJobState(), { hunger: 50, energy: 24 })
     ).toBe('Tired — head home to the compound and sleep.');
   });
 
-  it('energy exactly at the threshold (25) is not tired yet', () => {
+  it('fresh run, energy exactly at the threshold (25) is not tired yet', () => {
     expect(
       idleObjectiveFor(createStarterJobState(), { hunger: 50, energy: 25 })
     ).toBe('No job yet — find work at Daavi’s waakye joint.');
   });
 
-  it('the tired hint outranks the waakye nudge when hunger is OK', () => {
+  it('COMPLETED run, hunger ≤ 55: the meal line — even when tired (spec order)', () => {
+    // The joint's own door 1 is the meal at these needs, so the card says
+    // exactly that (the G-006 tired-first yield now only applies above
+    // the meal gate — the button and the line agree cell for cell).
     expect(idleObjectiveFor(done, { hunger: 40, energy: 10 })).toBe(
+      'Hungry? Buy waakye at Daavi’s (₵12).'
+    );
+  });
+
+  it('COMPLETED run, hunger above the gate + tired: the compound line', () => {
+    expect(idleObjectiveFor(done, { hunger: 60, energy: 10 })).toBe(
       'Tired — head home to the compound and sleep.'
     );
   });
 
-  it('a starving guest eats first — the food line wins when hunger < the work gate', () => {
+  it('COMPLETED run, fed and rested: work another shift', () => {
+    expect(idleObjectiveFor(done, { hunger: 60, energy: 60 })).toBe(
+      'Work another shift at Daavi’s.'
+    );
+  });
+
+  it('a starving guest still eats first — hunger ≤ 55 owns the line at any energy', () => {
     // Sleep costs 8 hunger, so sleeping while starving digs the hole deeper.
     expect(idleObjectiveFor(done, { hunger: 8, energy: 10 })).toBe(
-      'Hungry? Buy waakye at Daavi’s (₵12), or work another shift.'
+      'Hungry? Buy waakye at Daavi’s (₵12).'
     );
+    // A FRESH starving guest keeps the find-work beacon (the joint IS the
+    // destination — the anti-soft-lock waakye or the hustle lives there).
     expect(idleObjectiveFor(createStarterJobState(), { hunger: 5, energy: 10 })).toBe(
       'No job yet — find work at Daavi’s waakye joint.'
     );
   });
 
-  it('calling without needs keeps the G-005 behaviour (legacy HUD callers)', () => {
+  it('calling without needs keeps a stable line (legacy HUD callers)', () => {
     expect(idleObjectiveFor(createStarterJobState())).toBe(
       'No job yet — find work at Daavi’s waakye joint.'
     );
-    expect(idleObjectiveFor(done)).toBe(
-      'Hungry? Buy waakye at Daavi’s (₵12), or work another shift.'
-    );
+    expect(idleObjectiveFor(done)).toBe('Work another shift at Daavi’s.');
   });
 });
 

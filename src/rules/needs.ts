@@ -11,9 +11,11 @@
  *   - starter (Level-1) drain 0.05 hunger / 0.0333 energy per second
  *     (~3/min + ~2/min — the playability patch that keeps a ₵0 guest
  *     from soft-locking before the first payout)
- *   - low threshold 25, meal +45 hunger, water +6 hunger / +10 energy,
- *     sleep +55 energy / −8 hunger (G-006: you wake up hungry),
- *     work −18 energy (and −8 hunger, as in salvage)
+ *   - low threshold 25, meal +45 hunger, water +4 hunger / +2 energy
+ *     (G-008c round 2 — the salvage +6/+10 made ₵1 water a needs-juice
+ *     that out-competed sleep and waakye alike), sleep +55 energy / −8
+ *     hunger (G-006: you wake up hungry), work −18 energy (and −8
+ *     hunger, as in salvage)
  */
 
 export interface NeedsState {
@@ -21,6 +23,15 @@ export interface NeedsState {
   readonly hunger: number;
   /** 0–100 (100 = rested). */
   readonly energy: number;
+  /**
+   * Epoch ms of the most recent sachet-water purchase (G-008c round 2) —
+   * the anchor the 20 s water rest counts from. Optional so every
+   * pre-water slice keeps compiling; undefined reads as "never drunk".
+   * Threaded exactly like JobState.lastPayoutAt: stamped by drinkWater,
+   * preserved by every other needs transform, and read as pure data
+   * paired with the session's nowMs — no rule ever calls Date.now().
+   */
+  readonly lastWaterAt?: number;
 }
 
 /** Named decay profiles — Engine picks which one is active. */
@@ -37,9 +48,21 @@ export const LOW_THRESHOLD = 25;
 /** Hunger restored by a proper meal (waakye & friends). */
 export const MEAL_HUNGER_RESTORE = 45;
 
-/** Free compound water / sachet water effect. */
-export const WATER_HUNGER_RESTORE = 6;
-export const WATER_ENERGY_RESTORE = 10;
+/**
+ * Sachet-water effect — G-008c round 2 nerf: a sip, not a needs-juice.
+ * The salvage +6 hunger / +10 energy let ₵5 buy energy 60→100 and hunger
+ * 60→90, making both sleep and waakye pointless; now energy comes
+ * mainly from sleep and hunger from meals.
+ */
+export const WATER_HUNGER_RESTORE = 4;
+export const WATER_ENERGY_RESTORE = 2;
+
+/**
+ * At or above this hunger the provisions shop refuses water — the Act
+ * button greys out with "Not thirsty" (G-008c round 2, mirror of the
+ * sleep gate). Rounded, like the waakye Full gate.
+ */
+export const WATER_MAX_HUNGER = 80;
 
 /** Energy restored by sleeping at the compound (no bed bonus). */
 export const SLEEP_ENERGY_RESTORE = 55;
@@ -98,17 +121,24 @@ export function drainNeeds(
   if (dtSeconds <= 0 || dtSeconds > MAX_TICK_SECONDS) return state;
   const rate = DECAY_PER_SECOND[profile];
   return {
+    ...(state.lastWaterAt !== undefined ? { lastWaterAt: state.lastWaterAt } : {}),
     hunger: clampNeed(state.hunger - rate.hunger * dtSeconds),
     energy: clampNeed(state.energy - rate.energy * dtSeconds),
   };
 }
 
-/** Generic clamped restore — the primitive behind meal/water/sleep/work. */
+/**
+ * Generic clamped restore — the primitive behind meal/water/sleep/work.
+ * Carries an existing water stamp forward: eating, sleeping or working
+ * can never un-arm a running 20 s water rest (same rule as payouts and
+ * JobState.lastPayoutAt).
+ */
 export function applyRestore(
   state: NeedsState,
   delta: { hunger?: number; energy?: number }
 ): NeedsState {
   return {
+    ...(state.lastWaterAt !== undefined ? { lastWaterAt: state.lastWaterAt } : {}),
     hunger: clampNeed(state.hunger + (delta.hunger ?? 0)),
     energy: clampNeed(state.energy + (delta.energy ?? 0)),
   };
@@ -119,12 +149,19 @@ export function applyMeal(state: NeedsState): NeedsState {
   return applyRestore(state, { hunger: MEAL_HUNGER_RESTORE });
 }
 
-/** Water: +6 hunger and +10 energy (WATER_* constants). */
-export function drinkWater(state: NeedsState): NeedsState {
-  return applyRestore(state, {
+/**
+ * Water: +4 hunger and +2 energy (WATER_* constants), G-008c round 2.
+ * `nowMs` (the session's press clock, pure data) stamps `lastWaterAt` —
+ * the instant the 20 s per-sachet rest counts from. Omitted (legacy
+ * callers) any prior stamp is preserved, so a clockless re-drink can
+ * never un-arm a running cooldown.
+ */
+export function drinkWater(state: NeedsState, nowMs?: number): NeedsState {
+  const sipped = applyRestore(state, {
     hunger: WATER_HUNGER_RESTORE,
     energy: WATER_ENERGY_RESTORE,
   });
+  return nowMs === undefined ? sipped : { ...sipped, lastWaterAt: nowMs };
 }
 
 /**

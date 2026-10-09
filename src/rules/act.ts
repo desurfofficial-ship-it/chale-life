@@ -46,7 +46,12 @@
  *       (G-008b's shape only re-hired BROKE guests — a guest with ₵12+
  *       and a full belly stared at a dead "Full" button forever.)
  *   - At LOC-003 (Maame Effia's provisions): buy FOOD_SACHET_WATER for
- *       ₵1 with drinkWater — label "Buy water ₵1".
+ *       ₵1 — a SIP since G-008c round 2: +4 hunger / +2 energy, refused
+ *       with "Not thirsty" at round(hunger) ≥ WATER_MAX_HUNGER (80) and
+ *       on a 20 s per-sachet rest ("Water again in Ns", counted from
+ *       NeedsState.lastWaterAt via the generic cooldownRemaining), then
+ *       the cash gate. The salvage +6/+10 let ₵5 buy energy 60→100 and
+ *       hunger 60→90 — energy comes mainly from sleep now.
  *   - Too tired / too hungry (canWork gates) or short of cash:
  *       enabled=false with a short reason. Money never goes negative —
  *       buy() refuses, applyRestore clamps at 0.
@@ -69,6 +74,7 @@ import {
   advanceStep,
   completeJob,
   completedIdsOf,
+  cooldownRemaining,
   cooldownStatus,
   isJobCompleted,
   objectiveFor,
@@ -87,6 +93,7 @@ import {
   SLEEP_ENERGY_RESTORE,
   SLEEP_GATE_ENERGY,
   WAAKYE_MAX_HUNGER,
+  WATER_MAX_HUNGER,
   type NeedsState,
 } from './needs';
 import {
@@ -299,8 +306,36 @@ function decideAtWaakyeJoint(session: ActSession): Decision {
   };
 }
 
+/**
+ * Maame Effia's provisions (G-008c round 2): water is a ₵1 sip with a
+ * state gate, a rest and a purse gate — in that order, each reason the
+ * most useful truth for the guest standing there:
+ *   1. "Not thirsty" at round(hunger) ≥ WATER_MAX_HUNGER (80) — no
+ *      amount of cash makes the sip useful past the gate (the mirror of
+ *      the compound's "Not tired yet");
+ *   2. the 20 s per-sachet rest — the wait that fixes it first, counted
+ *      from NeedsState.lastWaterAt (the cooldownRemaining primitive
+ *      shared with the job shifts);
+ *   3. the purse — water still costs ₵1.
+ */
 function decideAtProvisions(session: ActSession): Decision {
   const label = `Buy water ${formatGHS(SACHET_WATER.priceGHS)}`;
+  if (Math.round(session.needs.hunger) >= WATER_MAX_HUNGER) {
+    return { kind: 'water', label, enabled: false, reason: 'Not thirsty' };
+  }
+  const rest = cooldownRemaining(
+    SACHET_WATER.cooldownSeconds ?? 0,
+    session.nowMs,
+    session.needs.lastWaterAt
+  );
+  if (rest.onCooldown) {
+    return {
+      kind: 'water',
+      label,
+      enabled: false,
+      reason: `Water again in ${Math.ceil(rest.remainingMs / 1000)}s`,
+    };
+  }
   if (!canAfford(session.wallet, SACHET_WATER.priceGHS)) {
     return {
       kind: 'water',
@@ -522,7 +557,10 @@ export function resolveAct(
         session: {
           ...session,
           wallet: purchase.wallet,
-          needs: drinkWater(session.needs),
+          // G-008c round 2: the press clock stamps lastWaterAt — the
+          // 20 s per-sachet rest counts from THIS instant (pure data in,
+          // pure data out, exactly like the job payout stamp).
+          needs: drinkWater(session.needs, session.nowMs),
           job: session.job,
         },
         toast: `Sachet water — +${SACHET_WATER.energyRestore} energy (−${formatGHS(SACHET_WATER.priceGHS)})`,
