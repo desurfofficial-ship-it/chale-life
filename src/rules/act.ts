@@ -1,13 +1,15 @@
 /**
  * Earn-and-eat act resolution — the pure brain behind the HUD's Act button.
  *
- * CONTRACT: pure TypeScript. No three.js, no React, no store imports.
+ * CONTRACT: pure TypeScript. No three.js, no React, no store imports, no
+ * Date.now() — every clock arrives as data on the session (`nowMs`, the
+ * press instant; `job.lastPayoutAt`, the last payout instant).
  * The Engine (E-003) samples the store into an ActSession, asks
  * `actPromptFor` what the button should say (every HUD notify), and on a
  * press calls `resolveAct` and commits the returned session back.
  *
- * Behaviour map (Task G-008b — G-008's proximity helpers wired into the
- * Act brain; earn-first is G-004 logic, sleep is G-006, Daavi name G-005):
+ * Behaviour map (Task G-008c — the joint dead-end + hardened guards;
+ * G-008b wired the proximity zones, earn-first is G-004, sleep G-006):
  *   - LOCATION is decided from the player position when the session carries
  *       one (the store samples it at press time): the compound is the WHOLE
  *       yard AABB via isInSleepZone (never the 2.5 m gate point), Daavi's
@@ -29,17 +31,31 @@
  *       location (G-008b: step 2 happens at Daavi's bench — the player
  *       has to walk there); elsewhere the button disables with a
  *       "Wrong spot" reason naming the step's target.
- *   - At LOC-001 with the hustle already completed this run: buy
- *       FOOD_WAAKYE (−₵12, applyMeal) only while round(hunger) ≤
- *       WAAKYE_MAX_HUNGER (55); above it the label reads "Full" and the
- *       button is disabled. Broke guests are re-hired instead (the
- *       zero-capital hustle stays the fallback — work-when-broke).
+ *   - At LOC-001 with the hustle already completed this run (G-008c item
+ *       1 — the counter has two doors, so money can never dead-end):
+ *         1. hungry enough (round(hunger) ≤ WAAKYE_MAX_HUNGER 55) and
+ *            ₵12 in pocket → "Buy waakye ₵12" (meals are NEVER
+ *            cooldown-gated — eating is not employment);
+ *         2. otherwise, if the body can work (canWork) and the job is
+ *            off cooldown (cooldownStatus — 45 s from the last payout,
+ *            enforced from the data's cooldownSeconds) → "Help Daavi";
+ *         3. neither → disabled with the most useful blocking reason:
+ *            the live countdown ("Daavi needs you again in Ns" — the
+ *            wait fixes it first), then "Full" (hunger above the
+ *            gate), then the canWork reason ("Too tired…").
+ *       (G-008b's shape only re-hired BROKE guests — a guest with ₵12+
+ *       and a full belly stared at a dead "Full" button forever.)
  *   - At LOC-003 (Maame Effia's provisions): buy FOOD_SACHET_WATER for
  *       ₵1 with drinkWater — label "Buy water ₵1".
  *   - Too tired / too hungry (canWork gates) or short of cash:
  *       enabled=false with a short reason. Money never goes negative —
  *       buy() refuses, applyRestore clamps at 0.
  *   - Not near anything: label "Act", enabled=false.
+ *
+ * G-008c item 4: resolveAct reports WHAT a press did through typed
+ * fields — `kind` (the decided ActKind) plus `purchased` / `paidOut` —
+ * so the store's guards detect purchases and payouts structurally
+ * instead of regex-matching the toast text (−₵ / +₵ was fragile).
  */
 
 import {
@@ -53,6 +69,7 @@ import {
   advanceStep,
   completeJob,
   completedIdsOf,
+  cooldownStatus,
   isJobCompleted,
   objectiveFor,
   startJob,
@@ -90,6 +107,14 @@ export interface ActSession {
    * making the press-time decision zone-exact.
    */
   readonly position?: { readonly x: number; readonly z: number };
+  /**
+   * The press instant in epoch ms (G-008c item 2) — the NOW the cooldown
+   * counts against. Pure data, sampled by the store at press time, so the
+   * rules never touch Date.now() and tests fake the clock by just writing
+   * a number. Optional: undefined reads as "no cooldown clock", which
+   * keeps every pre-G-008c caller and legacy slice compiling.
+   */
+  readonly nowMs?: number;
 }
 
 /** What the HUD's Act button should show right now. */
@@ -100,10 +125,18 @@ export interface ActPrompt {
   readonly reason?: string;
 }
 
-/** Result of one Act press: the next session plus a ~2 s HUD toast. */
+/** Result of one Act press: the next session, a ~2 s HUD toast, and —
+ *  G-008c item 4 — a typed report of WHAT happened (kind + the two
+ *  guard-relevant flags), replacing the old toast-text regexes. */
 export interface ActResolution {
   readonly session: ActSession;
   readonly toast: string | null;
+  /** Which decision this press resolved as (disabled presses keep their kind). */
+  readonly kind: ActKind;
+  /** true when this press SPENT cash (waakye or water bought). */
+  readonly purchased: boolean;
+  /** true when this press PAID a fully-worked shift out. */
+  readonly paidOut: boolean;
 }
 
 /** Daavi's zero-capital starter hustle — the only job act.ts starts.
@@ -129,8 +162,11 @@ export const DAAVI_BENCH_ID = DAAVI_BENCH.locationId;
 const WAAKYE = findFoodById(FOOD_WAAKYE_ID)!;
 const SACHET_WATER = findFoodById(FOOD_SACHET_WATER_ID)!;
 
+/** The kinds of decision one Act press can resolve as. */
+export type ActKind = 'idle' | 'start' | 'advance' | 'waakye' | 'water' | 'sleep';
+
 interface Decision {
-  readonly kind: 'idle' | 'start' | 'advance' | 'waakye' | 'water' | 'sleep';
+  readonly kind: ActKind;
   readonly label: string;
   readonly enabled: boolean;
   readonly reason?: string;
@@ -224,25 +260,43 @@ function decideAtWaakyeJoint(session: ActSession): Decision {
     return { kind: 'start', label: 'Help Daavi', enabled: true };
   }
 
-  // Hustle already worked this run — the joint sells waakye when it makes
-  // sense (G-008b: only while round(hunger) ≤ WAAKYE_MAX_HUNGER; above it
-  // the meal would mostly clamp away, so the button reads "Full" and
-  // refuses); broke guests get re-hired — the hustle is the fallback.
-  if (canAfford(wallet, WAAKYE.priceGHS)) {
-    if (Math.round(needs.hunger) <= WAAKYE_MAX_HUNGER) {
-      return waakyeOffer;
-    }
-    return { kind: 'waakye', label: 'Full', enabled: false, reason: 'You are full — waakye can wait.' };
+  // Hustle already worked this run — G-008c item 1: the counter has two
+  // doors and neither may dead-end. Door 1 is the meal (hunger at or
+  // under WAAKYE_MAX_HUNGER with cash in pocket — buying is NEVER
+  // cooldown-gated); door 2 is another shift (canWork AND the job off
+  // cooldown — data/jobs.ts cooldownSeconds, enforced from lastPayoutAt).
+  if (Math.round(needs.hunger) <= WAAKYE_MAX_HUNGER && canAfford(wallet, WAAKYE.priceGHS)) {
+    return waakyeOffer;
   }
-  if (!canWork(needs).ok) {
+  const hustle = findJobById(AUNTY_BA_HUSTLE_ID)!;
+  const cooldown = cooldownStatus(hustle, session.nowMs, job.lastPayoutAt);
+  if (work.ok && !cooldown.onCooldown) {
+    return { kind: 'start', label: 'Help Daavi', enabled: true };
+  }
+  // Neither door opens — disable with the most useful blocking reason,
+  // in this order: the COOLDOWN counts down (it is what the wait fixes
+  // first — the review pins ₵35 + hunger 70 mid-rest showing the live
+  // countdown, never a dead "Full"), then FULLNESS (the meal gate), then
+  // the body (canWork's tired / starving reasons).
+  if (cooldown.onCooldown) {
     return {
       kind: 'start',
       label: 'Help Daavi',
       enabled: false,
-      reason: work.reason,
+      reason: `${hustle.employerName} needs you again in ${Math.ceil(cooldown.remainingMs / 1000)}s`,
     };
   }
-  return { kind: 'start', label: 'Help Daavi', enabled: true };
+  if (Math.round(needs.hunger) > WAAKYE_MAX_HUNGER) {
+    return { kind: 'waakye', label: 'Full', enabled: false, reason: 'You are full — waakye can wait.' };
+  }
+  // Reaching here, the cooldown and fullness branches both missed, so the
+  // work door itself is what is shut (too tired / too hungry).
+  return {
+    kind: 'start',
+    label: 'Help Daavi',
+    enabled: false,
+    reason: work.reason,
+  };
 }
 
 function decideAtProvisions(session: ActSession): Decision {
@@ -381,7 +435,9 @@ export function actPromptFor(
 
 /**
  * Perform one Act press. Disabled / refused decisions return the SAME
- * session untouched with a null toast — committing it is a no-op.
+ * session untouched with a null toast — committing it is a no-op (the
+ * store's guards rely on that identity: same reference ⇒ the press did
+ * not fire and must not stamp the debounce window).
  */
 export function resolveAct(
   session: ActSession,
@@ -389,7 +445,7 @@ export function resolveAct(
 ): ActResolution {
   const decision = decideAct(session, nearLocationId);
   if (!decision.enabled) {
-    return { session, toast: null };
+    return { session, toast: null, kind: decision.kind, purchased: false, paidOut: false };
   }
 
   switch (decision.kind) {
@@ -398,56 +454,81 @@ export function resolveAct(
         energy: session.needs.energy,
         hunger: session.needs.hunger,
       });
-      if (!result.ok) return { session, toast: null };
+      if (!result.ok) return { session, toast: null, kind: 'start', purchased: false, paidOut: false };
       const title = findJobById(AUNTY_BA_HUSTLE_ID)?.title ?? 'hustle started';
       return {
+        // Spread first: the press-time position / nowMs ride through so a
+        // follow-up resolution keeps its zone- and cooldown-exact inputs.
         session: { ...session, wallet: result.wallet, job: result.job },
         toast: `Job accepted — ${title}`,
+        kind: 'start',
+        purchased: false,
+        paidOut: false,
       };
     }
 
     case 'advance': {
       const advanced = advanceStep(session.job);
-      if (!advanced.ok) return { session, toast: null };
+      if (!advanced.ok) return { session, toast: null, kind: 'advance', purchased: false, paidOut: false };
       if (!advanced.completed) {
-        return { session: { ...session, job: advanced.job }, toast: advanced.message };
+        return {
+          session: { ...session, job: advanced.job },
+          toast: advanced.message,
+          kind: 'advance',
+          purchased: false,
+          paidOut: false,
+        };
       }
-      // Final step performed: pay out and take the shift's toll.
-      const paid = completeJob(advanced.job, session.wallet);
-      if (!paid.ok) return { session, toast: null };
+      // Final step performed: pay out and take the shift's toll. G-008c:
+      // the payout is stamped with the session's press clock, arming the
+      // job's cooldownSeconds (pure data in / pure data out).
+      const paid = completeJob(advanced.job, session.wallet, session.nowMs);
+      if (!paid.ok) return { session, toast: null, kind: 'advance', purchased: false, paidOut: false };
       return {
         session: {
+          ...session,
           wallet: paid.wallet,
           needs: applyWorkCost(session.needs),
           job: paid.job,
         },
         toast: paid.message,
+        kind: 'advance',
+        purchased: false,
+        paidOut: true,
       };
     }
 
     case 'waakye': {
       const purchase = buy(session.wallet, WAAKYE.priceGHS);
-      if (!purchase.ok) return { session, toast: null };
+      if (!purchase.ok) return { session, toast: null, kind: 'waakye', purchased: false, paidOut: false };
       return {
         session: {
+          ...session,
           wallet: purchase.wallet,
           needs: applyMeal(session.needs),
           job: session.job,
         },
         toast: `Waakye! +${WAAKYE.hungerRestore} hunger (−${formatGHS(WAAKYE.priceGHS)})`,
+        kind: 'waakye',
+        purchased: true,
+        paidOut: false,
       };
     }
 
     case 'water': {
       const purchase = buy(session.wallet, SACHET_WATER.priceGHS);
-      if (!purchase.ok) return { session, toast: null };
+      if (!purchase.ok) return { session, toast: null, kind: 'water', purchased: false, paidOut: false };
       return {
         session: {
+          ...session,
           wallet: purchase.wallet,
           needs: drinkWater(session.needs),
           job: session.job,
         },
         toast: `Sachet water — +${SACHET_WATER.energyRestore} energy (−${formatGHS(SACHET_WATER.priceGHS)})`,
+        kind: 'water',
+        purchased: true,
+        paidOut: false,
       };
     }
 
@@ -456,15 +537,19 @@ export function resolveAct(
       // the store's identity check skips the wallet/job slices.
       return {
         session: {
+          ...session,
           wallet: session.wallet,
           needs: applySleep(session.needs),
           job: session.job,
         },
         toast: `Slept at the compound — +${SLEEP_ENERGY_RESTORE} energy`,
+        kind: 'sleep',
+        purchased: false,
+        paidOut: false,
       };
     }
 
     default:
-      return { session, toast: null };
+      return { session, toast: null, kind: 'idle', purchased: false, paidOut: false };
   }
 }

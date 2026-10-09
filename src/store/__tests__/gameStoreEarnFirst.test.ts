@@ -100,8 +100,14 @@ describe('gameStore (E-004): earn-first survives the spawn drain', () => {
       80 - DECAY_PER_SECOND.starter.energy * 240 - 18,
       10
     );
-    // The payout latches the run history — the ONE earn-first source of truth.
-    expect(paid.job).toEqual({ activeId: null, step: 0, completedIds: [HUSTLE_ID] });
+    // The payout latches the run history — the ONE earn-first source of
+    // truth — and stamps the cooldown anchor (G-008c lastPayoutAt).
+    expect(paid.job).toEqual({
+      activeId: null,
+      step: 0,
+      completedIds: [HUSTLE_ID],
+      lastPayoutAt: expect.any(Number),
+    });
     expect(paid.toast.message).toContain('+₵15');
 
     // Next Act at the joint sells waakye (earn-first satisfied): ₵35 → ₵23.
