@@ -12,9 +12,10 @@
  *   - repeated props via InstancedMesh (1 call per prop type)   → 8 draw calls
  *   - sagging power wires as one LineSegments                   → 1 draw call
  *   - canvas-textured signs                                     → 4 draw calls
- *   - Kenney road tiles, instanced GLBs (W-003 proof)           → ~2 draw calls
+ *   - Kenney road tiles: pipeline kept, not rendered (W-005 → W-007)
  *   - parked vehicles, producer GLBs (W-004, trademark-scrubbed) → 5 draw calls
- *   ≈ 21 draw calls and ≈ 42k triangles total — far under the 150 / 100k budget.
+ *   - outer apron (laterite + walls + trees + fading road)       → 1 draw call
+ *   ≈ ≤ 60 draw calls — far under the 150 budget (dc gate is 60).
  *
  * Mounts in one line from the engine:  <StarterBlock />
  *
@@ -24,8 +25,8 @@ import { Lighting } from './Lighting';
 import { InstancedProps } from './InstancedProps';
 import { Signs } from './Signs';
 import { Wires } from './Wires';
-import { RoadTiles } from './RoadTiles';
 import { Vehicles } from './Vehicles';
+import { ApronMesh } from './ApronMesh';
 import { staticGeometry } from './buildStatic';
 
 function StaticArchitecture() {
@@ -41,9 +42,12 @@ export function StarterBlock() {
     <group name="starter-block">
       <Lighting />
       <StaticArchitecture />
+      <ApronMesh />
       <InstancedProps />
       <Wires />
-      <RoadTiles />
+      {/* RoadTiles unmounted (W-005): 4 m Kenney strip inside a 7 m road —
+          keep the module + GLBs + ledger; re-enable when W-007 rebuilds a
+          street at kit width. */}
       <Vehicles />
       <Signs />
     </group>

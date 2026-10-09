@@ -120,7 +120,8 @@ export function App() {
         camera={{ position: [0, 30, 30], zoom: INITIAL_ZOOM, near: 0.1, far: 200 }}
         style={{ position: 'absolute', inset: 0 }}
       >
-        <color attach="background" args={['#090d16']} />
+        {/* Warm coastal haze (W-005). */}
+        <color attach="background" args={['#c8b89a']} />
         <GameLoop />
         <StarterBlock />
         <Player />
@@ -145,7 +146,7 @@ function WebGLFallback() {
       <div className="fallback__card">
         <h1>Chalé Life needs WebGL</h1>
         <p>
-          This game draws its world with WebGL, and your browser couldn&apos;t
+          This game draws its world with WebGL, and your browser couldn't
           create a WebGL context.
         </p>
         <p>
