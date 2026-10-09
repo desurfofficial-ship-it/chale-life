@@ -266,6 +266,9 @@ export interface HudSnapshot {
   zoom: number;
   /** renderer.info.render.calls from the previous frame (perf budget ≤150). */
   drawCalls: number;
+  /** Player projected to canvas CSS px (CameraRig, every frame via GameLoop). */
+  screenX: number;
+  screenY: number;
 }
 
 let hud: Readonly<HudSnapshot> = {
@@ -277,6 +280,8 @@ let hud: Readonly<HudSnapshot> = {
   inputZ: 0,
   zoom: INITIAL_ZOOM,
   drawCalls: 0,
+  screenX: 0,
+  screenY: 0,
 };
 
 const hudListeners = new Set<(snapshot: Readonly<HudSnapshot>) => void>();

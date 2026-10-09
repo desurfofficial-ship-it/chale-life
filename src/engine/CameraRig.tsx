@@ -11,8 +11,8 @@
  *   slides onto the canvas. Pinch midpoint drift still pans. The Recenter
  *   button (recenter token in the store) snaps back onto the player and
  *   resumes follow. Joystick movement (movementInput ≠ 0) also resumes follow.
- * - Framing: look-at is offset so the player sits ~45 % from the top of a
- *   390 × 844 viewport, clear of top HUD cards and bottom joystick/objective.
+ * - Framing: look-at is offset (tilt-corrected ÷ sin 45°) so the player sits
+ *   ~45 % from the top of a 390 × 844 viewport, clear of HUD / joystick.
  *
  * Canvas is orthographic (src/app/App.tsx) — screen→world scale is 1/zoom for
  * both axes, and the camera yaw is fixed (offset direction (0, 30, 30)), so
@@ -34,6 +34,9 @@ import {
 
 /** Fixed 45° top-down offset (direction only — ortho size is zoom-driven). */
 const OFFSET = new THREE.Vector3(0, 30, 30);
+/** Latest player screen position in canvas CSS pixels (updated every frame). */
+export const projectedPlayerScreen = { x: 0, y: 0 };
+const _proj = new THREE.Vector3();
 /** Exponential follow rate (1/s) — higher = tighter. */
 const FOLLOW_RATE = 5;
 const WHEEL_SENSITIVITY = 0.0012;
@@ -88,9 +91,11 @@ export function CameraRig() {
     }
 
     // Frame offset: shift look-at so the player sits at PLAYER_FROM_TOP.
-    // Screen +y maps to world +z; moving the centre down puts the player up.
+    // Camera is tilted 45° (OFFSET y=z), so a pure world-Z shift projects
+    // shorter on screen by sin(45°). Divide by that to hit the fraction.
     const viewH = gl.domElement.clientHeight / camera.zoom;
-    const frameOffsetZ = (0.5 - PLAYER_FROM_TOP) * viewH;
+    const frameOffsetZ =
+      ((0.5 - PLAYER_FROM_TOP) * viewH) / Math.sin(Math.PI / 4);
 
     camera.position.set(
       target.current.x + OFFSET.x,
@@ -98,6 +103,15 @@ export function CameraRig() {
       target.current.z + frameOffsetZ + OFFSET.z,
     );
     camera.lookAt(target.current.x, 0, target.current.z + frameOffsetZ);
+
+    // Project player world → canvas CSS pixels for ?debug=1 / e2e.
+    // lookAt dirties the local matrix; refresh world matrix before project().
+    camera.updateMatrixWorld();
+    const pp = getState().player.position;
+    _proj.set(pp.x, 0, pp.z).project(camera);
+    const el = gl.domElement;
+    projectedPlayerScreen.x = (_proj.x * 0.5 + 0.5) * el.clientWidth;
+    projectedPlayerScreen.y = (-_proj.y * 0.5 + 0.5) * el.clientHeight;
   });
 
   // Pointer gestures + wheel on the canvas element. Cleaned up on dispose.
