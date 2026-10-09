@@ -1,7 +1,8 @@
 /**
- * Outer apron past WORLD_MIN/MAX (W-005).
+ * Outer apron past WORLD_MIN/MAX (B-002 / B-003b).
  * Laterite ground ring, fading road stubs, low walls, sparse trees.
- * Specs are merged into the starter static mesh (no extra draw calls).
+ * Specs are consumed by ApronMesh (one merged draw call) — not folded into
+ * buildStatic, so the core block mesh stays independent of the outer ring.
  */
 import { PALETTE } from '../palette';
 import type { GeomSpec } from './geometry';

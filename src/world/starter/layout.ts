@@ -147,20 +147,21 @@ export const TROTRO_STOP = {
 
 // --------------------------------------------------------------- props -----
 export const UTILITY_POLES: { x: number; z: number }[] = [
-  // Road-edge of the south pavement — keeps the walk centre at z≈13.4
-  // clear for the 0.45 m player capsule (W-005 CI fix).
+  // Road-edge of the south pavement — walk centre z≈13.4 stays clear for the
+  // 0.45 m player capsule. Pole east of the trotro stop (x=26) keeps ≥2 m
+  // from the trotro footprint and off the x≈15 path to the waakye joint.
   { x: -28, z: 12.4 },
   { x: -12, z: 12.4 },
   { x: 4, z: 12.4 },
-  { x: 20, z: 12.4 },
+  { x: 26, z: 12.4 },
 ];
 
 export const WIRE_SPANS: { from: { x: number; z: number }; to: { x: number; z: number } }[] = [
   { from: { x: -30, z: 12.4 }, to: { x: -28, z: 12.4 } },
   { from: { x: -28, z: 12.4 }, to: { x: -12, z: 12.4 } },
   { from: { x: -12, z: 12.4 }, to: { x: 4, z: 12.4 } },
-  { from: { x: 4, z: 12.4 }, to: { x: 20, z: 12.4 } },
-  { from: { x: 20, z: 12.4 }, to: { x: 30, z: 12.4 } },
+  { from: { x: 4, z: 12.4 }, to: { x: 26, z: 12.4 } },
+  { from: { x: 26, z: 12.4 }, to: { x: 30, z: 12.4 } },
 ];
 
 export interface TreeSpot {
@@ -231,7 +232,7 @@ export const DIRT_PATCHES: Box2D[] = [
 
 // ------------------------------------------------------ kenney road tiles --
 /**
- * W-003 pipeline proof. W-005: NOT rendered on the 7 m main road — a 4 m
+ * W-003 pipeline proof. B-002: NOT rendered on the 7 m main road — a 4 m
  * strip inside a 7 m road looks wrong. Pipeline, GLBs and ledger rows stay.
  * Re-add placements only when a whole street is rebuilt at kit width (W-007).
  */
@@ -252,14 +253,14 @@ export const KENNEY_ROAD_TILES: KenneyTileSpot[] = [];
 
 // --------------------------------------------------------------- vehicles --
 /**
- * W-004 vehicle pack. Sizes (W×H×L m) from the producer brief:
- *   trotro 2.48×2.39×5.00, okada 1.02×1.54×2.30, van 2.46×1.80×4.30.
+ * W-004 vehicle pack. Sizes (W×H×L m) from the producer brief / loaded GLB:
+ *   trotro 2.48×2.39×5.00, okada 1.92×2.12×2.54 (GLB AABB), van 2.46×1.80×4.30.
  *
  * Native forward axis for ALL three models is ±Z (length along Z at ry=0).
  * Left-hand traffic: north curb = eastbound, south curb = westbound.
  * Van parks parallel to the north curb facing east → ry = −π/2.
  * Trotro sits in the south lane, clear of the stop shelter / bench / pole
- * by ≥ 0.3 m → z = 10.2.
+ * by ≥ 0.3 m → z = 9.0 (north edge of the south lane).
  */
 export type VehicleModel = 'trotro' | 'okada' | 'van';
 
@@ -270,10 +271,11 @@ export interface VehicleSpot {
   ry: number;
 }
 
-/** Producer-brief dimensions: width (X at ry=0), height, length (Z at ry=0). */
+/** Producer-brief / GLB dimensions: width (X at ry=0), height, length (Z at ry=0). */
 export const VEHICLE_DIMS: Record<VehicleModel, { w: number; h: number; l: number }> = {
+  // w/l from loaded GLB AABB (meshopt-decoded); okada brief was undersized.
   trotro: { w: 2.48, h: 2.39, l: 5.0 },
-  okada: { w: 1.02, h: 1.54, l: 2.3 },
+  okada: { w: 1.92, h: 2.12, l: 2.54 },
   van: { w: 2.46, h: 1.8, l: 4.3 },
 };
 
@@ -285,8 +287,12 @@ export function vehicleFootprint(spot: VehicleSpot): Box2D {
 }
 
 export const VEHICLE_SPOTS: VehicleSpot[] = [
-  { model: 'trotro', x: 22.5, z: 10.2, ry: Math.PI / 2 },
-  { model: 'okada', x: 18.3, z: 2.85, ry: Math.PI },
+  // Trotro on the north edge of the south lane (z≈9) so the 45° camera does
+  // not draw the shelter roof / pole over it (B-003b).
+  { model: 'trotro', x: 22.5, z: 9.0, ry: Math.PI / 2 },
+  // Okada: ry=0 (W-004) — nose to the road by the waakye kiosk. W-005's
+  // Math.PI flip was accidental; reverted in B-003b.
+  { model: 'okada', x: 18.3, z: 2.85, ry: 0 },
   { model: 'van', x: 3.5, z: 5.9, ry: -Math.PI / 2 },
 ];
 
