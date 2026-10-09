@@ -228,6 +228,10 @@ export const DIRT_PATCHES: Box2D[] = [
   box(15.5, 2.2, 6, 2.2),
   box(4, 22.5, 9, 4),
   box(-21, 0.8, 4.5, 2.2),
+  // G-008d: worn ground at Daavi's job spot (east of the kiosk) — the
+  // visible part starts at the kiosk's east wall (x 17.1); the overlap
+  // under the kiosk floor deck is hidden.
+  box(17.9, 0.0, 2.0, 1.6),
 ];
 
 // ------------------------------------------------------ kenney road tiles --
@@ -290,21 +294,60 @@ export const VEHICLE_SPOTS: VehicleSpot[] = [
   // Trotro on the north edge of the south lane (z≈9) so the 45° camera does
   // not draw the shelter roof / pole over it (B-003b).
   { model: 'trotro', x: 22.5, z: 9.0, ry: Math.PI / 2 },
-  // Okada: ry=0 (W-004) — nose to the road by the waakye kiosk. W-005's
-  // Math.PI flip was accidental; reverted in B-003b.
-  { model: 'okada', x: 18.3, z: 2.85, ry: 0 },
+  // Okada: ry=0 (W-004) — nose to the road. G-008d moved it from the north
+  // pavement (18.3, 2.85 — it walled off the counter→job-spot walk) to EAST
+  // of Daavi's bench (footprint x 22.64–24.56, z 1.58–4.12). The road
+  // shoulder was rejected: the e2e bench legs walk the z≈5.5 line both ways
+  // and return north at x ≤ 17.0, which any okada in the road would block.
+  { model: 'okada', x: 23.6, z: 2.85, ry: 0 },
   { model: 'van', x: 3.5, z: 5.9, ry: -Math.PI / 2 },
 ];
 
 /** Half-extent of a utility-pole collider (metres). */
 export const POLE_COLLIDER_HALF = 0.15; // 0.3 m box
 
+// ------------------------------------------------- daavi job spot / bench --
+/**
+ * G-008d: Daavi's joint is split into two non-overlapping zones —
+ *   FOOD COUNTER  LOC-001     (15.5, 2.4)  kiosk front, food only
+ *   JOB SPOT      LOC-001-JOB (18.0, 0.0)  kiosk east side, work only
+ *   BENCH         LOC-001-BENCH (21.5, 2.9) step-2 waypoint, north pavement
+ * The two standing spots live in src/data/locations.ts; this section holds
+ * the physical world side: the crate/pan stack that marks the job spot and
+ * the wooden bench mesh at the bench waypoint.
+ */
+
+/**
+ * Crates + stack of pans against the kiosk's EAST wall (x1 = 17.1). The
+ * solid footprint ends at x 17.62 so the standing point (18.0, 0.0) keeps
+ * 0.38 m of bare clearance — the 0.35 m player capsule can stand exactly
+ * on the spot. Visuals: buildStatic.daaviSpecs().
+ */
+export const JOB_SPOT_PROPS: Box2D = { x0: 17.1, z0: -0.5, x1: 17.62, z1: 0.5 };
+
+/**
+ * Daavi's bench waypoint (G-008d: moved off the road onto the north
+ * pavement z 1.85–3.85; was (20.5, 5.5) inside MAIN_ROAD).
+ *
+ * ⚠ AGENT 4 CONTRACT: DAAVI_BENCH in src/rules/proximity.ts must equal
+ * this { x: 21.5, z: 2.9 } — the objective marker and the step-2 Act zone
+ * anchor here. src/world/clearance.test.ts pins the world side.
+ */
+export const DAAVI_BENCH_SPOT = { x: 21.5, z: 2.9 };
+
+/**
+ * The bench mesh's solid footprint (seat + backrest, faces south). Sits
+ * just NORTH of the waypoint so the player stands beside the bench, not
+ * inside it — the waypoint itself stays outside every solid footprint.
+ */
+export const DAAVI_BENCH_MESH: Box2D = { x0: 20.7, z0: 3.15, x1: 22.3, z1: 3.65 };
+
 // --------------------------------------------------------------- apron -----
 /** Outer apron depth past WORLD_MIN/MAX on every side (metres). */
 export const APRON_DEPTH = 25;
 
 // ------------------------------------------------------------- colliders ---
-/** Building + wall + parked-vehicle + pole footprints that block movement. */
+/** Building + wall + parked-vehicle + pole + prop footprints that block movement. */
 export const SOLID_FOOTPRINTS: Box2D[] = [
   PROVISIONS.footprint,
   ...BLOCK_SHOPS.map((s) => s.footprint),
@@ -316,6 +359,8 @@ export const SOLID_FOOTPRINTS: Box2D[] = [
   CHOP_BAR.footprint,
   BLUE_HOUSE.footprint,
   TROTRO_STOP.bench,
+  JOB_SPOT_PROPS, // G-008d: crates + pans marking the job spot
+  DAAVI_BENCH_MESH, // G-008d: the wooden bench at the bench waypoint
   ...VEHICLE_SPOTS.map(vehicleFootprint),
   ...UTILITY_POLES.map((p) =>
     box(p.x, p.z, POLE_COLLIDER_HALF * 2, POLE_COLLIDER_HALF * 2),

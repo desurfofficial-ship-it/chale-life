@@ -27,9 +27,26 @@ describe('locations: contract invariants (W-002)', () => {
   });
 
   it('types are from the known LocationType set', () => {
-    const valid = new Set(['food', 'home', 'shop', 'transport', 'landmark']);
+    const valid = new Set(['food', 'home', 'shop', 'transport', 'landmark', 'job']);
     for (const l of locations) {
       expect(valid.has(l.type)).toBe(true);
     }
+  });
+});
+
+describe('locations: G-008d split zones', () => {
+  it('LOC-001-JOB is the kiosk-side job spot at (18.0, −0.1)', () => {
+    const job = locations.find((l) => l.id === 'LOC-001-JOB')!;
+    expect(job.name).toBe("Daavi's Job Spot");
+    expect(job.type).toBe('job');
+    expect(job.x).toBe(18.0); // just off the kiosk east wall (kiosk x1 = 17.1)
+    expect(job.z).toBe(-0.1); // 0.1 south of the design point — keeps the bench band clear
+  });
+
+  it('LOC-006 marks the junction from the pavement, not the carriageway', () => {
+    const junction = locations.find((l) => l.id === 'LOC-006')!;
+    expect(junction.name).toBe('Laterite Junction');
+    expect(junction.x).toBe(-21);
+    expect(junction.z).toBe(3.2); // north pavement (z 1.85–3.85); was (−21, 8), mid-road
   });
 });
