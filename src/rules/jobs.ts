@@ -383,17 +383,30 @@ export function objectiveFor(state: JobState): ObjectiveInfo | null {
  *   - No needs (legacy callers): the neutral post-shift nudge for a
  *       completed run, the beacon otherwise.
  */
-export function idleObjectiveFor(state: JobState, needs?: NeedsState): string {
+export function idleObjectiveFor(state: JobState, needs?: NeedsState, nowMs?: number): string {
   const waakye = findFoodById(FOOD_WAAKYE_ID)!;
+  // G-008e: the work-another-shift fallback must READ the payout cooldown
+  // — after a payout the job spot itself refuses with "needs you again
+  // in Ns" for cooldownSeconds, so the card may not tell a cooling guest
+  // to go work. Needs-based lines still outrank it: eating or sleeping
+  // through the cooldown is exactly what the countdown line suggests.
+  const cooldownLine = (): string | null => {
+    const hustle = findJobById('HUSTLE_AUNTY_BA_STARTER');
+    if (!hustle) return null;
+    const cd = cooldownStatus(hustle, nowMs, state.lastPayoutAt);
+    if (!cd.onCooldown) return null;
+    return `Daavi needs you again in ${Math.ceil(cd.remainingMs / 1000)}s — grab water or rest.`;
+  };
+  const workLine = 'Work another shift — jobs are at the side of Daavi’s kiosk.';
   if (isJobCompleted(state, 'HUSTLE_AUNTY_BA_STARTER')) {
-    if (!needs) return 'Work another shift — jobs are at the side of Daavi’s kiosk.';
+    if (!needs) return cooldownLine() ?? workLine;
     if (Math.round(needs.hunger) <= WAAKYE_MAX_HUNGER) {
       return `Hungry? Buy waakye at Daavi’s front counter (${formatGHS(waakye.priceGHS)}).`;
     }
     if (isTired(needs)) {
       return 'Tired — head home to the compound and sleep.';
     }
-    return 'Work another shift — jobs are at the side of Daavi’s kiosk.';
+    return cooldownLine() ?? workLine;
   }
   if (needs) {
     if (isTired(needs) && needs.hunger >= CAN_WORK_MIN_HUNGER) {

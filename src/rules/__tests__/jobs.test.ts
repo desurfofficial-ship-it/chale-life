@@ -24,6 +24,7 @@ import {
   startJob,
   type JobState,
 } from '../jobs';
+import { JOB_SPOT_PROPS } from '../../world/starter/layout';
 
 const wallet = (balanceGHS: number): WalletState => ({ balanceGHS });
 const starterWallet = () => wallet(20);
@@ -134,7 +135,7 @@ describe('jobs: advance step', () => {
     const second = advanceStep(job);
     expect(second.ok).toBe(true);
     expect(second.completed).toBe(false);
-    expect(second.message).toContain('One more lift');
+    expect(second.message).toContain('get paid');
     job = second.job;
     expect(job.step).toBe(2);
   });
@@ -488,7 +489,7 @@ describe('jobs: Daavi walk waypoints (G-008b item 4, G-008d items 8–10 constan
     expect(DAAVI_BENCH.z).toBeGreaterThanOrEqual(1.85);
     expect(DAAVI_BENCH.z).toBeLessThanOrEqual(3.85);
     expect(DAAVI_BENCH.x).toBeCloseTo(21.5, 5);
-    expect(DAAVI_BENCH.z).toBeCloseTo(2.9, 5);
+    expect(DAAVI_BENCH.z).toBeCloseTo(2.45, 5);
   });
 
   it('steps 1/3 target the DAAVI_JOB_SPOT — the kiosk\u2019s east side, off the road', () => {
@@ -543,17 +544,25 @@ describe('jobs: world clearance (G-008d item 10 — road, gutters, footprints, w
     // bar). COMPOUND_DOOR is exempt: it is a MARKER anchor on the house
     // face by design, not a standing spot.
     const caps = 0.35 + 0.25;
-    const waypoints: Array<[string, number, number]> = [
-      ['bench', DAAVI_BENCH.x, DAAVI_BENCH.z],
-      ['job spot', DAAVI_JOB_SPOT.x, DAAVI_JOB_SPOT.z],
+    // G-008e: the crates that MARK the job spot (JOB_SPOT_PROPS) are the
+    // one deliberate exception — the standing point hugs its own
+    // marker by design (layout.ts documents the 0.38 m bare gap; the
+    // world clearance suite pins >= CAPSULE there). Everything else keeps
+    // the full bar, and the bench — moved to (21.5, 2.45) —
+    // clears its mesh by the full 0.6 m again.
+    const waypoints: Array<[string, number, number, readonly Box2D[]]> = [
+      ['bench', DAAVI_BENCH.x, DAAVI_BENCH.z, []],
+      ['job spot', DAAVI_JOB_SPOT.x, DAAVI_JOB_SPOT.z, [JOB_SPOT_PROPS]],
     ];
-    for (const [name, x, z] of waypoints) {
+    for (const [name, x, z, ownMarker] of waypoints) {
       offRoadAndGutters(x, z, name);
       for (const f of SOLID_FOOTPRINTS) {
-        expect(
-          clearOf(x, z, f, caps),
-          `${name} (${x}, ${z}) must clear footprint ${JSON.stringify(f)}`
-        ).toBe(true);
+        const isOwn = ownMarker.includes(f);
+        const bar = isOwn ? 0.35 : caps;
+        const what = isOwn
+          ? `${name} (${x}, ${z}) must clear its own marker by the bare 0.35 m capsule`
+          : `${name} (${x}, ${z}) must clear footprint with the full ${caps} m bar`;
+        expect(clearOf(x, z, f, bar), `${what}: ${JSON.stringify(f)}`).toBe(true);
       }
     }
   });
@@ -577,7 +586,7 @@ describe('jobs: world clearance (G-008d item 10 — road, gutters, footprints, w
   });
 
   it('the job spot → bench straight-line walk hits no solid footprint', () => {
-    // Segment (18, 0) → (21.5, 2.9): slabs-vs-segment test over every
+    // Segment (18, 0) → (21.5, 2.45): slabs-vs-segment test over every
     // solid footprint. The okada parked at (18.3, 2.85) — footprint
     // x 17.34–19.26, z 1.58–4.12 — misses this line: the walk exits its
     // x-band (at z ≈ 1.05) before entering its z-band. Agent 3 is

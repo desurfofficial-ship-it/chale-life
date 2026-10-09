@@ -332,7 +332,8 @@ function daaviSpecs(): GeomSpec[] {
 
   // -- Daavi's bench: wooden, faces south (the road / the player) --
   // Seat + backrest fill DAAVI_BENCH_MESH exactly; the waypoint
-  // (21.5, 2.9) sits 0.25 m south of the seat's front face.
+  // (21.5, 2.45 — G-008e, nudged south of the mesh for capsule
+  // clearance) sits 0.7 m south of the seat's front face.
   const b = DAAVI_BENCH_MESH;
   const bcx = (b.x0 + b.x1) / 2;
   const bcz = (b.z0 + b.z1) / 2;

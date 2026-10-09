@@ -252,12 +252,12 @@ export const ACCRA_SIDE_HUSTLES: ReadonlyArray<JobDefinition> = [
         targetInteractableId: 'food_vendor',
         // G-008b: the bench is a proximity.ts waypoint (id pinned to
         // DAAVI_BENCH.locationId by a data-contract test). G-008d: the
-        // bench moved OFF the road onto the north pavement (21.5, 2.9).
+        // bench moved OFF the road onto the north pavement (21.5, 2.45).
         locationId: 'LOC-001-BENCH',
         requiredAssetId: 'ACC_RESTAURANT_001',
         targetLocationName: 'Daavi’s bench (north pavement)',
         actionVerb: 'Carry Pans',
-        completionMessage: 'Nice hustle! One more lift.',
+        completionMessage: 'Back to the side of the kiosk to get paid.',
       },
       {
         stepId: 'aunty_ba_3',

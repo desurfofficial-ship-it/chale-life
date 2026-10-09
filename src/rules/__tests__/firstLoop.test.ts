@@ -46,7 +46,7 @@ describe('the first loop (₵20 → Daavi → waakye)', () => {
 
     const step2 = advanceStep(job, 'food_vendor');
     expect(step2.ok).toBe(true);
-    expect(step2.message).toContain('One more lift');
+    expect(step2.message).toContain('get paid');
     job = step2.job;
 
     const step3 = advanceStep(job, 'food_vendor');

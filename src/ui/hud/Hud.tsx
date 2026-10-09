@@ -195,12 +195,19 @@ function ObjectiveCard() {
   const completedIds = useStoreValue((s) => s.job.completedIds);
   const hunger = useStoreValue((s) => s.needs.hunger);
   const energy = useStoreValue((s) => s.needs.energy);
+  // G-008e: the payout stamp + the wall clock let the idle card count the
+  // job cooldown down live (same ~1 Hz drain that ticks the Act reason).
+  const lastPayoutAt = useStoreValue((s) => s.job.lastPayoutAt);
   const objective = objectiveFor({ activeId, step, completedIds });
   // G-005: the idle line is a pure rules helper — Daavi-aware and
   // completedIds-aware (fresh guest vs. hungry-after-the-hustle nudge).
   // G-006: it is also needs-aware — low energy swaps the line for the
   // sleep hint (unless hunger needs the waakye nudge more).
-  const idleLine = idleObjectiveFor({ activeId, step, completedIds }, { hunger, energy });
+  const idleLine = idleObjectiveFor(
+    { activeId, step, completedIds, lastPayoutAt },
+    { hunger, energy },
+    Date.now()
+  );
   return (
     <div
       style={{

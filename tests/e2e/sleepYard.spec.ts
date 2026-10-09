@@ -181,41 +181,63 @@ async function pacedClick(page: Page, locator: ReturnType<Page['getByRole']>): P
 }
 
 /**
- * The G-008d walk from spawn to the JOB SPOT (collider-aware): east along
- * the south pavement, north past the counter, south into the road, east
- * past the okada, north beside the kiosk's east wall, west into the 0.9 m
- * job-spot zone — the same route earnAndEat.spec.ts drives.
+ * The G-008e walk from spawn to the JOB SPOT on the MERGED world (Agent
+ * 3's #28 moved the okada to 23.6, 2.85 — footprint x 22.64–24.56 —
+ * sealing the old okada–bench pavement gap but OPENING the pavement west
+ * of the bench): east along the south pavement, north past the counter,
+ * east along the north pavement (the bench west face pins any overshoot
+ * harmlessly past the x 18.6 goal), north into the job-spot band
+ * (descent target z 0.85 keeps the freeze inside the zone's westbound
+ * flip band |z| ≤ 0.9 even at full ~1.6 m poll drift), west into the
+ * 0.9 m zone — the same route earnAndEat.spec.ts drives.
  */
 async function walkToJobSpot(page: Page): Promise<void> {
   await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 15.0, 'eastbound');
   await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 3.4, 'north past the counter');
-  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'south into the road');
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.0, 'east past the okada');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.6, 'north beside the kiosk wall');
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.5, 'west into the job spot');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 18.6, 'east along the pavement past the job-spot column');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.85, 'north into the job-spot band');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.6, 'west into the job zone');
+  // Final approach keys on the ZONE itself (the same disc the probe
+  // uses, r 0.9 at (18, 0)) — a position-only stop could freeze at the
+  // high-z corner outside the zone and leave the wrong Act label up.
+  await holdUntil(
+    page,
+    'ArrowLeft',
+    async () => {
+      const p = await readPos(page);
+      return (p.x - 18) ** 2 + p.z * p.z <= 0.81;
+    },
+    'west into the job spot'
+  );
 }
 
 /**
  * The JOB SPOT → COUNTER walk (meals live at the front counter now):
- * east past the okada, south into the road, west along it, north into
- * the counter's zone.
+ * south onto the north pavement (clear of the crates at x ≥ 17.97),
+ * then west into the counter's zone — two wide-open legs (G-008e).
  */
 async function walkToCounter(page: Page): Promise<void> {
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 19.8, 'east past the okada');
-  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'south into the road');
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 16.8, 'west along the road');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 3.4, 'north to the counter');
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 2.2, 'south onto the pavement');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 17.2, 'west into the counter zone');
 }
 
 /**
- * The COUNTER → JOB SPOT walk back: south into the road, east past the
- * okada's line, north beside the kiosk wall, west into the zone.
+ * The COUNTER → JOB SPOT walk back (G-008e): east along the pavement
+ * past the job-spot column, south into the band, west into the zone.
  */
 async function walkBackToJobSpot(page: Page): Promise<void> {
-  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'back south into the road');
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.0, 'back east past the okada');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.6, 'back north beside the wall');
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.5, 'back west into the job spot');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 18.6, 'back east along the pavement past the job-spot column');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.85, 'back north into the job-spot band');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.6, 'west into the job zone');
+  await holdUntil(
+    page,
+    'ArrowLeft',
+    async () => {
+      const p = await readPos(page);
+      return (p.x - 18) ** 2 + p.z * p.z <= 0.81;
+    },
+    'back west into the job spot'
+  );
 }
 
 test('(a) sleep zone: the whole yard offers Sleep and +55 energy', async ({
@@ -292,30 +314,48 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
   await expect(grabButton).toHaveAttribute('aria-disabled', 'false');
   await pacedClick(page, grabButton); // step 1 (job spot)
 
-  // Walk to Daavi's bench on the north pavement (G-008d): east along the
-  // kiosk's north side (clear of the okada's z-band), then south into
-  // the zone. The stop keys on the button flipping ENABLED — 'Carry
-  // Pans' also renders disabled at wrong spots mid-shift.
+  // Walk to Daavi's bench — the G-008e ROAD LOOP around the merged
+  // world's solids: east passing NORTH of the relocated okada, south
+  // into the road east of it, west to the bench column, north until the
+  // r 2.5 bench zone flips 'Carry Pans' on. The stop keys on the button
+  // flipping ENABLED — 'Carry Pans' also renders disabled at wrong
+  // spots mid-shift.
   const carryButton = page.getByRole('button', { name: CARRY_VERB });
-  await expect(carryButton).toHaveAttribute('aria-disabled', 'true'); // not there yet
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.0, 'east to the bench line');
-  await holdUntil(
-    page,
-    'ArrowDown',
-    async () => (await carryButton.getAttribute('aria-disabled')) === 'false',
-    'south into the bench zone'
-  );
+  await expect(carryButton).toHaveAttribute('aria-disabled', 'true'); // not there yet (≥ 3 m from the bench zone)
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 25.2, 'east north of the okada');
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'south into the road east of the okada');
+  // Position-only legs — NO button-locator conditions inside holdUntil:
+  // between zones the Act pill relabels to bare 'Act', the 'Carry Pans'
+  // locator goes absent, and a getAttribute condition would block the
+  // poll while the key walks the robot into the far solids. The freeze
+  // rectangle [20.3, 21.5] × [4.0, 4.4] is fully inside the bench zone
+  // (worst corner dist 2.29 < 2.5), so the flip is guaranteed by
+  // geometry; the expect below does the waiting.
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 21.5, 'west along the road to the bench column');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 4.4, 'north into the bench zone');
   await expect(carryButton).toHaveAttribute('aria-disabled', 'false'); // the bench zone
   await pacedClick(page, carryButton); // step 2 at the bench
 
-  // Back to the job spot for the final lift + pay.
+  // Back to the job spot for the final lift + pay — the G-008e return:
+  // road west clear of the bench, north past the counter, pavement
+  // east, south into the band, west until the job zone flips 'Get paid'.
   const payButton = page.getByRole('button', { name: PAY_VERB });
   await expect(payButton).toHaveAttribute('aria-disabled', 'true'); // not there yet
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.6, 'north beside the wall');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 17.0, 'west along the road clear of the bench');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 3.4, 'north past the counter');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 18.6, 'east along the pavement past the job-spot column');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.85, 'north into the job-spot band');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.6, 'west into the job zone');
+  // Final approach keys on the ZONE itself (the same disc the probe
+  // uses, r 0.9 at (18, 0)) — a button-locator condition would block on
+  // the pill relabelling between zones (see the bench legs above).
   await holdUntil(
     page,
     'ArrowLeft',
-    async () => (await payButton.getAttribute('aria-disabled')) === 'false',
+    async () => {
+      const p = await readPos(page);
+      return (p.x - 18) ** 2 + p.z * p.z <= 0.81;
+    },
     'west into the job spot'
   );
   await expect(payButton).toHaveAttribute('aria-disabled', 'false');
@@ -337,7 +377,14 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
   await expect(coolingButton).toHaveAttribute('aria-disabled', 'true');
   expect(COOLDOWN_PROMPT.enabled).toBe(false);
   expect(COOLDOWN_PROMPT.label).not.toContain('waakye'); // the meal stays gated
-  await expect(page.getByText(COOLDOWN_REASON)).toBeVisible();
+  // G-008e: the countdown now renders in TWO places — the Act reason pill
+  // AND the idle objective card (with its "grab water or rest" tail) — so
+  // the old bare getByText hit Playwright strict mode. Assert each spot
+  // explicitly: the pill by testid, the card by its unique tail.
+  const reasonPill = page.getByTestId('act-reason');
+  await expect(reasonPill).toBeVisible();
+  await expect(reasonPill).toHaveText(COOLDOWN_REASON);
+  await expect(page.getByText('grab water or rest')).toBeVisible();
   // The pill settles into its greyed style (200 ms background transition —
   // mirrors earnAndEat.spec.ts) so the screenshot below is truthful.
   await expect(coolingButton).toHaveCSS('background-color', 'rgba(100, 116, 139, 0.3)');
@@ -377,21 +424,25 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
   await expect(grabButton).toHaveAttribute('aria-disabled', 'false'); // step 1 here
   await pacedClick(page, grabButton);
 
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.0, '2nd: east to the bench line');
-  await holdUntil(
-    page,
-    'ArrowDown',
-    async () => (await carryButton.getAttribute('aria-disabled')) === 'false',
-    '2nd: south into the bench zone'
-  );
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 25.2, '2nd: east north of the okada');
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, '2nd: south into the road east of the okada');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 21.5, '2nd: west along the road to the bench column');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 4.4, '2nd: north into the bench zone');
   await expect(carryButton).toHaveAttribute('aria-disabled', 'false');
   await pacedClick(page, carryButton); // step 2 at the bench
 
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.6, '2nd: north beside the wall');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 17.0, '2nd: west along the road clear of the bench');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 3.4, '2nd: north past the counter');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 18.6, '2nd: east along the pavement past the job-spot column');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.85, '2nd: north into the job-spot band');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.6, '2nd: west into the job zone');
   await holdUntil(
     page,
     'ArrowLeft',
-    async () => (await payButton.getAttribute('aria-disabled')) === 'false',
+    async () => {
+      const p = await readPos(page);
+      return (p.x - 18) ** 2 + p.z * p.z <= 0.81;
+    },
     '2nd: west into the job spot'
   );
   await expect(payButton).toHaveAttribute('aria-disabled', 'false');

@@ -214,7 +214,14 @@ export interface UmbrellaSpot {
 }
 
 export const UMBRELLAS: UmbrellaSpot[] = [
-  { x: 16.9, z: 3.1, color: 'umbrellaGreen' },
+  // G-008e: was (16.9, 3.1) — from the fixed south 45° camera the green
+  // canopy hung right over the counter→job-spot screen band and hid the
+  // player and the job-spot ring. Moved WEST of the kiosk front (kiosk
+  // west wall x 13.9): the canopy's screen band (x ≈ 12.0–14.4) now
+  // covers only the west end of the worn ground, clear of the counter
+  // player (15.5, 2.4) and the job-spot ring (18, 0). Visual-only —
+  // umbrellas carry no collider; Agent 3 may nudge within x ≤ 13.6.
+  { x: 13.2, z: 3.3, color: 'umbrellaGreen' },
   { x: 3.5, z: 22.5, color: 'umbrellaRed' },
   { x: 6.5, z: 22.7, color: 'umbrellaGreen' },
 ];
@@ -311,7 +318,7 @@ export const POLE_COLLIDER_HALF = 0.15; // 0.3 m box
  * G-008d: Daavi's joint is split into two non-overlapping zones —
  *   FOOD COUNTER  LOC-001     (15.5, 2.4)  kiosk front, food only
  *   JOB SPOT      LOC-001-JOB (18.0, 0.0)  kiosk east side, work only
- *   BENCH         LOC-001-BENCH (21.5, 2.9) step-2 waypoint, north pavement
+ *   BENCH         LOC-001-BENCH (21.5, 2.45) step-2 waypoint, north pavement
  * The two standing spots live in src/data/locations.ts; this section holds
  * the physical world side: the crate/pan stack that marks the job spot and
  * the wooden bench mesh at the bench waypoint.
@@ -329,11 +336,17 @@ export const JOB_SPOT_PROPS: Box2D = { x0: 17.1, z0: -0.5, x1: 17.62, z1: 0.5 };
  * Daavi's bench waypoint (G-008d: moved off the road onto the north
  * pavement z 1.85–3.85; was (20.5, 5.5) inside MAIN_ROAD).
  *
+ * G-008e: nudged south from (21.5, 2.9) to (21.5, 2.45) — the bench
+ * mesh below (z0 3.15) stood just 0.25 m north of the old waypoint,
+ * inside the 0.6 m capsule + margin the jobs clearance test pins; 2.45
+ * restores a 0.7 m gap. THE MESH DOES NOT MOVE — only the standing
+ * waypoint does (the player now stands a full stride off the seat).
+ *
  * ⚠ AGENT 4 CONTRACT: DAAVI_BENCH in src/rules/proximity.ts must equal
- * this { x: 21.5, z: 2.9 } — the objective marker and the step-2 Act zone
- * anchor here. src/world/clearance.test.ts pins the world side.
+ * this { x: 21.5, z: 2.45 } — the objective marker and the step-2 Act
+ * zone anchor here. src/world/clearance.test.ts pins the world side.
  */
-export const DAAVI_BENCH_SPOT = { x: 21.5, z: 2.9 };
+export const DAAVI_BENCH_SPOT = { x: 21.5, z: 2.45 };
 
 /**
  * The bench mesh's solid footprint (seat + backrest, faces south). Sits

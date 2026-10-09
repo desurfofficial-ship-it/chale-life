@@ -71,9 +71,13 @@ describe('act: data contract (G-002 item 2, G-008b bench walk, G-008d spot split
     expect(hustle.steps[2].locationId).toBe(DAAVI_JOB_SPOT_ID);
     expect(hustle.steps[2].actionVerb).toBe('Get paid');
     expect(locations.some((l) => l.id === WAAKYE_LOCATION_ID)).toBe(true);
-    // The job spot is NOT a locations.ts entry (Agent 3's contract file
-    // keeps its named points) — it lives in proximity.ts like the bench.
-    expect(locations.some((l) => l.id === 'LOC-001-JOB')).toBe(false);
+    // G-008e: Agent 3's #28 DID add LOC-001-JOB to locations.ts — the
+    // data and the name are theirs, kept. But it is a ZONE-BACKED id:
+    // nearestLocationId must never let it win the default-2.5 m point
+    // loop (that balloons the 0.9 m job zone over the counter's east
+    // half — the #28+#29 merge bug at (17.0, 0.5)). The skip and the
+    // counter-disc sweep are pinned in g008e-hotfix.test.ts.
+    expect(locations.some((l) => l.id === 'LOC-001-JOB')).toBe(true);
   });
 
   it('LOC-001 is the waakye joint and LOC-003 is the provisions shop', () => {
@@ -137,7 +141,7 @@ describe('act: the first earn-and-eat loop (₵20 → ₵35 → ₵23)', () => {
     expect(resolveAct(session, DAAVI_JOB_SPOT_ID).session).toBe(session);
 
     const lift2 = resolveAct(session, 'LOC-001-BENCH'); // walked to the bench
-    expect(lift2.toast).toContain('One more lift');
+    expect(lift2.toast).toContain('get paid');
     session = lift2.session;
     expect(session.job.step).toBe(2);
 
@@ -1358,7 +1362,7 @@ describe('act: Daavi bench walk (G-008b item 4, G-008d bench on the pavement)', 
     expect(prompt.enabled).toBe(true);
 
     const result = resolveAct(atStep(1, BENCH), null);
-    expect(result.toast).toContain('One more lift');
+    expect(result.toast).toContain('get paid');
     expect(result.session.job.step).toBe(2);
   });
 
