@@ -12,7 +12,7 @@
  *   - repeated props via InstancedMesh (1 call per prop type)   → 8 draw calls
  *   - sagging power wires as one LineSegments                   → 1 draw call
  *   - canvas-textured signs                                     → 4 draw calls
- *   - Kenney road tiles: pipeline kept, not rendered (W-005 → W-007)
+ *   - Kenney road tiles: pipeline kept, not rendered (B-002 → W-007)
  *   - parked vehicles, producer GLBs (W-004, trademark-scrubbed) → 5 draw calls
  *   - outer apron (laterite + walls + trees + fading road)       → 1 draw call
  *   ≈ ≤ 60 draw calls — far under the 150 budget (dc gate is 60).
@@ -45,7 +45,7 @@ export function StarterBlock() {
       <ApronMesh />
       <InstancedProps />
       <Wires />
-      {/* RoadTiles unmounted (W-005): 4 m Kenney strip inside a 7 m road —
+      {/* RoadTiles unmounted (B-002): 4 m Kenney strip inside a 7 m road —
           keep the module + GLBs + ledger; re-enable when W-007 rebuilds a
           street at kit width. */}
       <Vehicles />
