@@ -9,3 +9,4 @@ export * from './economy';
 export * from './jobs';
 export * from './housing';
 export * from './act';
+export * from './proximity';
