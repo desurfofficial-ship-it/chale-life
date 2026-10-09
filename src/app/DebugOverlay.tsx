@@ -24,6 +24,7 @@ export function DebugOverlay() {
     <div className="debug-overlay" aria-hidden="true">
       <div>fps  {hud.fps.toFixed(0)}</div>
       <div>pos  {hud.x.toFixed(2)} / {hud.z.toFixed(2)}</div>
+      <div>scr  {hud.screenX.toFixed(0)} / {hud.screenY.toFixed(0)}</div>
       <div>in   {hud.inputX.toFixed(2)} / {hud.inputZ.toFixed(2)}</div>
       <div>zoom {hud.zoom.toFixed(1)}</div>
       <div>dc   {hud.drawCalls}</div>
