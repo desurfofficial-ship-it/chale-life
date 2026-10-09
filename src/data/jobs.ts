@@ -252,17 +252,12 @@ export const ACCRA_SIDE_HUSTLES: ReadonlyArray<JobDefinition> = [
         targetInteractableId: 'food_vendor',
         // G-008b: the bench is a proximity.ts waypoint (id pinned to
         // DAAVI_BENCH.locationId by a data-contract test). G-008d: the
-        // bench moved OFF the road onto the north pavement; G-008e
-        // pinned the waypoint at (21.5, 2.45), just south of the mesh.
+        // bench moved OFF the road onto the north pavement (21.5, 2.45).
         locationId: 'LOC-001-BENCH',
         requiredAssetId: 'ACC_RESTAURANT_001',
         targetLocationName: 'Daavi’s bench (north pavement)',
         actionVerb: 'Carry Pans',
-        // G-008e: this toast fires as the get-paid step becomes active —
-        // it must point the player back to the kiosk's east side, not
-        // count lifts (the old "One more lift" read like step 3 was
-        // another carry).
-        completionMessage: 'Nice hustle! Back to the side of the kiosk to get paid.',
+        completionMessage: 'Back to the side of the kiosk to get paid.',
       },
       {
         stepId: 'aunty_ba_3',

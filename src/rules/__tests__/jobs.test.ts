@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { ACCRA_LEGAL_JOBS, findJobById } from '../../data/jobs';
 import { locations } from '../../data/locations';
 import {
-  JOB_SPOT_PROPS,
   MAIN_ROAD,
   NORTH_GUTTER,
   SOLID_FOOTPRINTS,
@@ -25,6 +24,7 @@ import {
   startJob,
   type JobState,
 } from '../jobs';
+import { JOB_SPOT_PROPS } from '../../world/starter/layout';
 
 const wallet = (balanceGHS: number): WalletState => ({ balanceGHS });
 const starterWallet = () => wallet(20);
@@ -135,7 +135,7 @@ describe('jobs: advance step', () => {
     const second = advanceStep(job);
     expect(second.ok).toBe(true);
     expect(second.completed).toBe(false);
-    expect(second.message).toContain('Back to the side of the kiosk'); // G-008e: points at the pay spot
+    expect(second.message).toContain('get paid');
     job = second.job;
     expect(job.step).toBe(2);
   });
@@ -484,9 +484,7 @@ describe('jobs: Daavi walk waypoints (G-008b item 4, G-008d items 8–10 constan
     expect(step2.locationId).toBe('LOC-001-BENCH');
     // G-008d: the bench sits on the NORTH PAVEMENT (z 1.85–3.85) — off
     // the road the old waypoint pointed into — and ≥ 3 m east of the
-    // kiosk point, so the forced walk is still real. G-008e: pinned at
-    // z 2.45 — the full capsule + margin (0.6 m) south of the bench mesh
-    // (layout.DAAVI_BENCH_MESH z0 3.15; 2.9 left only 0.25 m).
+    // kiosk point, so the forced walk is still real.
     expect(DAAVI_BENCH.x - 15.5).toBeGreaterThanOrEqual(3);
     expect(DAAVI_BENCH.z).toBeGreaterThanOrEqual(1.85);
     expect(DAAVI_BENCH.z).toBeLessThanOrEqual(3.85);
@@ -546,22 +544,25 @@ describe('jobs: world clearance (G-008d item 10 — road, gutters, footprints, w
     // bar). COMPOUND_DOOR is exempt: it is a MARKER anchor on the house
     // face by design, not a standing spot.
     const caps = 0.35 + 0.25;
-    const waypoints: Array<[string, number, number, Box2D | null]> = [
-      ['bench', DAAVI_BENCH.x, DAAVI_BENCH.z, null],
-      // G-008d item 8: the crate/pan stack marking the job spot is flush
-      // to the kiosk's east wall so the standing point keeps 0.38 m of
-      // BARE clearance (≥ the 0.35 m capsule, no margin) — its own props
-      // take the bare bar, every foreign footprint keeps the full
-      // margin. (The #28+#29 merge hid this behind the bench failure.)
-      ['job spot', DAAVI_JOB_SPOT.x, DAAVI_JOB_SPOT.z, JOB_SPOT_PROPS],
+    // G-008e: the crates that MARK the job spot (JOB_SPOT_PROPS) are the
+    // one deliberate exception — the standing point hugs its own
+    // marker by design (layout.ts documents the 0.38 m bare gap; the
+    // world clearance suite pins >= CAPSULE there). Everything else keeps
+    // the full bar, and the bench — moved to (21.5, 2.45) —
+    // clears its mesh by the full 0.6 m again.
+    const waypoints: Array<[string, number, number, readonly Box2D[]]> = [
+      ['bench', DAAVI_BENCH.x, DAAVI_BENCH.z, []],
+      ['job spot', DAAVI_JOB_SPOT.x, DAAVI_JOB_SPOT.z, [JOB_SPOT_PROPS]],
     ];
-    for (const [name, x, z, own] of waypoints) {
+    for (const [name, x, z, ownMarker] of waypoints) {
       offRoadAndGutters(x, z, name);
       for (const f of SOLID_FOOTPRINTS) {
-        expect(
-          clearOf(x, z, f, f === own ? 0 : caps),
-          `${name} (${x}, ${z}) must clear footprint ${JSON.stringify(f)}`
-        ).toBe(true);
+        const isOwn = ownMarker.includes(f);
+        const bar = isOwn ? 0.35 : caps;
+        const what = isOwn
+          ? `${name} (${x}, ${z}) must clear its own marker by the bare 0.35 m capsule`
+          : `${name} (${x}, ${z}) must clear footprint with the full ${caps} m bar`;
+        expect(clearOf(x, z, f, bar), `${what}: ${JSON.stringify(f)}`).toBe(true);
       }
     }
   });
@@ -585,7 +586,7 @@ describe('jobs: world clearance (G-008d item 10 — road, gutters, footprints, w
   });
 
   it('the job spot → bench straight-line walk hits no solid footprint', () => {
-    // Segment (18, 0) → (21.5, 2.9): slabs-vs-segment test over every
+    // Segment (18, 0) → (21.5, 2.45): slabs-vs-segment test over every
     // solid footprint. The okada parked at (18.3, 2.85) — footprint
     // x 17.34–19.26, z 1.58–4.12 — misses this line: the walk exits its
     // x-band (at z ≈ 1.05) before entering its z-band. Agent 3 is

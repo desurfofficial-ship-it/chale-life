@@ -363,23 +363,16 @@ export function objectiveFor(state: JobState): ObjectiveInfo | null {
  * and work only at the JOB SPOT beside the kiosk (LOC-001-JOB), so a line
  * that said "at Daavi's" would aim the guest at the wrong door:
  *
- *   - Starter hustle already worked this run:
- *       the 45 s cooldown (G-008e: read from the SAME cooldownStatus the
- *         Act button gates on — lastPayoutAt vs the caller's nowMs) →
- *         the rest line counting down: "Daavi needs you again in Ns —
- *         grab water or rest." The old "Work another shift" here
- *         promised a press the job spot would refuse for another 45 s;
+ *   - Hustle already worked this run:
  *       hunger ≤ WAAKYE_MAX_HUNGER (80) → the waakye line naming the
  *         FRONT COUNTER — the counter really offers the meal at these
- *         needs (round(hunger) ≤ 80, affordable — meals are never
- *         cooldown-gated), so the gate and the copy are the same door;
+ *         needs (round(hunger) ≤ 80, affordable), so the gate and the
+ *         copy are the same door;
  *       else energy < LOW_THRESHOLD (25) → the G-006 tired line — the
- *         compound's bed still takes anyone under 90 energy (rest is
- *         exactly what the cooldown asks for);
+ *         compound's bed still takes anyone under 90 energy;
  *       otherwise → work another shift, naming the side of the kiosk —
- *         with hunger above the meal gate, energy above the low line
- *         and the cooldown expired, canWork passes and the job spot
- *         offers "Help Daavi".
+ *         with hunger above the meal gate and energy above the low line,
+ *         canWork passes and the job spot offers "Help Daavi".
  *   - Starter hustle NOT yet worked (completedIds empty or without the
  *       hustle — undefined reads as []): the tired hint first when the
  *       belly can still take a nap's −8 hunger (G-006: sleeping while
@@ -387,42 +380,33 @@ export function objectiveFor(state: JobState): ObjectiveInfo | null {
  *       (the work gate would refuse them; the counter is the unstick),
  *       then the go-find-work beacon naming the JOB SPOT — the earn-first
  *       button's own answer, now at the side of the kiosk.
- *   - No needs (legacy callers): the cooldown rest line for a completed
- *       run still cooling, the neutral post-shift nudge otherwise, the
- *       beacon for a fresh run.
+ *   - No needs (legacy callers): the neutral post-shift nudge for a
+ *       completed run, the beacon otherwise.
  */
-export function idleObjectiveFor(
-  state: JobState,
-  needs?: NeedsState,
-  nowMs?: number
-): string {
+export function idleObjectiveFor(state: JobState, needs?: NeedsState, nowMs?: number): string {
   const waakye = findFoodById(FOOD_WAAKYE_ID)!;
+  // G-008e: the work-another-shift fallback must READ the payout cooldown
+  // — after a payout the job spot itself refuses with "needs you again
+  // in Ns" for cooldownSeconds, so the card may not tell a cooling guest
+  // to go work. Needs-based lines still outrank it: eating or sleeping
+  // through the cooldown is exactly what the countdown line suggests.
+  const cooldownLine = (): string | null => {
+    const hustle = findJobById('HUSTLE_AUNTY_BA_STARTER');
+    if (!hustle) return null;
+    const cd = cooldownStatus(hustle, nowMs, state.lastPayoutAt);
+    if (!cd.onCooldown) return null;
+    return `Daavi needs you again in ${Math.ceil(cd.remainingMs / 1000)}s — grab water or rest.`;
+  };
+  const workLine = 'Work another shift — jobs are at the side of Daavi’s kiosk.';
   if (isJobCompleted(state, 'HUSTLE_AUNTY_BA_STARTER')) {
-    // G-008e: the hint must read the cooldown it used to ignore. During
-    // the enforced 45 s rest the "Work another shift" line sent the
-    // guest to a job spot that refused them with its own countdown —
-    // the card now counts the same clock down instead. Meals and sleep
-    // stay first-choice when the body asks for them (neither is
-    // cooldown-gated); the rest line owns exactly the cells where the
-    // work line used to lie.
-    const cooldown = cooldownStatus(
-      findJobById('HUSTLE_AUNTY_BA_STARTER')!,
-      nowMs,
-      state.lastPayoutAt
-    );
-    const restLine = cooldown.onCooldown
-      ? `Daavi needs you again in ${Math.ceil(cooldown.remainingMs / 1000)}s — grab water or rest.`
-      : null;
-    if (!needs) {
-      return restLine ?? 'Work another shift — jobs are at the side of Daavi’s kiosk.';
-    }
+    if (!needs) return cooldownLine() ?? workLine;
     if (Math.round(needs.hunger) <= WAAKYE_MAX_HUNGER) {
       return `Hungry? Buy waakye at Daavi’s front counter (${formatGHS(waakye.priceGHS)}).`;
     }
     if (isTired(needs)) {
       return 'Tired — head home to the compound and sleep.';
     }
-    return restLine ?? 'Work another shift — jobs are at the side of Daavi’s kiosk.';
+    return cooldownLine() ?? workLine;
   }
   if (needs) {
     if (isTired(needs) && needs.hunger >= CAN_WORK_MIN_HUNGER) {
