@@ -7,7 +7,7 @@ import {
   setNearLocationId,
   setPlayerTransform,
 } from '../gameStore';
-import { AUNTY_BA_HUSTLE_ID, SLEEP_LOCATION_ID, WATER_LOCATION_ID, WAAKYE_LOCATION_ID } from '../../rules/act';
+import { AUNTY_BA_HUSTLE_ID, SLEEP_LOCATION_ID, WATER_LOCATION_ID } from '../../rules/act';
 
 /**
  * G-008b item 3 — the Act input guards live in requestAct so every input
@@ -29,9 +29,9 @@ import { AUNTY_BA_HUSTLE_ID, SLEEP_LOCATION_ID, WATER_LOCATION_ID, WAAKYE_LOCATI
  * suites, the tests form ONE ordered session on the module state.
  */
 
-/** Kiosk / bench / provisions / yard-inside-the-AABB coordinates. */
-const KIOSK = { x: 15.2, z: 2.4 };
-const BENCH = { x: 18.6, z: 2.4 };
+/** Job spot / bench / provisions / yard-inside-the-AABB coordinates. */
+const JOB_SPOT = { x: 18.0, z: 0.0 }; // DAAVI_JOB_SPOT (G-008d) — hire + steps 1/3
+const BENCH = { x: 21.4, z: 2.9 }; // DAAVI_BENCH on the north pavement (G-008d)
 const PROVISIONS = { x: -6.2, z: 2.6 };
 const YARD = { x: -9.5, z: 17.4 };
 
@@ -57,7 +57,7 @@ describe('store: Act input guards (G-008b + G-008c rework, one ordered session)'
   });
 
   it('the 600 ms debounce: a burst commits once, and dropped taps never re-arm the window', () => {
-    standAt(KIOSK, WAAKYE_LOCATION_ID);
+    standAt(JOB_SPOT, 'LOC-001-JOB');
     requestAct(); // accept the hustle — this press FIRES (stamps t0)
     expect(getState().job.activeId).toBe(AUNTY_BA_HUSTLE_ID);
     expect(getState().job.step).toBe(0);
@@ -94,15 +94,16 @@ describe('store: Act input guards (G-008b + G-008c rework, one ordered session)'
   });
 
   it('the payout lockout: a purchase inside 1000 ms of a payout is refused whole', () => {
-    // Continue the session: step 2 happens at Daavi's bench (the forced
-    // walk), step 3 back at the kiosk pays ₵15. The sleep cadence spent
-    // nothing, so the wallet rides at the starting ₵20.
+    // Continue the session: step 2 happens at Daavi's bench on the north
+    // pavement (the forced walk), step 3 back at the JOB SPOT pays ₵15.
+    // The sleep cadence spent nothing, so the wallet rides at the starting
+    // ₵20.
     standAt(BENCH, 'LOC-001-BENCH');
     wait(600);
     requestAct();
     expect(getState().job.step).toBe(2);
 
-    standAt(KIOSK, WAAKYE_LOCATION_ID);
+    standAt(JOB_SPOT, 'LOC-001-JOB');
     wait(600);
     requestAct();
     const payout = getState();

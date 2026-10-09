@@ -76,13 +76,30 @@ const labelStyle: CSSProperties = {
 
 /**
  * Clearance contract with the Engine's joystick (E-002 geometry, see
- * src/styles.css): on 390×844 the ring's bounding box is left 10 + 108 px
- * wide → right edge x = 118, top y = 722. The HUD root already pads 12 px,
- * so indenting the objective card's wrapper by 118 − 12 + 6 = 112 keeps its
- * left edge at x ≥ 124 — ≥ 6 px clear of the ring's top arc at any viewport
- * (G-001c, fixes PR #5 ISSUES #1). Do not shrink below 112.
+ * src/styles.css): the ring's bounding box is left 10 + 108 px wide →
+ * right edge x = 118. G-001c used that number to left-inset the objective
+ * card (left edge ≥ 124 — ≥ 6 px clear of the ring's top arc). G-008d
+ * item 6 moved the Act pill itself to the BOTTOM-RIGHT thumb zone (the
+ * centred pill and its centred reason line used to cross the ring on
+ * narrow phones), so the card keeps the left inset and the pill keeps
+ * this one. Do not shrink below 112.
  */
 const JOYSTICK_CLEAR_PX = 112;
+
+/**
+ * G-008d item 6 geometry: the Act pill hugs the BOTTOM-RIGHT thumb zone
+ * — its right edge lands at 16px + safe-area-inset-right (the HUD root
+ * pads 12px + safe-right, so the right stack takes marginRight 4px), and
+ * its bottom aligns with the joystick (the ring sits at bottom
+ * 14px + safe-area-inset-bottom; the root pads 12px + safe-bottom, so the
+ * bottom group takes paddingBottom 2px). The reason line rides ABOVE the
+ * pill, right-aligned, capped at 100vw − (joystick right edge 118px) −
+ * 32px — it can never reach the ring's x-band on any viewport, and being
+ * in-flow it can never collide with the objective card above it. Pinned
+ * by the actLayout e2e spec at 360×780 / 375×667 / 390×844.
+ */
+const ACT_STACK_MARGIN_RIGHT_PX = 4;
+const ACT_REASON_MAX_WIDTH = 'calc(100vw - 150px)';
 
 // ── Cards ────────────────────────────────────────────────────────────────────
 
@@ -238,10 +255,42 @@ function ActButton({
   const step = useStoreValue((s) => s.job.step);
   const objective = objectiveFor({ activeId, step });
   const label = actLabel ?? (objective ? objective.actionVerb : 'Act');
+  // G-008d item 6: the pill lives in the bottom-RIGHT thumb zone (the
+  // root's flex column right-aligns this stack; see the geometry note
+  // above); the reason line sits ABOVE the pill, right-aligned,
+  // width-capped off the joystick ring. The grid is justify-items: end so
+  // both boxes hug the right edge.
   return (
-    <div style={{ display: 'grid', justifyItems: 'center', gap: 4 }}>
+    <div
+      style={{
+        alignSelf: 'flex-end',
+        marginRight: ACT_STACK_MARGIN_RIGHT_PX,
+        display: 'grid',
+        justifyItems: 'end',
+        gap: 4,
+      }}
+    >
+      {/* G-008d item 6: the rules' disabled reason, ABOVE the pill and
+          right-aligned — it grows leftward, never into the ring. */}
+      {!enabled && reason && (
+        <span
+          data-testid="act-reason"
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: MUTED,
+            letterSpacing: '0.03em',
+            maxWidth: ACT_REASON_MAX_WIDTH,
+            textAlign: 'right',
+            lineHeight: 1.35,
+          }}
+        >
+          {reason}
+        </span>
+      )}
       <button
         type="button"
+        data-testid="act-pill"
         aria-disabled={!enabled}
         onPointerDown={(e) => {
           e.preventDefault();
@@ -270,21 +319,6 @@ function ActButton({
       >
         {label}
       </button>
-      {/* G-008b item 6: the rules' disabled reason, under the pill. */}
-      {!enabled && reason && (
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            color: MUTED,
-            letterSpacing: '0.03em',
-            maxWidth: 'min(64vw, 300px)',
-            textAlign: 'center',
-          }}
-        >
-          {reason}
-        </span>
-      )}
     </div>
   );
 }
@@ -330,18 +364,19 @@ export function Hud({ onAct, actLabel, actEnabled = true, actReason = null, toas
         <NeedsCard />
       </div>
 
-      {/* Bottom: objective line sits just above the thumb-zone Act button.
-          The card and toast share the left-inset wrapper (JOYSTICK_CLEAR_PX)
-          so neither box ever reaches over the joystick ring's top arc —
-          measured 0 px² overlap on 390×844 in G-001c; the Act pill keeps
-          its own 3 px ring clearance. */}
+      {/* Bottom group (G-008d item 6): the objective card and toast stay
+          LEFT-INSET above the joystick (JOYSTICK_CLEAR_PX wrapper, G-001c
+          contract); the Act pill right-aligns below them, bottom aligned
+          with the joystick — root padding 12px + safe-bottom, plus this
+          group's 2px, lands the pill's bottom edge exactly at the ring's
+          14px + safe-bottom. */}
       <div
         style={{
+          alignSelf: 'stretch',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
           gap: 10,
-          paddingBottom: 'env(safe-area-inset-bottom)',
+          paddingBottom: 2,
         }}
       >
         <div

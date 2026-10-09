@@ -6,10 +6,12 @@
  * runs its own pristine ordered session:
  *
  *   drain hunger 72 → 60 (four spawn minutes of starter drain, 240 × 1 s)
- *   → walk to the waakye joint (LOC-001) → the FIRST Act starts the hustle
- *   (not waakye — the E-003 hunger-proxy bug this kills; the button reads
- *   the employer prompt from the rules, never a hardcoded name) → the loop
- *   still reaches ₵35 → waakye lands ₵23 → completedIds latched exactly once.
+ *   → walk to the JOB SPOT (LOC-001-JOB, the kiosk's east side — G-008d
+ *   split) → the FIRST Act starts the hustle (the counter 3 m west would
+ *   happily sell waakye at these needs — the spots keep the doors honest;
+ *   the button reads the employer prompt from the rules, never a hardcoded
+ *   name) → the loop still reaches ₵35 → the counter sells waakye ₵23 →
+ *   completedIds latched exactly once.
  *
  * This is the store-level mirror of the live E-004 check: spawn, wait 60 s,
  * walk to the joint — the button must read the hustle prompt, not waakye.
@@ -51,10 +53,11 @@ describe('gameStore (E-004): earn-first survives the spawn drain', () => {
     expect(needs.hunger).toBeCloseTo(60, 5); // 72 − 3/min × 4 min
     expect(needs.energy).toBeCloseTo(80 - DECAY_PER_SECOND.starter.energy * 240, 10);
 
-    // Walk to the waakye joint (LOC-001). The E-003 hunger proxy would have
-    // flipped the Act to waakye right here; G-004's completedIds flag keeps
-    // it earn-first — the store-level projection says "Help <employer>".
-    setNearLocationId('LOC-001');
+    // Walk to the JOB SPOT (LOC-001-JOB — G-008d: the hire lives at the
+    // kiosk's east side). The counter 3 m west would sell this hungry
+    // guest a meal; the job spot's only offer is the hustle — the
+    // store-level projection says "Help <employer>".
+    setNearLocationId('LOC-001-JOB');
     const s = getState();
     const prompt = actPromptFor(
       {
@@ -79,17 +82,18 @@ describe('gameStore (E-004): earn-first survives the spawn drain', () => {
     expect(afterStart.toast.message).toContain('Job accepted');
   });
 
-  it('the drained loop still pays out ₵35 and waakye lands ₵23', () => {
+  it('the drained loop still pays out ₵35 and the counter sells waakye for ₵23', () => {
     // Acts 2 and 3 — steps 1/3 and 2/3, history rides along untouched.
-    // G-008b: step 2 happens at Daavi's bench east of the kiosk — the
-    // probe reads the waypoint for the middle press, then back to the joint.
+    // G-008b/G-008d: step 2 happens at Daavi's bench on the north
+    // pavement — the probe reads the waypoint for the middle press, then
+    // back to the job spot for the final lift.
     requestAct();
     expect(getState().job).toEqual({ activeId: HUSTLE_ID, step: 1, completedIds: [] });
     setNearLocationId('LOC-001-BENCH');
     requestAct();
     expect(getState().job).toEqual({ activeId: HUSTLE_ID, step: 2, completedIds: [] });
     expect(getState().wallet.balanceGHS).toBe(20); // pay only on completion
-    setNearLocationId('LOC-001');
+    setNearLocationId('LOC-001-JOB');
 
     // Final Act — +₵15 payout and the work toll on the drained needs.
     requestAct();
@@ -110,7 +114,9 @@ describe('gameStore (E-004): earn-first survives the spawn drain', () => {
     });
     expect(paid.toast.message).toContain('+₵15');
 
-    // Next Act at the joint sells waakye (earn-first satisfied): ₵35 → ₵23.
+    // Next Act — at the COUNTER this time (G-008d): the meal sells (earn-
+    // first satisfied): ₵35 → ₵23.
+    setNearLocationId('LOC-001');
     requestAct();
     const fed = getState();
     expect(fed.wallet.balanceGHS).toBe(23); // 35 − 12

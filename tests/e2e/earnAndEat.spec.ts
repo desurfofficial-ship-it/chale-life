@@ -1,15 +1,18 @@
 /**
  * E-005 robot playtest — the earn-and-eat core loop, driven end-to-end in a
  * real browser (Chromium, software WebGL via SwiftShader, 390x844) against
- * the BUILT app (vite preview of dist/).
+ * the BUILT app (vite preview of dist/) — G-008d edition: the hustle lives
+ * at the JOB SPOT (kiosk's east side), the bench on the north pavement,
+ * and the front counter sells food only.
  *
  * Flow (one ordered robot session — the store is session state):
  *   load → HUD shows ₵20 → G-006 sleep beat at the compound (spawn IS
  *   LOC-002): Sleep → energy up, hunger −8, then the bed refuses at
- *   energy ≥ 90 ("Not tired yet") → walk to LOC-001 on the keyboard → the Act
- *   button reads the hustle prompt → Act until the payout lands (₵35) → the
- *   button flips to the waakye offer → Act → ₵23 with hunger up → walk away →
- *   Act disabled.
+ *   energy ≥ 90 ("Not tired yet") → walk to the JOB SPOT on the keyboard
+ *   → the Act button reads the hustle prompt → Act (grab) → walk to the
+ *   bench → Act (carry) → walk back → Act (get paid, ₵35) → walk to the
+ *   front counter → the meal offer → Act → ₵23 with hunger up → walk away
+ *   → Act disabled.
  *
  * NAME-AGNOSTIC BY CONSTRUCTION: every expected button label is derived at
  * runtime from the pure rules (actPromptFor / objectiveFor) and the data
@@ -30,8 +33,12 @@ import { SLEEP_GATE_ENERGY } from '../../src/rules/needs';
 
 /** Data key of the starter hustle (an id, not an NPC name). */
 const HUSTLE_ID = 'HUSTLE_AUNTY_BA_STARTER';
-/** The waakye joint (src/data/locations.ts). */
+/** The waakye joint FRONT COUNTER (src/data/locations.ts) — food only. */
 const WAAKYE_LOCATION_ID = 'LOC-001';
+/** The job spot waypoint (proximity.ts, G-008d) — hire + steps 1/3. */
+const JOB_SPOT_ID = 'LOC-001-JOB';
+/** The bench waypoint (proximity.ts) — step 2. */
+const BENCH_ID = 'LOC-001-BENCH';
 /** The Starter Compound (src/data/locations.ts) — spawn point, G-006 sleep. */
 const SLEEP_LOCATION_ID = 'LOC-002';
 
@@ -44,15 +51,17 @@ const FRESH_SESSION = {
 
 // ── Rule-derived expectations (the name-agnostic contract) ──────────────────
 
-/** The Act prompt for a fresh guest standing at the joint: "Help <employer>". */
-const HELP_LABEL = actPromptFor(FRESH_SESSION, WAAKYE_LOCATION_ID).label;
+/** The Act prompt for a fresh guest standing at the JOB SPOT: "Help <employer>". */
+const HELP_LABEL = actPromptFor(FRESH_SESSION, JOB_SPOT_ID).label;
 
-/** The per-step Act verb while the shift is live (all starter steps share it). */
-const WORK_VERB = objectiveFor({ activeId: HUSTLE_ID, step: 0 })!.actionVerb;
+/** The per-step Act verbs (G-008d: each step has its own). */
+const GRAB_VERB = objectiveFor({ activeId: HUSTLE_ID, step: 0 })!.actionVerb;
+const CARRY_VERB = objectiveFor({ activeId: HUSTLE_ID, step: 1 })!.actionVerb;
+const PAY_VERB = objectiveFor({ activeId: HUSTLE_ID, step: 2 })!.actionVerb;
 
-/** The Act prompt once the hustle has paid out this run (G-004 earn-first):
- *  "Buy waakye <price>" — G-008b: the meal needs round(hunger) ≤ 55, so
- *  the derivation session is hungry enough to actually be offered it. */
+/** The Act prompt once the hustle has paid out this run: "Buy waakye <price>"
+ *  at the counter — G-008d: the meal gate is 80, so the derivation session
+ *  (hunger 50) is well under it. */
 const WAAKYE_LABEL = actPromptFor(
   {
     wallet: { balanceGHS: 35 },
@@ -240,11 +249,19 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
   await expect(sleepButton).toHaveCSS('background-color', 'rgba(100, 116, 139, 0.3)');
   await page.screenshot({ path: shot('02-sleep-not-tired-390x844.png') });
 
-  // ── 3. Walk east, then north, to the waakye joint (LOC-001) ─────────────
+  // ── 3. Walk east to the kiosk block, then around to the JOB SPOT ──────
+  // G-008d route (collider-aware): east along the south pavement to the
+  // kiosk's x, north past the counter, back south into the road, east
+  // past the okada, north beside the kiosk's east wall, west into the
+  // job spot's 0.9 m zone.
   await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 15.0, 'eastbound');
-  // The proximity probe (≤2.5 m) flips the Act prompt to the hustle offer.
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 3.4, 'north past the counter');
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'south into the road');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.0, 'east past the okada');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.6, 'north beside the kiosk wall');
+  // The proximity probe (the 0.9 m job-spot zone) flips the Act prompt.
   const helpButton = page.getByRole('button', { name: HELP_LABEL });
-  await holdUntil(page, 'ArrowUp', async () => helpButton.isVisible(), 'to the joint');
+  await holdUntil(page, 'ArrowLeft', async () => helpButton.isVisible(), 'west into the job spot');
   await expect(helpButton).toHaveAttribute('aria-disabled', 'false');
   // The prompt is rule-derived: it MUST name the employer from the data.
   expect(HELP_LABEL).toContain(EMPLOYER_NAME);
@@ -254,37 +271,57 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
   await expect(page.getByText('Job accepted')).toBeVisible();
   await expect(page.getByText(formatGHS(20), { exact: true })).toBeVisible(); // zero-capital
 
-  // G-008b: the three lifts are split across two spots — step 2 happens at
-  // Daavi's bench (≥ 3 m east of the kiosk), so the robot WALKS there and
-  // back, following the Act button's enabled edge. Each walk is bracketed
-  // by a disabled assertion first, so a stale render can't fake a stop.
-  const workButton = page.getByRole('button', { name: WORK_VERB });
+  // G-008d: the three lifts span two spots with per-step verbs — grab
+  // (job spot), carry (bench), get paid (job spot). Each walk is
+  // bracketed by a disabled assertion first, so a stale render can't
+  // fake a stop.
+  const grabButton = page.getByRole('button', { name: GRAB_VERB });
+  await expect(grabButton).toHaveAttribute('aria-disabled', 'false'); // step 1 here
+  await pacedClick(page, grabButton);
 
-  await expect(workButton).toHaveAttribute('aria-disabled', 'false'); // step 1 at the kiosk
-  await pacedClick(page, workButton);
+  // Walk to Daavi's bench on the north pavement: east along the kiosk's
+  // north side (clear of the okada's z-band), then south into the zone.
+  // NOTE: the stop keys on the button flipping ENABLED — 'Carry Pans'
+  // also renders disabled at wrong spots mid-shift.
+  const carryButton = page.getByRole('button', { name: CARRY_VERB });
+  await expect(carryButton).toHaveAttribute('aria-disabled', 'true'); // not there yet
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.0, 'east to the bench line');
+  await holdUntil(
+    page,
+    'ArrowDown',
+    async () => (await carryButton.getAttribute('aria-disabled')) === 'false',
+    'south into the bench zone'
+  );
+  await expect(carryButton).toHaveAttribute('aria-disabled', 'false'); // the bench zone
+  await pacedClick(page, carryButton); // step 2 at the bench
 
-  // G-008b walk to Daavi's bench, anchored on POSITIONS (the okada at
-  // 18.3/2.85 walls off the direct east line): south to the bench's z,
-  // straight east through its zone, then west + north to re-enter the
-  // kiosk zone for the final lift. Each leg re-anchors deterministically.
-  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 5.5, 'south to the bench line');
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.4, 'east to the bench');
-  await expect(workButton).toHaveAttribute('aria-disabled', 'false'); // the bench zone
-  await pacedClick(page, workButton); // step 2 at the bench
-
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 17.0, 'west clear of the bench');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 4.2, 'north to the kiosk zone');
-  await expect(workButton).toHaveAttribute('aria-disabled', 'false'); // the kiosk zone
-  await pacedClick(page, workButton); // final lift → payout
+  // Back to the job spot for the final lift + pay.
+  const payButton = page.getByRole('button', { name: PAY_VERB });
+  await expect(payButton).toHaveAttribute('aria-disabled', 'true'); // not there yet
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.6, 'north beside the wall');
+  await holdUntil(
+    page,
+    'ArrowLeft',
+    async () => (await payButton.getAttribute('aria-disabled')) === 'false',
+    'west into the job spot'
+  );
+  await expect(payButton).toHaveAttribute('aria-disabled', 'false');
+  await pacedClick(page, payButton); // final lift → payout
 
   await expect(page.getByText(formatGHS(35), { exact: true })).toBeVisible();
   await page.screenshot({ path: shot('03-wallet-35-390x844.png') });
 
-  // ── 5. Earn-first: the joint sells waakye once the guest is hungry ──────
-  // G-008b Full gate: right after the payout hunger sits above 55 ("Full")
-  // — the robot pins hunger 50 with the e2e hook so the meal is offered.
+  // ── 5. The front counter sells waakye once the guest is hungry ──────
+  // G-008d: the meal lives at the counter (west of the job spot) — the
+  // robot pins hunger 50 with the e2e hook, walks over, buys.
   await setNeeds(page, 50, 60);
   const waakyeButton = page.getByRole('button', { name: WAAKYE_LABEL });
+  // Collider-aware meal route: east past the okada first, south into the
+  // road, west along it, then north to the counter's zone.
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 19.8, 'east past the okada');
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'south into the road');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 16.8, 'west along the road');
+  await holdUntil(page, 'ArrowUp', async () => waakyeButton.isVisible(), 'north to the counter');
   await expect(waakyeButton).toHaveAttribute('aria-disabled', 'false');
   const hungerBeforeMeal = await hungerNow(page);
 
@@ -301,7 +338,7 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
 
   // ── 6. Walk away: no location nearby → Act disabled, wallet untouched ───
   const idleButton = page.getByRole('button', { name: 'Act', exact: true });
-  await holdUntil(page, 'ArrowDown', async () => idleButton.isVisible(), 'away from the joint');
+  await holdUntil(page, 'ArrowDown', async () => idleButton.isVisible(), 'away from the counter');
   await expect(idleButton).toHaveAttribute('aria-disabled', 'true');
   await expect(page.getByText(formatGHS(23), { exact: true })).toBeVisible();
 

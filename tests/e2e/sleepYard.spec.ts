@@ -1,24 +1,25 @@
 /**
  * G-008b robot playtest — the proximity wiring, verified end-to-end in the
- * same software-GL browser as the E-005 loop spec — EXTENDED by G-008c:
+ * same software-GL browser as the E-005 loop spec — EXTENDED by G-008c,
+ * RE-ROUTED by G-008d (the spot split):
  *
  *   (a) sleep zone: energy pinned to 40, the whole compound YARD (the
  *       isInSleepZone AABB — not the old 2.5 m gate point) offers an
  *       enabled "Sleep"; pressing it restores exactly +55 energy.
- *   (c) burst guard, made DETERMINISTIC (G-008c item 5): the payout tap,
- *       the setNeeds(50, 60) that arms the waakye offer, and 10 rapid
- *       taps all fire inside ONE evaluate call — every tap lands within
- *       a few milliseconds of the payout, so the 600 ms debounce and the
- *       1000 ms purchase lockout cover the burst on ANY CI speed (the
- *       G-008b shape depended on the burst landing within 1000 ms of a
- *       paced click — flaky on a slow runner).
- *   (b) the dead-end fix, live (G-008c item 1): at hunger 92 with ₵35 the
- *       button is NO LONGER a static "Full" — it is a disabled "Help
- *       Daavi" counting the cooldown down; the meal stays gated and the
- *       job comes back when the rest expires.
- *   (d) cooldown to the second shift: broke + on-cooldown shows the
- *       countdown reason; when it expires "Help Daavi" re-enables and a
- *       full second shift (kiosk → bench → kiosk) pays ₵15 again.
+ *   (c) burst guard, made DETERMINISTIC (G-008c item 5): the payout tap
+ *       (now the "Get paid" step AT THE JOB SPOT), the setNeeds(50, 60)
+ *       that arms the meal offer, and 10 rapid taps all fire inside ONE
+ *       evaluate call — every tap lands within a few milliseconds of the
+ *       payout, so the 600 ms debounce and the 1000 ms purchase lockout
+ *       cover the burst on ANY CI speed.
+ *   (b) the dead-end fix, live (G-008c item 1, G-008d spot): at hunger 92
+ *       with ₵35 the JOB SPOT button is a disabled "Help Daavi" counting
+ *       the cooldown down, and the COUNTER button is "Full" — each spot
+ *       states its own truth, and neither is a dead end.
+ *   (d) cooldown to the second shift: when the rest expires "Help Daavi"
+ *       re-enables and a full second shift (job spot → bench → job spot)
+ *       pays ₵15 again; the meal is bought at the counter in between —
+ *       meals are never cooldown-gated.
  *
  * NAME-AGNOSTIC like earnAndEat.spec.ts: labels are derived from the pure
  * rules; only data KEYS and rule outputs appear as literals.
@@ -30,27 +31,32 @@ import { findJobById } from '../../src/data/jobs';
 import { formatGHS } from '../../src/rules/economy';
 import { WAAKYE_MAX_HUNGER } from '../../src/rules/needs';
 
-/** The waakye joint / the compound (data keys). */
+/** The waakye joint FRONT COUNTER / the compound / the job spot (data keys). */
 const WAAKYE_LOCATION_ID = 'LOC-001';
+const JOB_SPOT_ID = 'LOC-001-JOB';
 /** The starter hustle id (a data key, not an NPC name). */
 const HUSTLE_ID = 'HUSTLE_AUNTY_BA_STARTER';
 const EMPLOYER_NAME = findJobById(HUSTLE_ID)!.employerName;
+/** Per-step verbs (G-008d: each step has its own). */
+const GRAB_VERB = 'Grab pans';
+const CARRY_VERB = 'Carry Pans';
+const PAY_VERB = 'Get paid';
 
-/** A paid guest at the joint, five seconds into the cooldown — the
+/** A paid guest at the JOB SPOT, five seconds into the cooldown — the
  *  derivation input for the G-008c disabled-state label. */
-const PAID_AT_JOINT = {
+const PAID_AT_JOB_SPOT = {
   wallet: { balanceGHS: 35 },
   needs: { hunger: 92, energy: 60 },
   job: { activeId: null, step: 0, completedIds: [HUSTLE_ID], lastPayoutAt: 0 },
   nowMs: 5_000,
 } as const;
 
-/** G-008c: mid-cooldown the button reads "Help <employer>", disabled —
- *  the meal is gated AND the rest is running (never a dead "Full"). */
-const COOLDOWN_PROMPT = actPromptFor(PAID_AT_JOINT, WAAKYE_LOCATION_ID);
-/** The waakye offer at the same spot once hunger is under the gate. */
+/** G-008c: mid-cooldown the JOB SPOT button reads "Help <employer>",
+ *  disabled — the work door counts the rest down. */
+const COOLDOWN_PROMPT = actPromptFor(PAID_AT_JOB_SPOT, JOB_SPOT_ID);
+/** The waakye offer at the COUNTER once hunger is under the gate. */
 const HUNGRY_PAID_LABEL = actPromptFor(
-  { ...PAID_AT_JOINT, needs: { hunger: 50, energy: 60 } },
+  { ...PAID_AT_JOB_SPOT, needs: { hunger: 50, energy: 60 } },
   WAAKYE_LOCATION_ID
 ).label;
 
@@ -174,9 +180,42 @@ async function pacedClick(page: Page, locator: ReturnType<Page['getByRole']>): P
   await locator.click();
 }
 
-/** The earn-and-eat walk: east along the street, then north to the kiosk. */
-async function walkToJoint(page: Page): Promise<void> {
+/**
+ * The G-008d walk from spawn to the JOB SPOT (collider-aware): east along
+ * the south pavement, north past the counter, south into the road, east
+ * past the okada, north beside the kiosk's east wall, west into the 0.9 m
+ * job-spot zone — the same route earnAndEat.spec.ts drives.
+ */
+async function walkToJobSpot(page: Page): Promise<void> {
   await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 15.0, 'eastbound');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 3.4, 'north past the counter');
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'south into the road');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.0, 'east past the okada');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.6, 'north beside the kiosk wall');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.5, 'west into the job spot');
+}
+
+/**
+ * The JOB SPOT → COUNTER walk (meals live at the front counter now):
+ * east past the okada, south into the road, west along it, north into
+ * the counter's zone.
+ */
+async function walkToCounter(page: Page): Promise<void> {
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 19.8, 'east past the okada');
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'south into the road');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 16.8, 'west along the road');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 3.4, 'north to the counter');
+}
+
+/**
+ * The COUNTER → JOB SPOT walk back: south into the road, east past the
+ * okada's line, north beside the kiosk wall, west into the zone.
+ */
+async function walkBackToJobSpot(page: Page): Promise<void> {
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'back south into the road');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.0, 'back east past the okada');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.6, 'back north beside the wall');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.5, 'back west into the job spot');
 }
 
 test('(a) sleep zone: the whole yard offers Sleep and +55 energy', async ({
@@ -236,44 +275,63 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
   test.setTimeout(600_000);
   const shot = (name: string) => testInfo.outputPath(name);
 
-  // Work the real loop to a payout: accept → kiosk → bench → kiosk.
+  // Work the real loop to a payout: hire at the JOB SPOT → grab → bench
+  // → get paid.
   await page.goto('/chale-life/?debug=1&e2e=1');
   await expect(page.getByText(formatGHS(20), { exact: true })).toBeVisible();
 
-  await walkToJoint(page);
+  await walkToJobSpot(page);
   const helpButton = page.getByRole('button', { name: 'Help Daavi' });
-  await holdUntil(page, 'ArrowUp', async () => helpButton.isVisible(), 'to the joint');
+  await expect(helpButton).toBeVisible(); // the zone probe already reads LOC-001-JOB
+  await expect(helpButton).toHaveAttribute('aria-disabled', 'false');
   await pacedClick(page, helpButton);
   await expect(page.getByText('Job accepted')).toBeVisible();
 
-  const workButton = page.getByRole('button', { name: 'Carry Pans' });
-  await pacedClick(page, workButton); // step 1 (kiosk)
+  // Step 1 fires right here — the player is standing at the job spot.
+  const grabButton = page.getByRole('button', { name: GRAB_VERB });
+  await expect(grabButton).toHaveAttribute('aria-disabled', 'false');
+  await pacedClick(page, grabButton); // step 1 (job spot)
 
-  // G-008b walk to Daavi's bench, anchored on POSITIONS (the okada at
-  // 18.3/2.85 walls off the direct east line): south to the bench's z,
-  // straight east through its zone, then west + north to re-enter the
-  // kiosk zone for the final lift. Each leg re-anchors deterministically.
-  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 5.5, 'south to the bench line');
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.4, 'east to the bench');
-  await expect(workButton).toHaveAttribute('aria-disabled', 'false'); // the bench zone
-  await pacedClick(page, workButton); // step 2 at the bench
+  // Walk to Daavi's bench on the north pavement (G-008d): east along the
+  // kiosk's north side (clear of the okada's z-band), then south into
+  // the zone. The stop keys on the button flipping ENABLED — 'Carry
+  // Pans' also renders disabled at wrong spots mid-shift.
+  const carryButton = page.getByRole('button', { name: CARRY_VERB });
+  await expect(carryButton).toHaveAttribute('aria-disabled', 'true'); // not there yet
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.0, 'east to the bench line');
+  await holdUntil(
+    page,
+    'ArrowDown',
+    async () => (await carryButton.getAttribute('aria-disabled')) === 'false',
+    'south into the bench zone'
+  );
+  await expect(carryButton).toHaveAttribute('aria-disabled', 'false'); // the bench zone
+  await pacedClick(page, carryButton); // step 2 at the bench
 
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 17.0, 'west clear of the bench');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 4.2, 'north to the kiosk zone');
-  await expect(workButton).toHaveAttribute('aria-disabled', 'false'); // the kiosk zone
+  // Back to the job spot for the final lift + pay.
+  const payButton = page.getByRole('button', { name: PAY_VERB });
+  await expect(payButton).toHaveAttribute('aria-disabled', 'true'); // not there yet
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.6, 'north beside the wall');
+  await holdUntil(
+    page,
+    'ArrowLeft',
+    async () => (await payButton.getAttribute('aria-disabled')) === 'false',
+    'west into the job spot'
+  );
+  await expect(payButton).toHaveAttribute('aria-disabled', 'false');
 
   // (c) THE DETERMINISTIC BURST: payout + arm + 10 taps in one evaluate —
   // every tap is within a few ms of the payout, so the 600 ms debounce and
   // the 1000 ms purchase lockout refuse them on any runner speed.
-  await payoutThenBurst(page, 'Carry Pans', 10);
+  await payoutThenBurst(page, PAY_VERB, 10);
 
   await expect(page.getByText(formatGHS(35), { exact: true })).toBeVisible(); // unchanged
   await expect(page.getByText('Waakye!')).toHaveCount(0); // nothing was bought
 
-  // (b) THE DEAD-END FIX, live: hunger 92 with ₵35 mid-cooldown used to
-  // read a static "Full" — the moneyed player's dead end. Now the button
-  // is a disabled "Help Daavi" counting the rest down (and the label is
-  // derived from the same rules the store runs, cooldown fields included).
+  // (b) THE DEAD-END FIX, live: hunger 92 with ₵35 mid-cooldown reads a
+  // disabled "Help Daavi" counting the rest down AT THE JOB SPOT — while
+  // the COUNTER (its own spot now) states its own truth: "Full". Neither
+  // is a dead end: the rest expires below, the meal is bought in between.
   await setNeeds(page, 92, 60);
   const coolingButton = page.getByRole('button', { name: COOLDOWN_PROMPT.label, exact: true });
   await expect(coolingButton).toHaveAttribute('aria-disabled', 'true');
@@ -285,52 +343,61 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
   await expect(coolingButton).toHaveCSS('background-color', 'rgba(100, 116, 139, 0.3)');
   await page.screenshot({ path: shot('06-cooldown-countdown-390x844.png') });
 
-  // Meals are NEVER cooldown-gated: once hunger is under the gate the
-  // waakye offer returns immediately — and the guards have long expired,
-  // so ONE normal tap buys it (₵35 → ₵23).
+  // Meals are NEVER cooldown-gated — and they live at the COUNTER now:
+  // the robot walks over (guards long expired) and ONE tap buys it.
   await setNeeds(page, 50, 60);
   const hungryButton = page.getByRole('button', { name: HUNGRY_PAID_LABEL, exact: true });
-  await expect(hungryButton).toHaveAttribute('aria-disabled', 'false');
   expect(HUNGRY_PAID_LABEL).toContain('waakye');
-  await page.waitForTimeout(1_400);
+  await walkToCounter(page);
+  await expect(hungryButton).toHaveAttribute('aria-disabled', 'false');
+  await page.waitForTimeout(1_200);
   await hungryButton.click();
   await expect(page.getByText('Waakye!')).toBeVisible();
   await expect(page.getByText(formatGHS(23), { exact: true })).toBeVisible();
 
-  // Eat down to broke (₵23 → ₵11): now neither door opens — hungry enough
-  // to want the meal but ₵1 short of it, and the rest is still running.
+  // Eat down to broke (₵23 → ₵11): the counter's purse gate takes over —
+  // "Not enough cash" is ITS truth, never a work answer.
   await setNeeds(page, 30, 60);
-  await expect(hungryButton).toHaveAttribute('aria-disabled', 'false'); // still affordable
+  await expect(hungryButton).toHaveAttribute('aria-disabled', 'false'); // hunger 30 ≤ 80
   await page.waitForTimeout(1_200);
   await hungryButton.click();
   await expect(page.getByText(formatGHS(11), { exact: true })).toBeVisible();
-
   await setNeeds(page, 30, 60);
-  await expect(coolingButton).toHaveAttribute('aria-disabled', 'true'); // broke + mid-rest
-  await expect(page.getByText(COOLDOWN_REASON)).toBeVisible();
-  await expect(coolingButton).toHaveCSS('background-color', 'rgba(100, 116, 139, 0.3)');
-  await page.screenshot({ path: shot('07-cooldown-broke-390x844.png') });
+  await expect(hungryButton).toHaveAttribute('aria-disabled', 'true'); // broke
+  await page.screenshot({ path: shot('07-counter-broke-390x844.png') });
 
-  // (d) the rest EXPIRES: "Help Daavi" comes back on its own — the wallet
-  // can never dead-end — and a full second shift pays ₵15 again.
-  await expect(helpButton).toHaveAttribute('aria-disabled', 'false', { timeout: 60_000 });
+  // (d) the rest EXPIRES: back at the job spot "Help Daavi" comes back on
+  // its own — the wallet can never dead-end — and a full second shift
+  // pays ₵15 again.
+  await walkBackToJobSpot(page);
+  await expect(helpButton).toHaveAttribute('aria-disabled', 'false', { timeout: 90_000 });
   await pacedClick(page, helpButton);
   await expect(page.getByText('Job accepted')).toBeVisible();
 
-  await expect(workButton).toHaveAttribute('aria-disabled', 'false'); // step 1 at the kiosk
-  await pacedClick(page, workButton);
+  await expect(grabButton).toHaveAttribute('aria-disabled', 'false'); // step 1 here
+  await pacedClick(page, grabButton);
 
-  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 5.5, '2nd: south to the bench line');
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.4, '2nd: east to the bench');
-  await expect(workButton).toHaveAttribute('aria-disabled', 'false');
-  await pacedClick(page, workButton); // step 2 at the bench
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.0, '2nd: east to the bench line');
+  await holdUntil(
+    page,
+    'ArrowDown',
+    async () => (await carryButton.getAttribute('aria-disabled')) === 'false',
+    '2nd: south into the bench zone'
+  );
+  await expect(carryButton).toHaveAttribute('aria-disabled', 'false');
+  await pacedClick(page, carryButton); // step 2 at the bench
 
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 17.0, '2nd: west clear of the bench');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 4.2, '2nd: north to the kiosk zone');
-  await expect(workButton).toHaveAttribute('aria-disabled', 'false');
-  await pacedClick(page, workButton); // final lift → second payout
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.6, '2nd: north beside the wall');
+  await holdUntil(
+    page,
+    'ArrowLeft',
+    async () => (await payButton.getAttribute('aria-disabled')) === 'false',
+    '2nd: west into the job spot'
+  );
+  await expect(payButton).toHaveAttribute('aria-disabled', 'false');
+  await pacedClick(page, payButton); // final lift → second payout
 
   await expect(page.getByText(formatGHS(26), { exact: true })).toBeVisible(); // 11 + 15
   await page.screenshot({ path: shot('08-second-payout-390x844.png') });
-  expect(WAAKYE_MAX_HUNGER).toBe(55); // the G-008b meal gate stands (unit-pinned boundary)
+  expect(WAAKYE_MAX_HUNGER).toBe(80); // the G-008d meal gate stands (unit-pinned boundary)
 });

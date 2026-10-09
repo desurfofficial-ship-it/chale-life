@@ -354,42 +354,56 @@ export function objectiveFor(state: JobState): ObjectiveInfo | null {
  * HUSTLE_AUNTY_BA_STARTER and LOC-001 is untouched, so the store and
  * completedIds don't churn).
  *
- * G-008c round 2 item 4 — the copy is NEEDS-BASED and can never suggest
+ * G-008c round 2 item 4: the copy is NEEDS-BASED and can never suggest
  * an action the Act button would refuse (property-tested over the
- * hunger/energy grid in act.test.ts):
+ * hunger/energy grid in act.test.ts).
+ *
+ * G-008d item 5: the copy also names the RIGHT SPOT for what it suggests
+ * — since the split, food happens only at Daavi's FRONT COUNTER (LOC-001)
+ * and work only at the JOB SPOT beside the kiosk (LOC-001-JOB), so a line
+ * that said "at Daavi's" would aim the guest at the wrong door:
  *
  *   - Hustle already worked this run:
- *       hunger ≤ WAAKYE_MAX_HUNGER (55) → the waakye line — the joint
- *         offers the meal at these needs (round(hunger) ≤ 55), so the
- *         old combined "…or work another shift" tail that contradicted
- *         a "Full" button at hunger 89 is gone;
+ *       hunger ≤ WAAKYE_MAX_HUNGER (80) → the waakye line naming the
+ *         FRONT COUNTER — the counter really offers the meal at these
+ *         needs (round(hunger) ≤ 80, affordable), so the gate and the
+ *         copy are the same door;
  *       else energy < LOW_THRESHOLD (25) → the G-006 tired line — the
  *         compound's bed still takes anyone under 90 energy;
- *       otherwise → work another shift — with hunger above the meal
- *         gate and energy above the low line, canWork passes and the
- *         joint offers "Help Daavi".
+ *       otherwise → work another shift, naming the side of the kiosk —
+ *         with hunger above the meal gate and energy above the low line,
+ *         canWork passes and the job spot offers "Help Daavi".
  *   - Starter hustle NOT yet worked (completedIds empty or without the
- *       hustle — undefined reads as []): the tired hint first (G-006,
- *       sleeping while starving digs the hole deeper so hungry guests
- *       keep the food-pointing line), then the go-find-work beacon —
- *       the earn-first button's own answer at the joint.
+ *       hustle — undefined reads as []): the tired hint first when the
+ *       belly can still take a nap's −8 hunger (G-006: sleeping while
+ *       starving digs the hole deeper), then — starving — the meal line
+ *       (the work gate would refuse them; the counter is the unstick),
+ *       then the go-find-work beacon naming the JOB SPOT — the earn-first
+ *       button's own answer, now at the side of the kiosk.
  *   - No needs (legacy callers): the neutral post-shift nudge for a
  *       completed run, the beacon otherwise.
  */
 export function idleObjectiveFor(state: JobState, needs?: NeedsState): string {
   const waakye = findFoodById(FOOD_WAAKYE_ID)!;
   if (isJobCompleted(state, 'HUSTLE_AUNTY_BA_STARTER')) {
-    if (!needs) return 'Work another shift at Daavi’s.';
+    if (!needs) return 'Work another shift — jobs are at the side of Daavi’s kiosk.';
     if (Math.round(needs.hunger) <= WAAKYE_MAX_HUNGER) {
-      return `Hungry? Buy waakye at Daavi’s (${formatGHS(waakye.priceGHS)}).`;
+      return `Hungry? Buy waakye at Daavi’s front counter (${formatGHS(waakye.priceGHS)}).`;
     }
     if (isTired(needs)) {
       return 'Tired — head home to the compound and sleep.';
     }
-    return 'Work another shift at Daavi’s.';
+    return 'Work another shift — jobs are at the side of Daavi’s kiosk.';
   }
-  if (needs && isTired(needs) && needs.hunger >= CAN_WORK_MIN_HUNGER) {
-    return 'Tired — head home to the compound and sleep.';
+  if (needs) {
+    if (isTired(needs) && needs.hunger >= CAN_WORK_MIN_HUNGER) {
+      return 'Tired — head home to the compound and sleep.';
+    }
+    // Starving (below the work hunger gate): the job spot would refuse
+    // them — the meal line is the only advice the button can back.
+    if (needs.hunger < CAN_WORK_MIN_HUNGER) {
+      return `Hungry? Buy waakye at Daavi’s front counter (${formatGHS(waakye.priceGHS)}).`;
+    }
   }
-  return 'No job yet — find work at Daavi’s waakye joint.';
+  return 'No job yet — find work at the side of Daavi’s kiosk.';
 }

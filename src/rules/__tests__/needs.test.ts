@@ -205,13 +205,15 @@ describe('needs: low thresholds and work gate', () => {
   });
 });
 
-describe('needs: waakye Full gate + water gate + low-stat hints (G-008b/c)', () => {
-  it('WAAKYE_MAX_HUNGER is 55 — meals above it clamp most of their restore away', () => {
-    expect(WAAKYE_MAX_HUNGER).toBe(55);
+describe('needs: waakye Full gate + water gate + low-stat hints (G-008b/c/d)', () => {
+  it('WAAKYE_MAX_HUNGER is 80 — the counter sells again after a shift or a sleep (G-008d)', () => {
+    // 55 made food feel unbuyable: drain is 3/min, a shift or a sleep
+    // costs 8 — the guest waited minutes before Daavi would sell.
+    expect(WAAKYE_MAX_HUNGER).toBe(80);
   });
 
-  it('WATER_MAX_HUNGER is 80 — the "Not thirsty" gate (G-008c round 2)', () => {
-    expect(WATER_MAX_HUNGER).toBe(80);
+  it('WATER_MAX_HUNGER is 90 — the "Not thirsty" gate keeps its own band (G-008d)', () => {
+    expect(WATER_MAX_HUNGER).toBe(90);
   });
 
   it('lowNeedsHints: hungry → "eat waakye" (food outranks rest)', () => {
