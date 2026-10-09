@@ -73,43 +73,42 @@ export const PROVISIONS: BuildingSpec = {
 };
 
 export const BLOCK_SHOPS: BuildingSpec[] = [
-  { id: 'shopA', footprint: box(1.3, -0.775, 4.6, 5.25), wall: 'mint', height: 2.9 }, // x -1..3.6
-  { id: 'shopB', footprint: box(5.9, -0.775, 4.6, 5.25), wall: 'cream', height: 2.9 }, // x 3.6..8.2
-  { id: 'shopC', footprint: box(10.5, -0.775, 4.6, 5.25), wall: 'creamFaded', height: 2.9 }, // x 8.2..12.8
+  { id: 'shopA', footprint: box(1.3, -0.775, 4.6, 5.25), wall: 'mint', height: 2.9 },
+  { id: 'shopB', footprint: box(5.9, -0.775, 4.6, 5.25), wall: 'cream', height: 2.9 },
+  { id: 'shopC', footprint: box(10.5, -0.775, 4.6, 5.25), wall: 'creamFaded', height: 2.9 },
 ];
 
 export const WAAKYE_KIOSK: BuildingSpec = {
   id: 'waakyeKiosk',
-  footprint: box(15.5, -0.1, 3.2, 3.2), // x 13.9..17.1, z -1.7..1.5
+  footprint: box(15.5, -0.1, 3.2, 3.2),
   wall: 'kioskYellow',
   height: 2.5,
 };
 
 export const NORTH_YARD_HOUSE: BuildingSpec = {
   id: 'northYardHouse',
-  footprint: box(22, -5.4, 8.8, 6), // x 17.6..26.4, z -8.4..-2.4
+  footprint: box(22, -5.4, 8.8, 6),
   wall: 'mint',
   height: 3.2,
 };
 
 export const WEST_HOUSE: BuildingSpec = {
   id: 'westHouse',
-  footprint: box(-27.7, -3, 4.6, 6.8), // x -30..-25.4, z -6.4..0.4
+  footprint: box(-27.7, -3, 4.6, 6.8),
   wall: 'skyBlue',
   height: 3.0,
 };
 
 // ------------------------------------------------------ buildings (S side) --
 export const COMPOUND: { walls: Box2D[]; house: Box2D; leanTo: Box2D; gate: { cx: number; z: number; width: number } } = {
-  // Wall ring x -16..-4, z 15..27, gate gap x -11..-8 on the north wall.
   walls: [
-    { x0: -16, z0: 15, x1: -11, z1: 15.24 }, // north wall, west of gate
-    { x0: -8, z0: 15, x1: -4, z1: 15.24 }, // north wall, east of gate
-    { x0: -16, z0: 26.76, x1: -4, z1: 27 }, // south wall
-    { x0: -16, z0: 15, x1: -15.76, z1: 27 }, // west wall
-    { x0: -4.24, z0: 15, x1: -4, z1: 27 }, // east wall
+    { x0: -16, z0: 15, x1: -11, z1: 15.24 },
+    { x0: -8, z0: 15, x1: -4, z1: 15.24 },
+    { x0: -16, z0: 26.76, x1: -4, z1: 27 },
+    { x0: -16, z0: 15, x1: -15.76, z1: 27 },
+    { x0: -4.24, z0: 15, x1: -4, z1: 27 },
   ],
-  house: box(-10, 21.5, 8, 6), // x -14..-6, z 18.5..24.5
+  house: box(-10, 21.5, 8, 6),
   leanTo: box(-5.2, 23.3, 1.8, 2.6),
   gate: { cx: -9.5, z: 15.12, width: 3 },
 };
@@ -123,21 +122,21 @@ export const COMPOUND_HOUSE: BuildingSpec = {
 
 export const CHOP_BAR: BuildingSpec = {
   id: 'chopBar',
-  footprint: box(3.5, 17.9, 9.4, 6.2), // x -1.2..8.2, z 14.8..21
+  footprint: box(3.5, 17.9, 9.4, 6.2),
   wall: 'chopBar',
   height: 3.2,
 };
 
 export const BLUE_HOUSE: BuildingSpec = {
   id: 'blueHouse',
-  footprint: box(15, 17.9, 8.4, 6.2), // x 10.8..19.2, z 14.8..21
+  footprint: box(15, 17.9, 8.4, 6.2),
   wall: 'skyBlue',
   height: 3.1,
 };
 
 // ------------------------------------------------------------- trotro stop --
 export const TROTRO_STOP = {
-  roof: box(22.5, 13.25, 3.8, 1.6), // x 20.6..24.4
+  roof: box(22.5, 13.25, 3.8, 1.6),
   posts: [
     { x: 21.0, z: 13.9 },
     { x: 24.0, z: 13.9 },
@@ -154,7 +153,6 @@ export const UTILITY_POLES: { x: number; z: number }[] = [
   { x: 20, z: 13.55 },
 ];
 
-/** Wire spans between consecutive poles (indices into UTILITY_POLES) + edge stubs. */
 export const WIRE_SPANS: { from: { x: number; z: number }; to: { x: number; z: number } }[] = [
   { from: { x: -30, z: 13.55 }, to: { x: -28, z: 13.55 } },
   { from: { x: -28, z: 13.55 }, to: { x: -12, z: 13.55 } },
@@ -166,7 +164,6 @@ export const WIRE_SPANS: { from: { x: number; z: number }; to: { x: number; z: n
 export interface TreeSpot {
   x: number;
   z: number;
-  /** Uniform scale variation. */
   s: number;
 }
 
@@ -176,7 +173,7 @@ export const NEEM_TREES: TreeSpot[] = [
   { x: 26.5, z: 2.9, s: 1.2 },
   { x: -2.0, z: 13.2, s: 1.0 },
   { x: -26, z: 13.1, s: 1.1 },
-  { x: -13, z: 26, s: 1.25 }, // inside compound yard
+  { x: -13, z: 26, s: 1.25 },
 ];
 
 export const PALM_TREES: TreeSpot[] = [
@@ -190,22 +187,21 @@ export const PALM_TREES: TreeSpot[] = [
 export interface ChairSpot {
   x: number;
   z: number;
-  /** Facing (radians, 0 = towards +z). */
   ry: number;
   color: PaletteKey;
 }
 
 export const PLASTIC_CHAIRS: ChairSpot[] = [
-  { x: 15.0, z: 2.9, ry: Math.PI - 0.15, color: 'plasticBlue' }, // at waakye kiosk
+  { x: 15.0, z: 2.9, ry: Math.PI - 0.15, color: 'plasticBlue' },
   { x: 16.6, z: 2.7, ry: Math.PI + 0.25, color: 'plasticRed' },
-  { x: -4.5, z: 2.8, ry: Math.PI, color: 'plasticGreen' }, // provisions front
-  { x: 2.6, z: 22.6, ry: 0.2, color: 'plasticRed' }, // chop bar
+  { x: -4.5, z: 2.8, ry: Math.PI, color: 'plasticGreen' },
+  { x: 2.6, z: 22.6, ry: 0.2, color: 'plasticRed' },
   { x: 4.3, z: 22.9, ry: -0.15, color: 'plasticBlue' },
   { x: 6.2, z: 22.6, ry: 0.3, color: 'plasticGreen' },
   { x: 7.4, z: 22.4, ry: 0.1, color: 'plasticRed' },
-  { x: -12.4, z: 13.1, ry: 0.4, color: 'plasticBlue' }, // compound gate
+  { x: -12.4, z: 13.1, ry: 0.4, color: 'plasticBlue' },
   { x: -6.9, z: 13.3, ry: -0.3, color: 'plasticGreen' },
-  { x: 24.9, z: 15.1, ry: Math.PI * 0.75, color: 'plasticRed' }, // near trotro stop
+  { x: 24.9, z: 15.1, ry: Math.PI * 0.75, color: 'plasticRed' },
 ];
 
 export interface UmbrellaSpot {
@@ -215,35 +211,27 @@ export interface UmbrellaSpot {
 }
 
 export const UMBRELLAS: UmbrellaSpot[] = [
-  { x: 16.9, z: 3.1, color: 'umbrellaGreen' }, // waakye corner
-  { x: 3.5, z: 22.5, color: 'umbrellaRed' }, // chop bar tables
+  { x: 16.9, z: 3.1, color: 'umbrellaGreen' },
+  { x: 3.5, z: 22.5, color: 'umbrellaRed' },
   { x: 6.5, z: 22.7, color: 'umbrellaGreen' },
 ];
 
 export const POLYTANKS: { x: number; z: number; s: number }[] = [
-  { x: -5.3, z: 20.6, s: 1.0 }, // inside compound, by east wall
+  { x: -5.3, z: 20.6, s: 1.0 },
 ];
 
-/** Dirt-yard wear patches (x, z, w, d) — soften the base plane. */
 export const DIRT_PATCHES: Box2D[] = [
-  box(-9.5, 13.3, 7, 2.4), // compound gate front
-  box(15.5, 2.2, 6, 2.2), // waakye kiosk front
-  box(4, 22.5, 9, 4), // chop bar seating
-  box(-21, 0.8, 4.5, 2.2), // laterite street beside the main road
+  box(-9.5, 13.3, 7, 2.4),
+  box(15.5, 2.2, 6, 2.2),
+  box(4, 22.5, 9, 4),
+  box(-21, 0.8, 4.5, 2.2),
 ];
 
 // ------------------------------------------------------ kenney road tiles --
 /**
- * W-003 pipeline proof: optimised Kenney City Kit (Roads) tiles (CC0,
- * public/models/roads/, meshopt + KTX2 via `npm run assets`), rendered
- * instanced ON TOP of the existing procedural road — the procedural road
- * stays and is not replaced by them.
- *
- * Kenney tiles ship as 1×1 units representing 4 m street sections; the
- * pipeline normalises each GLB to a 4 × 4 m footprint. A 4 m tile fits
- * inside the 7 m main road (z 4.5..11.5, centre z 8). The crossroad marks
- * the laterite side-street junction (x -24..-18), straights continue east
- * of it edge-to-edge on the 4 m grid.
+ * W-003 pipeline proof. W-005: NOT rendered on the 7 m main road — a 4 m
+ * strip inside a 7 m road looks wrong. Pipeline, GLBs and ledger rows stay.
+ * Re-add placements only when a whole street is rebuilt at kit width (W-007).
  */
 export type KenneyRoadTile = 'straight' | 'crossroad';
 
@@ -251,33 +239,25 @@ export interface KenneyTileSpot {
   tile: KenneyRoadTile;
   x: number;
   z: number;
-  /** Y rotation (radians). */
   ry: number;
 }
 
 export const KENNEY_TILE_METRES = 4;
-export const KENNEY_TILE_Y = 0.012; // lift above the procedural asphalt (z-fight guard)
+export const KENNEY_TILE_Y = 0.012;
 
-export const KENNEY_ROAD_TILES: KenneyTileSpot[] = [
-  { tile: 'crossroad', x: -21, z: 8, ry: 0 },
-  { tile: 'straight', x: -25, z: 8, ry: 0 },
-  { tile: 'straight', x: -17, z: 8, ry: 0 },
-  { tile: 'straight', x: -13, z: 8, ry: 0 },
-  { tile: 'straight', x: -9, z: 8, ry: 0 },
-  { tile: 'straight', x: -5, z: 8, ry: 0 },
-  { tile: 'straight', x: -1, z: 8, ry: 0 },
-];
+/** Empty until W-007 rebuilds a street at kit width. */
+export const KENNEY_ROAD_TILES: KenneyTileSpot[] = [];
 
 // --------------------------------------------------------------- vehicles --
 /**
- * W-004 vehicle pack (producer-optimised GLBs, public/models/vehicles/).
- * Trademark scrub applied: no brand names/logos in metadata or textures
- * (see docs/assets/LICENSES.csv). Sizes (W×H×L m) from the producer brief:
+ * W-004 vehicle pack. Sizes (W×H×L m) from the producer brief:
  *   trotro 2.48×2.39×5.00, okada 1.02×1.54×2.30, van 2.46×1.80×4.30.
- * "ry" is the yaw applied on top of each model's native forward axis
- * (trotro/okada natively face -z, van faces -x — calibrated from renders).
- * Rotations stay axis-aligned (0/±π/2/π) so the collider AABBs below match
- * the visible footprints exactly (yaw swaps W×L for the rotated models).
+ *
+ * Native forward axis for ALL three models is ±Z (length along Z at ry=0).
+ * Left-hand traffic: north curb = eastbound, south curb = westbound.
+ * Van parks parallel to the north curb facing east → ry = −π/2.
+ * Trotro sits in the south lane, clear of the stop shelter / bench / pole
+ * by ≥ 0.3 m → z = 10.2.
  */
 export type VehicleModel = 'trotro' | 'okada' | 'van';
 
@@ -285,21 +265,38 @@ export interface VehicleSpot {
   model: VehicleModel;
   x: number;
   z: number;
-  /** Yaw in radians (native-forward + this). */
   ry: number;
 }
 
+/** Producer-brief dimensions: width (X at ry=0), height, length (Z at ry=0). */
+export const VEHICLE_DIMS: Record<VehicleModel, { w: number; h: number; l: number }> = {
+  trotro: { w: 2.48, h: 2.39, l: 5.0 },
+  okada: { w: 1.02, h: 1.54, l: 2.3 },
+  van: { w: 2.46, h: 1.8, l: 4.3 },
+};
+
+/** Axis-aligned footprint for a parked vehicle after its yaw. */
+export function vehicleFootprint(spot: VehicleSpot): Box2D {
+  const d = VEHICLE_DIMS[spot.model];
+  const alongX = Math.abs(Math.sin(spot.ry)) > 0.5;
+  return alongX ? box(spot.x, spot.z, d.l, d.w) : box(spot.x, spot.z, d.w, d.l);
+}
+
 export const VEHICLE_SPOTS: VehicleSpot[] = [
-  // Native forward axes (from render calibration): trotro + okada face -z,
-  // van faces -x. Yaws below park each vehicle parallel to its curb,
-  // matching left-hand traffic (south lane = westbound, north = eastbound).
-  { model: 'trotro', x: 22.5, z: 9.9, ry: Math.PI / 2 }, // westbound at the trotro stop
-  { model: 'okada', x: 18.3, z: 2.85, ry: 0 }, // parked by the waakye kiosk, nose to the road
-  { model: 'van', x: 3.5, z: 5.9, ry: Math.PI }, // eastbound, north curb lane
+  { model: 'trotro', x: 22.5, z: 10.2, ry: Math.PI / 2 },
+  { model: 'okada', x: 18.3, z: 2.85, ry: Math.PI },
+  { model: 'van', x: 3.5, z: 5.9, ry: -Math.PI / 2 },
 ];
 
+/** Half-extent of a utility-pole collider (metres). */
+export const POLE_COLLIDER_HALF = 0.15; // 0.3 m box
+
+// --------------------------------------------------------------- apron -----
+/** Outer apron depth past WORLD_MIN/MAX on every side (metres). */
+export const APRON_DEPTH = 25;
+
 // ------------------------------------------------------------- colliders ---
-/** Building + wall + parked-vehicle footprints that block movement (AABBs, metres). */
+/** Building + wall + parked-vehicle + pole footprints that block movement. */
 export const SOLID_FOOTPRINTS: Box2D[] = [
   PROVISIONS.footprint,
   ...BLOCK_SHOPS.map((s) => s.footprint),
@@ -311,8 +308,8 @@ export const SOLID_FOOTPRINTS: Box2D[] = [
   CHOP_BAR.footprint,
   BLUE_HOUSE.footprint,
   TROTRO_STOP.bench,
-  // parked vehicles (W-004) — AABBs from the producer brief dimensions
-  box(22.5, 9.9, 5.0, 2.48), // trotro at the stop
-  box(18.3, 2.85, 2.3, 1.02), // okada by the kiosk
-  box(3.5, 5.9, 4.3, 2.46), // vintage van, north curb
+  ...VEHICLE_SPOTS.map(vehicleFootprint),
+  ...UTILITY_POLES.map((p) =>
+    box(p.x, p.z, POLE_COLLIDER_HALF * 2, POLE_COLLIDER_HALF * 2),
+  ),
 ];
