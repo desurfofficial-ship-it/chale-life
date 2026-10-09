@@ -220,7 +220,11 @@ export const ACCRA_SIDE_HUSTLES: ReadonlyArray<JobDefinition> = [
     startInteractableId: 'food_vendor',
     payGHS: 15,
     upfrontCapitalGHS: 0,
-    cooldownSeconds: 0,
+    // G-008c: the data finally has teeth — rules/jobs.ts cooldownStatus
+    // enforces this rest from the payout instant (JobState.lastPayoutAt),
+    // and the joint's Act button counts it down. The starter hustle used
+    // to carry 0, so a paid guest could chain shifts with no breath.
+    cooldownSeconds: 45,
     requirements: null,
     summary: 'Three lifts of cooking pans at Daavi’s waakye joint — instant cash.',
     steps: [

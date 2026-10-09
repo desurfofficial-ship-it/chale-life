@@ -1,15 +1,24 @@
 /**
  * G-008b robot playtest — the proximity wiring, verified end-to-end in the
- * same software-GL browser as the E-005 loop spec:
+ * same software-GL browser as the E-005 loop spec — EXTENDED by G-008c:
  *
  *   (a) sleep zone: energy pinned to 40, the whole compound YARD (the
  *       isInSleepZone AABB — not the old 2.5 m gate point) offers an
  *       enabled "Sleep"; pressing it restores exactly +55 energy.
- *   (b) Full gate: at hunger 92 with ₵35 in pocket and the hustle worked,
- *       the joint does NOT offer waakye — the button reads "Full", disabled.
- *   (c) burst guard: 10 rapid taps right after a payout leave the wallet
- *       untouched (600 ms debounce + 1000 ms post-payout purchase lockout),
- *       and a single normal tap after the guards expire still works.
+ *   (c) burst guard, made DETERMINISTIC (G-008c item 5): the payout tap,
+ *       the setNeeds(50, 60) that arms the waakye offer, and 10 rapid
+ *       taps all fire inside ONE evaluate call — every tap lands within
+ *       a few milliseconds of the payout, so the 600 ms debounce and the
+ *       1000 ms purchase lockout cover the burst on ANY CI speed (the
+ *       G-008b shape depended on the burst landing within 1000 ms of a
+ *       paced click — flaky on a slow runner).
+ *   (b) the dead-end fix, live (G-008c item 1): at hunger 92 with ₵35 the
+ *       button is NO LONGER a static "Full" — it is a disabled "Help
+ *       Daavi" counting the cooldown down; the meal stays gated and the
+ *       job comes back when the rest expires.
+ *   (d) cooldown to the second shift: broke + on-cooldown shows the
+ *       countdown reason; when it expires "Help Daavi" re-enables and a
+ *       full second shift (kiosk → bench → kiosk) pays ₵15 again.
  *
  * NAME-AGNOSTIC like earnAndEat.spec.ts: labels are derived from the pure
  * rules; only data KEYS and rule outputs appear as literals.
@@ -17,26 +26,36 @@
 
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
 import { actPromptFor } from '../../src/rules/act';
+import { findJobById } from '../../src/data/jobs';
 import { formatGHS } from '../../src/rules/economy';
 import { WAAKYE_MAX_HUNGER } from '../../src/rules/needs';
 
 /** The waakye joint / the compound (data keys). */
 const WAAKYE_LOCATION_ID = 'LOC-001';
+/** The starter hustle id (a data key, not an NPC name). */
+const HUSTLE_ID = 'HUSTLE_AUNTY_BA_STARTER';
+const EMPLOYER_NAME = findJobById(HUSTLE_ID)!.employerName;
 
-/** A paid guest at the joint — the Full-gate derivation input. */
+/** A paid guest at the joint, five seconds into the cooldown — the
+ *  derivation input for the G-008c disabled-state label. */
 const PAID_AT_JOINT = {
   wallet: { balanceGHS: 35 },
   needs: { hunger: 92, energy: 60 },
-  job: { activeId: null, step: 0, completedIds: ['HUSTLE_AUNTY_BA_STARTER'] },
+  job: { activeId: null, step: 0, completedIds: [HUSTLE_ID], lastPayoutAt: 0 },
+  nowMs: 5_000,
 } as const;
 
-/** "Full" — the G-008b label that replaces the waakye offer above the gate. */
-const FULL_LABEL = actPromptFor(PAID_AT_JOINT, WAAKYE_LOCATION_ID).label;
+/** G-008c: mid-cooldown the button reads "Help <employer>", disabled —
+ *  the meal is gated AND the rest is running (never a dead "Full"). */
+const COOLDOWN_PROMPT = actPromptFor(PAID_AT_JOINT, WAAKYE_LOCATION_ID);
 /** The waakye offer at the same spot once hunger is under the gate. */
 const HUNGRY_PAID_LABEL = actPromptFor(
   { ...PAID_AT_JOINT, needs: { hunger: 50, energy: 60 } },
   WAAKYE_LOCATION_ID
 ).label;
+
+/** The countdown reason line under the pill ("<employer> needs you again in Ns"). */
+const COOLDOWN_REASON = new RegExp(`${EMPLOYER_NAME} needs you again in \\d+s`);
 
 // ── Robot helpers (mirrors of earnAndEat.spec.ts) ────────────────────────────
 
@@ -107,23 +126,42 @@ async function holdUntil(
 }
 
 /**
- * Fire `taps` rapid pointerdowns on the Act pill inside ONE evaluate call —
- * a true same-burst tap flurry, far tighter than any Playwright click loop.
+ * G-008c item 5 — the payout tap, the setNeeds that arms the waakye
+ * offer, and `taps` rapid pointerdowns all inside ONE evaluate call: a
+ * single synchronous JS task, so the whole burst lands within a few ms
+ * of the payout regardless of CI speed. The Act button's DOM node is
+ * reused by React across the label flip (same element type, same tree
+ * position — only its text child changes), so holding the reference
+ * across the payout re-render is safe, and the button's closure still
+ * reads enabled=true while the store-side guards do the refusing.
  */
-async function burstTaps(page: Page, label: string, taps: number): Promise<void> {
+async function payoutThenBurst(page: Page, workLabel: string, taps: number): Promise<void> {
   await page.evaluate(
     ([buttonLabel, count]) => {
+      const setNeedsHook = (
+        window as unknown as {
+          __chaleTest: { setNeeds: (hunger: number, energy: number) => void };
+        }
+      ).__chaleTest.setNeeds;
       const button = [...document.querySelectorAll('button')].find(
         (b) => b.textContent === buttonLabel
       );
       if (!button) throw new Error(`Act pill "${buttonLabel}" not found`);
+      // 1. the payout tap — the final lift fires, wallet 20 → 35.
+      button.dispatchEvent(
+        new PointerEvent('pointerdown', { bubbles: true, cancelable: true })
+      );
+      // 2. arm the meal (the store commits synchronously; React catches up
+      //    AFTER this task, so the label swap cannot race the burst).
+      setNeedsHook(50, 60);
+      // 3. the burst.
       for (let i = 0; i < count; i++) {
         button.dispatchEvent(
           new PointerEvent('pointerdown', { bubbles: true, cancelable: true })
         );
       }
     },
-    [label, taps] as const
+    [workLabel, taps] as const
   );
 }
 
@@ -192,13 +230,13 @@ test('(a) sleep zone: the whole yard offers Sleep and +55 energy', async ({
     .toBeLessThanOrEqual(hungerBefore - 7);
 });
 
-test('(c) 10 rapid taps after a payout leave ₵35 alone, then (b) Full gate at hunger 92', async ({
+test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown to the second shift', async ({
   page,
 }, testInfo: TestInfo) => {
-  test.setTimeout(480_000);
+  test.setTimeout(600_000);
   const shot = (name: string) => testInfo.outputPath(name);
 
-  // Work the real loop to a payout: accept → kiosk → bench → kiosk → ₵35.
+  // Work the real loop to a payout: accept → kiosk → bench → kiosk.
   await page.goto('/chale-life/?debug=1&e2e=1');
   await expect(page.getByText(formatGHS(20), { exact: true })).toBeVisible();
 
@@ -223,38 +261,76 @@ test('(c) 10 rapid taps after a payout leave ₵35 alone, then (b) Full gate at 
   await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 17.0, 'west clear of the bench');
   await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 4.2, 'north to the kiosk zone');
   await expect(workButton).toHaveAttribute('aria-disabled', 'false'); // the kiosk zone
-  await pacedClick(page, workButton); // step 3 → payout
-  await expect(page.getByText(formatGHS(35), { exact: true })).toBeVisible();
 
-  // (c) 10 rapid taps after a payout: arm the meal (hunger 50 makes the
-  // waakye offer ENABLED — the burst is real, not blocked by the gate),
-  // then fire the flurry inside one evaluate — every tap lands within the
-  // store's 600 ms debounce / 1000 ms purchase lockout of the payout.
-  await setNeeds(page, 50, 60);
-  const hungryButton = page.getByRole('button', { name: HUNGRY_PAID_LABEL, exact: true });
-  await expect(hungryButton).toHaveAttribute('aria-disabled', 'false');
-  expect(HUNGRY_PAID_LABEL).toContain('waakye');
-
-  await burstTaps(page, HUNGRY_PAID_LABEL, 10);
+  // (c) THE DETERMINISTIC BURST: payout + arm + 10 taps in one evaluate —
+  // every tap is within a few ms of the payout, so the 600 ms debounce and
+  // the 1000 ms purchase lockout refuse them on any runner speed.
+  await payoutThenBurst(page, 'Carry Pans', 10);
 
   await expect(page.getByText(formatGHS(35), { exact: true })).toBeVisible(); // unchanged
   await expect(page.getByText('Waakye!')).toHaveCount(0); // nothing was bought
 
-  // (b) hunger 92 with ₵35: the waakye offer must be GONE — "Full", greyed.
+  // (b) THE DEAD-END FIX, live: hunger 92 with ₵35 mid-cooldown used to
+  // read a static "Full" — the moneyed player's dead end. Now the button
+  // is a disabled "Help Daavi" counting the rest down (and the label is
+  // derived from the same rules the store runs, cooldown fields included).
   await setNeeds(page, 92, 60);
-  const fullButton = page.getByRole('button', { name: FULL_LABEL, exact: true });
-  await expect(fullButton).toBeVisible();
-  expect(FULL_LABEL).toBe('Full');
-  expect(FULL_LABEL).not.toContain('waakye');
-  await expect(fullButton).toHaveAttribute('aria-disabled', 'true');
-  await page.screenshot({ path: shot('06-full-gate-390x844.png') });
+  const coolingButton = page.getByRole('button', { name: COOLDOWN_PROMPT.label, exact: true });
+  await expect(coolingButton).toHaveAttribute('aria-disabled', 'true');
+  expect(COOLDOWN_PROMPT.enabled).toBe(false);
+  expect(COOLDOWN_PROMPT.label).not.toContain('waakye'); // the meal stays gated
+  await expect(page.getByText(COOLDOWN_REASON)).toBeVisible();
+  // The pill settles into its greyed style (200 ms background transition —
+  // mirrors earnAndEat.spec.ts) so the screenshot below is truthful.
+  await expect(coolingButton).toHaveCSS('background-color', 'rgba(100, 116, 139, 0.3)');
+  await page.screenshot({ path: shot('06-cooldown-countdown-390x844.png') });
 
-  // The guards are a window, not a wall: after they expire, ONE normal
-  // tap buys the meal — ₵35 → ₵23, hunger up.
+  // Meals are NEVER cooldown-gated: once hunger is under the gate the
+  // waakye offer returns immediately — and the guards have long expired,
+  // so ONE normal tap buys it (₵35 → ₵23).
   await setNeeds(page, 50, 60);
+  const hungryButton = page.getByRole('button', { name: HUNGRY_PAID_LABEL, exact: true });
+  await expect(hungryButton).toHaveAttribute('aria-disabled', 'false');
+  expect(HUNGRY_PAID_LABEL).toContain('waakye');
   await page.waitForTimeout(1_400);
   await hungryButton.click();
   await expect(page.getByText('Waakye!')).toBeVisible();
   await expect(page.getByText(formatGHS(23), { exact: true })).toBeVisible();
-  expect(WAAKYE_MAX_HUNGER).toBe(55);
+
+  // Eat down to broke (₵23 → ₵11): now neither door opens — hungry enough
+  // to want the meal but ₵1 short of it, and the rest is still running.
+  await setNeeds(page, 30, 60);
+  await expect(hungryButton).toHaveAttribute('aria-disabled', 'false'); // still affordable
+  await page.waitForTimeout(1_200);
+  await hungryButton.click();
+  await expect(page.getByText(formatGHS(11), { exact: true })).toBeVisible();
+
+  await setNeeds(page, 30, 60);
+  await expect(coolingButton).toHaveAttribute('aria-disabled', 'true'); // broke + mid-rest
+  await expect(page.getByText(COOLDOWN_REASON)).toBeVisible();
+  await expect(coolingButton).toHaveCSS('background-color', 'rgba(100, 116, 139, 0.3)');
+  await page.screenshot({ path: shot('07-cooldown-broke-390x844.png') });
+
+  // (d) the rest EXPIRES: "Help Daavi" comes back on its own — the wallet
+  // can never dead-end — and a full second shift pays ₵15 again.
+  await expect(helpButton).toHaveAttribute('aria-disabled', 'false', { timeout: 60_000 });
+  await pacedClick(page, helpButton);
+  await expect(page.getByText('Job accepted')).toBeVisible();
+
+  await expect(workButton).toHaveAttribute('aria-disabled', 'false'); // step 1 at the kiosk
+  await pacedClick(page, workButton);
+
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 5.5, '2nd: south to the bench line');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.4, '2nd: east to the bench');
+  await expect(workButton).toHaveAttribute('aria-disabled', 'false');
+  await pacedClick(page, workButton); // step 2 at the bench
+
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 17.0, '2nd: west clear of the bench');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 4.2, '2nd: north to the kiosk zone');
+  await expect(workButton).toHaveAttribute('aria-disabled', 'false');
+  await pacedClick(page, workButton); // final lift → second payout
+
+  await expect(page.getByText(formatGHS(26), { exact: true })).toBeVisible(); // 11 + 15
+  await page.screenshot({ path: shot('08-second-payout-390x844.png') });
+  expect(WAAKYE_MAX_HUNGER).toBe(55); // the G-008b meal gate stands (unit-pinned boundary)
 });

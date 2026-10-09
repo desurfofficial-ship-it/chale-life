@@ -7,6 +7,7 @@ import {
   advanceStep,
   completeJob,
   completedIdsOf,
+  cooldownStatus,
   createStarterJobState,
   evaluateRequirements,
   idleObjectiveFor,
@@ -200,6 +201,67 @@ describe('jobs: complete with payout', () => {
     const result = completeJob(createStarterJobState(), starterWallet());
     expect(result.ok).toBe(false);
     expect(result.message).toContain('No active job');
+  });
+});
+
+describe('jobs: payout stamp + cooldown (G-008c item 2)', () => {
+  it('the starter hustle rests 45 s in the data — the value the rules enforce', () => {
+    const hustle = findJobById('HUSTLE_AUNTY_BA_STARTER')!;
+    expect(hustle.cooldownSeconds).toBe(45);
+    // Salvage cooldowns on the legal jobs stay untouched.
+    expect(findJobById('JOB_PROVISIONS_ASSISTANT')!.cooldownSeconds).toBe(45);
+    expect(findJobById('JOB_WAAKYE_DISPATCH')!.cooldownSeconds).toBe(60);
+    expect(findJobById('JOB_TROTRO_MATE')!.cooldownSeconds).toBe(30);
+  });
+
+  it('completeJob stamps lastPayoutAt from the caller\u2019s clock (pure data in)', () => {
+    let job = startJob(createStarterJobState(), starterWallet(), 'HUSTLE_AUNTY_BA_STARTER').job;
+    job = advanceStep(job).job;
+    job = advanceStep(job).job;
+    job = advanceStep(job).job;
+    const result = completeJob(job, starterWallet(), 123_456);
+    expect(result.ok).toBe(true);
+    expect(result.job.lastPayoutAt).toBe(123_456);
+  });
+
+  it('completeJob without a clock preserves an existing stamp and stays key-free otherwise', () => {
+    let job = startJob(createStarterJobState(), starterWallet(), 'HUSTLE_AUNTY_BA_STARTER').job;
+    job = advanceStep(job).job;
+    job = advanceStep(job).job;
+    job = advanceStep(job).job;
+    // Legacy caller (no nowMs), no prior stamp: the key stays absent, so
+    // the E-004-era slice shapes keep comparing equal.
+    const legacy = completeJob(job, starterWallet());
+    expect('lastPayoutAt' in legacy.job).toBe(false);
+
+    // A prior stamp survives a clockless re-completion — a later legacy
+    // payout can never un-arm a running cooldown.
+    const stamped = completeJob(job, starterWallet(), 500);
+    const again = completeJob(stamped.job, starterWallet());
+    expect(again.job.lastPayoutAt).toBe(500);
+  });
+
+  it('cooldownStatus counts the data cooldown from the payout instant', () => {
+    const hustle = findJobById('HUSTLE_AUNTY_BA_STARTER')!;
+    // 10 s into a 45 s rest: on, with 35 s to go.
+    expect(cooldownStatus(hustle, 10_000, 0)).toEqual({ onCooldown: true, remainingMs: 35_000 });
+    // The exact boundary is READY — 45 s elapsed leaves 0 ms remaining.
+    expect(cooldownStatus(hustle, 45_000, 0)).toEqual({ onCooldown: false, remainingMs: 0 });
+    expect(cooldownStatus(hustle, 44_999, 0)).toEqual({ onCooldown: true, remainingMs: 1 });
+    expect(cooldownStatus(hustle, 400_000, 0)).toEqual({ onCooldown: false, remainingMs: 0 });
+  });
+
+  it('cooldownStatus is ready on missing inputs and zero/negative data', () => {
+    const hustle = findJobById('HUSTLE_AUNTY_BA_STARTER')!;
+    // Legacy slices without the stamp, sessions without the press clock.
+    expect(cooldownStatus(hustle, undefined, 0).onCooldown).toBe(false);
+    expect(cooldownStatus(hustle, 10_000, undefined).onCooldown).toBe(false);
+    expect(cooldownStatus(hustle, undefined, undefined).onCooldown).toBe(false);
+    // A zero-cooldown job (and negative data, clamped) never rests.
+    const zero = { ...hustle, cooldownSeconds: 0 };
+    expect(cooldownStatus(zero, 10_000, 0).onCooldown).toBe(false);
+    const negative = { ...hustle, cooldownSeconds: -5 };
+    expect(cooldownStatus(negative, 10_000, 0).onCooldown).toBe(false);
   });
 });
 

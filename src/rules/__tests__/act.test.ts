@@ -31,10 +31,31 @@ const paidSession = (): ActSession => ({
   job: { activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] },
 });
 
-describe('act: data contract (G-002 item 2, G-008b bench walk)', () => {
+/**
+ * The paid session mid-cooldown (G-008c): Daavi paid out `elapsedMs` before
+ * the press clock `nowMs` — the exact shape the store threads (pure data,
+ * no Date.now()). Hunger 70 / ₵35 is the review's dead-end scenario.
+ */
+const paidSessionCooling = (elapsedMs = 10_000, nowMs = 1_000_000): ActSession => ({
+  wallet: { balanceGHS: 35 },
+  needs: { hunger: 70, energy: 62 },
+  job: {
+    activeId: null,
+    step: 0,
+    completedIds: [AUNTY_BA_HUSTLE_ID],
+    lastPayoutAt: nowMs - elapsedMs,
+  },
+  nowMs,
+});
+
+describe('act: data contract (G-002 item 2, G-008b bench walk, G-008c cooldown)', () => {
   it('Daavi steps 1/3 happen at the kiosk, step 2 at the bench, for a ₵15 payout', () => {
     const hustle = findJobById(AUNTY_BA_HUSTLE_ID)!;
     expect(hustle.payGHS).toBe(15);
+    // G-008c item 2: the data's cooldown has teeth — 45 s enforced by
+    // rules/jobs.ts cooldownStatus from the payout stamp.
+    expect(hustle.cooldownSeconds).toBe(45);
+    expect(hustle.employerName).toBe('Daavi'); // the countdown reason names it
     expect(hustle.steps.length).toBe(3);
     expect(hustle.steps[0].locationId).toBe(WAAKYE_LOCATION_ID);
     // G-008b: the second lift happens at Daavi's bench — a real waypoint
@@ -157,14 +178,16 @@ describe('act: the first earn-and-eat loop (₵20 → ₵35 → ₵23)', () => {
     expect(session.needs).toEqual({ hunger: 64, energy: 62 });
 
     // One yard sleep maxes energy (62 + 55 → capped 100), so the bed now
-    // refuses (≥ 90 gate) and the joint reads "Full" — the meal needs
-    // round(hunger) ≤ 55 and the street is the only clock that gets there.
+    // refuses (≥ 90 gate). The joint reads "Help Daavi" — G-008c: money
+    // can never dead-end at "Full" again; hunger 56 only gates the MEAL.
     session = resolveAct(session, SLEEP_LOCATION_ID).session; // hunger 56, energy 100
-    expect(actPromptFor(session, WAAKYE_LOCATION_ID).label).toBe('Full');
+    expect(actPromptFor(session, WAAKYE_LOCATION_ID).label).toBe('Help Daavi');
+    expect(actPromptFor(session, WAAKYE_LOCATION_ID).enabled).toBe(true);
     expect(actPromptFor(session, SLEEP_LOCATION_ID).enabled).toBe(false); // Not tired yet
 
-    // ~5.7 min of starter-profile drift (legal 2 s ticks): hunger 56 → 39
-    // (under the Full gate), energy 100 → ~88.7 (under the sleep gate).
+    // The loop CHOOSES the street instead of a second shift: ~5.7 min of
+    // starter-profile drift (legal 2 s ticks) brings hunger 56 → 39 (under
+    // the Full gate) and energy 100 → ~88.7 (under the sleep gate).
     for (let i = 0; i < 170; i++) {
       session = { ...session, needs: drainNeeds(session.needs, 2, 'starter') };
     }
@@ -189,7 +212,11 @@ describe('act: the first earn-and-eat loop (₵20 → ₵35 → ₵23)', () => {
   });
 
   it('never lets the wallet go negative across a mixed act day', () => {
-    let session = starterSession();
+    // G-008c: the session carries a press clock — the payout stamps
+    // lastPayoutAt = 0, so the post-sleep joint stop sits MID-COOLDOWN
+    // (hunger 56 + 45 s to go) and reads "Full", a disabled no-op. The
+    // wallet only ever moves through the meal that is actually offered.
+    let session: ActSession = { ...starterSession(), nowMs: 0 };
     const walk = [
       WAAKYE_LOCATION_ID, // accept
       WAAKYE_LOCATION_ID, // step 1
@@ -269,20 +296,23 @@ describe('act: earn-first at Daavi\u2019s (G-004)', () => {
     expect(prompt.reason).toContain('Too hungry');
   });
 
-  it('completed + full belly reads "Full" and refuses the meal (G-008b)', () => {
+  it('completed + moneyed + full belly: the hustle is offered — no dead end (G-008c)', () => {
+    // The G-008b shape read "Full" here and refused — a guest with ₵35
+    // could NEVER work again (the wallet capped at ~₵26). G-008c item 1:
+    // above the meal gate the button moves on to the second door, work.
     const session: ActSession = {
       wallet: { balanceGHS: 35 },
       needs: { hunger: 100, energy: 62 },
       job: { activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] },
     };
     const prompt = actPromptFor(session, WAAKYE_LOCATION_ID);
-    expect(prompt.label).toBe('Full');
-    expect(prompt.enabled).toBe(false);
-    expect(prompt.reason).toContain('full');
+    expect(prompt.label).toBe('Help Daavi');
+    expect(prompt.enabled).toBe(true);
+    expect(prompt.label).not.toContain('waakye'); // the meal is still gated off
 
     const result = resolveAct(session, WAAKYE_LOCATION_ID);
-    expect(result.session).toBe(session); // no-op
-    expect(result.toast).toBeNull();
+    expect(result.session.job.activeId).toBe(AUNTY_BA_HUSTLE_ID); // re-hired
+    expect(result.session.wallet.balanceGHS).toBe(35); // zero-capital hustle
   });
 
   it('broke and full? The zero-capital hustle is still the fallback', () => {
@@ -686,7 +716,7 @@ describe('act: sleep zone is the yard AABB (G-008b item 1)', () => {
   });
 });
 
-describe('act: waakye Full gate boundary (G-008b item 2)', () => {
+describe('act: waakye Full gate boundary (G-008b item 2, G-008c rework)', () => {
   const completed = (): ActSession => ({
     wallet: { balanceGHS: 35 },
     needs: { hunger: 50, energy: 62 },
@@ -698,31 +728,243 @@ describe('act: waakye Full gate boundary (G-008b item 2)', () => {
     expect(actPromptFor(s, WAAKYE_LOCATION_ID).label).toBe(`Buy waakye ${formatGHS(12)}`);
   });
 
-  it('round(hunger) 55.6 → 56: "Full", disabled, resolve is a no-op', () => {
+  it('round(hunger) 55.6 → 56 with a working body: "Help Daavi", NOT a dead Full (G-008c)', () => {
+    // G-008b read a disabled "Full" here; G-008c moves the moneyed guest
+    // on to the second door — work. The MEAL is what stays gated.
     const s: ActSession = { ...completed(), needs: { hunger: 55.6, energy: 62 } };
+    const prompt = actPromptFor(s, WAAKYE_LOCATION_ID);
+    expect(prompt.label).not.toContain('waakye');
+    expect(prompt.label).toBe('Help Daavi');
+    expect(prompt.enabled).toBe(true);
+    const result = resolveAct(s, WAAKYE_LOCATION_ID);
+    expect(result.session.job.activeId).toBe(AUNTY_BA_HUSTLE_ID);
+  });
+
+  it('round(hunger) 55.6 with the body blocked (energy 5): "Full" is the reason', () => {
+    // "Full" survives — as the FIRST blocking reason when NEITHER door
+    // opens (G-008c reason order: Full → canWork → cooldown).
+    const s: ActSession = { ...completed(), needs: { hunger: 55.6, energy: 5 } };
     const prompt = actPromptFor(s, WAAKYE_LOCATION_ID);
     expect(prompt.label).toBe('Full');
     expect(prompt.enabled).toBe(false);
+    expect(prompt.reason).toContain('full');
     const result = resolveAct(s, WAAKYE_LOCATION_ID);
-    expect(result.session).toBe(s);
+    expect(result.session).toBe(s); // no-op
     expect(result.toast).toBeNull();
   });
 
-  it('hunger 92 (the iPhone report) is "Full" — never a waakye offer', () => {
+  it('hunger 92 (the iPhone report): never a waakye offer — and never a dead end', () => {
     const s: ActSession = { ...completed(), needs: { hunger: 92, energy: 62 } };
     const prompt = actPromptFor(s, WAAKYE_LOCATION_ID);
     expect(prompt.label).not.toContain('waakye');
-    expect(prompt.label).toBe('Full');
-    expect(prompt.enabled).toBe(false);
+    expect(prompt.label).toBe('Help Daavi'); // G-008c: work instead
+    expect(prompt.enabled).toBe(true);
   });
 
-  it('the sleep door narrows: 92 → sleep → 84 — still "Full" per spec', () => {
+  it('the sleep door narrows: 92 → sleep → 84 — meal still gated, work takes over', () => {
     // One sleep from energy 62 caps energy at 100, so the second sleep is
-    // gated ("Not tired yet") — the meal waits for the street's drain.
+    // gated ("Not tired yet") — but the button no longer dead-ends: the
+    // shift offer stands until the street's drain brings hunger under 55.
     let s: ActSession = { ...completed(), needs: { hunger: 92, energy: 62 } };
     s = resolveAct(s, SLEEP_LOCATION_ID).session;
     expect(s.needs.hunger).toBe(84);
-    expect(actPromptFor(s, WAAKYE_LOCATION_ID).label).toBe('Full');
+    const prompt = actPromptFor(s, WAAKYE_LOCATION_ID);
+    expect(prompt.label).not.toContain('waakye');
+    expect(prompt.label).toBe('Help Daavi');
+    expect(prompt.enabled).toBe(true);
+  });
+});
+
+// ── G-008c: the joint after the first shift — cooldown + no dead end ───────
+
+describe('act: the joint after the first shift (G-008c items 1/2)', () => {
+  it('₵35 + hunger 70 ten seconds after the payout: disabled with the live countdown', () => {
+    // THE review scenario (item 6): after a shift, the moneyed guest waits
+    // out the rest — the button says so, counting down; it is never the
+    // dead "Full" the G-008b shape stared at.
+    const prompt = actPromptFor(paidSessionCooling(10_000), WAAKYE_LOCATION_ID);
+    expect(prompt.label).toBe('Help Daavi');
+    expect(prompt.enabled).toBe(false);
+    // 45 s rest − 10 s elapsed = 35 s to go, counted from the data.
+    expect(prompt.reason).toBe('Daavi needs you again in 35s');
+
+    const cooling = paidSessionCooling(10_000);
+    const result = resolveAct(cooling, WAAKYE_LOCATION_ID);
+    expect(result.session).toBe(cooling); // same reference — a true no-op
+    expect(result.kind).toBe('start');
+    expect(result.toast).toBeNull();
+  });
+
+  it('₵35 + hunger 70 forty-five seconds after the payout: "Help Daavi" → second payout ₵50', () => {
+    const prompt = actPromptFor(paidSessionCooling(45_000), WAAKYE_LOCATION_ID);
+    expect(prompt.label).toBe('Help Daavi');
+    expect(prompt.enabled).toBe(true);
+
+    let session = paidSessionCooling(45_000);
+    session = resolveAct(session, WAAKYE_LOCATION_ID).session; // accept
+    session = resolveAct(session, WAAKYE_LOCATION_ID).session; // step 1
+    session = resolveAct(session, 'LOC-001-BENCH').session; // step 2 (bench)
+    const final = resolveAct(session, WAAKYE_LOCATION_ID); // step 3 + payout
+    expect(final.paidOut).toBe(true);
+    expect(final.session.wallet.balanceGHS).toBe(50); // 35 + 15
+    // The second payout RE-ARMS the cooldown at the press clock…
+    expect(final.session.job.lastPayoutAt).toBe(1_000_000);
+    // …so an immediate re-hire is refused with a fresh countdown.
+    const again = actPromptFor(final.session, WAAKYE_LOCATION_ID);
+    expect(again.enabled).toBe(false);
+    expect(again.reason).toBe('Daavi needs you again in 45s');
+  });
+
+  it('hunger 92 + ₵35 + ON cooldown: the countdown — fullness waits its turn', () => {
+    // The countdown outranks "Full": the rest is what the wait fixes
+    // first. (Fullness only ever blocks the MEAL door, and moneyed
+    // guests cannot use that door at hunger 92 anyway.)
+    const s: ActSession = {
+      ...paidSessionCooling(10_000),
+      needs: { hunger: 92, energy: 62 },
+    };
+    const prompt = actPromptFor(s, WAAKYE_LOCATION_ID);
+    expect(prompt.label).toBe('Help Daavi');
+    expect(prompt.enabled).toBe(false);
+    expect(prompt.reason).toBe('Daavi needs you again in 35s');
+    expect(prompt.label).not.toContain('waakye');
+    const result = resolveAct(s, WAAKYE_LOCATION_ID);
+    expect(result.session).toBe(s);
+  });
+
+  it('waakye is STILL offered during the cooldown — meals are never cooldown-gated', () => {
+    const s: ActSession = {
+      ...paidSessionCooling(10_000),
+      needs: { hunger: 50, energy: 62 },
+    };
+    const prompt = actPromptFor(s, WAAKYE_LOCATION_ID);
+    expect(prompt.label).toBe(`Buy waakye ${formatGHS(12)}`);
+    expect(prompt.enabled).toBe(true);
+    const result = resolveAct(s, WAAKYE_LOCATION_ID);
+    expect(result.purchased).toBe(true);
+    expect(result.session.wallet.balanceGHS).toBe(23);
+    expect(result.session.needs.hunger).toBe(95);
+  });
+
+  it('broke + hungry + on cooldown: the countdown reason shows', () => {
+    const s: ActSession = {
+      wallet: { balanceGHS: 5 },
+      needs: { hunger: 30, energy: 62 },
+      job: {
+        activeId: null,
+        step: 0,
+        completedIds: [AUNTY_BA_HUSTLE_ID],
+        lastPayoutAt: 990_000,
+      },
+      nowMs: 1_000_000,
+    };
+    const prompt = actPromptFor(s, WAAKYE_LOCATION_ID);
+    expect(prompt.label).toBe('Help Daavi');
+    expect(prompt.enabled).toBe(false);
+    expect(prompt.reason).toBe('Daavi needs you again in 35s');
+  });
+
+  it('broke + full + tired: "Full" outranks "Too tired" (documented reason order)', () => {
+    // Off cooldown, so the countdown branch misses: fullness (the meal
+    // gate) is the next reason in line, ahead of the body's.
+    const s: ActSession = {
+      wallet: { balanceGHS: 5 },
+      needs: { hunger: 92, energy: 5 },
+      job: { activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] },
+    };
+    const prompt = actPromptFor(s, WAAKYE_LOCATION_ID);
+    expect(prompt.enabled).toBe(false);
+    expect(prompt.reason).toBe('You are full — waakye can wait.');
+  });
+
+  it('broke + hungry + tired: the canWork reason ("Too tired") — fullness does not apply', () => {
+    const s: ActSession = {
+      wallet: { balanceGHS: 5 },
+      needs: { hunger: 30, energy: 5 },
+      job: { activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] },
+    };
+    const prompt = actPromptFor(s, WAAKYE_LOCATION_ID);
+    expect(prompt.enabled).toBe(false);
+    expect(prompt.reason).toContain('Too tired');
+  });
+
+  it('a session WITHOUT the press clock (legacy caller) is never cooldown-gated', () => {
+    // Pre-G-008c sessions (no nowMs) read as ready — optional-safe like
+    // completedIds, so old callers and slices keep compiling.
+    const prompt = actPromptFor(paidSession(), WAAKYE_LOCATION_ID);
+    expect(prompt.enabled).toBe(true);
+  });
+});
+
+describe('act: resolution flags (G-008c item 4 — structural, not toast text)', () => {
+  it('a payout press reports kind advance + paidOut, never purchased', () => {
+    let session = starterSession();
+    session = resolveAct(session, WAAKYE_LOCATION_ID).session; // accept
+    session = resolveAct(session, WAAKYE_LOCATION_ID).session; // step 1
+    session = resolveAct(session, 'LOC-001-BENCH').session; // step 2
+    const payout = resolveAct(session, WAAKYE_LOCATION_ID); // step 3 + pay
+    expect(payout.kind).toBe('advance');
+    expect(payout.paidOut).toBe(true);
+    expect(payout.purchased).toBe(false);
+    expect(payout.toast).toContain('+₵15');
+  });
+
+  it('a mid-shift step reports advance with both flags false', () => {
+    let session = starterSession();
+    session = resolveAct(session, WAAKYE_LOCATION_ID).session; // accept
+    const step = resolveAct(session, WAAKYE_LOCATION_ID); // step 1
+    expect(step.kind).toBe('advance');
+    expect(step.paidOut).toBe(false);
+    expect(step.purchased).toBe(false);
+  });
+
+  it('purchases report purchased=true; hires report neither flag', () => {
+    const meal = resolveAct(
+      { ...paidSessionCooling(45_000), needs: { hunger: 50, energy: 62 } },
+      WAAKYE_LOCATION_ID
+    );
+    expect(meal.kind).toBe('waakye');
+    expect(meal.purchased).toBe(true);
+    expect(meal.paidOut).toBe(false);
+
+    const water = resolveAct(
+      { wallet: { balanceGHS: 5 }, needs: { hunger: 40, energy: 30 }, job: createStarterJobState() },
+      WATER_LOCATION_ID
+    );
+    expect(water.kind).toBe('water');
+    expect(water.purchased).toBe(true);
+    expect(water.paidOut).toBe(false);
+
+    const hire = resolveAct(starterSession(), WAAKYE_LOCATION_ID);
+    expect(hire.kind).toBe('start');
+    expect(hire.purchased).toBe(false);
+    expect(hire.paidOut).toBe(false);
+
+    const nap = resolveAct(
+      {
+        wallet: { balanceGHS: 23 },
+        needs: { hunger: 50, energy: 30 },
+        job: createStarterJobState(),
+      },
+      SLEEP_LOCATION_ID
+    );
+    expect(nap.kind).toBe('sleep');
+    expect(nap.purchased).toBe(false);
+    expect(nap.paidOut).toBe(false);
+  });
+
+  it('a disabled press keeps its decided kind with both flags false', () => {
+    const full: ActSession = {
+      wallet: { balanceGHS: 35 },
+      needs: { hunger: 92, energy: 5 },
+      job: { activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] },
+    };
+    const refused = resolveAct(full, WAAKYE_LOCATION_ID);
+    expect(refused.kind).toBe('waakye'); // the Full decision, disabled
+    expect(refused.purchased).toBe(false);
+    expect(refused.paidOut).toBe(false);
+    expect(refused.session).toBe(full);
+    expect(refused.toast).toBeNull();
   });
 });
 

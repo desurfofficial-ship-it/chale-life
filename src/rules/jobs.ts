@@ -34,6 +34,15 @@ export interface JobState {
    * compiling until E-004 threads the flag; undefined reads as [].
    */
   readonly completedIds?: readonly string[];
+  /**
+   * Epoch ms of the most recent completed-shift payout (G-008c) — the
+   * anchor the job's cooldownSeconds rests from. Optional so pre-G-008c
+   * slices keep compiling; undefined reads as "never paid", which is
+   * always off cooldown. The store threads it exactly like completedIds
+   * (reference-replaced, never mutated), and rules read it as pure data —
+   * paired with the session's nowMs, no rule ever calls Date.now().
+   */
+  readonly lastPayoutAt?: number;
 }
 
 /** Starter job state — matches the store default (nothing active, nothing done). */
@@ -229,8 +238,13 @@ export interface CompleteJobResult {
  * latch the finished id into `completedIds` (no duplicates) so the run
  * remembers the shift was done (G-004 earn-first). Refuses while steps
  * are still pending (wallet untouched).
+ *
+ * G-008c: `nowMs` (the session's press-time clock) is stamped into the
+ * returned state as `lastPayoutAt` — the instant the job's cooldown
+ * rests from. Omitted (legacy callers) the previous stamp, if any, is
+ * preserved so repeated completions can never un-arm a running cooldown.
  */
-export function completeJob(state: JobState, wallet: WalletState): CompleteJobResult {
+export function completeJob(state: JobState, wallet: WalletState, nowMs?: number): CompleteJobResult {
   const def = state.activeId ? findJobById(state.activeId) : undefined;
   if (!def) {
     return {
@@ -254,13 +268,48 @@ export function completeJob(state: JobState, wallet: WalletState): CompleteJobRe
   const nextCompleted = completed.includes(def.id)
     ? completed
     : [...completed, def.id];
+  const lastPayoutAt = nowMs ?? state.lastPayoutAt;
   return {
     ok: true,
-    job: { ...createStarterJobState(), completedIds: nextCompleted },
+    job: {
+      ...createStarterJobState(),
+      completedIds: nextCompleted,
+      ...(lastPayoutAt !== undefined ? { lastPayoutAt } : {}),
+    },
     wallet: pay(wallet, def.payGHS),
     payoutGHS: def.payGHS,
     message: `${def.steps[def.steps.length - 1].completionMessage} (+${formatGHS(def.payGHS)} Cash Paid!)`,
   };
+}
+
+export interface CooldownStatus {
+  /** true while the shift is still resting between runs. */
+  readonly onCooldown: boolean;
+  /** Milliseconds until the job is ready again (0 when ready). */
+  readonly remainingMs: number;
+}
+
+/**
+ * Pure cooldown math (G-008c item 2): a job rests `cooldownSeconds` from
+ * its LAST PAYOUT. Both clocks arrive as plain data — the session's
+ * `nowMs` and the JobState's `lastPayoutAt` (stamped by completeJob) — so
+ * this stays a pure (data, data) => data function: no Date.now(), no
+ * store, no timers. Missing inputs (legacy slices without the stamp) and
+ * cooldownSeconds 0 read as ready, so a fresh guest is never gated.
+ */
+export function cooldownStatus(
+  def: JobDefinition,
+  nowMs: number | undefined,
+  lastPayoutAt: number | undefined
+): CooldownStatus {
+  const cooldownMs = Math.max(0, def.cooldownSeconds) * 1000;
+  if (cooldownMs === 0 || nowMs === undefined || lastPayoutAt === undefined) {
+    return { onCooldown: false, remainingMs: 0 };
+  }
+  const remainingMs = cooldownMs - (nowMs - lastPayoutAt);
+  return remainingMs > 0
+    ? { onCooldown: true, remainingMs }
+    : { onCooldown: false, remainingMs: 0 };
 }
 
 export interface ObjectiveInfo {

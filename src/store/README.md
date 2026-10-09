@@ -43,6 +43,15 @@ time. Reading rules:
   payout latches a fresh, deduped array. It is the ONE source of truth for
   "worked before" — the E-003 `hasWorked` latch is retired and the objective
   marker reads `completedIds.length` instead.
+- G-008c: the slice also carries `lastPayoutAt?: number` — the epoch ms a
+  payout committed at, threaded into `resolveAct` alongside the press-time
+  `nowMs`. rules/jobs.ts `cooldownStatus` counts the job's `cooldownSeconds`
+  (pure data) from that pair; `requestAct` never interprets it.
+- G-008b guards, reworked by G-008c: `requestAct` drops a press within
+  600 ms of the last press that FIRED (dropped presses no longer re-arm the
+  window), and refuses a SPENDING press (`resolveAct`'s typed `purchased`
+  flag — not toast text) within 1000 ms of a payout (`paidOut` flag).
 - Store tests: `__tests__/gameStore.test.ts` (canonical ₵20 → ₵35 → ₵23 loop)
   and `__tests__/gameStoreEarnFirst.test.ts` (drain-hunger-to-60 earn-first
-  session — separate file so both start from a pristine store).
+  session — separate file so both start from a pristine store);
+  `__tests__/actGuards.test.ts` owns the guard windows under fake timers.

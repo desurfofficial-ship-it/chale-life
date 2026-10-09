@@ -48,8 +48,16 @@ export interface GameState {
    * E-004: completedIds = ids of shifts fully worked this run (G-004).
    * readonly like the rules' JobState — the store replaces the reference,
    * it never mutates the array in place.
+   * G-008c: lastPayoutAt = epoch ms of the most recent payout — the anchor
+   * the job's cooldownSeconds rests from (rules read it as pure data,
+   * paired with the press-time nowMs). Undefined = never paid this run.
    */
-  job: { activeId: string | null; step: number; completedIds: readonly string[] };
+  job: {
+    activeId: string | null;
+    step: number;
+    completedIds: readonly string[];
+    lastPayoutAt?: number;
+  };
   home: { tierId: string };
   time: { hour: number };
   /** E-003: id of the location within NEAR_LOCATION_RADIUS_M, else null. */
@@ -177,21 +185,26 @@ export function setNearLocationId(id: string | null): void {
 }
 
 /**
- * Act input guards (G-008b item 3) — the iPhone burst bug bought TWO
- * waakyes with one flurry of taps (₵44 → ₵20). Two module-level gates in
- * requestAct, so EVERY input path (HUD pill, keyboard, future joystick)
- * is covered without new state fields:
- *   - ACT_DEBOUNCE_MS: a press within 600 ms of ANY press attempt (even
- *       an ignored one) is dropped — bursts can never accumulate the
- *       quiet they'd need to fire twice.
- *   - PURCHASE_LOCKOUT_MS: a press that would SPEND money (its toast
- *       carries a −₵ price) is refused within 1000 ms of a payout toast
- *       (+₵… Cash Paid) — the payout burst can't roll straight into a
- *       purchase. Sleep/water/hire presses are unaffected by this gate.
+ * Act input guards (G-008b item 3, reworked by G-008c items 3/4) — the
+ * iPhone burst bug bought TWO waakyes with one flurry of taps (₵44 →
+ * ₵20). Two module-level gates in requestAct, so EVERY input path (HUD
+ * pill, keyboard, future joystick) is covered without new state fields:
+ *   - ACT_DEBOUNCE_MS: a press within 600 ms of the last press that
+ *       FIRED is dropped. G-008c: dropped presses no longer re-stamp the
+ *       window (that used to make taps under 600 ms apart never fire at
+ *       all) — only a press that actually commits moves the reference,
+ *       so a steady 400 ms tap rhythm fires every other tap and a mash
+ *       on an enabled button commits once per 600 ms.
+ *   - PURCHASE_LOCKOUT_MS: a press that would SPEND money is refused
+ *       within 1000 ms of a payout — the payout burst can't roll
+ *       straight into a purchase. G-008c: "would spend" and "just paid"
+ *       come from resolveAct's typed purchased / paidOut flags, NOT from
+ *       regex-matching the toast text (−₵ / +₵ was fragile). Sleep, hire
+ *       and step presses are unaffected by this gate.
  */
 const ACT_DEBOUNCE_MS = 600;
 const PURCHASE_LOCKOUT_MS = 1000;
-let lastActAttemptAt = 0;
+let lastFiredAt = 0;
 let lastPayoutAt = 0;
 
 /**
@@ -206,14 +219,9 @@ let guardsForTests = false;
 /** Test-only toggle (used by src/store/__tests__/actGuards.test.ts). */
 export function __setActGuardsForTests(on: boolean): void {
   guardsForTests = on;
-  lastActAttemptAt = 0;
+  lastFiredAt = 0;
   lastPayoutAt = 0;
 }
-
-/** Payout toasts end in "+₵<n> Cash Paid!" (rules/completeJob). */
-const PAYOUT_TOAST = /\+₵\d/;
-/** Purchase toasts carry the paid price as a negative cedi amount. */
-const PURCHASE_TOAST = /−₵\d/;
 
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
 /** Commit an Act toast + arrival timestamp; schedule the store-side clear. */
@@ -234,27 +242,25 @@ function pushToast(message: string): void {
 /**
  * HUD Act button / keyboard Act key → Earn-and-eat handshake (E-003).
  * Samples the store into a pure rules/act.ts ActSession (including the
- * completedIds run history — G-004 earn-first, and the player position —
- * G-008b zone-exact decisions), runs resolveAct against the current
- * nearLocationId, and commits the returned wallet, needs and job slices
- * back (identity-checked: resolveAct returns the SAME session when the
- * act was disabled/refused, so a no-op press never notifies). The
- * returned completedIds array is stored by reference: rules hand back the
- * SAME array while a shift just advances (no re-render churn) and a
- * fresh, deduped array only when a payout latches a shift (E-004).
+ * completedIds run history — G-004 earn-first, the player position —
+ * G-008b zone-exact decisions, and nowMs — G-008c's cooldown clock),
+ * runs resolveAct against the current nearLocationId, and commits the
+ * returned wallet, needs and job slices back (identity-checked:
+ * resolveAct returns the SAME session when the act was disabled/refused,
+ * so a no-op press never notifies). The returned completedIds array is
+ * stored by reference: rules hand back the SAME array while a shift just
+ * advances (no re-render churn) and a fresh, deduped array only when a
+ * payout latches a shift (E-004).
  */
 export function requestAct(): void {
-  // G-008b input guards — see the constants above. The debounce stamps
-  // EVERY attempt so a continuous burst never slips through the window.
   const now = Date.now();
   const guardsActive = ACT_GUARDS_DEFAULT || guardsForTests;
-  let purchaseLocked = false;
-  if (guardsActive) {
-    const debounced = now - lastActAttemptAt < ACT_DEBOUNCE_MS;
-    lastActAttemptAt = now;
-    if (debounced) return;
-    purchaseLocked = now - lastPayoutAt < PURCHASE_LOCKOUT_MS;
-  }
+
+  // G-008c item 3: the debounce window counts from the last press that
+  // FIRED. A dropped press returns here WITHOUT stamping — it never
+  // moves the window, so paced taps keep firing every other beat.
+  if (guardsActive && now - lastFiredAt < ACT_DEBOUNCE_MS) return;
+  const purchaseLocked = guardsActive && now - lastPayoutAt < PURCHASE_LOCKOUT_MS;
 
   const session: ActSession = {
     wallet: { balanceGHS: state.wallet.balanceGHS },
@@ -263,18 +269,23 @@ export function requestAct(): void {
       activeId: state.job.activeId,
       step: state.job.step,
       completedIds: state.job.completedIds,
+      lastPayoutAt: state.job.lastPayoutAt,
     },
     // G-008b: press-time position — act.ts re-checks the sleep zone and
     // the bench waypoint against the REAL position, not the probe frame.
     position: { x: state.player.position.x, z: state.player.position.z },
+    // G-008c: press-time clock — the cooldown counts against THIS number,
+    // keeping the rules pure (no Date.now() below src/store).
+    nowMs: now,
   };
 
-  const { session: next, toast } = resolveAct(session, state.nearLocationId);
+  const { session: next, toast, purchased, paidOut } = resolveAct(session, state.nearLocationId);
 
   // A purchase within 1000 ms of a payout is refused before any commit —
-  // resolveAct is pure, so dropping the result here is a true no-op.
-  if (guardsActive && purchaseLocked && toast !== null && PURCHASE_TOAST.test(toast)) return;
-  if (guardsActive && toast !== null && PAYOUT_TOAST.test(toast)) lastPayoutAt = now;
+  // G-008c item 4: detected via resolveAct's typed `purchased` flag, not
+  // the toast text. resolveAct is pure, so dropping the result is a true
+  // no-op (and, being a refusal, it stamps neither gate).
+  if (purchaseLocked && purchased) return;
 
   let changed = false;
   if (next.wallet !== session.wallet) {
@@ -292,11 +303,22 @@ export function requestAct(): void {
     // G-004 run history: rules return the same array while a shift advances
     // and a fresh deduped array when completeJob latches a payout.
     state.job.completedIds = next.job.completedIds ?? [];
+    // G-008c: the payout stamp — the cooldown's anchor, threaded like
+    // completedIds (undefined until the first payout commits one).
+    state.job.lastPayoutAt = next.job.lastPayoutAt;
     changed = true;
   }
   if (toast) {
     pushToast(toast);
     changed = true;
+  }
+
+  // Only a press that FIRED stamps the debounce (same reference ⇒ no-op
+  // ⇒ no stamp), and a payout additionally arms the purchase lockout —
+  // detected via the typed `paidOut` flag, not the "+₵" toast.
+  if (guardsActive && next !== session) {
+    lastFiredAt = now;
+    if (paidOut) lastPayoutAt = now;
   }
   if (changed) notify();
 }

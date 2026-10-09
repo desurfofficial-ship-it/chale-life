@@ -109,8 +109,14 @@ describe('gameStore: the ₵20 → ₵35 → ₵23 loop at the waakye joint (LOC
     // work cost: −8 hunger, −18 energy from the starter 72/80
     expect(s.needs).toEqual({ hunger: 64, energy: 62 });
     // shift cleared, the run latched the completed hustle (G-004 earn-first
-    // flag — the ONE "worked before" source of truth since E-004)
-    expect(s.job).toEqual({ activeId: null, step: 0, completedIds: [HUSTLE_ID] });
+    // flag — the ONE "worked before" source of truth since E-004), and the
+    // payout stamped the cooldown anchor (G-008c lastPayoutAt).
+    expect(s.job).toEqual({
+      activeId: null,
+      step: 0,
+      completedIds: [HUSTLE_ID],
+      lastPayoutAt: expect.any(Number),
+    });
     expect(s.toast.message).toContain('+₵15');
   });
 

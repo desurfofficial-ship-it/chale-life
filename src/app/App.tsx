@@ -86,15 +86,22 @@ export function App() {
   // E-004: array identity is stable while a shift advances; it flips only on
   // a payout latch, so this selector re-renders exactly when history changes.
   const completedIds = useStoreValue((s) => s.job.completedIds);
+  // G-008c: the payout stamp the cooldown counts from (primitive — flips
+  // exactly when a payout commits, like completedIds above).
+  const lastPayoutAt = useStoreValue((s) => s.job.lastPayoutAt);
   const nearLocationId = useStoreValue((s) => s.nearLocationId);
   const toastMessage = useStoreValue((s) => s.toast.message);
 
   // Pure rules projection of the store snapshot — what the Act button says.
+  // G-008c: nowMs is the wall-clock NOW the job cooldown counts against;
+  // the ~1 Hz needs drain keeps this component re-rendering, so the
+  // "Daavi needs you again in Ns" reason ticks down live under the pill.
   const prompt = actPromptFor(
     {
       wallet: { balanceGHS: balance },
       needs: { hunger, energy },
-      job: { activeId, step, completedIds },
+      job: { activeId, step, completedIds, lastPayoutAt },
+      nowMs: Date.now(),
     },
     nearLocationId
   );
