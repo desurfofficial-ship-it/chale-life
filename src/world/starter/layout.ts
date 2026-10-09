@@ -148,20 +148,20 @@ export const TROTRO_STOP = {
 // --------------------------------------------------------------- props -----
 export const UTILITY_POLES: { x: number; z: number }[] = [
   // Road-edge of the south pavement — walk centre z≈13.4 stays clear for the
-  // 0.45 m player capsule. Pole at x=16 (not 20) keeps ≥2 m from the trotro
-  // footprint at the stop (B-003b).
+  // 0.45 m player capsule. Pole east of the trotro stop (x=26) keeps ≥2 m
+  // from the trotro footprint and off the x≈15 path to the waakye joint.
   { x: -28, z: 12.4 },
   { x: -12, z: 12.4 },
   { x: 4, z: 12.4 },
-  { x: 16, z: 12.4 },
+  { x: 26, z: 12.4 },
 ];
 
 export const WIRE_SPANS: { from: { x: number; z: number }; to: { x: number; z: number } }[] = [
   { from: { x: -30, z: 12.4 }, to: { x: -28, z: 12.4 } },
   { from: { x: -28, z: 12.4 }, to: { x: -12, z: 12.4 } },
   { from: { x: -12, z: 12.4 }, to: { x: 4, z: 12.4 } },
-  { from: { x: 4, z: 12.4 }, to: { x: 16, z: 12.4 } },
-  { from: { x: 16, z: 12.4 }, to: { x: 30, z: 12.4 } },
+  { from: { x: 4, z: 12.4 }, to: { x: 26, z: 12.4 } },
+  { from: { x: 26, z: 12.4 }, to: { x: 30, z: 12.4 } },
 ];
 
 export interface TreeSpot {
