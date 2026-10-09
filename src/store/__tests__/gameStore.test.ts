@@ -100,7 +100,7 @@ describe('gameStore: the ₵20 → ₵35 → ₵23 loop at Daavi’s spots (G-00
     requestAct();
     s = getState();
     expect(s.job).toEqual({ activeId: HUSTLE_ID, step: 2, completedIds: [] });
-    expect(s.toast.message).toContain('One more lift');
+    expect(s.toast.message).toContain('Back to the side of the kiosk'); // G-008e: points at the pay spot
     expect(s.wallet.balanceGHS).toBe(20); // pay only on completion
     setNearLocationId('LOC-001-JOB');
   });
