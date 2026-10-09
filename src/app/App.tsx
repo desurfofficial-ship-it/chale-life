@@ -101,11 +101,18 @@ export function App() {
 
   // The Hud re-renders itself from the store; only prop changes need it to
   // re-render from here (label/enabled flip on enter/leave, toast per Act).
+  // G-008b item 6: prompt.reason feeds the disabled hint under the pill.
   const hud = useMemo(
     () => (
-      <Hud onAct={requestAct} actLabel={prompt.label} actEnabled={prompt.enabled} toast={toastMessage} />
+      <Hud
+        onAct={requestAct}
+        actLabel={prompt.label}
+        actEnabled={prompt.enabled}
+        actReason={prompt.reason ?? null}
+        toast={toastMessage}
+      />
     ),
-    [prompt.label, prompt.enabled, toastMessage]
+    [prompt.label, prompt.enabled, prompt.reason, toastMessage]
   );
 
   if (!webglOk) return <WebGLFallback />;

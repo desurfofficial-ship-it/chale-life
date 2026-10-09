@@ -89,11 +89,16 @@ describe('gameStore: the ₵20 → ₵35 → ₵23 loop at the waakye joint (LOC
     expect(s.job).toEqual({ activeId: HUSTLE_ID, step: 1, completedIds: [] });
     expect(s.toast.message).toContain('Two more lifts');
 
+    // G-008b: step 2 happens at Daavi's bench (≥ 3 m east of the kiosk) —
+    // the walk is part of the shift. The probe reads the waypoint, the
+    // player presses, then heads back to the kiosk for the last lift.
+    setNearLocationId('LOC-001-BENCH');
     requestAct();
     s = getState();
     expect(s.job).toEqual({ activeId: HUSTLE_ID, step: 2, completedIds: [] });
     expect(s.toast.message).toContain('One more lift');
     expect(s.wallet.balanceGHS).toBe(20); // pay only on completion
+    setNearLocationId('LOC-001');
   });
 
   it('the final Act pays ₵15 and takes the work energy/hunger toll', () => {
@@ -110,12 +115,16 @@ describe('gameStore: the ₵20 → ₵35 → ₵23 loop at the waakye joint (LOC
   });
 
   it('the next Act at the joint buys waakye: ₵35 → ₵23, hunger rises 45 (clamped)', () => {
+    // G-008b Full gate: waakye is offered only while round(hunger) ≤ 55.
+    // The guest drifts ~3 starter minutes off the payout (legal 2 s ticks)
+    // — hunger 64 → 55, energy 62 → ~56 — and the meal is back on menu.
+    for (let i = 0; i < 90; i++) tickNeedsDrain(2);
     requestAct();
     const s = getState();
     expect(s.wallet.balanceGHS).toBe(23);
-    // 64 + 45 = 109 → clamped to 100; energy untouched by the meal
-    expect(s.needs.hunger).toBe(100);
-    expect(s.needs.energy).toBe(62);
+    // 55 + 45 ≈ 100 — still clamped; energy only drifted on the walk
+    expect(s.needs.hunger).toBeCloseTo(100, 5);
+    expect(s.needs.energy).toBeCloseTo(62 - DECAY_PER_SECOND.starter.energy * 180, 2);
     expect(s.toast.message).toContain('Waakye');
     expect(s.job.completedIds).toEqual([HUSTLE_ID]); // unchanged by eating
   });
@@ -130,7 +139,10 @@ describe('gameStore: sachet water at the provisions store + toast lifetime', () 
 
       const s = getState();
       expect(s.wallet.balanceGHS).toBe(22);
-      expect(s.needs).toEqual({ hunger: 100, energy: 72 }); // +10 energy, hunger clamped
+      // +10 energy over the drifted 56, hunger clamped at ~100 (G-008b: the
+      // meal above landed at exactly 55 + 45, water clamps into it).
+      expect(s.needs.hunger).toBeCloseTo(100, 5);
+      expect(s.needs.energy).toBeCloseTo(62 - DECAY_PER_SECOND.starter.energy * 180 + 10, 2);
       expect(s.toast.message).toContain('Sachet water');
       expect(s.toast.at).toBe(Date.now()); // timestamp recorded on arrival
 

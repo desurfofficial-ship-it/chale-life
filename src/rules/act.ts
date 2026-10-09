@@ -6,25 +6,34 @@
  * `actPromptFor` what the button should say (every HUD notify), and on a
  * press calls `resolveAct` and commits the returned session back.
  *
- * Behaviour map (Task G-006 — sleep closes the work → eat → rest loop;
- * earn-first at Daavi's is G-004 logic, Daavi name from G-005):
+ * Behaviour map (Task G-008b — G-008's proximity helpers wired into the
+ * Act brain; earn-first is G-004 logic, sleep is G-006, Daavi name G-005):
+ *   - LOCATION is decided from the player position when the session carries
+ *       one (the store samples it at press time): the compound is the WHOLE
+ *       yard AABB via isInSleepZone (never the 2.5 m gate point), Daavi's
+ *       bench is its own waypoint, and the named locations keep their
+ *       2.5 m points (proximity.nearestLocationId encodes the priority).
+ *       Without a position (HUD prompt path) the zone-aware nearLocationId
+ *       written by the GameLoop probe is used — same helper, same result.
+ *   - At LOC-002 (Starter Compound): sleep — free, +55 energy (applySleep)
+ *       and −8 hunger (you wake up hungry), label "Sleep". Disabled with
+ *       "Not tired yet" at energy ≥ SLEEP_GATE_ENERGY (90). Sleep never
+ *       steals a live job step, and is allowed mid-shift (nap between
+ *       lifts) — the job passes through untouched.
  *   - At LOC-001 (Daavi's waakye joint), starter hustle NOT yet worked
  *       this run (JobState.completedIds): start HUSTLE_AUNTY_BA_STARTER —
  *       label "Help Daavi". One anti-soft-lock exception: too hungry to
  *       work (energy fine, hunger < CAN_WORK_MIN_HUNGER) with ₵12 in
  *       pocket → waakye first, so hunger can never wall the hustle off.
- *   - At LOC-001 with that hustle active: advance one step; the final
- *       advance also completes the shift — +₵15 and the work
- *       energy/hunger cost (applyWorkCost).
+ *   - With the hustle active, Act advances ONLY at the current step's
+ *       location (G-008b: step 2 happens at Daavi's bench — the player
+ *       has to walk there); elsewhere the button disables with a
+ *       "Wrong spot" reason naming the step's target.
  *   - At LOC-001 with the hustle already completed this run: buy
- *       FOOD_WAAKYE (−₵12, applyMeal) when affordable and hunger < 100 —
- *       label "Buy waakye ₵12"; otherwise offer the hustle again
- *       (work-when-broke, full belly, hungry-but-cashless).
- *   - At LOC-002 (the Starter Compound, G-006): sleep — free, +55 energy
- *       (applySleep) and −8 hunger (you wake up hungry), label "Sleep".
- *       Disabled with "Not tired yet" at energy ≥ SLEEP_GATE_ENERGY (90).
- *       If a shift's next step ever targets the compound, Act stays on
- *       the job track — sleep never steals a live step.
+ *       FOOD_WAAKYE (−₵12, applyMeal) only while round(hunger) ≤
+ *       WAAKYE_MAX_HUNGER (55); above it the label reads "Full" and the
+ *       button is disabled. Broke guests are re-hired instead (the
+ *       zero-capital hustle stays the fallback — work-when-broke).
  *   - At LOC-003 (Maame Effia's provisions): buy FOOD_SACHET_WATER for
  *       ₵1 with drinkWater — label "Buy water ₵1".
  *   - Too tired / too hungry (canWork gates) or short of cash:
@@ -43,6 +52,7 @@ import { buy, canAfford, formatGHS, type WalletState } from './economy';
 import {
   advanceStep,
   completeJob,
+  completedIdsOf,
   isJobCompleted,
   objectiveFor,
   startJob,
@@ -56,16 +66,30 @@ import {
   CAN_WORK_MIN_HUNGER,
   canWork,
   drinkWater,
+  LOW_THRESHOLD,
   SLEEP_ENERGY_RESTORE,
   SLEEP_GATE_ENERGY,
+  WAAKYE_MAX_HUNGER,
   type NeedsState,
 } from './needs';
+import {
+  DAAVI_BENCH,
+  isInSleepZone,
+  nearestLocationId,
+} from './proximity';
 
 /** Everything one Act press can touch — the Engine projects the store into this. */
 export interface ActSession {
   readonly wallet: WalletState;
   readonly needs: NeedsState;
   readonly job: JobState;
+  /**
+   * Player world position in metres (G-008b). Optional so the HUD's
+   * prompt path can rely on the zone-aware `nearLocationId` without
+   * re-rendering per frame; the store's requestAct always supplies it,
+   * making the press-time decision zone-exact.
+   */
+  readonly position?: { readonly x: number; readonly z: number };
 }
 
 /** What the HUD's Act button should show right now. */
@@ -96,6 +120,12 @@ export const WATER_LOCATION_ID = 'LOC-003';
 /** The Starter Compound (src/data/locations.ts) — free sleep since G-006. */
 export const SLEEP_LOCATION_ID = 'LOC-002';
 
+/**
+ * Daavi's bench waypoint id (G-008, proximity.ts) — hustle step 2 happens
+ * here, a short walk east of the kiosk.
+ */
+export const DAAVI_BENCH_ID = DAAVI_BENCH.locationId;
+
 const WAAKYE = findFoodById(FOOD_WAAKYE_ID)!;
 const SACHET_WATER = findFoodById(FOOD_SACHET_WATER_ID)!;
 
@@ -116,6 +146,25 @@ function decideAdvance(session: ActSession): Decision {
 }
 
 /**
+ * Advance gated by the CURRENT STEP's target location (G-008b: the hustle
+ * forces its walk — step 2 only advances at Daavi's bench). Off-spot the
+ * button disables with a reason naming where the step happens.
+ */
+function decideAdvanceForStep(session: ActSession, locationId: string): Decision {
+  if (activeStepAt(session, locationId)) return decideAdvance(session);
+  const def = findJobById(session.job.activeId ?? '');
+  const step = def?.steps[Math.min(session.job.step, def.steps.length - 1)];
+  return {
+    kind: 'advance',
+    label: step?.actionVerb ?? 'Act',
+    enabled: false,
+    reason: step
+      ? `Wrong spot — this step happens at ${step.targetLocationName}.`
+      : 'Finish your current shift first.',
+  };
+}
+
+/**
  * True when the active shift's next step happens at this location
  * (G-006: such a step outranks the location's own act — sleep never
  * steals a live job step).
@@ -131,7 +180,9 @@ function decideAtWaakyeJoint(session: ActSession): Decision {
   const work = canWork(needs);
 
   if (job.activeId === AUNTY_BA_HUSTLE_ID) {
-    return decideAdvance(session);
+    // G-008b: advance only AT the step's location — step 2 forces the
+    // walk to Daavi's bench, so tapping at the kiosk refuses with a hint.
+    return decideAdvanceForStep(session, WAAKYE_LOCATION_ID);
   }
 
   if (job.activeId) {
@@ -174,9 +225,14 @@ function decideAtWaakyeJoint(session: ActSession): Decision {
   }
 
   // Hustle already worked this run — the joint sells waakye when it makes
-  // sense (affordable, room to eat); otherwise Daavi re-hires you.
-  if (canAfford(wallet, WAAKYE.priceGHS) && needs.hunger < 100) {
-    return waakyeOffer;
+  // sense (G-008b: only while round(hunger) ≤ WAAKYE_MAX_HUNGER; above it
+  // the meal would mostly clamp away, so the button reads "Full" and
+  // refuses); broke guests get re-hired — the hustle is the fallback.
+  if (canAfford(wallet, WAAKYE.priceGHS)) {
+    if (Math.round(needs.hunger) <= WAAKYE_MAX_HUNGER) {
+      return waakyeOffer;
+    }
+    return { kind: 'waakye', label: 'Full', enabled: false, reason: 'You are full — waakye can wait.' };
   }
   if (!canWork(needs).ok) {
     return {
@@ -203,6 +259,30 @@ function decideAtProvisions(session: ActSession): Decision {
 }
 
 /**
+ * Daavi's bench (G-008 waypoint, ≥ 3 m east of the kiosk): only the
+ * bench-targeted step advances here; anything else is idle.
+ */
+function decideAtBench(session: ActSession): Decision {
+  if (session.job.activeId === AUNTY_BA_HUSTLE_ID) {
+    return decideAdvanceForStep(session, DAAVI_BENCH_ID);
+  }
+  if (session.job.activeId) {
+    return {
+      kind: 'idle',
+      label: 'Act',
+      enabled: false,
+      reason: 'Finish your current shift first.',
+    };
+  }
+  return {
+    kind: 'idle',
+    label: 'Act',
+    enabled: false,
+    reason: 'Nothing to do here yet.',
+  };
+}
+
+/**
  * The Starter Compound (home): sleep is free and always on offer — even
  * mid-shift (a nap between lifts never touches the job) — unless a shift
  * step targets the compound itself, in which case Act works the step.
@@ -217,14 +297,17 @@ function decideAtCompound(session: ActSession): Decision {
   return { kind: 'sleep', label: 'Sleep', enabled: true };
 }
 
-function decideAct(session: ActSession, nearLocationId: string | null): Decision {
-  if (nearLocationId === WAAKYE_LOCATION_ID) {
+function decideAt(session: ActSession, locationId: string | null): Decision {
+  if (locationId === WAAKYE_LOCATION_ID) {
     return decideAtWaakyeJoint(session);
   }
-  if (nearLocationId === SLEEP_LOCATION_ID) {
+  if (locationId === SLEEP_LOCATION_ID) {
     return decideAtCompound(session);
   }
-  if (nearLocationId === WATER_LOCATION_ID) {
+  if (locationId === DAAVI_BENCH_ID) {
+    return decideAtBench(session);
+  }
+  if (locationId === WATER_LOCATION_ID) {
     return decideAtProvisions(session);
   }
   return {
@@ -232,8 +315,52 @@ function decideAct(session: ActSession, nearLocationId: string | null): Decision
     label: 'Act',
     enabled: false,
     reason:
-      nearLocationId === null ? undefined : 'Nothing to do here yet.',
+      locationId === null ? undefined : 'Nothing to do here yet.',
   };
+}
+
+function decideAct(session: ActSession, nearLocationId: string | null): Decision {
+  const { position } = session;
+  if (!position) {
+    // HUD prompt path: the GameLoop probe writes the zone-aware location
+ // (proximity.nearestLocationId — the same zones, edge-for-edge).
+    return decideAt(session, nearLocationId);
+  }
+  // G-008b item 1: the compound decision is the yard AABB via
+  // isInSleepZone — never the 2.5 m gate point. The bench waypoint and
+  // the named points come from the same zone resolver, priorities baked in
+  // (sleep zone > bench > 2.5 m points). A position that lands NOWHERE
+  // defers to the zone-aware nearLocationId — headless callers that only
+  // set the probe (and a player standing in no zone at all) agree either
+  // way, because the GameLoop writes the same zones into the probe.
+  if (isInSleepZone(position.x, position.z)) {
+    return decideAtCompound(session);
+  }
+  return decideAt(session, nearestLocationId(position.x, position.z) ?? nearLocationId);
+}
+
+/**
+ * Where the objective marker should sit right now (G-008b item 7).
+ *
+ *   - Active job → the current step's `locationId` (or its interactable id
+ *       for untagged steps — the engine keeps the id→location map).
+ *   - No job + energy below the LOW threshold (25) → LOC-002: the marker
+ *       anchors at COMPOUND_DOOR via proximity.markerPositionFor — the
+ *       tired guest is walked HOME before they hit the canWork wall.
+ *   - No job + nothing worked this run → LOC-001 (the "go find work"
+ *       beacon, unchanged from E-003/E-004).
+ *   - Otherwise → null (hidden — a completed shift sits in completedIds).
+ */
+export function objectiveMarkerTarget(job: JobState, needs: NeedsState): string | null {
+  if (job.activeId !== null) {
+    const def = findJobById(job.activeId);
+    if (!def) return null;
+    const step = def.steps[Math.min(job.step, def.steps.length - 1)];
+    return step ? (step.locationId ?? step.targetInteractableId) : null;
+  }
+  if (needs.energy < LOW_THRESHOLD) return SLEEP_LOCATION_ID;
+  if (completedIdsOf(job).length === 0) return WAAKYE_LOCATION_ID;
+  return null;
 }
 
 /** What the Act button should say at this session, this near this location. */

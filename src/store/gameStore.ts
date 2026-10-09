@@ -29,7 +29,7 @@
  */
 
 import { resolveAct, type ActSession } from '../rules/act';
-import { drainNeeds } from '../rules/needs';
+import { clampNeed, drainNeeds } from '../rules/needs';
 
 export interface Vec3 {
   x: number;
@@ -176,8 +176,46 @@ export function setNearLocationId(id: string | null): void {
   notify();
 }
 
-let toastTimer: ReturnType<typeof setTimeout> | null = null;
+/**
+ * Act input guards (G-008b item 3) — the iPhone burst bug bought TWO
+ * waakyes with one flurry of taps (₵44 → ₵20). Two module-level gates in
+ * requestAct, so EVERY input path (HUD pill, keyboard, future joystick)
+ * is covered without new state fields:
+ *   - ACT_DEBOUNCE_MS: a press within 600 ms of ANY press attempt (even
+ *       an ignored one) is dropped — bursts can never accumulate the
+ *       quiet they'd need to fire twice.
+ *   - PURCHASE_LOCKOUT_MS: a press that would SPEND money (its toast
+ *       carries a −₵ price) is refused within 1000 ms of a payout toast
+ *       (+₵… Cash Paid) — the payout burst can't roll straight into a
+ *       purchase. Sleep/water/hire presses are unaffected by this gate.
+ */
+const ACT_DEBOUNCE_MS = 600;
+const PURCHASE_LOCKOUT_MS = 1000;
+let lastActAttemptAt = 0;
+let lastPayoutAt = 0;
 
+/**
+ * The guards are live in dev/production/e2e (vite preview builds run with
+ * MODE=production). Vitest unit suites default them OFF — some store suites
+ * press requestAct back-to-back synchronously and assert every step — and
+ * the guard suite below opts back in explicitly.
+ */
+const ACT_GUARDS_DEFAULT = import.meta.env.MODE !== 'test';
+let guardsForTests = false;
+
+/** Test-only toggle (used by src/store/__tests__/actGuards.test.ts). */
+export function __setActGuardsForTests(on: boolean): void {
+  guardsForTests = on;
+  lastActAttemptAt = 0;
+  lastPayoutAt = 0;
+}
+
+/** Payout toasts end in "+₵<n> Cash Paid!" (rules/completeJob). */
+const PAYOUT_TOAST = /\+₵\d/;
+/** Purchase toasts carry the paid price as a negative cedi amount. */
+const PURCHASE_TOAST = /−₵\d/;
+
+let toastTimer: ReturnType<typeof setTimeout> | null = null;
 /** Commit an Act toast + arrival timestamp; schedule the store-side clear. */
 function pushToast(message: string): void {
   const at = Date.now();
@@ -196,15 +234,28 @@ function pushToast(message: string): void {
 /**
  * HUD Act button / keyboard Act key → Earn-and-eat handshake (E-003).
  * Samples the store into a pure rules/act.ts ActSession (including the
- * completedIds run history — G-004 earn-first), runs resolveAct against the
- * current nearLocationId, and commits the returned wallet, needs and job
- * slices back (identity-checked: resolveAct returns the SAME session when
- * the act was disabled/refused, so a no-op press never notifies). The
+ * completedIds run history — G-004 earn-first, and the player position —
+ * G-008b zone-exact decisions), runs resolveAct against the current
+ * nearLocationId, and commits the returned wallet, needs and job slices
+ * back (identity-checked: resolveAct returns the SAME session when the
+ * act was disabled/refused, so a no-op press never notifies). The
  * returned completedIds array is stored by reference: rules hand back the
- * SAME array while a shift just advances (no re-render churn) and a fresh,
- * deduped array only when a payout latches a shift (E-004).
+ * SAME array while a shift just advances (no re-render churn) and a
+ * fresh, deduped array only when a payout latches a shift (E-004).
  */
 export function requestAct(): void {
+  // G-008b input guards — see the constants above. The debounce stamps
+  // EVERY attempt so a continuous burst never slips through the window.
+  const now = Date.now();
+  const guardsActive = ACT_GUARDS_DEFAULT || guardsForTests;
+  let purchaseLocked = false;
+  if (guardsActive) {
+    const debounced = now - lastActAttemptAt < ACT_DEBOUNCE_MS;
+    lastActAttemptAt = now;
+    if (debounced) return;
+    purchaseLocked = now - lastPayoutAt < PURCHASE_LOCKOUT_MS;
+  }
+
   const session: ActSession = {
     wallet: { balanceGHS: state.wallet.balanceGHS },
     needs: { hunger: state.needs.hunger, energy: state.needs.energy },
@@ -213,9 +264,17 @@ export function requestAct(): void {
       step: state.job.step,
       completedIds: state.job.completedIds,
     },
+    // G-008b: press-time position — act.ts re-checks the sleep zone and
+    // the bench waypoint against the REAL position, not the probe frame.
+    position: { x: state.player.position.x, z: state.player.position.z },
   };
 
   const { session: next, toast } = resolveAct(session, state.nearLocationId);
+
+  // A purchase within 1000 ms of a payout is refused before any commit —
+  // resolveAct is pure, so dropping the result here is a true no-op.
+  if (guardsActive && purchaseLocked && toast !== null && PURCHASE_TOAST.test(toast)) return;
+  if (guardsActive && toast !== null && PAYOUT_TOAST.test(toast)) lastPayoutAt = now;
 
   let changed = false;
   if (next.wallet !== session.wallet) {
@@ -304,4 +363,23 @@ export function subscribeHud(fn: (snapshot: Readonly<HudSnapshot>) => void): () 
 export function publishHud(snapshot: HudSnapshot): void {
   hud = snapshot;
   for (const fn of hudListeners) fn(hud);
+}
+
+/**
+ * G-008b e2e hook — reachable only under `?e2e=1` (never in normal play).
+ * The CI robot pins exact needs values so assertions can be deterministic:
+ * the sleep test needs an uncapped +55 (energy ≤ 45 at the door), the Full
+ * gate pins hunger 92. No secrets, no state exports beyond this setter.
+ */
+if (
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('e2e') === '1'
+) {
+  (window as unknown as Record<string, unknown>).__chaleTest = {
+    setNeeds: (hunger: number, energy: number): void => {
+      state.needs.hunger = clampNeed(hunger);
+      state.needs.energy = clampNeed(energy);
+      notify();
+    },
+  };
 }

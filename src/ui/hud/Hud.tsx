@@ -25,7 +25,7 @@ import { useEffect, useState, useSyncExternalStore, type CSSProperties } from 'r
 import { getState, subscribe, type GameState } from '../../store/gameStore';
 import { formatGHS } from '../../rules/economy';
 import { idleObjectiveFor, objectiveFor } from '../../rules/jobs';
-import { isLow, LOW_THRESHOLD } from '../../rules/needs';
+import { isLow, lowNeedsHints, LOW_THRESHOLD } from '../../rules/needs';
 
 export interface HudProps {
   /** Called by the Act button — the Engine decides what "Act" means. */
@@ -34,6 +34,11 @@ export interface HudProps {
   actLabel?: string;
   /** false greys the Act button out (Engine computed actPromptFor). */
   actEnabled?: boolean;
+  /**
+   * Why the Act button is disabled right now (G-008b item 6) — the rules'
+   * ActPrompt.reason (canWork/unmet-requirement wording), shown under Act.
+   */
+  actReason?: string | null;
   /** Transient message shown above Act for ~2 s (resolveAct toast). */
   toast?: string | null;
 }
@@ -148,15 +153,19 @@ function NeedBar({ label, value }: { label: string; value: number }) {
 function NeedsCard() {
   const hunger = useStoreValue((s) => s.needs.hunger);
   const energy = useStoreValue((s) => s.needs.energy);
+  // G-008b item 5: the hints are a pure, unit-tested rules helper —
+  // hungry → "eat waakye", low energy → "LOW ENERGY — sleep at the
+  // compound" (both lines when both stats are low).
+  const hints = lowNeedsHints({ hunger, energy });
   return (
     <div style={{ ...GLASS, padding: '10px 14px', display: 'grid', gap: 7, minWidth: 196 }}>
       <NeedBar label="Hunger" value={hunger} />
       <NeedBar label="Energy" value={energy} />
-      {(isLow(hunger) || isLow(energy)) && (
-        <div style={{ fontSize: 10, fontWeight: 700, color: LOW_RED, letterSpacing: '0.04em' }}>
-          LOW — eat waakye / rest at the compound ({LOW_THRESHOLD}▼)
+      {hints.map((hint) => (
+        <div key={hint} style={{ fontSize: 10, fontWeight: 700, color: LOW_RED, letterSpacing: '0.04em' }}>
+          {hint}
         </div>
-      )}
+      ))}
     </div>
   );
 }
@@ -218,52 +227,71 @@ function ActButton({
   onAct,
   actLabel,
   enabled,
+  reason,
 }: {
   onAct: () => void;
   actLabel?: string;
   enabled: boolean;
+  reason?: string | null;
 }) {
   const activeId = useStoreValue((s) => s.job.activeId);
   const step = useStoreValue((s) => s.job.step);
   const objective = objectiveFor({ activeId, step });
   const label = actLabel ?? (objective ? objective.actionVerb : 'Act');
   return (
-    <button
-      type="button"
-      aria-disabled={!enabled}
-      onPointerDown={(e) => {
-        e.preventDefault();
-        if (!enabled) return;
-        onAct();
-      }}
-      style={{
-        pointerEvents: 'auto',
-        minWidth: 148,
-        minHeight: 56,
-        padding: '0 26px',
-        borderRadius: 999,
-        border: enabled ? '1px solid rgba(250,204,21,0.65)' : '1px solid rgba(148,163,184,0.4)',
-        background: enabled ? YELLOW : 'rgba(100,116,139,0.3)',
-        color: enabled ? '#0a0f1a' : MUTED,
-        fontSize: 17,
-        fontWeight: 800,
-        letterSpacing: '0.02em',
-        fontFamily: FONT,
-        boxShadow: enabled ? '0 6px 20px rgba(250,204,21,0.28)' : 'none',
-        touchAction: 'manipulation',
-        WebkitTapHighlightColor: 'transparent',
-        cursor: enabled ? 'pointer' : 'default',
-        transition: 'background 200ms linear, color 200ms linear, border-color 200ms linear',
-      }}
-    >
-      {label}
-    </button>
+    <div style={{ display: 'grid', justifyItems: 'center', gap: 4 }}>
+      <button
+        type="button"
+        aria-disabled={!enabled}
+        onPointerDown={(e) => {
+          e.preventDefault();
+          if (!enabled) return;
+          onAct();
+        }}
+        style={{
+          pointerEvents: 'auto',
+          minWidth: 148,
+          minHeight: 56,
+          padding: '0 26px',
+          borderRadius: 999,
+          border: enabled ? '1px solid rgba(250,204,21,0.65)' : '1px solid rgba(148,163,184,0.4)',
+          background: enabled ? YELLOW : 'rgba(100,116,139,0.3)',
+          color: enabled ? '#0a0f1a' : MUTED,
+          fontSize: 17,
+          fontWeight: 800,
+          letterSpacing: '0.02em',
+          fontFamily: FONT,
+          boxShadow: enabled ? '0 6px 20px rgba(250,204,21,0.28)' : 'none',
+          touchAction: 'manipulation',
+          WebkitTapHighlightColor: 'transparent',
+          cursor: enabled ? 'pointer' : 'default',
+          transition: 'background 200ms linear, color 200ms linear, border-color 200ms linear',
+        }}
+      >
+        {label}
+      </button>
+      {/* G-008b item 6: the rules' disabled reason, under the pill. */}
+      {!enabled && reason && (
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: MUTED,
+            letterSpacing: '0.03em',
+            maxWidth: 'min(64vw, 300px)',
+            textAlign: 'center',
+          }}
+        >
+          {reason}
+        </span>
+      )}
+    </div>
   );
 }
 
 // ── Root ─────────────────────────────────────────────────────────────────────
 
-export function Hud({ onAct, actLabel, actEnabled = true, toast = null }: HudProps) {
+export function Hud({ onAct, actLabel, actEnabled = true, actReason = null, toast = null }: HudProps) {
   // Toast lifetime is component-local (never touches the store): visible
   // while `toast` is set, hidden TOAST_MS after the latest message arrived.
   const [toastVisible, setToastVisible] = useState(false);
@@ -345,7 +373,7 @@ export function Hud({ onAct, actLabel, actEnabled = true, toast = null }: HudPro
             </div>
           )}
         </div>
-        <ActButton onAct={onAct} actLabel={actLabel} enabled={actEnabled} />
+        <ActButton onAct={onAct} actLabel={actLabel} enabled={actEnabled} reason={actReason} />
       </div>
     </div>
   );

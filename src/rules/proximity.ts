@@ -34,11 +34,16 @@ export const COMPOUND_DOOR = { x: -10, z: 18.5 };
 
 /**
  * Daavi’s bench waypoint — ≥ 3 m east of the kiosk (LOC-001 at 15.5, 2.4).
+ * G-008b: parked at (20.5, 5.5) on the south-east diagonal — the okada
+ * (W-004: 18.3, 2.85, footprint x 17.3..19.3 / z 1.6..4.1) walls off the
+ * whole straight-east band, so the bench sits past its south face where
+ * the forced step-2 walk is unobstructed (pinned by the jobs
+ * data-contract clearance test against every solid footprint).
  */
 export const DAAVI_BENCH = {
   locationId: 'LOC-001-BENCH' as const,
-  x: 18.6,
-  z: 2.4,
+  x: 20.5,
+  z: 5.5,
   radius: DEFAULT_NEAR_RADIUS_M,
 };
 

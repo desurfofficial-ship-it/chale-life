@@ -81,11 +81,15 @@ describe('gameStore (E-004): earn-first survives the spawn drain', () => {
 
   it('the drained loop still pays out ₵35 and waakye lands ₵23', () => {
     // Acts 2 and 3 — steps 1/3 and 2/3, history rides along untouched.
+    // G-008b: step 2 happens at Daavi's bench east of the kiosk — the
+    // probe reads the waypoint for the middle press, then back to the joint.
     requestAct();
     expect(getState().job).toEqual({ activeId: HUSTLE_ID, step: 1, completedIds: [] });
+    setNearLocationId('LOC-001-BENCH');
     requestAct();
     expect(getState().job).toEqual({ activeId: HUSTLE_ID, step: 2, completedIds: [] });
     expect(getState().wallet.balanceGHS).toBe(20); // pay only on completion
+    setNearLocationId('LOC-001');
 
     // Final Act — +₵15 payout and the work toll on the drained needs.
     requestAct();

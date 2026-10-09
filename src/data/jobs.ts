@@ -239,11 +239,15 @@ export const ACCRA_SIDE_HUSTLES: ReadonlyArray<JobDefinition> = [
       {
         stepId: 'aunty_ba_2',
         stepTitle: 'Second stack',
-        instruction: 'Press Act again to carry the second stack to the bench.',
+        instruction:
+          'Carry the stack to Daavi’s bench east of the kiosk, then press Act to set it down.',
         targetInteractableId: 'food_vendor',
-        locationId: 'LOC-001',
+        // G-008b: the bench is a proximity.ts waypoint (id pinned to
+        // DAAVI_BENCH.locationId by a data-contract test), ≥ 3 m east of
+        // the kiosk — the step forces a short walk.
+        locationId: 'LOC-001-BENCH',
         requiredAssetId: 'ACC_RESTAURANT_001',
-        targetLocationName: 'Daavi (Waakye Joint)',
+        targetLocationName: 'Daavi’s bench (east of the kiosk)',
         actionVerb: 'Carry Pans',
         completionMessage: 'Nice hustle! One more lift.',
       },

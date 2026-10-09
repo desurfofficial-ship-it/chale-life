@@ -62,6 +62,13 @@ export const WORK_HUNGER_COST = 8;
 export const CAN_WORK_MIN_ENERGY = 12;
 export const CAN_WORK_MIN_HUNGER = 10;
 
+/**
+ * Waakye is only offered while rounded hunger is at or below this (G-008b):
+ * above it the joint's Act label reads "Full" and the button is disabled —
+ * a meal bought at hunger 92+ used to waste most of its restore.
+ */
+export const WAAKYE_MAX_HUNGER = 55;
+
 /** Frame-spike guard: ticks longer than 2 s are ignored (salvage tick). */
 export const MAX_TICK_SECONDS = 2;
 
@@ -146,6 +153,19 @@ export function isHungry(state: NeedsState): boolean {
 
 export function isTired(state: NeedsState): boolean {
   return isLow(state.energy);
+}
+
+/**
+ * The NeedsCard's low-stat hint lines (G-008b item 5):
+ *   - hungry → "eat waakye" (food outranks rest — sleep costs hunger)
+ *   - energy low → "LOW ENERGY — sleep at the compound"
+ * Both lines show when both stats are low; empty when the guest is fine.
+ */
+export function lowNeedsHints(state: NeedsState): readonly string[] {
+  const hints: string[] = [];
+  if (isHungry(state)) hints.push('eat waakye');
+  if (isTired(state)) hints.push('LOW ENERGY — sleep at the compound');
+  return hints;
 }
 
 export interface CanWorkResult {

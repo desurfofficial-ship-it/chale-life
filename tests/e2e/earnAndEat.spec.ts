@@ -51,11 +51,12 @@ const HELP_LABEL = actPromptFor(FRESH_SESSION, WAAKYE_LOCATION_ID).label;
 const WORK_VERB = objectiveFor({ activeId: HUSTLE_ID, step: 0 })!.actionVerb;
 
 /** The Act prompt once the hustle has paid out this run (G-004 earn-first):
- *  "Buy waakye <price>" — the meal price comes from the data via the rules. */
+ *  "Buy waakye <price>" — G-008b: the meal needs round(hunger) ≤ 55, so
+ *  the derivation session is hungry enough to actually be offered it. */
 const WAAKYE_LABEL = actPromptFor(
   {
     wallet: { balanceGHS: 35 },
-    needs: { hunger: 56, energy: 57 },
+    needs: { hunger: 50, energy: 57 },
     job: { activeId: null, step: 0, completedIds: [HUSTLE_ID] },
   },
   WAAKYE_LOCATION_ID
@@ -115,6 +116,24 @@ async function energyNow(page: Page): Promise<number> {
   return Number(now);
 }
 
+/**
+ * G-008b e2e hook (?e2e=1 — store-exposed test setter): pin exact needs so
+ * the Full gate (round(hunger) ≤ 55) is deterministic regardless of how
+ * much boot/walk drain preceded the assertion.
+ */
+async function setNeeds(page: Page, hunger: number, energy: number): Promise<void> {
+  await page.evaluate(
+    ([h, e]) => {
+      (
+        window as unknown as {
+          __chaleTest: { setNeeds: (hunger: number, energy: number) => void };
+        }
+      ).__chaleTest.setNeeds(h, e);
+    },
+    [hunger, energy] as const
+  );
+}
+
 /** Draw calls from the ?debug=1 overlay. */
 async function drawCalls(page: Page): Promise<number> {
   const text = await page.locator('.debug-overlay').innerText();
@@ -148,6 +167,21 @@ async function holdUntil(
   }
 }
 
+/**
+ * Human-paced Act tap (G-008b): the 600 ms debounce swallows robot-speed
+ * clicks and PURCHASES stay locked 1000 ms after a payout — the robot taps
+ * like a person, and buys a beat later still (ms defaults to 700; pass
+ * 1200+ for purchases that follow a payout).
+ */
+async function pacedClick(
+  page: Page,
+  locator: ReturnType<Page['getByRole']>,
+  ms = 700
+): Promise<void> {
+  await page.waitForTimeout(ms);
+  await locator.click();
+}
+
 test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Act disables off-location', async ({
   page,
 }, testInfo: TestInfo) => {
@@ -167,7 +201,7 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
   const shot = (name: string) => testInfo.outputPath(name);
 
   // ── 1. Load: HUD shows the starter wallet ────────────────────────────────
-  await page.goto('/chale-life/?debug=1');
+  await page.goto('/chale-life/?debug=1&e2e=1');
   await expect(page.getByText(formatGHS(20), { exact: true })).toBeVisible();
   const hunger0 = await hungerNow(page);
   expect(hunger0).toBeGreaterThanOrEqual(55); // starter 72 minus boot-time drain
@@ -216,25 +250,47 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
   expect(HELP_LABEL).toContain(EMPLOYER_NAME);
 
   // ── 4. Act: accept the hustle, work all steps until the payout ──────────
-  await helpButton.click();
+  await pacedClick(page, helpButton);
   await expect(page.getByText('Job accepted')).toBeVisible();
   await expect(page.getByText(formatGHS(20), { exact: true })).toBeVisible(); // zero-capital
 
-  // Three work steps (objectiveFor verbs) — the last one pays +₵15.
-  for (let step = 0; step < 3; step++) {
-    const workButton = page.getByRole('button', { name: WORK_VERB });
-    await expect(workButton).toHaveAttribute('aria-disabled', 'false');
-    await workButton.click();
-  }
+  // G-008b: the three lifts are split across two spots — step 2 happens at
+  // Daavi's bench (≥ 3 m east of the kiosk), so the robot WALKS there and
+  // back, following the Act button's enabled edge. Each walk is bracketed
+  // by a disabled assertion first, so a stale render can't fake a stop.
+  const workButton = page.getByRole('button', { name: WORK_VERB });
+
+  await expect(workButton).toHaveAttribute('aria-disabled', 'false'); // step 1 at the kiosk
+  await pacedClick(page, workButton);
+
+  // G-008b walk to Daavi's bench, anchored on POSITIONS (the okada at
+  // 18.3/2.85 walls off the direct east line): south to the bench's z,
+  // straight east through its zone, then west + north to re-enter the
+  // kiosk zone for the final lift. Each leg re-anchors deterministically.
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 5.5, 'south to the bench line');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.4, 'east to the bench');
+  await expect(workButton).toHaveAttribute('aria-disabled', 'false'); // the bench zone
+  await pacedClick(page, workButton); // step 2 at the bench
+
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 17.0, 'west clear of the bench');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 4.2, 'north to the kiosk zone');
+  await expect(workButton).toHaveAttribute('aria-disabled', 'false'); // the kiosk zone
+  await pacedClick(page, workButton); // final lift → payout
+
   await expect(page.getByText(formatGHS(35), { exact: true })).toBeVisible();
   await page.screenshot({ path: shot('03-wallet-35-390x844.png') });
 
-  // ── 5. Earn-first: the joint now sells waakye (not a re-hire) ───────────
+  // ── 5. Earn-first: the joint sells waakye once the guest is hungry ──────
+  // G-008b Full gate: right after the payout hunger sits above 55 ("Full")
+  // — the robot pins hunger 50 with the e2e hook so the meal is offered.
+  await setNeeds(page, 50, 60);
   const waakyeButton = page.getByRole('button', { name: WAAKYE_LABEL });
   await expect(waakyeButton).toHaveAttribute('aria-disabled', 'false');
   const hungerBeforeMeal = await hungerNow(page);
 
-  await waakyeButton.click();
+  // 1200 ms — past the 1000 ms post-payout purchase lockout, not just the
+  // 600 ms debounce (the payout press was the robot's previous tap).
+  await pacedClick(page, waakyeButton, 1200);
   await expect(page.getByText('Waakye!')).toBeVisible();
   await expect(page.getByText(formatGHS(23), { exact: true })).toBeVisible();
   await expect
