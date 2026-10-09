@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ACCRA_LEGAL_JOBS, findJobById } from '../../data/jobs';
+import { SOLID_FOOTPRINTS } from '../../world/starter/layout';
+import { DAAVI_BENCH, markerPositionFor } from '../proximity';
 import { type WalletState } from '../economy';
 import {
   advanceStep,
@@ -366,5 +368,54 @@ describe('jobs: requirements + objective helper', () => {
       fedAndRested
     );
     expect(result.ok).toBe(true);
+  });
+});
+
+describe('jobs: Daavi bench walk (G-008b item 4)', () => {
+  it('step 2 targets the DAAVI_BENCH waypoint — pinned to the proximity constant', () => {
+    const hustle = findJobById('HUSTLE_AUNTY_BA_STARTER')!;
+    const step2 = hustle.steps[1];
+    expect(step2.stepId).toBe('aunty_ba_2');
+    // The id string is byte-pinned to proximity.ts so the Act routing and
+    // the marker can never drift from the data.
+    expect(step2.locationId).toBe(DAAVI_BENCH.locationId);
+    expect(step2.locationId).toBe('LOC-001-BENCH');
+    // The walk is real: the bench sits ≥ 3 m east of the kiosk point.
+    expect(DAAVI_BENCH.x - 15.5).toBeGreaterThanOrEqual(3);
+  });
+
+  it('the bench waypoint is walkable — clear of every solid footprint (G-008b)', () => {
+    // G-008b lesson: W-004 parked an okada at (18.3, 2.85) right on the
+    // original bench line, walling the forced walk off. Pin the waypoint
+    // clear of ALL solid footprints (+ 0.35 m player capsule + margin).
+    const caps = 0.35 + 0.25;
+    for (const f of SOLID_FOOTPRINTS) {
+      const clear =
+        DAAVI_BENCH.x + caps <= f.x0 ||
+        DAAVI_BENCH.x - caps >= f.x1 ||
+        DAAVI_BENCH.z + caps <= f.z0 ||
+        DAAVI_BENCH.z - caps >= f.z1;
+      expect(
+        clear,
+        `bench (${DAAVI_BENCH.x}, ${DAAVI_BENCH.z}) must clear footprint ${JSON.stringify(f)}`
+      ).toBe(true);
+    }
+  });
+
+  it('step 2 tells the player to walk, and names the bench as the target', () => {
+    const step2 = findJobById('HUSTLE_AUNTY_BA_STARTER')!.steps[1];
+    expect(step2.instruction).toContain('bench');
+    expect(step2.targetLocationName).toContain('bench');
+    // Steps 1/3 keep the kiosk naming.
+    const hustle = findJobById('HUSTLE_AUNTY_BA_STARTER')!;
+    expect(hustle.steps[0].targetLocationName).toContain('Waakye Joint');
+    expect(hustle.steps[2].targetLocationName).toContain('Waakye Joint');
+  });
+
+  it('markerPositionFor resolves the bench and the compound door anchors', () => {
+    expect(markerPositionFor('LOC-001-BENCH')).toEqual({ x: DAAVI_BENCH.x, z: DAAVI_BENCH.z });
+    expect(markerPositionFor('LOC-002')).toEqual({ x: -10, z: 18.5 }); // COMPOUND_DOOR
+    expect(markerPositionFor('LOC-001')).toEqual({ x: 15.5, z: 2.4 });
+    expect(markerPositionFor(null)).toBeNull();
   });
 });

@@ -20,15 +20,14 @@ import { useEffect, useRef } from 'react';
 import { movementStep, type Kinematics } from './movement';
 import { projectedPlayerScreen } from './CameraRig';
 import { colliders, worldBounds } from '../world/colliders';
-import { locations } from '../data/locations';
 import { MAX_TICK_SECONDS } from '../rules/needs';
+import { nearestLocationId } from '../rules/proximity';
 import {
   getZoom,
   getState,
   HUD_INTERVAL_S,
   movementInput,
   NEEDS_DRAIN_INTERVAL_S,
-  NEAR_LOCATION_RADIUS_M,
   publishHud,
   setNearLocationId,
   setPlayerTransform,
@@ -74,22 +73,13 @@ export function GameLoop() {
     const k = kin.current;
     setPlayerTransform(k.x, k.z, k.yaw);
 
-    // E-003 proximity: nearest location within NEAR_LOCATION_RADIUS_M of the
-    // player (6 locations → 6 squared-distance checks, allocation-free).
-    // setNearLocationId no-ops while unchanged, so this is free most frames.
-    let nearest: string | null = null;
-    let bestD2 = NEAR_LOCATION_RADIUS_M * NEAR_LOCATION_RADIUS_M;
-    for (let i = 0; i < locations.length; i++) {
-      const loc = locations[i];
-      const dx = loc.x - k.x;
-      const dz = loc.z - k.z;
-      const d2 = dx * dx + dz * dz;
-      if (d2 <= bestD2) {
-        bestD2 = d2;
-        nearest = loc.id;
-      }
-    }
-    setNearLocationId(nearest);
+    // E-003 proximity, G-008b wiring: the probe is ZONE-AWARE now —
+    // proximity.nearestLocationId reads the whole compound yard as LOC-002
+    // (isInSleepZone AABB), Daavi's bench as its own waypoint, and keeps
+    // the 2.5 m points for the named locations. setNearLocationId no-ops
+    // while unchanged, so this stays free most frames and the HUD prompt
+    // never re-renders per-frame.
+    setNearLocationId(nearestLocationId(k.x, k.z));
 
     // E-003 needs drain: accumulate clamped dt, commit at ~1 Hz. Each
     // frame's contribution is additionally capped at MAX_TICK_SECONDS so

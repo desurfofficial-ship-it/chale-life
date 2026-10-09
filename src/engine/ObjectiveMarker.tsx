@@ -1,13 +1,17 @@
 /**
- * Objective marker (E-003) — a glowing ring on the ground (plus a faint
- * vertical beam so the spot reads from far) at the player's current
- * objective:
+ * Objective marker (E-003, G-008b wiring) — a glowing ring on the ground
+ * (plus a faint vertical beam so the spot reads from far) at the player's
+ * current objective. WHAT the target is lives in the pure rules
+ * (rules/act.ts objectiveMarkerTarget, unit-tested):
  *   - active job → the active step's location (steps carry `locationId`
- *     from src/data/jobs.ts; the starter hustle is fully tagged)
- *   - no job and nothing worked this run (job.completedIds empty, E-004 —
- *     the retired hasWorked latch's replacement) → LOC-001, the waakye
- *     joint (the "go find work" beacon a brand-new guest walks towards)
+ *     from src/data/jobs.ts; the starter hustle is fully tagged — its
+ *     step 2 walks to Daavi's bench)
+ *   - no job and energy < 25 → LOC-002, anchored at COMPOUND_DOOR
+ *     (proximity.markerPositionFor) — sleep before the canWork wall
+ *   - no job and nothing worked this run (job.completedIds empty) →
+ *     LOC-001, the waakye joint (the "go find work" beacon)
  *   - otherwise → hidden (a completed shift sits in completedIds).
+ * WHERE the target sits on the map is proximity.markerPositionFor.
  *
  * Budget & rules:
  *   - exactly 2 draw calls when visible (ring + beam), 0 when hidden
@@ -24,9 +28,8 @@ import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import { AdditiveBlending, DoubleSide } from 'three';
 import type { Group, Mesh, MeshBasicMaterial } from 'three';
-import { locations } from '../data/locations';
-import { findJobById } from '../data/jobs';
-import { WAAKYE_LOCATION_ID } from '../rules/act';
+import { objectiveMarkerTarget } from '../rules/act';
+import { markerPositionFor } from '../rules/proximity';
 import { getState } from '../store/gameStore';
 
 /**
@@ -53,19 +56,11 @@ export function ObjectiveMarker() {
   useFrame((_, rawDt) => {
     const s = getState();
 
-    // Where is the objective right now?
-    let target: string | null = null;
-    if (s.job.activeId) {
-      const def = findJobById(s.job.activeId);
-      if (def) {
-        const step = def.steps[Math.min(s.job.step, def.steps.length - 1)];
-        target =
-          step.locationId ?? INTERACTABLE_TO_LOCATION[step.targetInteractableId] ?? null;
-      }
-    } else if (s.job.completedIds.length === 0) {
-      // E-004: nothing worked this run — keep the "find work" beacon on.
-      target = WAAKYE_LOCATION_ID;
-    }
+    // Where is the objective right now? The decision lives in the pure
+    // rules (unit-tested): active step → its location; no job + energy
+    // < 25 → LOC-002 (G-008b: the tired guest is walked HOME, the marker
+    // anchors at COMPOUND_DOOR); no job + fresh run → LOC-001; else hidden.
+    const target = objectiveMarkerTarget(s.job, s.needs);
 
     const group = groupRef.current;
     if (!group) return;
@@ -73,9 +68,12 @@ export function ObjectiveMarker() {
     // Relocate only when the target CHANGES (never per frame).
     if (target !== targetIdRef.current) {
       targetIdRef.current = target;
-      const loc = target ? locations.find((l) => l.id === target) : undefined;
-      if (loc) {
-        group.position.set(loc.x, 0, loc.z);
+      // markerPositionFor knows the compound door anchor and the bench
+      // waypoint; untagged steps resolve through the interactable map.
+      const resolved = target === null ? null : (INTERACTABLE_TO_LOCATION[target] ?? target);
+      const pos = resolved === null ? null : markerPositionFor(resolved);
+      if (pos) {
+        group.position.set(pos.x, 0, pos.z);
         group.visible = true;
       } else {
         group.visible = false;

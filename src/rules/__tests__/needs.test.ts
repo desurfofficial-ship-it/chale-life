@@ -15,9 +15,11 @@ import {
   LOW_THRESHOLD,
   MAX_TICK_SECONDS,
   MEAL_HUNGER_RESTORE,
+  lowNeedsHints,
   SLEEP_ENERGY_RESTORE,
   SLEEP_GATE_ENERGY,
   SLEEP_HUNGER_COST,
+  WAAKYE_MAX_HUNGER,
   WATER_ENERGY_RESTORE,
   WATER_HUNGER_RESTORE,
   WORK_ENERGY_COST,
@@ -173,5 +175,30 @@ describe('needs: low thresholds and work gate', () => {
   it('canWork allows a fed and rested player', () => {
     expect(canWork(at(80, 80)).ok).toBe(true);
     expect(canWork(at(10, 12)).ok).toBe(true); // exactly at the gates
+  });
+});
+
+describe('needs: waakye Full gate + low-stat hints (G-008b)', () => {
+  it('WAAKYE_MAX_HUNGER is 55 — meals above it clamp most of their restore away', () => {
+    expect(WAAKYE_MAX_HUNGER).toBe(55);
+  });
+
+  it('lowNeedsHints: hungry → "eat waakye" (food outranks rest)', () => {
+    expect(lowNeedsHints({ hunger: 20, energy: 80 })).toEqual(['eat waakye']);
+    expect(lowNeedsHints({ hunger: 25, energy: 80 })).toEqual([]); // threshold is exclusive
+  });
+
+  it('lowNeedsHints: low energy → "LOW ENERGY — sleep at the compound"', () => {
+    expect(lowNeedsHints({ hunger: 80, energy: 24 })).toEqual([
+      'LOW ENERGY — sleep at the compound',
+    ]);
+  });
+
+  it('lowNeedsHints: both low → both lines, hungry first', () => {
+    expect(lowNeedsHints({ hunger: 10, energy: 5 })).toEqual([
+      'eat waakye',
+      'LOW ENERGY — sleep at the compound',
+    ]);
+    expect(lowNeedsHints({ hunger: 80, energy: 80 })).toEqual([]);
   });
 });
