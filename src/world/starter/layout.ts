@@ -67,7 +67,7 @@ export interface BuildingSpec {
 
 export const PROVISIONS: BuildingSpec = {
   id: 'provisions',
-  footprint: box(-6, -1.575, 8, 6.85), // x -10..-2, z -5..1.85
+  footprint: box(-6, -1.575, 8, 6.85),
   wall: 'skyBlue',
   height: 3.4,
 };
@@ -147,18 +147,20 @@ export const TROTRO_STOP = {
 
 // --------------------------------------------------------------- props -----
 export const UTILITY_POLES: { x: number; z: number }[] = [
-  { x: -28, z: 13.55 },
-  { x: -12, z: 13.55 },
-  { x: 4, z: 13.55 },
-  { x: 20, z: 13.55 },
+  // Road-edge of the south pavement — keeps the walk centre at z≈13.4
+  // clear for the 0.45 m player capsule (W-005 CI fix).
+  { x: -28, z: 12.4 },
+  { x: -12, z: 12.4 },
+  { x: 4, z: 12.4 },
+  { x: 20, z: 12.4 },
 ];
 
 export const WIRE_SPANS: { from: { x: number; z: number }; to: { x: number; z: number } }[] = [
-  { from: { x: -30, z: 13.55 }, to: { x: -28, z: 13.55 } },
-  { from: { x: -28, z: 13.55 }, to: { x: -12, z: 13.55 } },
-  { from: { x: -12, z: 13.55 }, to: { x: 4, z: 13.55 } },
-  { from: { x: 4, z: 13.55 }, to: { x: 20, z: 13.55 } },
-  { from: { x: 20, z: 13.55 }, to: { x: 30, z: 13.55 } },
+  { from: { x: -30, z: 12.4 }, to: { x: -28, z: 12.4 } },
+  { from: { x: -28, z: 12.4 }, to: { x: -12, z: 12.4 } },
+  { from: { x: -12, z: 12.4 }, to: { x: 4, z: 12.4 } },
+  { from: { x: 4, z: 12.4 }, to: { x: 20, z: 12.4 } },
+  { from: { x: 20, z: 12.4 }, to: { x: 30, z: 12.4 } },
 ];
 
 export interface TreeSpot {
