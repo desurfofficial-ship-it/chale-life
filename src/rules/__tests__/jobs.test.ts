@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { ACCRA_LEGAL_JOBS, findJobById } from '../../data/jobs';
-import { SOLID_FOOTPRINTS } from '../../world/starter/layout';
-import { DAAVI_BENCH, markerPositionFor } from '../proximity';
+import { locations } from '../../data/locations';
+import {
+  MAIN_ROAD,
+  NORTH_GUTTER,
+  SOLID_FOOTPRINTS,
+  SOUTH_GUTTER,
+  type Box2D,
+} from '../../world/starter/layout';
+import { DAAVI_BENCH, DAAVI_JOB_SPOT, markerPositionFor } from '../proximity';
 import { type WalletState } from '../economy';
 import {
   advanceStep,
@@ -332,16 +339,16 @@ describe('jobs: completed-run history (G-004 completedIds)', () => {
   });
 });
 
-describe('jobs: idle objective line (G-005 Daavi)', () => {
-  it('fresh run points the guest at Daavi’s waakye joint', () => {
+describe('jobs: idle objective line (G-005 Daavi, G-008d spot-naming copy)', () => {
+  it('fresh run points the guest at the side of Daavi’s kiosk (the job spot)', () => {
     expect(idleObjectiveFor(createStarterJobState())).toBe(
-      'No job yet — find work at Daavi’s waakye joint.'
+      'No job yet — find work at the side of Daavi’s kiosk.'
     );
   });
 
   it('legacy slice without completedIds reads as an empty history', () => {
     expect(idleObjectiveFor({ activeId: null, step: 0 })).toBe(
-      'No job yet — find work at Daavi’s waakye joint.'
+      'No job yet — find work at the side of Daavi’s kiosk.'
     );
   });
 
@@ -354,18 +361,18 @@ describe('jobs: idle objective line (G-005 Daavi)', () => {
       step: 0,
       completedIds: ['HUSTLE_AUNTY_BA_STARTER'],
     };
-    expect(idleObjectiveFor(done)).toBe('Work another shift at Daavi’s.');
+    expect(idleObjectiveFor(done)).toBe('Work another shift — jobs are at the side of Daavi’s kiosk.');
   });
 
-  it('history without the hustle still points at the joint (not the meal nudge)', () => {
+  it('history without the hustle still points at the kiosk side (not the meal nudge)', () => {
     const other: JobState = { activeId: null, step: 0, completedIds: ['JOB_TROTRO_MATE'] };
     expect(idleObjectiveFor(other)).toBe(
-      'No job yet — find work at Daavi’s waakye joint.'
+      'No job yet — find work at the side of Daavi’s kiosk.'
     );
   });
 });
 
-describe('jobs: idle objective priority (G-006 tired hint, G-008c round 2 needs-based)', () => {
+describe('jobs: idle objective priority (G-006 tired hint, G-008d gates + spots)', () => {
   const done: JobState = {
     activeId: null,
     step: 0,
@@ -381,47 +388,47 @@ describe('jobs: idle objective priority (G-006 tired hint, G-008c round 2 needs-
   it('fresh run, energy exactly at the threshold (25) is not tired yet', () => {
     expect(
       idleObjectiveFor(createStarterJobState(), { hunger: 50, energy: 25 })
-    ).toBe('No job yet — find work at Daavi’s waakye joint.');
+    ).toBe('No job yet — find work at the side of Daavi’s kiosk.');
   });
 
-  it('COMPLETED run, hunger ≤ 55: the meal line — even when tired (spec order)', () => {
-    // The joint's own door 1 is the meal at these needs, so the card says
-    // exactly that (the G-006 tired-first yield now only applies above
-    // the meal gate — the button and the line agree cell for cell).
-    expect(idleObjectiveFor(done, { hunger: 40, energy: 10 })).toBe(
-      'Hungry? Buy waakye at Daavi’s (₵12).'
+  it('COMPLETED run, hunger ≤ 80: the meal line naming the FRONT COUNTER — even when tired', () => {
+    // The counter's own door is the meal at these needs, so the card says
+    // exactly that — and names the counter, not the joint at large
+    // (G-008d: food happens at the front counter ONLY).
+    expect(idleObjectiveFor(done, { hunger: 61, energy: 10 })).toBe(
+      'Hungry? Buy waakye at Daavi’s front counter (₵12).'
     );
   });
 
   it('COMPLETED run, hunger above the gate + tired: the compound line', () => {
-    expect(idleObjectiveFor(done, { hunger: 60, energy: 10 })).toBe(
+    expect(idleObjectiveFor(done, { hunger: 85, energy: 10 })).toBe(
       'Tired — head home to the compound and sleep.'
     );
   });
 
-  it('COMPLETED run, fed and rested: work another shift', () => {
-    expect(idleObjectiveFor(done, { hunger: 60, energy: 60 })).toBe(
-      'Work another shift at Daavi’s.'
+  it('COMPLETED run, fed and rested: work another shift, at the side of the kiosk', () => {
+    expect(idleObjectiveFor(done, { hunger: 85, energy: 60 })).toBe(
+      'Work another shift — jobs are at the side of Daavi’s kiosk.'
     );
   });
 
-  it('a starving guest still eats first — hunger ≤ 55 owns the line at any energy', () => {
+  it('a starving guest still eats first — hunger ≤ 80 owns the line at any energy', () => {
     // Sleep costs 8 hunger, so sleeping while starving digs the hole deeper.
     expect(idleObjectiveFor(done, { hunger: 8, energy: 10 })).toBe(
-      'Hungry? Buy waakye at Daavi’s (₵12).'
+      'Hungry? Buy waakye at Daavi’s front counter (₵12).'
     );
-    // A FRESH starving guest keeps the find-work beacon (the joint IS the
-    // destination — the anti-soft-lock waakye or the hustle lives there).
+    // A FRESH starving guest (below the work hunger gate) also gets the
+    // meal line — the job spot would refuse them; the counter is the fix.
     expect(idleObjectiveFor(createStarterJobState(), { hunger: 5, energy: 10 })).toBe(
-      'No job yet — find work at Daavi’s waakye joint.'
+      'Hungry? Buy waakye at Daavi’s front counter (₵12).'
     );
   });
 
   it('calling without needs keeps a stable line (legacy HUD callers)', () => {
     expect(idleObjectiveFor(createStarterJobState())).toBe(
-      'No job yet — find work at Daavi’s waakye joint.'
+      'No job yet — find work at the side of Daavi’s kiosk.'
     );
-    expect(idleObjectiveFor(done)).toBe('Work another shift at Daavi’s.');
+    expect(idleObjectiveFor(done)).toBe('Work another shift — jobs are at the side of Daavi’s kiosk.');
   });
 });
 
@@ -465,7 +472,7 @@ describe('jobs: requirements + objective helper', () => {
   });
 });
 
-describe('jobs: Daavi bench walk (G-008b item 4)', () => {
+describe('jobs: Daavi walk waypoints (G-008b item 4, G-008d items 8–10 constants)', () => {
   it('step 2 targets the DAAVI_BENCH waypoint — pinned to the proximity constant', () => {
     const hustle = findJobById('HUSTLE_AUNTY_BA_STARTER')!;
     const step2 = hustle.steps[1];
@@ -474,42 +481,124 @@ describe('jobs: Daavi bench walk (G-008b item 4)', () => {
     // the marker can never drift from the data.
     expect(step2.locationId).toBe(DAAVI_BENCH.locationId);
     expect(step2.locationId).toBe('LOC-001-BENCH');
-    // The walk is real: the bench sits ≥ 3 m east of the kiosk point.
+    // G-008d: the bench sits on the NORTH PAVEMENT (z 1.85–3.85) — off
+    // the road the old waypoint pointed into — and ≥ 3 m east of the
+    // kiosk point, so the forced walk is still real.
     expect(DAAVI_BENCH.x - 15.5).toBeGreaterThanOrEqual(3);
+    expect(DAAVI_BENCH.z).toBeGreaterThanOrEqual(1.85);
+    expect(DAAVI_BENCH.z).toBeLessThanOrEqual(3.85);
+    expect(DAAVI_BENCH.x).toBeCloseTo(21.5, 5);
+    expect(DAAVI_BENCH.z).toBeCloseTo(2.9, 5);
   });
 
-  it('the bench waypoint is walkable — clear of every solid footprint (G-008b)', () => {
-    // G-008b lesson: W-004 parked an okada at (18.3, 2.85) right on the
-    // original bench line, walling the forced walk off. Pin the waypoint
-    // clear of ALL solid footprints (+ 0.35 m player capsule + margin).
-    const caps = 0.35 + 0.25;
-    for (const f of SOLID_FOOTPRINTS) {
-      const clear =
-        DAAVI_BENCH.x + caps <= f.x0 ||
-        DAAVI_BENCH.x - caps >= f.x1 ||
-        DAAVI_BENCH.z + caps <= f.z0 ||
-        DAAVI_BENCH.z - caps >= f.z1;
-      expect(
-        clear,
-        `bench (${DAAVI_BENCH.x}, ${DAAVI_BENCH.z}) must clear footprint ${JSON.stringify(f)}`
-      ).toBe(true);
-    }
+  it('steps 1/3 target the DAAVI_JOB_SPOT — the kiosk\u2019s east side, off the road', () => {
+    const hustle = findJobById('HUSTLE_AUNTY_BA_STARTER')!;
+    expect(hustle.steps[0].locationId).toBe(DAAVI_JOB_SPOT.locationId);
+    expect(hustle.steps[0].locationId).toBe('LOC-001-JOB');
+    expect(hustle.steps[2].locationId).toBe(DAAVI_JOB_SPOT.locationId);
+    // The agreed G-008d coordinates: just off the east wall, standing
+    // point (18.0, 0.0) left walkable (Agent 3's crates go near 17.6, 0).
+    expect(DAAVI_JOB_SPOT.x).toBeCloseTo(18.0, 5);
+    expect(DAAVI_JOB_SPOT.z).toBeCloseTo(0.0, 5);
+    expect(hustle.steps[0].targetLocationName).toContain('kiosk');
+    expect(hustle.steps[2].targetLocationName).toContain('kiosk');
+    expect(hustle.steps[0].instruction).toContain('side of Daavi’s kiosk');
   });
 
   it('step 2 tells the player to walk, and names the bench as the target', () => {
     const step2 = findJobById('HUSTLE_AUNTY_BA_STARTER')!.steps[1];
     expect(step2.instruction).toContain('bench');
+    expect(step2.instruction).toContain('north pavement');
     expect(step2.targetLocationName).toContain('bench');
-    // Steps 1/3 keep the kiosk naming.
-    const hustle = findJobById('HUSTLE_AUNTY_BA_STARTER')!;
-    expect(hustle.steps[0].targetLocationName).toContain('Waakye Joint');
-    expect(hustle.steps[2].targetLocationName).toContain('Waakye Joint');
   });
 
-  it('markerPositionFor resolves the bench and the compound door anchors', () => {
+  it('markerPositionFor resolves the bench, the job spot and the compound door anchors', () => {
     expect(markerPositionFor('LOC-001-BENCH')).toEqual({ x: DAAVI_BENCH.x, z: DAAVI_BENCH.z });
     expect(markerPositionFor('LOC-002')).toEqual({ x: -10, z: 18.5 }); // COMPOUND_DOOR
     expect(markerPositionFor('LOC-001')).toEqual({ x: 15.5, z: 2.4 });
+    expect(markerPositionFor('LOC-001-JOB')).toEqual({ x: DAAVI_JOB_SPOT.x, z: DAAVI_JOB_SPOT.z });
     expect(markerPositionFor(null)).toBeNull();
+  });
+});
+
+// ── G-008d item 10: clearance — waypoints and locations off the road,
+// ── off the gutters, out of every solid footprint, and the job spot →
+// ── bench walk hits nothing solid.
+
+describe('jobs: world clearance (G-008d item 10 — road, gutters, footprints, walk)', () => {
+  /** Entirely clear of a box, with `margin` metres to spare. */
+  const clearOf = (x: number, z: number, f: Box2D, margin: number): boolean =>
+    x + margin <= f.x0 || x - margin >= f.x1 || z + margin <= f.z0 || z - margin >= f.z1;
+
+  const offRoadAndGutters = (x: number, z: number, what: string): void => {
+    const inRoad = z > MAIN_ROAD.z0 && z < MAIN_ROAD.z1;
+    const inGutter =
+      (z > NORTH_GUTTER.z0 && z < NORTH_GUTTER.z1) ||
+      (z > SOUTH_GUTTER.z0 && z < SOUTH_GUTTER.z1);
+    expect(inRoad || inGutter, `${what} (${x}, ${z}) must sit off the road and the gutters`).toBe(false);
+  };
+
+  it('every walk WAYPOINT (bench, job spot) clears every solid footprint with capsule margin', () => {
+    // Standing spots — 0.35 m player capsule + 0.25 m margin (G-008b's
+    // bar). COMPOUND_DOOR is exempt: it is a MARKER anchor on the house
+    // face by design, not a standing spot.
+    const caps = 0.35 + 0.25;
+    const waypoints: Array<[string, number, number]> = [
+      ['bench', DAAVI_BENCH.x, DAAVI_BENCH.z],
+      ['job spot', DAAVI_JOB_SPOT.x, DAAVI_JOB_SPOT.z],
+    ];
+    for (const [name, x, z] of waypoints) {
+      offRoadAndGutters(x, z, name);
+      for (const f of SOLID_FOOTPRINTS) {
+        expect(
+          clearOf(x, z, f, caps),
+          `${name} (${x}, ${z}) must clear footprint ${JSON.stringify(f)}`
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('every named LOCATION sits off the road/gutters and outside every solid footprint', () => {
+    // Strict containment (no margin) for the named points — Agent 3 owns
+    // locations.ts; a violation here is a world-layer fix. LOC-006 is
+    // exempt: the Laterite Junction LANDMARK sits in the road surface by
+    // design ("where the laterite street meets the main road") and hosts
+    // no Act — flagged to Agent 3/producer if that should change.
+    for (const loc of locations) {
+      if (loc.type === 'landmark') continue;
+      offRoadAndGutters(loc.x, loc.z, loc.id);
+      for (const f of SOLID_FOOTPRINTS) {
+        expect(
+          clearOf(loc.x, loc.z, f, 0),
+          `${loc.id} (${loc.x}, ${loc.z}) must sit outside footprint ${JSON.stringify(f)}`
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('the job spot → bench straight-line walk hits no solid footprint', () => {
+    // Segment (18, 0) → (21.5, 2.9): slabs-vs-segment test over every
+    // solid footprint. The okada parked at (18.3, 2.85) — footprint
+    // x 17.34–19.26, z 1.58–4.12 — misses this line: the walk exits its
+    // x-band (at z ≈ 1.05) before entering its z-band. Agent 3 is
+    // re-sitting that okada anyway (G-008d item 9); this pin survives
+    // either way.
+    const ax = DAAVI_JOB_SPOT.x;
+    const az = DAAVI_JOB_SPOT.z;
+    const bx = DAAVI_BENCH.x;
+    const bz = DAAVI_BENCH.z;
+    for (const f of SOLID_FOOTPRINTS) {
+      // Sample the segment at 5 cm — a 0.15 m pole box is still hit 3×.
+      let hit = false;
+      for (let t = 0; t <= 1; t += 0.01) {
+        const x = ax + (bx - ax) * t;
+        const z = az + (bz - az) * t;
+        if (x > f.x0 && x < f.x1 && z > f.z0 && z < f.z1) {
+          hit = true;
+          break;
+        }
+      }
+      expect(hit, `job spot → bench walk must miss footprint ${JSON.stringify(f)}`).toBe(false);
+    }
   });
 });

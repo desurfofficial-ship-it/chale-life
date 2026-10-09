@@ -240,6 +240,34 @@ export function __setNeedsForTests(hunger: number, energy: number): void {
   notify();
 }
 
+/**
+ * Act-prompt override (G-008d item 7) — the e2e layout test forces the
+ * game's LONGEST label and reason through the hook instead of walking the
+ * robot into rare states, so the joystick-clearance assertion is
+ * deterministic at every viewport. Pure presentation: it only re-dresses
+ * what App passes to the Hud — requestAct keeps deciding from the real
+ * rules (a forced label never makes a press fire). Module-level like the
+ * guards; vitest suites never touch it.
+ */
+export interface ActPromptOverride {
+  readonly label?: string;
+  readonly enabled?: boolean;
+  readonly reason?: string | null;
+}
+
+let actPromptOverride: ActPromptOverride | null = null;
+
+/** Test-only prompt override setter (exposed on the ?e2e=1 hook). */
+export function __setActPromptOverrideForTests(o: ActPromptOverride | null): void {
+  actPromptOverride = o;
+  notify();
+}
+
+/** The live override (or null) — App reads this through a store selector. */
+export function getActPromptOverride(): ActPromptOverride | null {
+  return actPromptOverride;
+}
+
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
 /** Commit an Act toast + arrival timestamp; schedule the store-side clear. */
 function pushToast(message: string): void {
@@ -434,6 +462,12 @@ if (
       state.needs.hunger = clampNeed(hunger);
       state.needs.energy = clampNeed(energy);
       notify();
+    },
+    // G-008d item 7: force a specific Act label/enabled/reason — the
+    // layout spec pushes the longest real strings through this (the
+    // wrong-spot bench reason is the longest reason in the game).
+    setActPrompt: (o: ActPromptOverride | null): void => {
+      __setActPromptOverrideForTests(o);
     },
   };
 }

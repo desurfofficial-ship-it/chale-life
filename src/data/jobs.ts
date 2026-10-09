@@ -209,9 +209,10 @@ export const ACCRA_LEGAL_JOBS: ReadonlyArray<JobDefinition> = [
 /** Side hustles — starter hustle, errands and small trading. */
 export const ACCRA_SIDE_HUSTLES: ReadonlyArray<JobDefinition> = [
   {
-    // Starter hustle: zero capital, three Acts at ONE nearby marker, pays
-    // inside the first minute so a brand-new guest can buy food without
-    // ever opening a menu. Auto-offered to first-session guests.
+    // Starter hustle: zero capital, three Acts across TWO nearby spots
+    // (G-008d: grab/pay at the kiosk's east side, set-down at the bench),
+    // pays inside the first minute so a brand-new guest can buy food
+    // without ever opening a menu. Auto-offered to first-session guests.
     id: 'HUSTLE_AUNTY_BA_STARTER',
     kind: 'side_hustle',
     title: 'Help Daavi carry pans',
@@ -231,39 +232,45 @@ export const ACCRA_SIDE_HUSTLES: ReadonlyArray<JobDefinition> = [
       {
         stepId: 'aunty_ba_1',
         stepTitle: 'First stack',
+        // G-008d item 4: the walk happens at the JOB SPOT — the kiosk's
+        // east side (LOC-001-JOB, proximity.ts) — never at the front
+        // counter, which sells food only.
         instruction:
-          'Walk to the green marker at Daavi’s waakye joint and press Act to grab the first stack of pans.',
+          'Go to the side of Daavi’s kiosk and press Act to grab the first stack of pans.',
         targetInteractableId: 'food_vendor',
-        locationId: 'LOC-001',
+        locationId: 'LOC-001-JOB',
         requiredAssetId: 'ACC_RESTAURANT_001',
-        targetLocationName: 'Daavi (Waakye Joint)',
-        actionVerb: 'Carry Pans',
+        targetLocationName: 'Daavi’s job spot (side of the kiosk)',
+        actionVerb: 'Grab pans',
         completionMessage: 'First stack up on your head. Two more lifts.',
       },
       {
         stepId: 'aunty_ba_2',
         stepTitle: 'Second stack',
         instruction:
-          'Carry the stack to Daavi’s bench east of the kiosk, then press Act to set it down.',
+          'Carry the stack to Daavi’s bench on the north pavement, then press Act to set it down.',
         targetInteractableId: 'food_vendor',
         // G-008b: the bench is a proximity.ts waypoint (id pinned to
-        // DAAVI_BENCH.locationId by a data-contract test), ≥ 3 m east of
-        // the kiosk — the step forces a short walk.
+        // DAAVI_BENCH.locationId by a data-contract test). G-008d: the
+        // bench moved OFF the road onto the north pavement (21.5, 2.9).
         locationId: 'LOC-001-BENCH',
         requiredAssetId: 'ACC_RESTAURANT_001',
-        targetLocationName: 'Daavi’s bench (east of the kiosk)',
+        targetLocationName: 'Daavi’s bench (north pavement)',
         actionVerb: 'Carry Pans',
         completionMessage: 'Nice hustle! One more lift.',
       },
       {
         stepId: 'aunty_ba_3',
         stepTitle: 'Last lift & pay',
-        instruction: 'One final Act — Daavi pays you ₵15 on the spot.',
+        // G-008d item 4: the payout happens at the job spot too — the
+        // counter never handles work.
+        instruction:
+          'Back to the side of the kiosk — one final Act at the job spot and Daavi pays you ₵15 on the spot.',
         targetInteractableId: 'food_vendor',
-        locationId: 'LOC-001',
+        locationId: 'LOC-001-JOB',
         requiredAssetId: 'ACC_RESTAURANT_001',
-        targetLocationName: 'Daavi (Waakye Joint)',
-        actionVerb: 'Carry Pans',
+        targetLocationName: 'Daavi’s job spot (side of the kiosk)',
+        actionVerb: 'Get paid',
         completionMessage: 'Daavi laughs and pays you well.',
       },
     ],

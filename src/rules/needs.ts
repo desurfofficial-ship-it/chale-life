@@ -60,9 +60,11 @@ export const WATER_ENERGY_RESTORE = 2;
 /**
  * At or above this hunger the provisions shop refuses water — the Act
  * button greys out with "Not thirsty" (G-008c round 2, mirror of the
- * sleep gate). Rounded, like the waakye Full gate.
+ * sleep gate). Rounded, like the waakye Full gate. G-008d: 80 → 90 —
+ * the waakye Full gate moved up to 80, so the sip keeps its own band
+ * (85 still drinks, 92 refuses) instead of colliding with the meal.
  */
-export const WATER_MAX_HUNGER = 80;
+export const WATER_MAX_HUNGER = 90;
 
 /** Energy restored by sleeping at the compound (no bed bonus). */
 export const SLEEP_ENERGY_RESTORE = 55;
@@ -86,11 +88,17 @@ export const CAN_WORK_MIN_ENERGY = 12;
 export const CAN_WORK_MIN_HUNGER = 10;
 
 /**
- * Waakye is only offered while rounded hunger is at or below this (G-008b):
- * above it the joint's Act label reads "Full" and the button is disabled —
- * a meal bought at hunger 92+ used to waste most of its restore.
+ * Waakye is only offered while rounded hunger is at or below this (G-008b,
+ * G-008d: 55 → 80):
+ * above it the front counter's Act label reads "Full" and the button is
+ * disabled — a meal bought at hunger 92+ would waste most of its restore.
+ * The old 55 made food feel unbuyable after a shift (drain is 3/min, a
+ * shift or a sleep costs 8 — minutes of waiting before Daavi would sell);
+ * 80 keeps the anti-waste point while the counter actually sells. The
+ * restore still clamps at 100 (applyRestore), so the tail is never wasted
+ * beyond the gate.
  */
-export const WAAKYE_MAX_HUNGER = 55;
+export const WAAKYE_MAX_HUNGER = 80;
 
 /** Frame-spike guard: ticks longer than 2 s are ignored (salvage tick). */
 export const MAX_TICK_SECONDS = 2;

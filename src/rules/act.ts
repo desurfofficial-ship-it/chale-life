@@ -8,50 +8,48 @@
  * `actPromptFor` what the button should say (every HUD notify), and on a
  * press calls `resolveAct` and commits the returned session back.
  *
- * Behaviour map (Task G-008c — the joint dead-end + hardened guards;
- * G-008b wired the proximity zones, earn-first is G-004, sleep G-006):
+ * Behaviour map (Task G-008d — Daavi's joint is TWO spots; G-008c wired
+ * the cooldowns/guards, G-008b the proximity zones, G-004 earn-first,
+ * G-006 sleep):
  *   - LOCATION is decided from the player position when the session carries
  *       one (the store samples it at press time): the compound is the WHOLE
  *       yard AABB via isInSleepZone (never the 2.5 m gate point), Daavi's
- *       bench is its own waypoint, and the named locations keep their
- *       2.5 m points (proximity.nearestLocationId encodes the priority).
- *       Without a position (HUD prompt path) the zone-aware nearLocationId
- *       written by the GameLoop probe is used — same helper, same result.
+ *       bench and job spot are their own waypoints, and the named locations
+ *       keep their 2.5 m points (proximity.nearestLocationId encodes the
+ *       priority: sleep zone > bench > job spot > points). Without a
+ *       position (HUD prompt path) the zone-aware nearLocationId written
+ *       by the GameLoop probe is used — same helper, same result.
  *   - At LOC-002 (Starter Compound): sleep — free, +55 energy (applySleep)
  *       and −8 hunger (you wake up hungry), label "Sleep". Disabled with
  *       "Not tired yet" at energy ≥ SLEEP_GATE_ENERGY (90). Sleep never
  *       steals a live job step, and is allowed mid-shift (nap between
  *       lifts) — the job passes through untouched.
- *   - At LOC-001 (Daavi's waakye joint), starter hustle NOT yet worked
- *       this run (JobState.completedIds): start HUSTLE_AUNTY_BA_STARTER —
- *       label "Help Daavi". One anti-soft-lock exception: too hungry to
- *       work (energy fine, hunger < CAN_WORK_MIN_HUNGER) with ₵12 in
- *       pocket → waakye first, so hunger can never wall the hustle off.
- *   - With the hustle active, Act advances ONLY at the current step's
- *       location (G-008b: step 2 happens at Daavi's bench — the player
- *       has to walk there); elsewhere the button disables with a
- *       "Wrong spot" reason naming the step's target.
- *   - At LOC-001 with the hustle already completed this run (G-008c item
- *       1 — the counter has two doors, so money can never dead-end):
- *         1. hungry enough (round(hunger) ≤ WAAKYE_MAX_HUNGER 55) and
- *            ₵12 in pocket → "Buy waakye ₵12" (meals are NEVER
- *            cooldown-gated — eating is not employment);
- *         2. otherwise, if the body can work (canWork) and the job is
- *            off cooldown (cooldownStatus — 45 s from the last payout,
- *            enforced from the data's cooldownSeconds) → "Help Daavi";
- *         3. neither → disabled with the most useful blocking reason:
- *            the live countdown ("Daavi needs you again in Ns" — the
- *            wait fixes it first), then "Full" (hunger above the
- *            gate), then the canWork reason ("Too tired…").
- *       (G-008b's shape only re-hired BROKE guests — a guest with ₵12+
- *       and a full belly stared at a dead "Full" button forever.)
+ *   - At LOC-001 (Daavi's FRONT COUNTER — G-008d item 2) food ONLY ever
+ *       happens: "Buy waakye ₵12" while round(hunger) ≤ WAAKYE_MAX_HUNGER
+ *       (80) and the purse allows, else disabled "Full" / "Not enough
+ *       cash". Meals are NEVER cooldown-gated and NEVER gated by the run
+ *       history — a counter is a counter. Act here can never start or
+ *       advance a job (the old single-spot button that meant both). The
+ *       G-008c dead-end is fixed BY the split: the moneyed guest the
+ *       counter refuses (Full) walks 3 m east and works.
+ *   - At LOC-001-JOB (Daavi's JOB SPOT — the kiosk's east side) work ONLY
+ *       ever happens: no active shift → "Help Daavi" (zero-capital hire,
+ *       canWork + cooldownStatus gates); the hustle live → its step 1/3
+ *       advances here; disabled with the live countdown ("Daavi needs you
+ *       again in Ns"), then the canWork reason ("Too tired…" / "Too
+ *       hungry…"). Step 2 happens at the bench — pressing here mid-walk
+ *       refuses with the wrong-spot reason naming the bench.
+ *   - At LOC-001-BENCH (Daavi's bench, north pavement): only the
+ *       bench-targeted step advances. Steps 1/3 pending → "Wrong spot —
+ *       jobs are at the side of the kiosk."; idle and hungry with cash →
+ *       "Wrong spot — food is at the front counter."
  *   - At LOC-003 (Maame Effia's provisions): buy FOOD_SACHET_WATER for
  *       ₵1 — a SIP since G-008c round 2: +4 hunger / +2 energy, refused
- *       with "Not thirsty" at round(hunger) ≥ WATER_MAX_HUNGER (80) and
- *       on a 20 s per-sachet rest ("Water again in Ns", counted from
- *       NeedsState.lastWaterAt via the generic cooldownRemaining), then
- *       the cash gate. The salvage +6/+10 let ₵5 buy energy 60→100 and
- *       hunger 60→90 — energy comes mainly from sleep now.
+ *       with "Not thirsty" at round(hunger) ≥ WATER_MAX_HUNGER (90 —
+ *       G-008d) and on a 20 s per-sachet rest ("Water again in Ns",
+ *       counted from NeedsState.lastWaterAt via the generic
+ *       cooldownRemaining), then the cash gate. Energy comes mainly from
+ *       sleep.
  *   - Too tired / too hungry (canWork gates) or short of cash:
  *       enabled=false with a short reason. Money never goes negative —
  *       buy() refuses, applyRestore clamps at 0.
@@ -76,7 +74,6 @@ import {
   completedIdsOf,
   cooldownRemaining,
   cooldownStatus,
-  isJobCompleted,
   objectiveFor,
   startJob,
   type JobState,
@@ -85,7 +82,6 @@ import {
   applyMeal,
   applySleep,
   applyWorkCost,
-  CAN_WORK_MIN_ENERGY,
   CAN_WORK_MIN_HUNGER,
   canWork,
   drinkWater,
@@ -98,6 +94,7 @@ import {
 } from './needs';
 import {
   DAAVI_BENCH,
+  DAAVI_JOB_SPOT,
   isInSleepZone,
   nearestLocationId,
 } from './proximity';
@@ -151,8 +148,16 @@ export interface ActResolution {
  *  completedIds never churn. */
 export const AUNTY_BA_HUSTLE_ID = 'HUSTLE_AUNTY_BA_STARTER';
 
-/** Daavi's waakye joint (LOC-001 in src/data/locations.ts) — hustle + waakye meal. */
+/** Daavi's waakye joint FRONT COUNTER (LOC-001 in src/data/locations.ts) —
+ *  food only since G-008d: buy waakye, nothing else. */
 export const WAAKYE_LOCATION_ID = 'LOC-001';
+
+/**
+ * Daavi's JOB SPOT (G-008d, proximity.ts DAAVI_JOB_SPOT) — the kiosk's
+ * east side. Hiring and the hustle's steps 1/3 happen here; food never
+ * does. Id pinned to the proximity constant by the data-contract test.
+ */
+export const DAAVI_JOB_SPOT_ID = DAAVI_JOB_SPOT.locationId;
 
 /** Maame Effia's provisions store (src/data/locations.ts) — sachet water. */
 export const WATER_LOCATION_ID = 'LOC-003';
@@ -218,14 +223,54 @@ function activeStepAt(session: ActSession, locationId: string): boolean {
   return def?.steps[session.job.step]?.locationId === locationId;
 }
 
-function decideAtWaakyeJoint(session: ActSession): Decision {
-  const { wallet, needs, job } = session;
-  const work = canWork(needs);
+/**
+ * Daavi's FRONT COUNTER (LOC-001) — G-008d item 2: FOOD ONLY. The old
+ * single joint button meant both "eat" and "work" and dead-ended when
+ * its two doors disagreed; the counter now has exactly one door, and it
+ * is the meal. Disabled states, in the task's order:
+ *   1. "Full" — round(hunger) above WAAKYE_MAX_HUNGER (80): the meal
+ *      would clamp-waste its restore, no purse changes that (the mirror
+ *      of the provisions' "Not thirsty");
+ *   2. "Not enough cash" — the purse gate (waakye is ₵12).
+ * Meals are NEVER cooldown-gated and NEVER gated by completedIds — a
+ * fresh guest and a paid guest see the same counter. Act here can never
+ * start or advance a job: the resolve switch has no job case for the
+ * counter's 'waakye' kind, and no decide branch here even looks at the
+ * job slice (pinned by the counter-never-advances test).
+ */
+function decideAtFoodCounter(session: ActSession): Decision {
+  const label = `Buy waakye ${formatGHS(WAAKYE.priceGHS)}`;
+  if (Math.round(session.needs.hunger) > WAAKYE_MAX_HUNGER) {
+    return { kind: 'waakye', label: 'Full', enabled: false, reason: 'You are full — waakye can wait.' };
+  }
+  if (!canAfford(session.wallet, WAAKYE.priceGHS)) {
+    return {
+      kind: 'waakye',
+      label,
+      enabled: false,
+      reason: `Not enough cash — waakye is ${formatGHS(WAAKYE.priceGHS)}.`,
+    };
+  }
+  return { kind: 'waakye', label, enabled: true };
+}
+
+/**
+ * Daavi's JOB SPOT (LOC-001-JOB) — G-008d item 2: WORK ONLY. Hiring
+ * ("Help Daavi") and the hustle's steps 1/3 ("Grab pans" / "Get paid")
+ * happen here; food never does. Disabled states, the task's cascade:
+ * the live COOLDOWN (it is what the wait fixes first — the review's
+ * ₵35 + hunger 70 pin), then the body (canWork's tired / hungry
+ * reasons). The job's own cooldownSeconds (45 s from lastPayoutAt,
+ * G-008c) is enforced from the data via cooldownStatus.
+ */
+function decideAtJobSpot(session: ActSession): Decision {
+  const { needs, job } = session;
 
   if (job.activeId === AUNTY_BA_HUSTLE_ID) {
-    // G-008b: advance only AT the step's location — step 2 forces the
-    // walk to Daavi's bench, so tapping at the kiosk refuses with a hint.
-    return decideAdvanceForStep(session, WAAKYE_LOCATION_ID);
+    // The live shift: steps 1/3 advance HERE (G-008d moved them from
+    // LOC-001); step 2 refuses with the wrong-spot reason naming the
+    // bench — the walk is the shift (G-008b, kept).
+    return decideAdvanceForStep(session, DAAVI_JOB_SPOT_ID);
   }
 
   if (job.activeId) {
@@ -238,53 +283,14 @@ function decideAtWaakyeJoint(session: ActSession): Decision {
     };
   }
 
-  const waakyeOffer: Decision = {
-    kind: 'waakye',
-    label: `Buy waakye ${formatGHS(WAAKYE.priceGHS)}`,
-    enabled: true,
-  };
-
-  // Earn-first (G-004): the starter hustle comes before food — tracked by
-  // JobState.completedIds, never by a hunger proxy (spawn drain used to
-  // push hunger under the old threshold within minutes, hiding ₵35).
-  if (!isJobCompleted(job, AUNTY_BA_HUSTLE_ID)) {
-    if (!work.ok) {
-      // canWork fails BECAUSE of hunger (energy clears its own gate) and
-      // waakye is in reach — eat, or hunger walls the hustle off forever.
-      const hungerBlocked =
-        needs.energy >= CAN_WORK_MIN_ENERGY &&
-        needs.hunger < CAN_WORK_MIN_HUNGER;
-      if (hungerBlocked && canAfford(wallet, WAAKYE.priceGHS)) {
-        return waakyeOffer;
-      }
-      return {
-        kind: 'start',
-        label: 'Help Daavi',
-        enabled: false,
-        reason: work.reason,
-      };
-    }
-    return { kind: 'start', label: 'Help Daavi', enabled: true };
-  }
-
-  // Hustle already worked this run — G-008c item 1: the counter has two
-  // doors and neither may dead-end. Door 1 is the meal (hunger at or
-  // under WAAKYE_MAX_HUNGER with cash in pocket — buying is NEVER
-  // cooldown-gated); door 2 is another shift (canWork AND the job off
-  // cooldown — data/jobs.ts cooldownSeconds, enforced from lastPayoutAt).
-  if (Math.round(needs.hunger) <= WAAKYE_MAX_HUNGER && canAfford(wallet, WAAKYE.priceGHS)) {
-    return waakyeOffer;
-  }
+  const work = canWork(needs);
   const hustle = findJobById(AUNTY_BA_HUSTLE_ID)!;
   const cooldown = cooldownStatus(hustle, session.nowMs, job.lastPayoutAt);
   if (work.ok && !cooldown.onCooldown) {
     return { kind: 'start', label: 'Help Daavi', enabled: true };
   }
-  // Neither door opens — disable with the most useful blocking reason,
-  // in this order: the COOLDOWN counts down (it is what the wait fixes
-  // first — the review pins ₵35 + hunger 70 mid-rest showing the live
-  // countdown, never a dead "Full"), then FULLNESS (the meal gate), then
-  // the body (canWork's tired / starving reasons).
+  // Hire blocked — the most useful truth first: the COUNTDOWN (the wait
+  // fixes it), then the body (too tired / too hungry).
   if (cooldown.onCooldown) {
     return {
       kind: 'start',
@@ -293,11 +299,6 @@ function decideAtWaakyeJoint(session: ActSession): Decision {
       reason: `${hustle.employerName} needs you again in ${Math.ceil(cooldown.remainingMs / 1000)}s`,
     };
   }
-  if (Math.round(needs.hunger) > WAAKYE_MAX_HUNGER) {
-    return { kind: 'waakye', label: 'Full', enabled: false, reason: 'You are full — waakye can wait.' };
-  }
-  // Reaching here, the cooldown and fullness branches both missed, so the
-  // work door itself is what is shut (too tired / too hungry).
   return {
     kind: 'start',
     label: 'Help Daavi',
@@ -348,12 +349,27 @@ function decideAtProvisions(session: ActSession): Decision {
 }
 
 /**
- * Daavi's bench (G-008 waypoint, ≥ 3 m east of the kiosk): only the
- * bench-targeted step advances here; anything else is idle.
+ * Daavi's bench (G-008 waypoint, G-008d: north pavement at 21.5/2.9):
+ * only the bench-targeted step advances here. Everything else is a
+ * redirect or idle:
+ *   - hustle steps 1/3 pending → the job spot is where the work is:
+ *     "Wrong spot — jobs are at the side of the kiosk.";
+ *   - no active job, hungry with cash → the counter is where the food is:
+ *     "Wrong spot — food is at the front counter." (the G-008d wrong-spot
+ *     phrasing pair; the bench itself neither hires nor feeds);
+ *   - otherwise the plain idle refusal.
  */
 function decideAtBench(session: ActSession): Decision {
   if (session.job.activeId === AUNTY_BA_HUSTLE_ID) {
-    return decideAdvanceForStep(session, DAAVI_BENCH_ID);
+    if (activeStepAt(session, DAAVI_BENCH_ID)) return decideAdvance(session);
+    const def = findJobById(AUNTY_BA_HUSTLE_ID)!;
+    const step = def.steps[Math.min(session.job.step, def.steps.length - 1)];
+    return {
+      kind: 'advance',
+      label: step?.actionVerb ?? 'Act',
+      enabled: false,
+      reason: 'Wrong spot — jobs are at the side of the kiosk.',
+    };
   }
   if (session.job.activeId) {
     return {
@@ -361,6 +377,17 @@ function decideAtBench(session: ActSession): Decision {
       label: 'Act',
       enabled: false,
       reason: 'Finish your current shift first.',
+    };
+  }
+  if (
+    Math.round(session.needs.hunger) <= WAAKYE_MAX_HUNGER &&
+    canAfford(session.wallet, WAAKYE.priceGHS)
+  ) {
+    return {
+      kind: 'idle',
+      label: 'Act',
+      enabled: false,
+      reason: 'Wrong spot — food is at the front counter.',
     };
   }
   return {
@@ -388,7 +415,12 @@ function decideAtCompound(session: ActSession): Decision {
 
 function decideAt(session: ActSession, locationId: string | null): Decision {
   if (locationId === WAAKYE_LOCATION_ID) {
-    return decideAtWaakyeJoint(session);
+    // The front counter: food only — never a job action (G-008d item 2).
+    return decideAtFoodCounter(session);
+  }
+  if (locationId === DAAVI_JOB_SPOT_ID) {
+    // The job spot: work only — never a purchase (G-008d item 2).
+    return decideAtJobSpot(session);
   }
   if (locationId === SLEEP_LOCATION_ID) {
     return decideAtCompound(session);
@@ -416,12 +448,13 @@ function decideAct(session: ActSession, nearLocationId: string | null): Decision
     return decideAt(session, nearLocationId);
   }
   // G-008b item 1: the compound decision is the yard AABB via
-  // isInSleepZone — never the 2.5 m gate point. The bench waypoint and
-  // the named points come from the same zone resolver, priorities baked in
-  // (sleep zone > bench > 2.5 m points). A position that lands NOWHERE
-  // defers to the zone-aware nearLocationId — headless callers that only
-  // set the probe (and a player standing in no zone at all) agree either
-  // way, because the GameLoop writes the same zones into the probe.
+  // isInSleepZone — never the 2.5 m gate point. The bench waypoint, the
+  // G-008d job spot and the named points come from the same zone
+  // resolver, priorities baked in (sleep zone > bench > job spot > 2.5 m
+  // points). A position that lands NOWHERE defers to the zone-aware
+  // nearLocationId — headless callers that only set the probe (and a
+  // player standing in no zone at all) agree either way, because the
+  // GameLoop writes the same zones into the probe.
   if (isInSleepZone(position.x, position.z)) {
     return decideAtCompound(session);
   }
@@ -429,16 +462,24 @@ function decideAct(session: ActSession, nearLocationId: string | null): Decision
 }
 
 /**
- * Where the objective marker should sit right now (G-008b item 7).
+ * Where the objective marker should sit right now (G-008b item 7,
+ * G-008d item 4 — mirrored branch-for-branch with idleObjectiveFor so
+ * the beacon can never disagree with the hint copy):
  *
- *   - Active job → the current step's `locationId` (or its interactable id
- *       for untagged steps — the engine keeps the id→location map).
- *   - No job + energy below the LOW threshold (25) → LOC-002: the marker
+ *   - Active job → the current step's `locationId` (or its interactable
+ *       id for untagged steps): the hustle's steps 1/3 point at the JOB
+ *       SPOT (data/jobs.ts moved them there), step 2 at the bench.
+ *   - Idle, meal line would show (completed run with round(hunger) ≤
+ *       WAAKYE_MAX_HUNGER, or a fresh guest too hungry to work) →
+ *       LOC-001: the FRONT COUNTER — the eating hint points at food.
+ *   - Idle, energy below the LOW threshold (25) → LOC-002: the marker
  *       anchors at COMPOUND_DOOR via proximity.markerPositionFor — the
  *       tired guest is walked HOME before they hit the canWork wall.
- *   - No job + nothing worked this run → LOC-001 (the "go find work"
- *       beacon, unchanged from E-003/E-004).
- *   - Otherwise → null (hidden — a completed shift sits in completedIds).
+ *   - Idle, nothing worked this run (fresh fed guest) → LOC-001-JOB:
+ *       the find-work beacon points at the spot where "Help Daavi"
+ *       actually lives since the split (it used to point at the joint).
+ *   - Otherwise → null (hidden — a completed fed-and-rested shift sits
+ *       in completedIds; the work-line copy names the spot in text).
  */
 export function objectiveMarkerTarget(job: JobState, needs: NeedsState): string | null {
   if (job.activeId !== null) {
@@ -447,8 +488,23 @@ export function objectiveMarkerTarget(job: JobState, needs: NeedsState): string 
     const step = def.steps[Math.min(job.step, def.steps.length - 1)];
     return step ? (step.locationId ?? step.targetInteractableId) : null;
   }
-  if (needs.energy < LOW_THRESHOLD) return SLEEP_LOCATION_ID;
-  if (completedIdsOf(job).length === 0) return WAAKYE_LOCATION_ID;
+  const completed = completedIdsOf(job).length > 0;
+  if (needs) {
+    // Mirror idleObjectiveFor's food line: the counter owns it whenever
+    // the copy would suggest eating (completed + under the meal gate, or
+    // a fresh guest below the work hunger gate).
+    if (completed && Math.round(needs.hunger) <= WAAKYE_MAX_HUNGER) {
+      return WAAKYE_LOCATION_ID;
+    }
+    if (!completed && needs.hunger < CAN_WORK_MIN_HUNGER) {
+      return WAAKYE_LOCATION_ID;
+    }
+    if (needs.energy < LOW_THRESHOLD) return SLEEP_LOCATION_ID;
+  } else if (completedIdsOf(job).length === 0) {
+    // Legacy needs-less callers: the find-work beacon.
+    return DAAVI_JOB_SPOT_ID;
+  }
+  if (!completed) return DAAVI_JOB_SPOT_ID;
   return null;
 }
 

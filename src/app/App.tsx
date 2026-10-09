@@ -48,9 +48,11 @@ import { Player } from '../player/Player';
 import { actPromptFor } from '../rules/act';
 import {
   INITIAL_ZOOM,
+  getActPromptOverride,
   getState,
   requestAct,
   subscribe,
+  type ActPromptOverride,
   type GameState,
 } from '../store/gameStore';
 import { Hud } from '../ui';
@@ -66,6 +68,25 @@ initializePlayerSpawn();
 /** Primitive-selector store read — mirrors the Hud's own plumbing. */
 function useStoreValue<T>(select: (state: GameState) => T): T {
   return useSyncExternalStore(subscribe, () => select(getState()));
+}
+
+/** Merge the e2e prompt override over the rules prompt (field-by-field). */
+function applyPromptOverride(
+  base: ReturnType<typeof actPromptFor>,
+  override: ActPromptOverride | null
+): ReturnType<typeof actPromptFor> {
+  if (!override) return base;
+  return {
+    label: override.label ?? base.label,
+    enabled: override.enabled ?? base.enabled,
+    ...(override.reason !== undefined
+      ? override.reason !== null
+        ? { reason: override.reason }
+        : {} // null clears the line
+      : base.reason !== undefined
+        ? { reason: base.reason }
+        : {}),
+  };
 }
 
 export function App() {
@@ -100,7 +121,7 @@ export function App() {
   // G-008c: nowMs is the wall-clock NOW the job cooldown counts against;
   // the ~1 Hz needs drain keeps this component re-rendering, so the
   // "Daavi needs you again in Ns" reason ticks down live under the pill.
-  const prompt = actPromptFor(
+  const rulesPrompt = actPromptFor(
     {
       wallet: { balanceGHS: balance },
       needs: { hunger, energy, lastWaterAt },
@@ -109,6 +130,11 @@ export function App() {
     },
     nearLocationId
   );
+  // G-008d item 7: the ?e2e=1 layout hook may re-dress the prompt (the
+  // longest label/reason, forced deterministically). Presentation-only —
+  // requestAct always decides from the real rules below this.
+  const override = useStoreValue(() => getActPromptOverride());
+  const prompt = applyPromptOverride(rulesPrompt, override);
 
   // The Hud re-renders itself from the store; only prop changes need it to
   // re-render from here (label/enabled flip on enter/leave, toast per Act).

@@ -73,8 +73,11 @@ describe('gameStore: E-003 defaults', () => {
   });
 });
 
-describe('gameStore: the ₵20 → ₵35 → ₵23 loop at the waakye joint (LOC-001)', () => {
-  it('Act 1 starts the starter hustle at step 0 for ₵0 capital', () => {
+describe('gameStore: the ₵20 → ₵35 → ₵23 loop at Daavi’s spots (G-008d split)', () => {
+  it('Act 1 starts the starter hustle at step 0 for ₵0 capital (at the JOB SPOT)', () => {
+    // G-008d: hiring happens at the job spot (LOC-001-JOB), never the
+    // front counter — the counter sells food only.
+    setNearLocationId('LOC-001-JOB');
     requestAct();
     const s = getState();
     expect(s.job).toEqual({ activeId: HUSTLE_ID, step: 0, completedIds: [] });
@@ -89,16 +92,17 @@ describe('gameStore: the ₵20 → ₵35 → ₵23 loop at the waakye joint (LOC
     expect(s.job).toEqual({ activeId: HUSTLE_ID, step: 1, completedIds: [] });
     expect(s.toast.message).toContain('Two more lifts');
 
-    // G-008b: step 2 happens at Daavi's bench (≥ 3 m east of the kiosk) —
-    // the walk is part of the shift. The probe reads the waypoint, the
-    // player presses, then heads back to the kiosk for the last lift.
+    // G-008b: step 2 happens at Daavi's bench — the walk is part of the
+    // shift. G-008d: the bench is on the north pavement. The probe reads
+    // the waypoint, the player presses, then heads back to the job spot
+    // for the last lift.
     setNearLocationId('LOC-001-BENCH');
     requestAct();
     s = getState();
     expect(s.job).toEqual({ activeId: HUSTLE_ID, step: 2, completedIds: [] });
     expect(s.toast.message).toContain('One more lift');
     expect(s.wallet.balanceGHS).toBe(20); // pay only on completion
-    setNearLocationId('LOC-001');
+    setNearLocationId('LOC-001-JOB');
   });
 
   it('the final Act pays ₵15 and takes the work energy/hunger toll', () => {
@@ -120,10 +124,11 @@ describe('gameStore: the ₵20 → ₵35 → ₵23 loop at the waakye joint (LOC
     expect(s.toast.message).toContain('+₵15');
   });
 
-  it('the next Act at the joint buys waakye: ₵35 → ₵23, hunger rises 45 (clamped)', () => {
-    // G-008b Full gate: waakye is offered only while round(hunger) ≤ 55.
-    // The guest drifts ~3 starter minutes off the payout (legal 2 s ticks)
-    // — hunger 64 → 55, energy 62 → ~56 — and the meal is back on menu.
+  it('the next Act at the COUNTER buys waakye: ₵35 → ₵23, hunger rises 45 (clamped)', () => {
+    // G-008d: the counter sells whenever round(hunger) ≤ 80 — the paid
+    // guest (hunger 64) can buy right away. The 3-min drift below is now
+    // belt-and-braces (it also proves a drained guest still buys).
+    setNearLocationId('LOC-001');
     for (let i = 0; i < 90; i++) tickNeedsDrain(2);
     requestAct();
     const s = getState();
@@ -140,10 +145,10 @@ describe('gameStore: sachet water at the provisions store + toast lifetime', () 
   it('Act at LOC-003 buys water (₵23 → ₵22, sip effects) and the toast auto-expires', () => {
     vi.useFakeTimers();
     try {
-      // G-008c round 2: water is refused with "Not thirsty" at hunger ≥
-      // 80 — the meal above clamped hunger at 100, so the guest drinks
-      // only after ~7 starter minutes of drift bring hunger under the
-      // gate (100 − 0.05 × 420 = 79).
+      // G-008c round 2, G-008d gate: water is refused with "Not thirsty"
+      // at hunger ≥ 90 — the meal above clamped hunger at 100, so the
+      // guest drinks only after ~7 starter minutes of drift bring hunger
+      // under the gate (100 − 0.05 × 420 = 79).
       for (let i = 0; i < 210; i++) tickNeedsDrain(2);
       setNearLocationId('LOC-003');
       requestAct();
