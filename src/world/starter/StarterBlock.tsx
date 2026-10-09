@@ -14,7 +14,7 @@
  *   - canvas-textured signs                                     → 4 draw calls
  *   - Kenney road tiles: pipeline kept, not rendered (W-005 → W-007)
  *   - parked vehicles, producer GLBs (W-004, trademark-scrubbed) → 5 draw calls
- *   - outer apron (laterite + walls + trees + fading road)       → merged in
+ *   - outer apron (laterite + walls + trees + fading road)       → 1 draw call
  *   ≈ ≤ 60 draw calls — far under the 150 budget (dc gate is 60).
  *
  * Mounts in one line from the engine:  <StarterBlock />
@@ -26,6 +26,7 @@ import { InstancedProps } from './InstancedProps';
 import { Signs } from './Signs';
 import { Wires } from './Wires';
 import { Vehicles } from './Vehicles';
+import { ApronMesh } from './ApronMesh';
 import { staticGeometry } from './buildStatic';
 
 function StaticArchitecture() {
@@ -41,6 +42,7 @@ export function StarterBlock() {
     <group name="starter-block">
       <Lighting />
       <StaticArchitecture />
+      <ApronMesh />
       <InstancedProps />
       <Wires />
       {/* RoadTiles unmounted (W-005): 4 m Kenney strip inside a 7 m road —
