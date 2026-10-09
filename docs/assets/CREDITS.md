@@ -18,7 +18,6 @@ Every **CC-BY-4.0** asset shipped in `public/assets/` and the creator it must be
 | SibeYu | beach reef | [https://sketchfab.com/3d-models/beach-reef-5b2ee1922da846a9a6c3df4e5a8dfe43](https://sketchfab.com/3d-models/beach-reef-5b2ee1922da846a9a6c3df4e5a8dfe43) | `public/assets/glb/beach/beach_reef.glb` | OK — licence verified via Sketchfab API 2026-10-08 |
 | bunlypich | SUPPER MARKET | [https://sketchfab.com/3d-models/supper-market-74e53463fdb54927be09771091d37dad](https://sketchfab.com/3d-models/supper-market-74e53463fdb54927be09771091d37dad) | `public/assets/glb/markets/super-market/super_market.glb` | OK — licence verified via Sketchfab API 2026-10-08 |
 | jungle_jim | Beach kit | [https://sketchfab.com/3d-models/beach-kit-6e0e5cc33a1542679f8383e9e260eb90](https://sketchfab.com/3d-models/beach-kit-6e0e5cc33a1542679f8383e9e260eb90) | `public/assets/glb/beach/beach_kit.glb` | OK — licence verified via Sketchfab API 2026-10-08 |
-| jungle_jim | Retro Anime Vintage Volkswagen Van | [https://sketchfab.com/3d-models/retro-anime-vintage-volkswagen-van-5772dc675e5347e09979998bfcf54938](https://sketchfab.com/3d-models/retro-anime-vintage-volkswagen-van-5772dc675e5347e09979998bfcf54938) | `public/assets/glb/vehicles/retro_anime_vintage_volkswagen_van.glb` | OK — licence verified via Sketchfab API 2026-10-08 |
 | micaelsampaio | Sunset Walking Low Poly Girl [Rigged] | [https://sketchfab.com/3d-models/sunset-walking-low-poly-girl-rigged-341f934134d041c581b590cedff26d88](https://sketchfab.com/3d-models/sunset-walking-low-poly-girl-rigged-341f934134d041c581b590cedff26d88) | `public/assets/glb/characters/sunset-walking-low-poly-girl-rigged/sunset_walking_low_poly_girl_rigged.glb` | OK — licence verified via Sketchfab API 2026-10-08 |
 | mikurban | Chair, table, wardrobe, suitcase furniture | [https://sketchfab.com/3d-models/chair-table-wardrobe-suitcase-furniture-779508b3e7d64fe3a7eed7be5037534f](https://sketchfab.com/3d-models/chair-table-wardrobe-suitcase-furniture-779508b3e7d64fe3a7eed7be5037534f) | `public/assets/glb/furniture/chair_table_wardrobe_suitcase_furniture.glb` | OK — licence verified via Sketchfab API 2026-10-08 |
 | yuuuusukeeee | Building_[office room]_curtain | [https://sketchfab.com/3d-models/building-office-room-curtain-f4730125b3854cd4a5a70e59e369439d](https://sketchfab.com/3d-models/building-office-room-curtain-f4730125b3854cd4a5a70e59e369439d) | `public/assets/glb/buildings/building_office_room_curtain.glb` | OK — licence verified via Sketchfab API 2026-10-08 |
@@ -45,7 +44,6 @@ Every **CC-BY-4.0** asset shipped in `public/assets/` and the creator it must be
   "beach reef" by SibeYu — https://creativecommons.org/licenses/by/4.0/
   "SUPPER MARKET" by bunlypich — https://creativecommons.org/licenses/by/4.0/
   "Beach kit" by jungle_jim — https://creativecommons.org/licenses/by/4.0/
-  "Retro Anime Vintage Volkswagen Van" by jungle_jim — https://creativecommons.org/licenses/by/4.0/
   "Sunset Walking Low Poly Girl [Rigged]" by micaelsampaio — https://creativecommons.org/licenses/by/4.0/
   "Chair, table, wardrobe, suitcase furniture" by mikurban — https://creativecommons.org/licenses/by/4.0/
   "Building_[office room]_curtain" by yuuuusukeeee — https://creativecommons.org/licenses/by/4.0/
@@ -74,5 +72,15 @@ Every file under `public/models/` is ledger-tracked in [LICENSES.csv](./LICENSES
 | Asset | Creator | Licence | Files |
 |---|---|---|---|
 | City Kit (Roads) v2.1 (road-straight, road-crossroad) | Kenney (kenney.nl) | CC0 1.0 (credit voluntary) | `public/models/roads/*.glb` |
+| Trotro (car rapide) — vehicle pack | KidBi-Gaming | CC-BY-4.0 | `public/models/vehicles/trotro_car_rapide.glb` |
+| Okada motorbike — vehicle pack | KidBi-Gaming | CC-BY-4.0 | `public/models/vehicles/okada_motorbike.glb` |
+| Vintage van — vehicle pack | Jungle Jim | CC-BY-4.0 | `public/models/vehicles/vintage_van.glb` |
+
+Vehicle credits above are the strings to reproduce on the in-game Credits
+screen. Per the trademark policy, shipped vehicle assets are referred to only
+by their generic in-game names ("trotro", "okada motorbike", "vintage van");
+original Sketchfab model titles may differ and are reachable through the
+ledger's `source_url`. Trademark names and badge marks were removed from the
+shipped GLBs (see LICENSES.csv `modified` column).
 
 Pipeline: `npm run assets` (scripts/optimize-assets.mjs, @gltf-transform: dedup → weld → scale normalised to metres → meshopt + KTX2 ≤1024 px). `public/basis/` holds the Basis Universal KTX2 transcoder shipped with three.js (Apache-2.0, © three.js authors, Konsolas & Ben Houston / Basis Univeral, Binomial LLC).
