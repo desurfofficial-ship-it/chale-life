@@ -18,6 +18,7 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { movementStep, type Kinematics } from './movement';
+import { projectedPlayerScreen } from './CameraRig';
 import { colliders, worldBounds } from '../world/colliders';
 import { locations } from '../data/locations';
 import { MAX_TICK_SECONDS } from '../rules/needs';
@@ -119,6 +120,8 @@ export function GameLoop() {
         // Draw calls of the LAST completed render (info auto-resets each
         // frame) — the ?debug=1 perf number for the ≤150 budget.
         drawCalls: state.gl.info.render.calls,
+        screenX: projectedPlayerScreen.x,
+        screenY: projectedPlayerScreen.y,
       });
     }
   });
