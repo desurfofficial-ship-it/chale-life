@@ -81,6 +81,10 @@ export function App() {
   const balance = useStoreValue((s) => s.wallet.balanceGHS);
   const hunger = useStoreValue((s) => s.needs.hunger);
   const energy = useStoreValue((s) => s.needs.energy);
+  // G-008c round 2: the sachet-water rest's anchor — the Act pill near
+  // Maame Effia's counts the 20 s rest down from the same data the store
+  // presses against (flips exactly when a water purchase commits).
+  const lastWaterAt = useStoreValue((s) => s.needs.lastWaterAt);
   const activeId = useStoreValue((s) => s.job.activeId);
   const step = useStoreValue((s) => s.job.step);
   // E-004: array identity is stable while a shift advances; it flips only on
@@ -99,7 +103,7 @@ export function App() {
   const prompt = actPromptFor(
     {
       wallet: { balanceGHS: balance },
-      needs: { hunger, energy },
+      needs: { hunger, energy, lastWaterAt },
       job: { activeId, step, completedIds, lastPayoutAt },
       nowMs: Date.now(),
     },

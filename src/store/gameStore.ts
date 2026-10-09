@@ -43,7 +43,13 @@ export interface GameState {
     yaw: number;
   };
   wallet: { balanceGHS: number };
-  needs: { hunger: number; energy: number };
+  /**
+   * G-008c round 2: lastWaterAt is the epoch ms of the most recent sachet
+   * water — the anchor the 20 s per-sachet rest counts from (rules read
+   * it as pure data, paired with the press-time nowMs). Undefined =
+   * never drunk this run. Threaded exactly like job.lastPayoutAt.
+   */
+  needs: { hunger: number; energy: number; lastWaterAt?: number };
   /**
    * E-004: completedIds = ids of shifts fully worked this run (G-004).
    * readonly like the rules' JobState — the store replaces the reference,
@@ -223,6 +229,17 @@ export function __setActGuardsForTests(on: boolean): void {
   lastPayoutAt = 0;
 }
 
+/**
+ * Test-only needs override (G-008c round 2) — the guard suite re-arms the
+ * body between paced taps so a cooldown-free act (sleep) can count FIRED
+ * presses; never reachable in normal play, same spirit as the ?e2e=1 hook.
+ */
+export function __setNeedsForTests(hunger: number, energy: number): void {
+  state.needs.hunger = clampNeed(hunger);
+  state.needs.energy = clampNeed(energy);
+  notify();
+}
+
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
 /** Commit an Act toast + arrival timestamp; schedule the store-side clear. */
 function pushToast(message: string): void {
@@ -251,6 +268,10 @@ function pushToast(message: string): void {
  * stored by reference: rules hand back the SAME array while a shift just
  * advances (no re-render churn) and a fresh, deduped array only when a
  * payout latches a shift (E-004).
+ *
+ * G-008c round 2: the needs slice also threads lastWaterAt (the 20 s
+ * sachet-water rest's anchor) — sampled onto the session, committed from
+ * resolveAct's returned needs, preserved by the drain.
  */
 export function requestAct(): void {
   const now = Date.now();
@@ -264,7 +285,12 @@ export function requestAct(): void {
 
   const session: ActSession = {
     wallet: { balanceGHS: state.wallet.balanceGHS },
-    needs: { hunger: state.needs.hunger, energy: state.needs.energy },
+    needs: {
+      hunger: state.needs.hunger,
+      energy: state.needs.energy,
+      // G-008c round 2: the sachet rest's anchor rides with the needs.
+      lastWaterAt: state.needs.lastWaterAt,
+    },
     job: {
       activeId: state.job.activeId,
       step: state.job.step,
@@ -295,6 +321,9 @@ export function requestAct(): void {
   if (next.needs !== session.needs) {
     state.needs.hunger = next.needs.hunger;
     state.needs.energy = next.needs.energy;
+    // G-008c round 2: the water stamp — the sachet rest's anchor,
+    // threaded like job.lastPayoutAt (undefined until the first sip).
+    state.needs.lastWaterAt = next.needs.lastWaterAt;
     changed = true;
   }
   if (next.job !== session.job) {
@@ -334,6 +363,9 @@ export function tickNeedsDrain(dtSeconds: number): void {
   if (next === state.needs) return; // guard tripped — nothing to commit
   state.needs.hunger = next.hunger;
   state.needs.energy = next.energy;
+  // G-008c round 2: drainNeeds preserves the water stamp — commit it
+  // back (a no-op value-wise, but keeps the slice shape honest).
+  state.needs.lastWaterAt = next.lastWaterAt;
   notify();
 }
 

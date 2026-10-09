@@ -23,7 +23,7 @@ import {
   pay,
   type WalletState,
 } from './economy';
-import { CAN_WORK_MIN_HUNGER, isTired, type NeedsState } from './needs';
+import { CAN_WORK_MIN_HUNGER, isTired, WAAKYE_MAX_HUNGER, type NeedsState } from './needs';
 
 export interface JobState {
   readonly activeId: string | null;
@@ -290,26 +290,36 @@ export interface CooldownStatus {
 }
 
 /**
- * Pure cooldown math (G-008c item 2): a job rests `cooldownSeconds` from
- * its LAST PAYOUT. Both clocks arrive as plain data — the session's
- * `nowMs` and the JobState's `lastPayoutAt` (stamped by completeJob) — so
- * this stays a pure (data, data) => data function: no Date.now(), no
- * store, no timers. Missing inputs (legacy slices without the stamp) and
- * cooldownSeconds 0 read as ready, so a fresh guest is never gated.
+ * Pure cooldown math (G-008c item 2), generic over what rests: a job
+ * rests `cooldownSeconds` from its LAST PAYOUT, a sachet water (round 2)
+ * rests 20 s from its LAST PURCHASE. Both clocks arrive as plain data —
+ * the session's `nowMs` and the state's stamp — so this stays a pure
+ * (data, data) => data function: no Date.now(), no store, no timers.
+ * Missing inputs (legacy slices without the stamp) and a 0/negative
+ * cooldown read as ready, so a fresh guest is never gated.
  */
+export function cooldownRemaining(
+  cooldownSeconds: number,
+  nowMs: number | undefined,
+  lastAt: number | undefined
+): CooldownStatus {
+  const cooldownMs = Math.max(0, cooldownSeconds) * 1000;
+  if (cooldownMs === 0 || nowMs === undefined || lastAt === undefined) {
+    return { onCooldown: false, remainingMs: 0 };
+  }
+  const remainingMs = cooldownMs - (nowMs - lastAt);
+  return remainingMs > 0
+    ? { onCooldown: true, remainingMs }
+    : { onCooldown: false, remainingMs: 0 };
+}
+
+/** The job-shaped wrapper: a definition's cooldownSeconds from its payout stamp. */
 export function cooldownStatus(
   def: JobDefinition,
   nowMs: number | undefined,
   lastPayoutAt: number | undefined
 ): CooldownStatus {
-  const cooldownMs = Math.max(0, def.cooldownSeconds) * 1000;
-  if (cooldownMs === 0 || nowMs === undefined || lastPayoutAt === undefined) {
-    return { onCooldown: false, remainingMs: 0 };
-  }
-  const remainingMs = cooldownMs - (nowMs - lastPayoutAt);
-  return remainingMs > 0
-    ? { onCooldown: true, remainingMs }
-    : { onCooldown: false, remainingMs: 0 };
+  return cooldownRemaining(def.cooldownSeconds, nowMs, lastPayoutAt);
 }
 
 export interface ObjectiveInfo {
@@ -344,22 +354,42 @@ export function objectiveFor(state: JobState): ObjectiveInfo | null {
  * HUSTLE_AUNTY_BA_STARTER and LOC-001 is untouched, so the store and
  * completedIds don't churn).
  *
- *   - G-006 (checked first): low energy (`needs` passed and isTired —
- *       energy < LOW_THRESHOLD 25) with hunger still above the work gate
- *       → point the guest home to sleep. Sleep costs 8 hunger, so a
- *       starving guest (hunger < CAN_WORK_MIN_HUNGER) eats first: the
- *       tired hint deliberately yields to the food lines below.
- *   - Starter hustle not yet worked this run (completedIds empty or without
- *       the hustle — undefined reads as []) → point the guest at the joint.
- *   - Hustle already worked → nudge toward the waakye loop (price derived
- *       from the data, not hardcoded) or another shift of the same hustle.
+ * G-008c round 2 item 4 — the copy is NEEDS-BASED and can never suggest
+ * an action the Act button would refuse (property-tested over the
+ * hunger/energy grid in act.test.ts):
+ *
+ *   - Hustle already worked this run:
+ *       hunger ≤ WAAKYE_MAX_HUNGER (55) → the waakye line — the joint
+ *         offers the meal at these needs (round(hunger) ≤ 55), so the
+ *         old combined "…or work another shift" tail that contradicted
+ *         a "Full" button at hunger 89 is gone;
+ *       else energy < LOW_THRESHOLD (25) → the G-006 tired line — the
+ *         compound's bed still takes anyone under 90 energy;
+ *       otherwise → work another shift — with hunger above the meal
+ *         gate and energy above the low line, canWork passes and the
+ *         joint offers "Help Daavi".
+ *   - Starter hustle NOT yet worked (completedIds empty or without the
+ *       hustle — undefined reads as []): the tired hint first (G-006,
+ *       sleeping while starving digs the hole deeper so hungry guests
+ *       keep the food-pointing line), then the go-find-work beacon —
+ *       the earn-first button's own answer at the joint.
+ *   - No needs (legacy callers): the neutral post-shift nudge for a
+ *       completed run, the beacon otherwise.
  */
 export function idleObjectiveFor(state: JobState, needs?: NeedsState): string {
+  const waakye = findFoodById(FOOD_WAAKYE_ID)!;
+  if (isJobCompleted(state, 'HUSTLE_AUNTY_BA_STARTER')) {
+    if (!needs) return 'Work another shift at Daavi’s.';
+    if (Math.round(needs.hunger) <= WAAKYE_MAX_HUNGER) {
+      return `Hungry? Buy waakye at Daavi’s (${formatGHS(waakye.priceGHS)}).`;
+    }
+    if (isTired(needs)) {
+      return 'Tired — head home to the compound and sleep.';
+    }
+    return 'Work another shift at Daavi’s.';
+  }
   if (needs && isTired(needs) && needs.hunger >= CAN_WORK_MIN_HUNGER) {
     return 'Tired — head home to the compound and sleep.';
   }
-  const waakye = findFoodById(FOOD_WAAKYE_ID)!;
-  return isJobCompleted(state, 'HUSTLE_AUNTY_BA_STARTER')
-    ? `Hungry? Buy waakye at Daavi’s (${formatGHS(waakye.priceGHS)}), or work another shift.`
-    : 'No job yet — find work at Daavi’s waakye joint.';
+  return 'No job yet — find work at Daavi’s waakye joint.';
 }

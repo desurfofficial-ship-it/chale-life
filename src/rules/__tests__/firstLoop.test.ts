@@ -87,7 +87,7 @@ describe('the first loop (₵20 → Daavi → waakye)', () => {
     expect(wallet.balanceGHS).toBeLessThan(35);
   });
 
-  it('a broke player can still sip sachet water (+6 hunger, +10 energy)', () => {
+  it('a broke player can still sip sachet water (+4 hunger, +2 energy — round-2 sip)', () => {
     const water = findFoodById('FOOD_SACHET_WATER')!;
     expect(water.hungerRestore).toBe(WATER_HUNGER_RESTORE);
     expect(water.energyRestore).toBe(WATER_ENERGY_RESTORE);
@@ -100,13 +100,14 @@ describe('the first loop (₵20 → Daavi → waakye)', () => {
     wallet = purchase.wallet;
     expect(wallet.balanceGHS).toBe(0);
 
-    // Free compound water matches sachet effects — recovery always exists.
+    // Free compound water matches sachet effects — recovery always exists,
+    // but a SIP now (G-008c round 2): water can no longer replace meals.
     const sipped = {
       hunger: needs.hunger + WATER_HUNGER_RESTORE,
       energy: needs.energy + WATER_ENERGY_RESTORE,
     };
-    expect(sipped.hunger).toBe(16);
-    expect(sipped.energy).toBe(20);
+    expect(sipped.hunger).toBe(14);
+    expect(sipped.energy).toBe(12);
   });
 
   it('formatGHS prices the street menu the way the HUD shows it', () => {

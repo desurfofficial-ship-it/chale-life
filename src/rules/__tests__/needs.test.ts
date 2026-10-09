@@ -22,6 +22,7 @@ import {
   WAAKYE_MAX_HUNGER,
   WATER_ENERGY_RESTORE,
   WATER_HUNGER_RESTORE,
+  WATER_MAX_HUNGER,
   WORK_ENERGY_COST,
   type NeedsState,
 } from '../needs';
@@ -98,12 +99,38 @@ describe('needs: restores', () => {
     expect(capped.hunger).toBe(100);
   });
 
-  it('water restores +6 hunger and +10 energy', () => {
-    expect(WATER_HUNGER_RESTORE).toBe(6);
-    expect(WATER_ENERGY_RESTORE).toBe(10);
+  it('water is a ₵1 sip: +4 hunger / +2 energy (G-008c round 2 nerf)', () => {
+    // The salvage +6/+10 let ₵5 buy energy 60→100 and hunger 60→90 —
+    // water out-competed sleep AND waakye. Now it is a small top-up.
+    expect(WATER_HUNGER_RESTORE).toBe(4);
+    expect(WATER_ENERGY_RESTORE).toBe(2);
     const sipped = drinkWater(at(50, 50));
-    expect(sipped.hunger).toBe(56);
-    expect(sipped.energy).toBe(60);
+    expect(sipped.hunger).toBe(54);
+    expect(sipped.energy).toBe(52);
+  });
+
+  it('drinkWater stamps lastWaterAt from the caller\u2019s clock, key-free without one', () => {
+    // Pure data in/out — the store's press clock rides through the rules.
+    const stamped = drinkWater(at(50, 50), 123_456);
+    expect(stamped.lastWaterAt).toBe(123_456);
+    // Legacy clockless callers keep the slice shape exactly as before.
+    const legacy = drinkWater(at(50, 50));
+    expect('lastWaterAt' in legacy).toBe(false);
+    // A re-drink re-stamps (the rest counts from the NEW purchase).
+    const again = drinkWater(legacy, 200_000);
+    expect(again.lastWaterAt).toBe(200_000);
+  });
+
+  it('no needs transform ever un-arms a running water rest (stamp preserved)', () => {
+    const stamped = drinkWater(at(50, 50), 123_456);
+    expect(applyMeal(stamped).lastWaterAt).toBe(123_456);
+    expect(applySleep(stamped).lastWaterAt).toBe(123_456);
+    expect(applyWorkCost(stamped).lastWaterAt).toBe(123_456);
+    expect(applyRestore(stamped, { hunger: -10 }).lastWaterAt).toBe(123_456);
+    expect(drainNeeds(stamped, 1, 'starter').lastWaterAt).toBe(123_456);
+    // …and stamp-free states stay key-free (E-002 slice shapes keep comparing equal).
+    expect('lastWaterAt' in drainNeeds(at(50, 50), 1, 'starter')).toBe(false);
+    expect('lastWaterAt' in applyMeal(at(50, 50))).toBe(false);
   });
 
   it('sleep restores +55 energy capped at 100 and wakes you hungry (−8, G-006)', () => {
@@ -178,9 +205,13 @@ describe('needs: low thresholds and work gate', () => {
   });
 });
 
-describe('needs: waakye Full gate + low-stat hints (G-008b)', () => {
+describe('needs: waakye Full gate + water gate + low-stat hints (G-008b/c)', () => {
   it('WAAKYE_MAX_HUNGER is 55 — meals above it clamp most of their restore away', () => {
     expect(WAAKYE_MAX_HUNGER).toBe(55);
+  });
+
+  it('WATER_MAX_HUNGER is 80 — the "Not thirsty" gate (G-008c round 2)', () => {
+    expect(WATER_MAX_HUNGER).toBe(80);
   });
 
   it('lowNeedsHints: hungry → "eat waakye" (food outranks rest)', () => {

@@ -137,26 +137,41 @@ describe('gameStore: the ₵20 → ₵35 → ₵23 loop at the waakye joint (LOC
 });
 
 describe('gameStore: sachet water at the provisions store + toast lifetime', () => {
-  it('Act at LOC-003 buys water (₵23 → ₵22, +10 energy) and the toast auto-expires', () => {
+  it('Act at LOC-003 buys water (₵23 → ₵22, sip effects) and the toast auto-expires', () => {
     vi.useFakeTimers();
     try {
+      // G-008c round 2: water is refused with "Not thirsty" at hunger ≥
+      // 80 — the meal above clamped hunger at 100, so the guest drinks
+      // only after ~7 starter minutes of drift bring hunger under the
+      // gate (100 − 0.05 × 420 = 79).
+      for (let i = 0; i < 210; i++) tickNeedsDrain(2);
       setNearLocationId('LOC-003');
       requestAct();
 
       const s = getState();
       expect(s.wallet.balanceGHS).toBe(22);
-      // +10 energy over the drifted 56, hunger clamped at ~100 (G-008b: the
-      // meal above landed at exactly 55 + 45, water clamps into it).
-      expect(s.needs.hunger).toBeCloseTo(100, 5);
-      expect(s.needs.energy).toBeCloseTo(62 - DECAY_PER_SECOND.starter.energy * 180 + 10, 2);
+      // A SIP now (+4 hunger / +2 energy — G-008c round 2): hunger 79 →
+      // 83, energy +2 over the drifted value.
+      expect(s.needs.hunger).toBeCloseTo(83, 5);
+      expect(s.needs.energy).toBeCloseTo(62 - DECAY_PER_SECOND.starter.energy * 600 + 2, 2);
+      // The sachet rest is armed at the press clock (threaded needs field).
+      const waterStamp = Date.now();
+      expect(s.needs.lastWaterAt).toBe(waterStamp);
       expect(s.toast.message).toContain('Sachet water');
-      expect(s.toast.at).toBe(Date.now()); // timestamp recorded on arrival
+      expect(s.toast.at).toBe(waterStamp); // timestamp recorded on arrival
 
       // Store-side linger outlives the HUD's own 2 s window, then clears.
       vi.advanceTimersByTime(TOAST_LINGER_MS - 100);
-      expect(getState().toast.message).toBe('Sachet water — +10 energy (−₵1)');
+      expect(getState().toast.message).toBe('Sachet water — +2 energy (−₵1)');
       vi.advanceTimersByTime(200);
       expect(getState().toast.message).toBeNull();
+
+      // A second sachet while the 20 s rest runs is refused by the RULES
+      // (all store-level gates are off here): wallet and stamp untouched.
+      vi.advanceTimersByTime(700);
+      requestAct();
+      expect(getState().wallet.balanceGHS).toBe(22);
+      expect(getState().needs.lastWaterAt).toBe(waterStamp);
     } finally {
       vi.useRealTimers();
       setNearLocationId('LOC-001');

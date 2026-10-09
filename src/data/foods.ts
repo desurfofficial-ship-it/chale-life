@@ -5,6 +5,12 @@
  * doc (waakye ₵12/meal, cooker meal ₵5), and the salvage NeedsSystem
  * constants (meal +45 hunger, water +6 hunger / +10 energy).
  *
+ * G-008c round 2: sachet water is nerfed to +4 hunger / +2 energy with a
+ * 20 s per-sachet rest. The salvage numbers let ₵5 of water buy energy
+ * 60→100 and hunger 60→90 (₵0.17 per hunger point vs waakye's ₵0.27),
+ * making both sleep and waakye pointless — energy should come mainly
+ * from sleep and hunger from meals.
+ *
  * Pure data — no state, no store imports, no three.js, no React.
  */
 
@@ -16,6 +22,12 @@ export interface FoodItem {
   readonly hungerRestore: number;
   /** Energy restored when eaten, clamped to 100 by the rules. */
   readonly energyRestore: number;
+  /**
+   * Seconds before this item can be bought again (G-008c round 2) —
+   * 0/undefined = no rest. Enforced in rules from the session's nowMs
+   * against NeedsState.lastWaterAt, exactly like a job's cooldownSeconds.
+   */
+  readonly cooldownSeconds?: number;
   /** Where the player buys it. */
   readonly vendorInteractableId: string;
   readonly summary: string;
@@ -50,10 +62,11 @@ export const FOODS: ReadonlyArray<FoodItem> = [
     id: 'FOOD_SACHET_WATER',
     title: 'Sachet Water',
     priceGHS: 1,
-    hungerRestore: 6,
-    energyRestore: 10,
+    hungerRestore: 4,
+    energyRestore: 2,
+    cooldownSeconds: 20,
     vendorInteractableId: 'provision_shop',
-    summary: 'Ice-cold pure water — small bite, real lift. +10 energy.',
+    summary: 'Ice-cold pure water — a small sip. +4 hunger, +2 energy.',
   },
 ];
 
