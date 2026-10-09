@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ACCRA_LEGAL_JOBS, findJobById } from '../../data/jobs';
 import { locations } from '../../data/locations';
 import {
+  JOB_SPOT_PROPS,
   MAIN_ROAD,
   NORTH_GUTTER,
   SOLID_FOOTPRINTS,
@@ -134,7 +135,7 @@ describe('jobs: advance step', () => {
     const second = advanceStep(job);
     expect(second.ok).toBe(true);
     expect(second.completed).toBe(false);
-    expect(second.message).toContain('One more lift');
+    expect(second.message).toContain('Back to the side of the kiosk'); // G-008e: points at the pay spot
     job = second.job;
     expect(job.step).toBe(2);
   });
@@ -483,12 +484,14 @@ describe('jobs: Daavi walk waypoints (G-008b item 4, G-008d items 8–10 constan
     expect(step2.locationId).toBe('LOC-001-BENCH');
     // G-008d: the bench sits on the NORTH PAVEMENT (z 1.85–3.85) — off
     // the road the old waypoint pointed into — and ≥ 3 m east of the
-    // kiosk point, so the forced walk is still real.
+    // kiosk point, so the forced walk is still real. G-008e: pinned at
+    // z 2.45 — the full capsule + margin (0.6 m) south of the bench mesh
+    // (layout.DAAVI_BENCH_MESH z0 3.15; 2.9 left only 0.25 m).
     expect(DAAVI_BENCH.x - 15.5).toBeGreaterThanOrEqual(3);
     expect(DAAVI_BENCH.z).toBeGreaterThanOrEqual(1.85);
     expect(DAAVI_BENCH.z).toBeLessThanOrEqual(3.85);
     expect(DAAVI_BENCH.x).toBeCloseTo(21.5, 5);
-    expect(DAAVI_BENCH.z).toBeCloseTo(2.9, 5);
+    expect(DAAVI_BENCH.z).toBeCloseTo(2.45, 5);
   });
 
   it('steps 1/3 target the DAAVI_JOB_SPOT — the kiosk\u2019s east side, off the road', () => {
@@ -543,15 +546,20 @@ describe('jobs: world clearance (G-008d item 10 — road, gutters, footprints, w
     // bar). COMPOUND_DOOR is exempt: it is a MARKER anchor on the house
     // face by design, not a standing spot.
     const caps = 0.35 + 0.25;
-    const waypoints: Array<[string, number, number]> = [
-      ['bench', DAAVI_BENCH.x, DAAVI_BENCH.z],
-      ['job spot', DAAVI_JOB_SPOT.x, DAAVI_JOB_SPOT.z],
+    const waypoints: Array<[string, number, number, Box2D | null]> = [
+      ['bench', DAAVI_BENCH.x, DAAVI_BENCH.z, null],
+      // G-008d item 8: the crate/pan stack marking the job spot is flush
+      // to the kiosk's east wall so the standing point keeps 0.38 m of
+      // BARE clearance (≥ the 0.35 m capsule, no margin) — its own props
+      // take the bare bar, every foreign footprint keeps the full
+      // margin. (The #28+#29 merge hid this behind the bench failure.)
+      ['job spot', DAAVI_JOB_SPOT.x, DAAVI_JOB_SPOT.z, JOB_SPOT_PROPS],
     ];
-    for (const [name, x, z] of waypoints) {
+    for (const [name, x, z, own] of waypoints) {
       offRoadAndGutters(x, z, name);
       for (const f of SOLID_FOOTPRINTS) {
         expect(
-          clearOf(x, z, f, caps),
+          clearOf(x, z, f, f === own ? 0 : caps),
           `${name} (${x}, ${z}) must clear footprint ${JSON.stringify(f)}`
         ).toBe(true);
       }

@@ -252,12 +252,16 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
   // ── 3. Walk east to the kiosk block, then around to the JOB SPOT ──────
   // G-008d route (collider-aware): east along the south pavement to the
   // kiosk's x, north past the counter, back south into the road, east
-  // past the okada, north beside the kiosk's east wall, west into the
-  // job spot's 0.9 m zone.
+  // into the kiosk–bench corridor, north beside the kiosk's east wall,
+  // west into the job spot's 0.9 m zone. G-008e merge fix: the corridor
+  // between the crate stack (x ≤ 17.62) and the bench mesh (x ≥ 20.7)
+  // is clear since the okada moved east of the bench, so the robot turns
+  // north at x 19 — the old x 20 line drove its capsule straight into
+  // the bench mesh's south face.
   await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 15.0, 'eastbound');
   await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 3.4, 'north past the counter');
   await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'south into the road');
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.0, 'east past the okada');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 19.0, 'east into the corridor');
   await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.6, 'north beside the kiosk wall');
   // The proximity probe (the 0.9 m job-spot zone) flips the Act prompt.
   const helpButton = page.getByRole('button', { name: HELP_LABEL });
@@ -313,12 +317,14 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
 
   // ── 5. The front counter sells waakye once the guest is hungry ──────
   // G-008d: the meal lives at the counter (west of the job spot) — the
-  // robot pins hunger 50 with the e2e hook, walks over, buys.
+  // robot pins hunger 50 with the e2e hook, walks over, buys. G-008e
+  // merge fix: nothing solid sits south of the job spot any more (the
+  // okada moved east of the bench), so the robot walks straight down
+  // into the road instead of the old okada-dodging east hook.
   await setNeeds(page, 50, 60);
   const waakyeButton = page.getByRole('button', { name: WAAKYE_LABEL });
-  // Collider-aware meal route: east past the okada first, south into the
-  // road, west along it, then north to the counter's zone.
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 19.8, 'east past the okada');
+  // Collider-aware meal route: south into the road, west along it, then
+  // north to the counter's zone.
   await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'south into the road');
   await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 16.8, 'west along the road');
   await holdUntil(page, 'ArrowUp', async () => waakyeButton.isVisible(), 'north to the counter');

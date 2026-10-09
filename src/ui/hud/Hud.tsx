@@ -193,14 +193,24 @@ function ObjectiveCard() {
   // E-004 store slice carries the run history (reference replaced, never
   // mutated — a safe useSyncExternalStore snapshot).
   const completedIds = useStoreValue((s) => s.job.completedIds);
+  // G-008e: the cooldown rest line counts from the payout stamp — the
+  // card reads it with the UI's wall clock (the store owns Date.now()
+  // at its boundary too; the rules stay pure data-in/data-out).
+  const lastPayoutAt = useStoreValue((s) => s.job.lastPayoutAt);
   const hunger = useStoreValue((s) => s.needs.hunger);
   const energy = useStoreValue((s) => s.needs.energy);
   const objective = objectiveFor({ activeId, step, completedIds });
   // G-005: the idle line is a pure rules helper — Daavi-aware and
   // completedIds-aware (fresh guest vs. hungry-after-the-hustle nudge).
   // G-006: it is also needs-aware — low energy swaps the line for the
-  // sleep hint (unless hunger needs the waakye nudge more).
-  const idleLine = idleObjectiveFor({ activeId, step, completedIds }, { hunger, energy });
+  // sleep hint (unless hunger needs the waakye nudge more). G-008e: it
+  // now reads the job cooldown, so a paid guest sees "Daavi needs you
+  // again in Ns" instead of a work line the button would refuse.
+  const idleLine = idleObjectiveFor(
+    { activeId, step, completedIds, lastPayoutAt },
+    { hunger, energy },
+    Date.now()
+  );
   return (
     <div
       style={{

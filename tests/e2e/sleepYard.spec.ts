@@ -60,8 +60,15 @@ const HUNGRY_PAID_LABEL = actPromptFor(
   WAAKYE_LOCATION_ID
 ).label;
 
-/** The countdown reason line under the pill ("<employer> needs you again in Ns"). */
-const COOLDOWN_REASON = new RegExp(`${EMPLOYER_NAME} needs you again in \\d+s`);
+/** The countdown reason line under the pill ("<employer> needs you again
+ *  in Ns") — $-anchored so it matches the PILL's bare reason only, never
+ *  the objective card's longer G-008e idle line. */
+const COOLDOWN_REASON = new RegExp(`${EMPLOYER_NAME} needs you again in \\d+s$`);
+/** G-008e: the objective card's idle line counts the SAME rest down —
+ *  two surfaces, one clock, each matched by its exact shape. */
+const COOLDOWN_CARD_LINE = new RegExp(
+  `${EMPLOYER_NAME} needs you again in \\d+s — grab water or rest\\.`
+);
 
 // ── Robot helpers (mirrors of earnAndEat.spec.ts) ────────────────────────────
 
@@ -183,37 +190,42 @@ async function pacedClick(page: Page, locator: ReturnType<Page['getByRole']>): P
 /**
  * The G-008d walk from spawn to the JOB SPOT (collider-aware): east along
  * the south pavement, north past the counter, south into the road, east
- * past the okada, north beside the kiosk's east wall, west into the 0.9 m
- * job-spot zone — the same route earnAndEat.spec.ts drives.
+ * into the kiosk–bench corridor, north beside the kiosk's east wall, west
+ * into the 0.9 m job-spot zone — the same route earnAndEat.spec.ts
+ * drives. G-008e merge fix: the corridor between the crate stack (x ≤
+ * 17.62) and the bench mesh (x ≥ 20.7) is clear since the okada moved
+ * east of the bench, so the robot turns north at x 19 — the old x 20
+ * line drove its capsule straight into the bench mesh's south face.
  */
 async function walkToJobSpot(page: Page): Promise<void> {
   await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 15.0, 'eastbound');
   await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 3.4, 'north past the counter');
   await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'south into the road');
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.0, 'east past the okada');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 19.0, 'east into the corridor');
   await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.6, 'north beside the kiosk wall');
   await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.5, 'west into the job spot');
 }
 
 /**
  * The JOB SPOT → COUNTER walk (meals live at the front counter now):
- * east past the okada, south into the road, west along it, north into
- * the counter's zone.
+ * south into the road (nothing solid sits south of the job spot since
+ * the okada moved east of the bench), west along it, north into the
+ * counter's zone.
  */
 async function walkToCounter(page: Page): Promise<void> {
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 19.8, 'east past the okada');
   await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'south into the road');
   await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 16.8, 'west along the road');
   await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 3.4, 'north to the counter');
 }
 
 /**
- * The COUNTER → JOB SPOT walk back: south into the road, east past the
- * okada's line, north beside the kiosk wall, west into the zone.
+ * The COUNTER → JOB SPOT walk back: south into the road, east into the
+ * kiosk–bench corridor (x 19 — clear of the bench mesh's west face),
+ * north beside the kiosk wall, west into the zone.
  */
 async function walkBackToJobSpot(page: Page): Promise<void> {
   await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'back south into the road');
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.0, 'back east past the okada');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 19.0, 'back east into the corridor');
   await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.6, 'back north beside the wall');
   await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.5, 'back west into the job spot');
 }
@@ -337,7 +349,10 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
   await expect(coolingButton).toHaveAttribute('aria-disabled', 'true');
   expect(COOLDOWN_PROMPT.enabled).toBe(false);
   expect(COOLDOWN_PROMPT.label).not.toContain('waakye'); // the meal stays gated
-  await expect(page.getByText(COOLDOWN_REASON)).toBeVisible();
+  await expect(page.getByText(COOLDOWN_REASON)).toBeVisible(); // the pill
+  // G-008e: the objective card reads the cooldown too — one clock on two
+  // surfaces, so the hint can't contradict the button mid-rest.
+  await expect(page.getByText(COOLDOWN_CARD_LINE)).toBeVisible();
   // The pill settles into its greyed style (200 ms background transition —
   // mirrors earnAndEat.spec.ts) so the screenshot below is truthful.
   await expect(coolingButton).toHaveCSS('background-color', 'rgba(100, 116, 139, 0.3)');
