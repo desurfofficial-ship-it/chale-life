@@ -83,4 +83,4 @@ original Sketchfab model titles may differ and are reachable through the
 ledger's `source_url`. Trademark names and badge marks were removed from the
 shipped GLBs (see LICENSES.csv `modified` column).
 
-Pipeline: `npm run assets` (scripts/optimize-assets.mjs, @gltf-transform: dedup → weld → scale normalised to metres → meshopt + KTX2 ≤1024 px). `public/basis/` holds the Basis Universal KTX2 transcoder shipped with three.js (Apache-2.0, © three.js authors, Konsolas & Ben Houston / Basis Univeral, Binomial LLC).
+Pipeline: `npm run assets` (scripts/optimize-assets.mjs, @gltf-transform: dedup → weld → scale normalised to metres → meshopt + KTX2 ≤1024 px). The Basis Universal KTX2 transcoder is three.js's own copy (Apache-2.0, © three.js authors, Konsolas & Ben Houston / Basis Univeral, Binomial LLC), emitted + hashed into `dist/assets/` by the bundler at build time (E-007 removed the duplicate hand-copied `public/basis/`).
