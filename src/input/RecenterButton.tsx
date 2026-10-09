@@ -9,7 +9,12 @@ import { requestRecenter } from '../store/gameStore';
 
 export function RecenterButton() {
   return (
-    <button type="button" className="recenter-btn" onClick={() => requestRecenter()}>
+    <button
+      type="button"
+      className="recenter-btn"
+      onClick={() => requestRecenter()}
+      onPointerDown={(e) => e.stopPropagation()}
+    >
       Recenter
     </button>
   );

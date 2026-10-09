@@ -71,6 +71,10 @@ export function Joystick() {
       role="application"
       aria-label="Movement joystick"
       onPointerDown={(e) => {
+        // Stop propagation so the canvas CameraRig never sees this pointer as
+        // a canvas-owned pan start — a stick drag that slides onto the canvas
+        // must never pan or suspend follow.
+        e.stopPropagation();
         if (pointerId.current !== null) return; // one steering pointer max
         pointerId.current = e.pointerId;
         try {
@@ -82,12 +86,15 @@ export function Joystick() {
         update(e);
       }}
       onPointerMove={(e) => {
+        e.stopPropagation();
         if (pointerId.current === e.pointerId) update(e);
       }}
       onPointerUp={(e) => {
+        e.stopPropagation();
         if (pointerId.current === e.pointerId) release();
       }}
       onPointerCancel={(e) => {
+        e.stopPropagation();
         if (pointerId.current === e.pointerId) release();
       }}
     >
