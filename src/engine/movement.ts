@@ -18,7 +18,11 @@
  *     acceleration (analog stick pressure = slower walk; release = braking).
  *  4. Movement integrates one axis at a time against circle-vs-box collision —
  *     blocking an axis while the other still moves gives free wall sliding.
- *  5. Position is hard-clamped to the world bounds (minus capsule radius).
+ *     When the displacement this frame exceeds WALL_THICKNESS_M (0.24 m —
+ *     the compound wall thickness), the step is split into sub-steps so a
+ *     thin wall cannot be tunneled through at high speed / low framerate.
+ *  5. Position is hard-clamped to the world bounds (WORLD_MIN/MAX minus
+ *     capsule radius) every frame.
  *  6. Yaw follows the direction of travel (three.js convention: yaw 0 = +Z).
  *
  * Tuning lives in DEFAULT_MOVEMENT; the visual capsule radius in
@@ -55,6 +59,11 @@ export interface MovementConfig {
   radius?: number;
   /** Hard world bounds. Defaults to the World contract's `worldBounds`. */
   bounds?: Box;
+  /**
+   * Max travel per sub-step (metres). Defaults to WALL_THICKNESS_M so a
+   * single integrate cannot jump past a compound wall (0.24 m thick).
+   */
+  maxSubstepM?: number;
 }
 
 export const DEFAULT_MOVEMENT = {
@@ -62,6 +71,13 @@ export const DEFAULT_MOVEMENT = {
   accel: 40,
   radius: 0.45,
 } as const;
+
+/**
+ * Compound wall thickness on the starter block (layout COMPOUND.walls are
+ * 0.24 m deep). Any integrate step longer than this is split so fast
+ * movement / large dt cannot tunnel through.
+ */
+export const WALL_THICKNESS_M = 0.24;
 
 export function movementStep(
   state: Kinematics,
@@ -77,6 +93,7 @@ export function movementStep(
   const radius = config.radius ?? DEFAULT_MOVEMENT.radius;
   const cameraYaw = config.cameraYaw ?? 0;
   const bounds = config.bounds ?? worldBounds;
+  const maxSubstepM = config.maxSubstepM ?? WALL_THICKNESS_M;
 
   // 1. Clamp input magnitude to 1 — diagonals are never faster than straight.
   let ix = Number.isFinite(input.x) ? input.x : 0;
@@ -113,18 +130,25 @@ export function movementStep(
     vz += (dvz / dvLen) * maxDv;
   }
 
-  // 4. Integrate + resolve one axis at a time (blocked axis stops, the other
-  //    keeps moving → wall sliding falls out for free).
+  // 4. Integrate with sub-steps when the full-frame travel would exceed the
+  //    thinnest solid (compound wall 0.24 m). One axis at a time → slide.
   let x = state.x;
   let z = state.z;
-  const nextX = x + vx * dt;
-  if (circleHitsAny(nextX, z, radius, colliders)) vx = 0;
-  else x = nextX;
-  const nextZ = z + vz * dt;
-  if (circleHitsAny(x, nextZ, radius, colliders)) vz = 0;
-  else z = nextZ;
+  const travel = Math.hypot(vx * dt, vz * dt);
+  const subSteps = Math.max(1, Math.ceil(travel / Math.max(maxSubstepM, 1e-6)));
+  const subDt = dt / subSteps;
 
-  // 5. Hard clamp to the world bounds, zeroing velocity into the wall.
+  for (let s = 0; s < subSteps; s++) {
+    const nextX = x + vx * subDt;
+    if (circleHitsAny(nextX, z, radius, colliders)) vx = 0;
+    else x = nextX;
+
+    const nextZ = z + vz * subDt;
+    if (circleHitsAny(x, nextZ, radius, colliders)) vz = 0;
+    else z = nextZ;
+  }
+
+  // 5. Hard clamp to WORLD_MIN/MAX minus capsule radius; zero velocity into wall.
   const bounded = clampToBounds(x, z, radius, bounds);
   x = bounded.x;
   z = bounded.z;
