@@ -192,33 +192,36 @@ async function pacedClick(page: Page, locator: ReturnType<Page['getByRole']>): P
  * 0.9 m zone — the same route earnAndEat.spec.ts drives.
  */
 async function walkToJobSpot(page: Page): Promise<void> {
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 15.0, 'eastbound');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 3.4, 'north past the counter');
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 18.6, 'east along the pavement past the job-spot column');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.85, 'north into the job-spot band');
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.6, 'west into the job zone');
+  // ACCRA MAP route: east out of the sleep yard (zone x1 = −131), then
+  // east along the clear z ≈ −2 corridor (0.25 m north of the kiosk face),
+  // two-stage into the 0.9 m job disc at (−122.9, −2.4).
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -130.6, 'east out of the sleep yard');
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= -1.5, 'south onto the pavement line');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -124.3, 'east along the plot to the job-spot column');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -2.0, 'north into the job-spot band');
   // Final approach keys on the ZONE itself (the same disc the probe
-  // uses, r 0.9 at (18, 0)) — a position-only stop could freeze at the
-  // high-z corner outside the zone and leave the wrong Act label up.
+  // uses, r 0.9 at (−122.9, −2.4)) — a button-locator condition would
+  // block on the pill relabelling between zones.
   await holdUntil(
     page,
-    'ArrowLeft',
+    'ArrowRight',
     async () => {
       const p = await readPos(page);
-      return (p.x - 18) ** 2 + p.z * p.z <= 0.81;
+      return (p.x + 122.9) ** 2 + (p.z + 2.4) ** 2 <= 0.81;
     },
-    'west into the job spot'
+    'east into the job-spot disc'
   );
 }
 
 /**
  * The JOB SPOT → COUNTER walk (meals live at the front counter now):
- * south onto the north pavement (clear of the crates at x ≥ 17.97),
- * then west into the counter's zone — two wide-open legs (G-008e).
+ * ACCRA MAP (collider-probed): south onto the pavement line (z −1.4,
+ * north of the counter slab — clear all the way), then WEST into the
+ * counter's r 2.5 zone (flip at x ≤ −124.03; −124.5 stops 0.5 m inside).
  */
 async function walkToCounter(page: Page): Promise<void> {
-  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 2.2, 'south onto the pavement');
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 17.2, 'west into the counter zone');
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= -1.4, 'south onto the pavement line');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= -124.5, 'west into the counter zone');
 }
 
 /**
@@ -226,17 +229,20 @@ async function walkToCounter(page: Page): Promise<void> {
  * past the job-spot column, south into the band, west into the zone.
  */
 async function walkBackToJobSpot(page: Page): Promise<void> {
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 18.6, 'back east along the pavement past the job-spot column');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.85, 'back north into the job-spot band');
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.6, 'west into the job zone');
+  // ACCRA MAP: east along the pavement, NORTH into the job-spot band
+  // (z −2.0 — the disc at z −1.5 would sit exactly on the 0.9 m boundary
+  // and a 0.36 m poll step could overshoot past it), then east into the
+  // 0.9 m job disc.
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -124.3, 'back east to the job-spot column');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -2.0, 'north into the job-spot band');
   await holdUntil(
     page,
-    'ArrowLeft',
+    'ArrowRight',
     async () => {
       const p = await readPos(page);
-      return (p.x - 18) ** 2 + p.z * p.z <= 0.81;
+      return (p.x + 122.9) ** 2 + (p.z + 2.4) ** 2 <= 0.81;
     },
-    'back west into the job spot'
+    'back east into the job spot'
   );
 }
 
@@ -262,15 +268,18 @@ test('(a) sleep zone: the whole yard offers Sleep and +55 energy', async ({
   await expect(sleepButton).toBeVisible();
   await expect(sleepButton).toHaveAttribute('aria-disabled', 'false');
 
-  // Walk INTO the yard — south through the 3 m gate opening (+z is south):
-  // past the gate point's 2.5 m radius (z > 15.9) the ZONE, not the point,
-  // is what keeps Sleep on the button. Walk to the house door area.
-  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 17, 'into the yard');
+  // Walk INTO the yard — north across the mats (−z): past the yard edge
+  // the ZONE, not any point, is what keeps Sleep on the button. Walk to
+  // the yard centre (clear of the clothesline props at z ≈ −3.5).
+  // dodge east of the clothesline first (its x-band −137.2…−135.2 seals
+  // the direct north walk from the spawn), then north into the yard
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -134.5, 'east clear of the clothesline');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -6, 'into the yard');
   const inYard = await readPos(page);
-  expect(inYard.x).toBeGreaterThanOrEqual(-16); // inside the SLEEP_ZONE AABB
-  expect(inYard.x).toBeLessThanOrEqual(-4);
-  expect(inYard.z).toBeGreaterThanOrEqual(13);
-  expect(inYard.z).toBeGreaterThan(15.9); // OUTSIDE the old 2.5 m gate point
+  expect(inYard.x).toBeGreaterThanOrEqual(-142); // inside the SLEEP_ZONE AABB
+  expect(inYard.x).toBeLessThanOrEqual(-130);
+  expect(inYard.z).toBeGreaterThanOrEqual(-12);
+  expect(inYard.z).toBeLessThanOrEqual(-5); // deep in the yard, off the apron
   await expect(sleepButton).toHaveAttribute('aria-disabled', 'false');
 
   await page.screenshot({ path: shot('05-sleep-in-yard-390x844.png') });
@@ -322,41 +331,43 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
   // spots mid-shift.
   const carryButton = page.getByRole('button', { name: CARRY_VERB });
   await expect(carryButton).toHaveAttribute('aria-disabled', 'true'); // not there yet (≥ 3 m from the bench zone)
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 25.2, 'east north of the okada');
-  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'south into the road east of the okada');
-  // Position-only legs — NO button-locator conditions inside holdUntil:
-  // between zones the Act pill relabels to bare 'Act', the 'Carry Pans'
-  // locator goes absent, and a getAttribute condition would block the
-  // poll while the key walks the robot into the far solids. The freeze
-  // rectangle [20.3, 21.5] × [4.0, 4.4] is fully inside the bench zone
-  // (worst corner dist 2.29 < 2.5), so the flip is guaranteed by
+  // ACCRA MAP (collider-probed): the straight west walk at z −2.4 is
+  // SEALED (kiosk body + counter slab) — south onto the z ≈ −1.5 pavement
+  // line first (the −1.5 target leaves ~1.9 m of headroom to the bollard
+  // pocket at (−125.2, 0.8); the HUD position lags the true capsule by up
+  // to ~1.1 m under software GL and an overshoot past +0.37 pins the west
+  // walk — seen live with a −0.6 target), then west into the bench zone
+  // (x ≤ −131 keeps drift overshoots inside the r 2.5 zone). Position-only
+  // legs — NO button-locator conditions inside holdUntil: between zones
+  // the Act pill relabels to bare 'Act', the 'Carry Pans' locator goes
+  // absent, and a getAttribute condition would block the poll while the
+  // key walks the robot into the far solids. The stop (−131, −1.5) sits
+  // 1.75 m from the bench waypoint, so the flip is guaranteed by
   // geometry; the expect below does the waiting.
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 21.5, 'west along the road to the bench column');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 4.4, 'north into the bench zone');
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= -1.5, 'south onto the pavement line');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= -131.0, 'west along the pavement into the bench zone');
   await expect(carryButton).toHaveAttribute('aria-disabled', 'false'); // the bench zone
   await pacedClick(page, carryButton); // step 2 at the bench
 
-  // Back to the job spot for the final lift + pay — the G-008e return:
-  // road west clear of the bench, north past the counter, pavement
-  // east, south into the band, west until the job zone flips 'Get paid'.
+  // Back to the job spot for the final lift + pay — the ACCRA MAP return:
+  // east along the pavement line (probed clear at z −1.5…−1.0), north
+  // into the job-spot band, east into the 0.9 m disc.
   const payButton = page.getByRole('button', { name: PAY_VERB });
   await expect(payButton).toHaveAttribute('aria-disabled', 'true'); // not there yet
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 17.0, 'west along the road clear of the bench');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 3.4, 'north past the counter');
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 18.6, 'east along the pavement past the job-spot column');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.85, 'north into the job-spot band');
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.6, 'west into the job zone');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -124.3, 'east along the corridor to the job-spot column');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -2.0, 'north into the job-spot band');
   // Final approach keys on the ZONE itself (the same disc the probe
-  // uses, r 0.9 at (18, 0)) — a button-locator condition would block on
-  // the pill relabelling between zones (see the bench legs above).
+  // uses, r 0.9 at (−122.9, −2.4)) — a button-locator condition would
+  // block on the pill relabelling between zones (see the bench legs
+  // above).
   await holdUntil(
     page,
-    'ArrowLeft',
+    'ArrowRight',
     async () => {
       const p = await readPos(page);
-      return (p.x - 18) ** 2 + p.z * p.z <= 0.81;
+      return (p.x + 122.9) ** 2 + (p.z + 2.4) ** 2 <= 0.81;
     },
-    'west into the job spot'
+    'east into the job spot'
   );
   await expect(payButton).toHaveAttribute('aria-disabled', 'false');
 
@@ -424,24 +435,19 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
   await expect(grabButton).toHaveAttribute('aria-disabled', 'false'); // step 1 here
   await pacedClick(page, grabButton);
 
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 25.2, '2nd: east north of the okada');
-  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, '2nd: south into the road east of the okada');
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 21.5, '2nd: west along the road to the bench column');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 4.4, '2nd: north into the bench zone');
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= -1.5, '2nd: south onto the pavement line');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= -131.0, '2nd: west into the bench zone');
   await expect(carryButton).toHaveAttribute('aria-disabled', 'false');
   await pacedClick(page, carryButton); // step 2 at the bench
 
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 17.0, '2nd: west along the road clear of the bench');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 3.4, '2nd: north past the counter');
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 18.6, '2nd: east along the pavement past the job-spot column');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.85, '2nd: north into the job-spot band');
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.6, '2nd: west into the job zone');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -124.3, '2nd: east back to the job-spot column');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -2.0, '2nd: north into the job-spot band');
   await holdUntil(
     page,
-    'ArrowLeft',
+    'ArrowRight',
     async () => {
       const p = await readPos(page);
-      return (p.x - 18) ** 2 + p.z * p.z <= 0.81;
+      return (p.x + 122.9) ** 2 + (p.z + 2.4) ** 2 <= 0.81;
     },
     '2nd: west into the job spot'
   );

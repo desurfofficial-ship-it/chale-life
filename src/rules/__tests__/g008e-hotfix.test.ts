@@ -9,7 +9,17 @@ import {
   WAAKYE_LOCATION_ID,
 } from '../act';
 import { DAAVI_BENCH, DAAVI_JOB_SPOT, nearestLocationId } from '../proximity';
-import { DAAVI_BENCH_MESH, DAAVI_BENCH_SPOT, UMBRELLAS } from '../../world/starter/layout';
+// ACCRA MAP: the plot's solid geometry comes from the captured collider set
+import { colliders } from '../../world/colliders';
+
+/** The kiosk shell on the DAAVI_PLOT (Jamestown, −126.5,−3.6). */
+const KIOSK = colliders.find(
+  (c) => c.minX <= -126.4 && c.maxX >= -126.6 && c.minZ <= -3.7 && c.maxZ >= -3.5
+)!;
+/** The counter slab the kiosk fronts (y 0.89–1.01 — kept as a solid). */
+const KIOSK_COUNTER = colliders.find(
+  (c) => c.minX <= -126.6 && c.maxX >= -126.4 && c.minZ <= -2.4 && c.maxZ >= -2.1
+)!;
 
 // Curly apostrophe / em dash built from code points so this file stays pure
 // ASCII (the production copy strings use the typographic characters).
@@ -23,11 +33,12 @@ describe('G-008e: zone-backed ids never win the point loop', () => {
     expect(entry).toBeDefined();
     // On the spot itself the ZONE (r 0.9) owns the answer.
     expect(nearestLocationId(DAAVI_JOB_SPOT.x, DAAVI_JOB_SPOT.z)).toBe('LOC-001-JOB');
-    // THE MERGE BUG: (17.0, 0.5) is 1.12 m from the job point, so the
-    // default-2.5 m point loop WOULD claim it for the job spot (as the
-    // merged main did: "Help Daavi" instead of "Buy waakye"). With the
-    // zone-backed skip the counter, 2.42 m away, is the answer.
-    expect(nearestLocationId(17.0, 0.5)).toBe(WAAKYE_LOCATION_ID);
+    // THE MERGE BUG CLASS: a point between the two zones must resolve to
+    // the COUNTER, never the job spot — e.g. (−124.9, −2.0) is 1.9 m from
+    // the job point (inside the old default-2.5 m takeover) but 1.75 m
+    // from the counter, which wins because the zone-backed skip keeps the
+    // job id out of the point loop.
+    expect(nearestLocationId(-124.9, -2.0)).toBe(WAAKYE_LOCATION_ID);
   });
 
   it('every point inside LOC-001' + RSQ + 's 2.5 m and outside the job spot' + RSQ + 's 0.9 m resolves to the counter', () => {
@@ -55,26 +66,35 @@ describe('G-008e: zone-backed ids never win the point loop', () => {
   });
 });
 
-describe('G-008e: bench waypoint 2.45 ' + DASH + ' proximity.ts and layout.ts agree, mesh unmoved', () => {
-  it('DAAVI_BENCH === DAAVI_BENCH_SPOT === (21.5, 2.45); the mesh stays at z0 3.15', () => {
-    expect(DAAVI_BENCH.x).toBeCloseTo(21.5, 5);
-    expect(DAAVI_BENCH.z).toBeCloseTo(2.45, 5);
-    expect(DAAVI_BENCH_SPOT.x).toBeCloseTo(DAAVI_BENCH.x, 5);
-    expect(DAAVI_BENCH_SPOT.z).toBeCloseTo(DAAVI_BENCH.z, 5);
-    // THE MESH DID NOT MOVE: the waypoint keeps a 0.7 m gap to its face,
-    // back inside the 0.6 m capsule + margin bar the clearance tests pin.
-    expect(DAAVI_BENCH_MESH.z0).toBeCloseTo(3.15, 5);
-    expect(DAAVI_BENCH_MESH.z1).toBeCloseTo(3.65, 5);
-    expect(DAAVI_BENCH_MESH.z0 - DAAVI_BENCH.z).toBeCloseTo(0.7, 5);
+describe('G-008e: bench waypoint ' + DASH + ' the pavement set-down stays off the road and clear of solids', () => {
+  it('DAAVI_BENCH is the plot pavement west of the kiosk (−132.5, −0.6)', () => {
+    expect(DAAVI_BENCH.x).toBeCloseTo(-132.5, 5);
+    expect(DAAVI_BENCH.z).toBeCloseTo(-0.6, 5);
+    // Off the Daavi St carriageway (z 0.5…7.5) and off the plot's
+    // pavement edge (the waypoint sits on the strip z −1.3…0.5).
+    expect(DAAVI_BENCH.z).toBeLessThan(0.5);
+    expect(DAAVI_BENCH.z).toBeGreaterThan(-1.3);
   });
 
-  it('the green umbrella moved west of the kiosk front (off the counter/screen band)', () => {
-    // Was (16.9, 3.1) — the canopy hid the player and the job-spot ring
-    // from the fixed south camera. The kiosk front is x 13.9-17.1; west
-    // of it the canopy can never cover the counter or the job spot.
-    const green = UMBRELLAS[0];
-    expect(green.x).toBeLessThan(13.9);
-    expect(green.x).toBeGreaterThan(10);
+  it('the bench waypoint clears every plot solid by the capsule + margin bar', () => {
+    const caps = 0.35 + 0.25;
+    for (const c of colliders) {
+      // solids on the plot only
+      if (c.maxX < -152 || c.minX > -122 || c.maxZ < -20 || c.minZ > 0.5) continue;
+      const clear =
+        DAAVI_BENCH.x + caps <= c.minX ||
+        DAAVI_BENCH.x - caps >= c.maxX ||
+        DAAVI_BENCH.z + caps <= c.minZ ||
+        DAAVI_BENCH.z - caps >= c.maxZ;
+      expect(clear, `bench waypoint must clear ${JSON.stringify(c)}`).toBe(true);
+    }
+  });
+
+  it('the kiosk shell and its counter slab exist where the rules say they do', () => {
+    expect(KIOSK).toBeDefined();
+    expect(KIOSK_COUNTER).toBeDefined();
+    // the counter zone point sits in front of the counter slab, not inside it
+    expect(locations.find((l) => l.id === 'LOC-001')!.z).toBeGreaterThan(KIOSK_COUNTER.maxZ);
   });
 });
 

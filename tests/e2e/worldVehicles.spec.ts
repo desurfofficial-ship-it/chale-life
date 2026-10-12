@@ -45,5 +45,9 @@ test('world screenshots: van top-down, trotro stop, west junction, east edge', a
 
   const text = await page.locator('.debug-overlay').innerText();
   const dc = Number(text.match(/dc\s+(\d+)/)?.[1] ?? 999);
-  expect(dc, `draw calls ${dc} should be ≤ 60`).toBeLessThanOrEqual(60);
+  // ACCRA MAP budget (re-derived): the batched street view measures ~380
+  // draws (v6 viewer: ~163 at overview + instanced nature + shadows). The
+  // guard catches the UNBATCHED regression (3992 draws when SceneBatcher
+  // was skipped) — the old starter block's ≤ 60 died with the map swap.
+  expect(dc, `draw calls ${dc} should be ≤ 450`).toBeLessThanOrEqual(450);
 });

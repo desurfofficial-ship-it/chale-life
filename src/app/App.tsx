@@ -7,8 +7,10 @@
  * rig (src/engine/CameraRig.tsx) owns zoom/follow at runtime. Component order
  * inside the Canvas matters — <GameLoop /> mounts (and subscribes) first so
  * the transform it writes this frame is what <Player />, <CameraRig /> and
- * <ObjectiveMarker /> consume this same frame. <StarterBlock /> owns ALL
- * scene lighting (its Lighting component) — this file adds no lights.
+ * <ObjectiveMarker /> consume this same frame. <AccraWorld /> (the Accra map,
+ * v6) owns ALL scene lighting (its SceneLights) — this file adds no lights.
+ * The world is 1:1 metres at city scale (plate x −280…340); the dusk rig,
+ * fog and skyline come from the map itself.
  *
  * `shadows="percentage"` enables the shadow-map pass the World's Lighting
  * expects (its meshes set castShadow/receiveShadow) — three r186 only ships
@@ -56,7 +58,7 @@ import {
   type GameState,
 } from '../store/gameStore';
 import { Hud } from '../ui';
-import { StarterBlock } from '../world';
+import { AccraWorld } from '../world';
 import { DebugOverlay } from './DebugOverlay';
 import { isWebGLAvailable } from './webgl';
 
@@ -161,12 +163,12 @@ export function App() {
         shadows="percentage"
         dpr={[1, 1.25]}
         gl={{ antialias: false, alpha: false, powerPreference: 'high-performance' }}
-        camera={{ position: [0, 30, 30], zoom: INITIAL_ZOOM, near: 0.1, far: 200 }}
+        camera={{ position: [0, 60, 60], zoom: INITIAL_ZOOM, near: 0.1, far: 900 }}
         style={{ position: 'absolute', inset: 0 }}
       >
         {/* Background + fog owned by Lighting (B-003b — no duplicate). */}
         <GameLoop />
-        <StarterBlock />
+        <AccraWorld />
         <Player />
         <ObjectiveMarker />
         <CameraRig />

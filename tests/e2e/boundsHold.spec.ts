@@ -1,17 +1,21 @@
 /**
  * B-004 e2e: hold a direction for 20 s and assert the player stays inside
- * WORLD_MIN/MAX minus the capsule radius (0.45 m).
+ * WORLD bounds minus the capsule radius (0.45 m).
  *
- * Does not require reaching the world edge — the path from spawn is full of
+ * ACCRA MAP: the playable plate is x −280…340, z −116…116 (worldBounds in
+ * src/world/colliders.ts, derived from PLATE in lib/mapConfig.ts) — the old
+ * starter block's ±30 constants predate the map swap (the spawn itself,
+ * x −136, is outside them, which failed the test instantly). Does not
+ * require reaching the world edge — the path from spawn is full of
  * colliders. The contract under test is the hard clamp, not free travel.
  */
 import { expect, test } from '@playwright/test';
 
-const WORLD_MIN = -30;
-const WORLD_MAX = 30;
+const WORLD_MIN_X = -280;
+const WORLD_MAX_X = 340;
+const WORLD_MIN_Z = -116;
+const WORLD_MAX_Z = 116;
 const RADIUS = 0.45;
-const LO = WORLD_MIN + RADIUS;
-const HI = WORLD_MAX - RADIUS;
 
 async function readPos(page: import('@playwright/test').Page) {
   const text = await page.locator('[aria-hidden]').first().innerText().catch(() => '');
@@ -43,10 +47,10 @@ test('B-004: hold ArrowRight 20 s — position stays inside world bounds − rad
     const p = await readPos(page);
     if (Number.isFinite(p.x) && Number.isFinite(p.z)) {
       samples.push(p);
-      expect(p.x, `x out of bounds at t=${Date.now() - start}ms`).toBeGreaterThanOrEqual(LO - 1e-3);
-      expect(p.x, `x out of bounds at t=${Date.now() - start}ms`).toBeLessThanOrEqual(HI + 1e-3);
-      expect(p.z, `z out of bounds at t=${Date.now() - start}ms`).toBeGreaterThanOrEqual(LO - 1e-3);
-      expect(p.z, `z out of bounds at t=${Date.now() - start}ms`).toBeLessThanOrEqual(HI + 1e-3);
+      expect(p.x, `x out of bounds at t=${Date.now() - start}ms`).toBeGreaterThanOrEqual(WORLD_MIN_X - 1e-3);
+      expect(p.x, `x out of bounds at t=${Date.now() - start}ms`).toBeLessThanOrEqual(WORLD_MAX_X + 1e-3);
+      expect(p.z, `z out of bounds at t=${Date.now() - start}ms`).toBeGreaterThanOrEqual(WORLD_MIN_Z - 1e-3);
+      expect(p.z, `z out of bounds at t=${Date.now() - start}ms`).toBeLessThanOrEqual(WORLD_MAX_Z + 1e-3);
     }
   }
   await page.keyboard.up('ArrowRight');
@@ -55,10 +59,10 @@ test('B-004: hold ArrowRight 20 s — position stays inside world bounds − rad
   // Movement input was held — player should have moved or pressed against a
   // collider, but every sample must remain inside the playable AABB.
   const last = samples[samples.length - 1];
-  expect(last.x).toBeGreaterThanOrEqual(LO - 1e-3);
-  expect(last.x).toBeLessThanOrEqual(HI + 1e-3);
-  expect(last.z).toBeGreaterThanOrEqual(LO - 1e-3);
-  expect(last.z).toBeLessThanOrEqual(HI + 1e-3);
+  expect(last.x).toBeGreaterThanOrEqual(WORLD_MIN_X - 1e-3);
+  expect(last.x).toBeLessThanOrEqual(WORLD_MAX_X + 1e-3);
+  expect(last.z).toBeGreaterThanOrEqual(WORLD_MIN_Z - 1e-3);
+  expect(last.z).toBeLessThanOrEqual(WORLD_MAX_Z + 1e-3);
   // Sanity: we actually observed a position (and typically moved from spawn).
   expect(Number.isFinite(first.x)).toBe(true);
   expect(Number.isFinite(last.x)).toBe(true);

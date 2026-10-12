@@ -27,6 +27,8 @@ export default defineConfig({
   use: {
     viewport: { width: 390, height: 844 },
     baseURL: 'http://localhost:4173',
+    // Pin the local chromium build (the playwright cache ships 1243 here).
+    executablePath: '/home/z/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome',
     launchOptions: {
       args: [
         '--use-gl=angle',

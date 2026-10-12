@@ -530,12 +530,13 @@ describe('act: the split spots (G-008d — food only at the counter, work only a
   });
 
   it('the job spot zone is where the probe says it is (position path)', () => {
-    // (18, 0) itself, and points inside r 0.9, resolve to the job spot;
-    // (17, 0.5) is counter territory (2.42 m) and outside the job spot.
+    // (−122.9, −2.4) itself, and points inside r 0.9, resolve to the job
+    // spot; (−124.9, −2.0) is counter territory (1.75 m) and outside the
+    // job spot (ACCRA MAP anchors).
     for (const pos of [
-      { x: 18, z: 0 },
-      { x: 17.5, z: 0.5 },
-      { x: 18.4, z: -0.4 },
+      { x: -122.9, z: -2.4 },
+      { x: -123.4, z: -1.9 },
+      { x: -122.5, z: -2.8 },
     ]) {
       const prompt = actPromptFor(
         { ...starterSession(), position: pos },
@@ -544,7 +545,7 @@ describe('act: the split spots (G-008d — food only at the counter, work only a
       expect(prompt.label, `position ${pos.x},${pos.z}`).toBe('Help Daavi');
     }
     const counterSide = actPromptFor(
-      { ...starterSession(), position: { x: 17.0, z: 0.5 } },
+      { ...starterSession(), position: { x: -124.9, z: -2.0 } },
       null
     );
     expect(counterSide.label).toBe(`Buy waakye ${formatGHS(12)}`);
@@ -799,7 +800,7 @@ describe('act: sleep at the Starter Compound (LOC-002, G-006)', () => {
   it('LOC-002 is the compound: a real home location', () => {
     const compound = locations.find((l) => l.id === SLEEP_LOCATION_ID)!;
     expect(compound.type).toBe('home');
-    expect(compound.name).toBe('Starter Compound');
+    expect(compound.name).toBe('Daavi Compound Yard');
   });
 });
 
@@ -986,7 +987,7 @@ describe('act: prompt and resolution agree', () => {
           wallet: { balanceGHS: 35 },
           needs: { hunger: 50, energy: 62 },
           job: { activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] },
-          position: { x: 15.5, z: 2.4 }, // the counter itself
+          position: { x: -126.5, z: -1.85 }, // the counter itself
         },
         null,
       ],
@@ -995,7 +996,7 @@ describe('act: prompt and resolution agree', () => {
           wallet: { balanceGHS: 35 },
           needs: { hunger: 92, energy: 62 },
           job: { activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] },
-          position: { x: 15.5, z: 2.4 }, // Full gate through the position path
+          position: { x: -126.5, z: -1.85 }, // Full gate through the position path
         },
         null,
       ],
@@ -1029,15 +1030,15 @@ describe('act: prompt and resolution agree', () => {
 
 // ── G-008b: proximity wiring (items 1, 2, 4, 7) ─────────────────────────────
 
-const YARD_CENTRE = { x: -10, z: 20 };
-const YARD_GATE = { x: -9.5, z: 13.4 }; // the designed spawn
-const KIOSK = { x: 15.5, z: 2.4 };
+const YARD_CENTRE = { x: -136, z: -6 }; // the sleep-yard centre (ACCRA MAP)
+const YARD_GATE = { x: -136, z: -2 }; // the designed spawn
+const KIOSK = { x: -126.5, z: -1.85 }; // the counter point (ACCRA MAP)
 const BENCH = { x: DAAVI_BENCH.x, z: DAAVI_BENCH.z }; // the real waypoint
-const GATE_POINT_ONLY = { x: -4.5, z: 8 }; // outside the yard, near no point
+const GATE_POINT_ONLY = { x: -118, z: -4 }; // outside the yard, near no point
 
 describe('act: sleep zone is the yard AABB (G-008b item 1)', () => {
   it('the whole yard offers Sleep — not just the 2.5 m gate point', () => {
-    for (const pos of [YARD_CENTRE, YARD_GATE, { x: -14, z: 22 }, { x: -4.2, z: 13.2 }]) {
+    for (const pos of [YARD_CENTRE, YARD_GATE, { x: -140, z: -10 }, { x: -131.5, z: -3 }]) {
       const prompt = actPromptFor(
         { wallet: { balanceGHS: 20 }, needs: { hunger: 50, energy: 40 }, job: createStarterJobState(), position: pos },
         null // the point probe reads nothing here — the zone decides
@@ -1395,8 +1396,8 @@ describe('act: Daavi bench walk (G-008b item 4, G-008d bench on the pavement)', 
 
   it('a nap at the yard mid-shift still works, and the bench is not the yard', () => {
     // Sanity: the zone priority — the pavement bench is never the yard,
-    // the yard (x ≤ −4) is never the bench.
-    expect(actPromptFor(atStep(1, { x: -10, z: 20 }), null).label).toBe('Sleep');
+    // the yard (x ≤ −131) is never the bench (ACCRA MAP anchors).
+    expect(actPromptFor(atStep(1, { x: -136, z: -6 }), null).label).toBe('Sleep');
   });
 });
 
@@ -1413,7 +1414,7 @@ describe('act: objective marker target (G-008b item 7, G-008d item 4)', () => {
 
   it('energy < 25 with no job → LOC-002 (markerPositionFor anchors COMPOUND_DOOR)', () => {
     expect(objectiveMarkerTarget(createStarterJobState(), { hunger: 72, energy: 24 })).toBe(SLEEP_LOCATION_ID);
-    expect(markerPositionFor(SLEEP_LOCATION_ID)).toEqual({ x: -10, z: 18.5 }); // the door
+    expect(markerPositionFor(SLEEP_LOCATION_ID)).toEqual({ x: -148, z: -3.4 }); // the door
     // The threshold is the shared LOW threshold: exactly 25 is not tired.
     expect(objectiveMarkerTarget(createStarterJobState(), { hunger: 72, energy: 25 })).toBe(DAAVI_JOB_SPOT_ID);
   });
@@ -1439,7 +1440,7 @@ describe('act: objective marker target (G-008b item 7, G-008d item 4)', () => {
     expect(
       objectiveMarkerTarget(createStarterJobState(), { hunger: 5, energy: 80 })
     ).toBe(WAAKYE_LOCATION_ID);
-    expect(markerPositionFor(WAAKYE_LOCATION_ID)).toEqual({ x: 15.5, z: 2.4 });
+    expect(markerPositionFor(WAAKYE_LOCATION_ID)).toEqual({ x: -126.5, z: -1.85 });
   });
 });
 

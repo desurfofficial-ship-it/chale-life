@@ -2,18 +2,22 @@
  * colliders.ts — CONTRACT MODULE (do not break).
  *
  * Exports axis-aligned collider boxes in world metres (1 unit = 1 m):
- *   - `colliders`: building + compound-wall footprints players cannot cross
- *   - `worldBounds`: the playable 60 × 60 m block limit
+ *   - `colliders`: every solid footprint on the Accra plate players cannot
+ *     cross (5,400+ boxes — the map viewer's own captured set, same data the
+ *     map's headless movement simulation runs on)
+ *   - `worldBounds`: the playable plate (x −280…340, z −116…116)
  *
  * Boxes are { minX, minZ, maxX, maxZ } — NO three.js / engine imports, so
  * engine and rules code can consume this module from anywhere.
  *
- * Data flows from starter/layout.ts, which is also the source of truth for
- * the visible geometry — colliders and visuals cannot drift apart.
+ * Source of truth: src/world/accra/data/colliders.json — captured from the
+ * live AccraScene with ?capture=1 (lib/colliderExport.ts) during the v6 map
+ * integration; regenerate after world edits and re-run the map's sim suite.
  *
- * Owned by Agent 3 (World & Art).
+ * The old 60 × 60 m starter-block footprints are gone along with the starter
+ * map itself (the Accra map replaces it wholesale).
  */
-import { SOLID_FOOTPRINTS, WORLD_MAX, WORLD_MIN } from './starter/layout';
+import rawBoxes from './accra/data/colliders.json';
 
 export interface ColliderBox {
   minX: number;
@@ -22,23 +26,34 @@ export interface ColliderBox {
   maxZ: number;
 }
 
-export const colliders: ColliderBox[] = SOLID_FOOTPRINTS.map((f) => ({
-  minX: f.x0,
-  minZ: f.z0,
-  maxX: f.x1,
-  maxZ: f.z1,
-}));
-
-export const worldBounds: ColliderBox = {
-  minX: WORLD_MIN,
-  minZ: WORLD_MIN,
-  maxX: WORLD_MAX,
-  maxZ: WORLD_MAX,
-};
+interface RawBox {
+  min: [number, number, number];
+  max: [number, number, number];
+  kind: string;
+}
 
 /**
- * Alias kept from the E-001 placeholder so either type name resolves to the
- * same shape. Engine keeps its own `Box` in src/engine/collision.ts — the two
- * are structurally identical.
+ * Solid AABBs on the plate (x/z extents of every captured solid that blocks a
+ * walker): boxes whose top is below 0.3 m (mats, ground decals — step-overs)
+ * or whose base is above 1.2 m (head-height signs, awnings — walk-under)
+ * are excluded, exactly like the map sim's own head-height rule.
  */
-export type Box = ColliderBox;
+export const colliders: ColliderBox[] = (rawBoxes as unknown as { boxes: RawBox[] }).boxes
+  .filter((b) => b.min[1] <= 1.2 && b.max[1] >= 0.3)
+  .map((b) => ({
+    minX: b.min[0],
+    minZ: b.min[2],
+    maxX: b.max[0],
+    maxZ: b.max[2],
+  }));
+
+/** The playable plate — PLATE from the map config (x −280…340, z −116…116). */
+export const worldBounds: ColliderBox = {
+  minX: -280,
+  minZ: -116,
+  maxX: 340,
+  maxZ: 116,
+};
+
+/** Alias kept from the E-001 placeholder so either type name resolves. */
+export type Collider = ColliderBox;

@@ -216,8 +216,8 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
   expect(hunger0).toBeGreaterThanOrEqual(55); // starter 72 minus boot-time drain
   expect(hunger0).toBeLessThanOrEqual(72);
   const spawn = await readPos(page);
-  expect(spawn.x).toBeCloseTo(-9.5, 0); // LOC-002 compound gate
-  expect(spawn.z).toBeCloseTo(13.4, 0);
+  expect(spawn.x).toBeCloseTo(-136, 0); // LOC-002 sleep yard (ACCRA MAP plot)
+  expect(spawn.z).toBeCloseTo(-2, 0);
 
   await page.screenshot({ path: shot('01-start-390x844.png') });
 
@@ -259,11 +259,22 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
   // the job-spot band (descent target z 0.85 keeps the freeze inside the
   // zone's westbound flip band |z| ≤ 0.9 even at full ~1.6 m poll drift),
   // west into the 0.9 m zone.
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 15.0, 'eastbound');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 3.4, 'north past the counter');
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 18.6, 'east along the pavement past the job-spot column');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.85, 'north into the job-spot band');
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.6, 'west into the job zone');
+  // ACCRA MAP route: east out of the sleep yard (zone x1 = −131), then
+  // east along the clear z ≈ −2 corridor (0.25 m north of the kiosk face),
+  // two-stage into the 0.9 m job disc at (−122.9, −2.4).
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -130.6, 'east out of the sleep yard');
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= -1.5, 'south onto the pavement line');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -124.3, 'east along the plot to the job-spot column');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -2.0, 'north into the job-spot band');
+  await holdUntil(
+    page,
+    'ArrowRight',
+    async () => {
+      const p = await readPos(page);
+      return (p.x + 122.9) ** 2 + (p.z + 2.4) ** 2 <= 0.81;
+    },
+    'east into the job-spot disc'
+  );
   // The proximity probe (the 0.9 m job-spot zone) flips the Act prompt.
   const helpButton = page.getByRole('button', { name: HELP_LABEL });
   await holdUntil(page, 'ArrowLeft', async () => helpButton.isVisible(), 'west into the job spot');
@@ -284,52 +295,43 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
   await expect(grabButton).toHaveAttribute('aria-disabled', 'false'); // step 1 here
   await pacedClick(page, grabButton);
 
-  // Walk to Daavi's bench — the G-008e ROAD LOOP around the merged
-  // world's solids: east passing NORTH of the relocated okada (its
-  // z-band starts 1.58; this leg runs at z ≤ 0.95), south into the road
-  // EAST of the okada, west to the bench column, north until the r 2.5
-  // bench zone flips 'Carry Pans' on (its road-side edge z ≈ 4.95 fires
-  // long before the bench face could pin the capsule at z 4.0).
-  // NOTE: the stop keys on the button flipping ENABLED — 'Carry Pans'
-  // also renders disabled at wrong spots mid-shift.
+  // Walk to Daavi's bench. ACCRA MAP (collider-probed): the straight west
+  // walk at the job spot's z (−2.4) is SEALED — the kiosk body (x −128…−125,
+  // z −4.6…−2.6) and its front counter slab (z −2.65…−2.05) block the
+  // capsule at x ≈ −124.55 (the robot grinds into the east face). The clear
+  // corridor is the z ≈ −1.5 pavement line (probed clear −1.5…+0.3 for the
+  // full west run): south onto the pavement line, then west into the r 2.5
+  // bench zone (the flip fires at x ≤ −130.2 on this line; aiming x ≤ −131
+  // keeps every drift overshoot inside it). The −1.5 target also leaves
+  // ~1.9 m of headroom to the bollard pocket at (−125.2, 0.8): the HUD
+  // position lags the true capsule by up to ~1.1 m under software GL, and
+  // an overshoot past +0.37 would pin the west walk on the bollard's
+  // z-band (seen live at (−124.82, +0.46) with a −0.6 target).
   const carryButton = page.getByRole('button', { name: CARRY_VERB });
   await expect(carryButton).toHaveAttribute('aria-disabled', 'true'); // not there yet (≥ 3 m from the bench zone)
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 25.2, 'east north of the okada');
-  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'south into the road east of the okada');
-  // Position-only legs — NO button-locator conditions inside holdUntil:
-  // between zones the Act pill relabels to bare 'Act', the 'Carry Pans'
-  // locator goes absent, and a getAttribute condition would block the
-  // poll while the key walks the robot into the far solids. The freeze
-  // rectangle [20.3, 21.5] × [4.0, 4.4] is fully inside the bench zone
-  // (worst corner dist 2.29 < 2.5), so the flip is guaranteed by
-  // geometry; the expect below does the waiting.
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 21.5, 'west along the road to the bench column');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 4.4, 'north into the bench zone');
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= -1.5, 'south onto the pavement line');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= -131.0, 'west along the pavement into the bench zone');
   await expect(carryButton).toHaveAttribute('aria-disabled', 'false'); // the bench zone
   await pacedClick(page, carryButton); // step 2 at the bench
 
-  // Back to the job spot for the final lift + pay — the G-008e return:
-  // road west clear of the bench (tangent-passes its z-band at worst),
-  // north past the counter, pavement east, south into the band, west
-  // until the job zone flips 'Get paid' on.
+  // Back to the job spot for the final lift + pay — east along the
+  // pavement line (probed clear at z −1.5…−1.0), two-stage into the
+  // 0.9 m job disc.
   const payButton = page.getByRole('button', { name: PAY_VERB });
   await expect(payButton).toHaveAttribute('aria-disabled', 'true'); // not there yet
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 17.0, 'west along the road clear of the bench');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 3.4, 'north past the counter');
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 18.6, 'east along the pavement past the job-spot column');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.85, 'north into the job-spot band');
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.6, 'west into the job zone');
-  // Final approach keys on the ZONE itself (the same disc the probe
-  // uses, r 0.9 at (18, 0)) — a button-locator condition would block on
-  // the pill relabelling between zones (see the bench legs above).
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -124.3, 'east back to the job-spot column');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -2.0, 'north into the job-spot band');
+  // Final approach keys on the ZONE itself (the same disc the probe uses,
+  // r 0.9 at (−122.9, −2.4)) — a button-locator condition would block on
+  // the pill relabelling between zones.
   await holdUntil(
     page,
-    'ArrowLeft',
+    'ArrowRight',
     async () => {
       const p = await readPos(page);
-      return (p.x - 18) ** 2 + p.z * p.z <= 0.81;
+      return (p.x + 122.9) ** 2 + (p.z + 2.4) ** 2 <= 0.81;
     },
-    'west into the job spot'
+    'east into the job spot'
   );
   await expect(payButton).toHaveAttribute('aria-disabled', 'false');
   await pacedClick(page, payButton); // final lift → payout
@@ -342,11 +344,12 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
   // robot pins hunger 50 with the e2e hook, walks over, buys.
   await setNeeds(page, 50, 60);
   const waakyeButton = page.getByRole('button', { name: WAAKYE_LABEL });
-  // Collider-aware meal route (G-008e): south onto the north pavement
-  // (clear of the crates at x ≥ 17.97), then west into the counter's
-  // zone — two legs, both wide open on the merged world.
-  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 2.2, 'south onto the pavement');
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 17.2, 'west into the counter zone');
+  // Collider-aware meal route (ACCRA MAP, probed): south out of the
+  // job-spot band onto the pavement line (z −1.4 — north of the counter
+  // slab, clear all the way), then west into the counter's r 2.5 zone —
+  // the flip fires at x ≤ −124.03; −124.5 stops 0.5 m inside it.
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= -1.4, 'south onto the pavement line');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= -124.5, 'west into the counter zone');
   await expect(waakyeButton).toHaveAttribute('aria-disabled', 'false');
   const hungerBeforeMeal = await hungerNow(page);
 
@@ -367,8 +370,12 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
   await expect(idleButton).toHaveAttribute('aria-disabled', 'true');
   await expect(page.getByText(formatGHS(23), { exact: true })).toBeVisible();
 
-  // ── 7. Perf budget + a clean console ───────────────────────────────
-  expect(await drawCalls(page)).toBeLessThan(60);
+  // ── 7. Perf budget + a clean console ─────────────────────────────
+  // ACCRA MAP budget (re-derived): the batched street view measures 379
+  // draws (the v6 viewer reports ~163 at overview + instanced nature);
+  // the guard's job is to catch the UNBATCHED regression (measured 3992
+  // when SceneBatcher was skipped), not to pin the old starter map's 60.
+  expect(await drawCalls(page)).toBeLessThan(450);
   expect(failedAssets, 'every shipped asset must resolve').toEqual([]);
   expect(pageErrors, 'the playtest must run without page errors').toEqual([]);
 });

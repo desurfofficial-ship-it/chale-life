@@ -29,7 +29,16 @@ export function Player() {
   const silhouetteGroup = useRef<THREE.Group>(null);
 
   const { camera, scene } = useThree();
-  const raycaster = useMemo(() => new THREE.Raycaster(), []);
+  // three's Sprite.raycast reads `raycaster.camera` and THROWS (null
+  // matrixWorld) when it is unset — and one thrown useFrame callback kills
+  // the whole R3F frame loop (black screen: render never runs, dc 0, scr
+  // 0/0). The Accra map's scene carries billboard sprites the old starter
+  // block never had, so the occlusion raycaster must know the camera.
+  const raycaster = useMemo(() => {
+    const r = new THREE.Raycaster();
+    r.camera = camera;
+    return r;
+  }, [camera]);
   const _origin = useMemo(() => new THREE.Vector3(), []);
   const _dir = useMemo(() => new THREE.Vector3(), []);
   const _player = useMemo(() => new THREE.Vector3(), []);
@@ -58,6 +67,10 @@ export function Player() {
       const obj = hits[i].object;
       if (obj.userData?.[PLAYER_MESH_FLAG]) continue;
       if (!obj.visible) continue;
+      // Occluders are solid geometry. Sprites (billboard markers) and other
+      // non-mesh objects never hide the player — dimming the capsule because
+      // a floating label crossed the ray would flicker the silhouette.
+      if (!(obj as THREE.Mesh).isMesh) continue;
       occluded = true;
       break;
     }

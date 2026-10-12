@@ -42,20 +42,25 @@ import { locations, type Location } from '../data/locations';
 export const DEFAULT_NEAR_RADIUS_M = 2.5;
 
 /**
- * Compound yard AABB from starter layout walls (x −16..−4, z 15..27)
- * plus the gate apron so the designed spawn at z≈13.4 can Act.
+ * Sleep zone = the reserved plot's open yard (mats) + pavement apron, so the
+ * designed spawn at (−136, −2) can Act. Marker anchor: the compound-house
+ * door on the plot's west side.
  */
 export const SLEEP_ZONE = {
   locationId: 'LOC-002' as const,
-  x0: -16,
-  x1: -4,
-  /** Includes the designed spawn at the gate (z≈13.4). */
-  z0: 13.0,
-  z1: 27,
+  // ACCRA MAP: the reserved plot's open sleep yard (mats x −142…−130) plus
+  // the pavement apron south of it (z −1.4 = the pavement strip edge), so
+  // the designed spawn at (−136, −2) can Act.
+  x0: -142,
+  // x1 −131: the yard's water drum (−130.5,−6.2) sits just outside so the
+  // sachet-water point beside it can win its own probe.
+  x1: -131,
+  z0: -12,
+  z1: -1.4,
 };
 
 /** House door on the south face of the compound house — marker anchor. */
-export const COMPOUND_DOOR = { x: -10, z: 18.5 };
+export const COMPOUND_DOOR = { x: -148, z: -3.4 };
 
 /**
  * Daavi's bench waypoint — the hustle's step-2 set-down. G-008d: MOVED
@@ -71,8 +76,11 @@ export const COMPOUND_DOOR = { x: -10, z: 18.5 };
  */
 export const DAAVI_BENCH = {
   locationId: 'LOC-001-BENCH' as const,
-  x: 21.5,
-  z: 2.45,
+  // ACCRA MAP: the set-down spot on the plot pavement west of the kiosk —
+  // off the Daavi St carriageway (z 0.5…7.5), outside the sleep zone, 6.2 m
+  // from the counter and 9.8 m from the job spot (disjointness pins hold).
+  x: -132.5,
+  z: -0.6,
   radius: DEFAULT_NEAR_RADIUS_M,
 };
 
@@ -88,8 +96,10 @@ export const DAAVI_BENCH = {
  */
 export const DAAVI_JOB_SPOT = {
   locationId: 'LOC-001-JOB' as const,
-  x: 18.0,
-  z: 0.0,
+  // ACCRA MAP: the kiosk's east side (kiosk x −128…−125); 3.61 m from the
+  // counter so the 2.5 + 0.9 m zones stay disjoint (asserted by tests).
+  x: -122.9,
+  z: -2.4,
   radius: 0.9,
 };
 
