@@ -214,6 +214,32 @@ async function pacedClick(page: Page, locator: ReturnType<Page['getByRole']>): P
 }
 
 /**
+ * Human-paced Act tap that must land INSIDE the 0.9 m job disc: the
+ * capsule coasts after every key release, and on a near-real-time runner
+ * the 700 ms pacing pause alone can carry it OUT of the disc — the pill
+ * flips to bare 'Act', the locator never resolves, and the click burns
+ * the whole test budget waiting (CI 2026-10-13 lost sleepYard (c) + the
+ * earnAndEat mirror on a faster runner than the routes were tuned on).
+ * So the click gets a short timeout, and if the label went absent the
+ * creep re-settles the capsule at r ≤ 0.5 (where burst coast cannot reach
+ * the edge) and the click retries — speed-agnostic by construction. The
+ * shift state lives in the store, so only the position was ever wrong.
+ */
+async function pacedClickInSpot(
+  page: Page,
+  locator: ReturnType<Page['getByRole']>,
+  reenter: () => Promise<void>
+): Promise<void> {
+  await page.waitForTimeout(700);
+  try {
+    await locator.click({ timeout: 4_000 });
+  } catch {
+    await reenter();
+    await locator.click({ timeout: 15_000 });
+  }
+}
+
+/**
  * The G-008e walk from spawn to the JOB SPOT on the MERGED world (Agent
  * 3's #28 moved the okada to 23.6, 2.85 — footprint x 22.64–24.56 —
  * sealing the old okada–bench pavement gap but OPENING the pavement west
@@ -342,7 +368,7 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
   const helpButton = page.getByRole('button', { name: 'Help Daavi' });
   await expect(helpButton).toBeVisible(); // the zone probe already reads LOC-001-JOB
   await expect(helpButton).toHaveAttribute('aria-disabled', 'false');
-  await pacedClick(page, helpButton);
+  await pacedClickInSpot(page, helpButton, () => creepIntoJobSpot(page, 'hire retry'));
   await expect(page.getByText('Job accepted')).toBeVisible();
 
   // Step 1 fires right here — the player is standing at the job spot.
@@ -458,7 +484,7 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
   // only the wall-clock ceiling grew (the spec budget is 20 m — see
   // setTimeout above; healthy runs still re-enable in ~45–60 s).
   await expect(helpButton).toHaveAttribute('aria-disabled', 'false', { timeout: 300_000 });
-  await pacedClick(page, helpButton);
+  await pacedClickInSpot(page, helpButton, () => creepIntoJobSpot(page, '2nd hire retry'));
   await expect(page.getByText('Job accepted')).toBeVisible();
 
   await expect(grabButton).toHaveAttribute('aria-disabled', 'false'); // step 1 here
@@ -472,10 +498,13 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
   await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -124.3, '2nd: east back to the job-spot column');
   await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -2.0, '2nd: north into the job-spot band');
   // Same hardening as the first-shift pay leg: burst-creep to r ≤ 0.5 —
-  // the raw r 0.9-edge release coasted back out of the disc on CI.
+  // the raw r 0.9-edge release coasted back out of the disc on CI (hit
+  // independently by BOTH PRs on the same day: #34 run 1 and #35's 943f2bc;
+  // creepIntoJobSpot's settle IS the post-edge-release settle this file's
+  // pacedClickInSpot path used to add separately).
   await creepIntoJobSpot(page, '2nd: pay');
   await expect(payButton).toHaveAttribute('aria-disabled', 'false');
-  await pacedClick(page, payButton); // final lift → second payout
+  await pacedClickInSpot(page, payButton, () => creepIntoJobSpot(page, '2nd pay retry')); // final lift → second payout
 
   await expect(page.getByText(formatGHS(26), { exact: true })).toBeVisible(); // 11 + 15
   await page.screenshot({ path: shot('08-second-payout-390x844.png') });

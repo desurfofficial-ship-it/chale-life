@@ -228,6 +228,32 @@ async function pacedClick(
   await locator.click();
 }
 
+/**
+ * Human-paced Act tap that must land INSIDE the 0.9 m job disc: the
+ * capsule coasts after every key release, and on a near-real-time runner
+ * the 700 ms pacing pause alone can carry it OUT of the disc — the pill
+ * flips to bare 'Act', the locator never resolves, and the click burns
+ * the whole test budget waiting (CI 2026-10-13 lost earnAndEat + sleepYard
+ * (c) to exactly this on a faster runner than the routes were tuned on).
+ * So the click gets a short timeout, and if the label went absent the
+ * creep re-settles the capsule at r ≤ 0.5 (where burst coast cannot reach
+ * the edge) and the click retries — speed-agnostic by construction. The
+ * shift state lives in the store, so only the position was ever wrong.
+ */
+async function pacedClickInSpot(
+  page: Page,
+  locator: ReturnType<Page['getByRole']>,
+  reenter: () => Promise<void>
+): Promise<void> {
+  await page.waitForTimeout(700);
+  try {
+    await locator.click({ timeout: 4_000 });
+  } catch {
+    await reenter();
+    await locator.click({ timeout: 15_000 });
+  }
+}
+
 test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Act disables off-location', async ({
   page,
 }, testInfo: TestInfo) => {
@@ -313,7 +339,7 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
   expect(HELP_LABEL).toContain(EMPLOYER_NAME);
 
   // ── 4. Act: accept the hustle, work all steps until the payout ──────────
-  await pacedClick(page, helpButton);
+  await pacedClickInSpot(page, helpButton, () => creepIntoJobSpot(page, 'hire retry'));
   await expect(page.getByText('Job accepted')).toBeVisible();
   await expect(page.getByText(formatGHS(20), { exact: true })).toBeVisible(); // zero-capital
 
@@ -357,7 +383,7 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
   // centre so the prompt flips ON and stays on through the pay press.
   await creepIntoJobSpot(page, 'pay');
   await expect(payButton).toHaveAttribute('aria-disabled', 'false');
-  await pacedClick(page, payButton); // final lift → payout
+  await pacedClickInSpot(page, payButton, () => creepIntoJobSpot(page, 'pay retry')); // final lift → payout
 
   await expect(page.getByText(formatGHS(35), { exact: true })).toBeVisible();
   await page.screenshot({ path: shot('03-wallet-35-390x844.png') });
