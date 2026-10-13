@@ -25,8 +25,12 @@ import * as THREE from 'three'
 import { useGLTF } from '@react-three/drei'
 import { clone as skeletonClone } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import { markAnimated, unmarkAnimated } from './SceneBatcher'
+// publicUrl() (E-007 guardrail): the app deploys under vite base
+// '/chale-life/' (vite preview + GitHub Pages) — a bare '/models/…'
+// resolves against the ORIGIN ROOT and 404s in every built deploy.
+import { publicUrl } from '../../world/gltfSupport'
 
-export const CHARACTER_MODEL_URL = '/models/AccraLife_Male_Character_SkinRefined_v2.glb'
+export const CHARACTER_MODEL_URL = publicUrl('/models/AccraLife_Male_Character_SkinRefined_v2.glb')
 
 // measured constants (parsed from the GLB — keep in sync if the file changes)
 export const CHARACTER = {
