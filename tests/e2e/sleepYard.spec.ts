@@ -324,7 +324,13 @@ test('(a) sleep zone: the whole yard offers Sleep and +55 energy', async ({
 test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown to the second shift', async ({
   page,
 }, testInfo: TestInfo) => {
-  test.setTimeout(600_000);
+  // 20 m: (c)+(d) spans the burst → payout → two meals → a SECOND full
+  // shift, and between them a cooldown expiry that runs on GAME time —
+  // the CI runner's game clock crawls (SwiftShader rAF), so that wait
+  // alone can burn its whole 300 s ceiling. 600 s killed the test mid
+  // second-shift (the first CI run died inside the 'Get paid' click);
+  // the ceiling must cover: pre-(d) ≈ 4.5 m + wait ≤ 5 m + shift ≈ 1.5 m.
+  test.setTimeout(1_200_000);
   const shot = (name: string) => testInfo.outputPath(name);
 
   // Work the real loop to a payout: hire at the JOB SPOT → grab → bench
@@ -453,8 +459,8 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
   // slow CI runner game-time advances far slower than wall-clock, and the
   // first CI run outgrew the old 90 s ceiling while the robot stood on the
   // spot with "Help Daavi" still greyed. The expiry predicate is unchanged;
-  // only the wall-clock ceiling grew (worst case ≈ 8.3 m < the 10 m spec
-  // timeout; healthy runs still re-enable in ~45–60 s).
+  // only the wall-clock ceiling grew (the spec budget is 20 m — see
+  // setTimeout above; healthy runs still re-enable in ~45–60 s).
   await expect(helpButton).toHaveAttribute('aria-disabled', 'false', { timeout: 300_000 });
   await pacedClick(page, helpButton);
   await expect(page.getByText('Job accepted')).toBeVisible();
