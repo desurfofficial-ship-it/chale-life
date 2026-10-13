@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { locations } from '../../data/locations';
-import { createStarterJobState, idleObjectiveFor, type JobState } from '../jobs';
+import {
+  createStarterJobState,
+  idleObjectiveFor,
+  starterHustleCoolingDown,
+  type JobState,
+} from '../jobs';
 import {
   actPromptFor,
   AUNTY_BA_HUSTLE_ID,
   DAAVI_JOB_SPOT_ID,
+  promptCooldownLive,
   SLEEP_LOCATION_ID,
   WAAKYE_LOCATION_ID,
 } from '../act';
@@ -183,5 +189,42 @@ describe('G-008e: the cooldown line never suggests an action the Act button refu
         }
       }
     }
+  });
+});
+
+describe('G-008e follow-up: the countdown clock gates (pure rules helpers)', () => {
+  // Same wall-clock anchor style as the describes above — every input is
+  // plain data, no Date.now() anywhere (rules/README.md convention).
+  const NOW = 1_000_000;
+
+  it('starterHustleCoolingDown mirrors the 45 s payout window edge-for-edge', () => {
+    // Never paid / no session clock → never gated (fresh guest reads free).
+    expect(starterHustleCoolingDown(NOW, undefined)).toBe(false);
+    expect(starterHustleCoolingDown(undefined, NOW)).toBe(false);
+    // Fresh payout → live; the window is the definition's cooldownSeconds.
+    expect(starterHustleCoolingDown(NOW, NOW)).toBe(true);
+    expect(starterHustleCoolingDown(NOW + 44_999, NOW)).toBe(true);
+    // The expiry boundary: cooldownRemaining counts 45_000 ms exactly.
+    expect(starterHustleCoolingDown(NOW + 45_000, NOW)).toBe(false);
+    expect(starterHustleCoolingDown(NOW + 300_000, NOW)).toBe(false);
+  });
+
+  it('promptCooldownLive covers BOTH prompt countdowns (job + water rest)', () => {
+    // Neither stamp armed → no countdown can be live.
+    expect(promptCooldownLive(NOW, undefined, undefined)).toBe(false);
+    // Each rest alone is enough (job 45 s, sachet water 20 s).
+    expect(promptCooldownLive(NOW, NOW, undefined)).toBe(true);
+    expect(promptCooldownLive(NOW, undefined, NOW)).toBe(true);
+    // Simultaneous stamps: the water rest (20 s) always expires BEFORE the
+    // job rest (45 s), so the job window alone carries liveness through.
+    expect(promptCooldownLive(NOW + 20_000, NOW, NOW)).toBe(true);
+    expect(promptCooldownLive(NOW + 45_000, NOW, NOW)).toBe(false);
+    // Staggered stamps — a water bought 40 s AFTER the payout: the job
+    // rest expires at NOW+45s, the water rest outlives it to NOW+60s, so
+    // the clock must keep running in between.
+    expect(promptCooldownLive(NOW + 50_000, NOW, NOW + 40_000)).toBe(true);
+    // Both expired (60 s past the payout; the water's 20 s from NOW+40s
+    // hits its edge exactly) → frozen clock.
+    expect(promptCooldownLive(NOW + 60_000, NOW, NOW + 40_000)).toBe(false);
   });
 });

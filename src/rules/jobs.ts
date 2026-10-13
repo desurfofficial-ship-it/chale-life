@@ -322,6 +322,22 @@ export function cooldownStatus(
   return cooldownRemaining(def.cooldownSeconds, nowMs, lastPayoutAt);
 }
 
+/**
+ * Whether the starter hustle's payout cooldown rests live at nowMs
+ * (G-008e follow-up): the HUD objective card's standalone 1 Hz countdown
+ * clock runs exactly this long — the session clock feeds it back each
+ * tick, and when this returns false no timer runs at all. Pure data in,
+ * boolean out — the card's copy itself still comes only from
+ * idleObjectiveFor (single source of truth for text).
+ */
+export function starterHustleCoolingDown(
+  nowMs: number | undefined,
+  lastPayoutAt: number | undefined
+): boolean {
+  const hustle = findJobById('HUSTLE_AUNTY_BA_STARTER');
+  return hustle ? cooldownStatus(hustle, nowMs, lastPayoutAt).onCooldown : false;
+}
+
 export interface ObjectiveInfo {
   readonly tag: string;
   readonly title: string;

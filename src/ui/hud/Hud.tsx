@@ -24,8 +24,13 @@
 import { useEffect, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import { getState, subscribe, type GameState } from '../../store/gameStore';
 import { formatGHS } from '../../rules/economy';
-import { idleObjectiveFor, objectiveFor } from '../../rules/jobs';
+import {
+  idleObjectiveFor,
+  objectiveFor,
+  starterHustleCoolingDown,
+} from '../../rules/jobs';
 import { isLow, lowNeedsHints, LOW_THRESHOLD } from '../../rules/needs';
+import { useCountdownNow } from '../useTicker';
 
 export interface HudProps {
   /** Called by the Act button — the Engine decides what "Act" means. */
@@ -195,9 +200,16 @@ function ObjectiveCard() {
   const completedIds = useStoreValue((s) => s.job.completedIds);
   const hunger = useStoreValue((s) => s.needs.hunger);
   const energy = useStoreValue((s) => s.needs.energy);
-  // G-008e: the payout stamp + the wall clock let the idle card count the
-  // job cooldown down live (same ~1 Hz drain that ticks the Act reason).
   const lastPayoutAt = useStoreValue((s) => s.job.lastPayoutAt);
+  // G-008e: the payout stamp lets the idle card count the job cooldown
+  // down live. G-008e follow-up: the clock is a STANDALONE 1 Hz tick —
+  // the drain cadence only commits while a need is actually moving, so a
+  // capped belly would freeze the count mid-window; with no cooldown
+  // armed (and for every tick after it expires) the clock is frozen and
+  // no timer runs at all.
+  const nowMs = useCountdownNow(lastPayoutAt, (t) =>
+    starterHustleCoolingDown(t, lastPayoutAt)
+  );
   const objective = objectiveFor({ activeId, step, completedIds });
   // G-005: the idle line is a pure rules helper — Daavi-aware and
   // completedIds-aware (fresh guest vs. hungry-after-the-hustle nudge).
@@ -206,7 +218,7 @@ function ObjectiveCard() {
   const idleLine = idleObjectiveFor(
     { activeId, step, completedIds, lastPayoutAt },
     { hunger, energy },
-    Date.now()
+    nowMs
   );
   return (
     <div

@@ -7,3 +7,4 @@
 
 export { Hud } from './hud/Hud';
 export type { HudProps } from './hud/Hud';
+export { useCountdownNow } from './useTicker';
