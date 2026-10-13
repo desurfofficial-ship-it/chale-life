@@ -60,15 +60,8 @@ const HUNGRY_PAID_LABEL = actPromptFor(
   WAAKYE_LOCATION_ID
 ).label;
 
-/** The countdown reason line under the pill ("<employer> needs you again
- *  in Ns") — $-anchored so it matches the PILL's bare reason only, never
- *  the objective card's longer G-008e idle line. */
-const COOLDOWN_REASON = new RegExp(`${EMPLOYER_NAME} needs you again in \\d+s$`);
-/** G-008e: the objective card's idle line counts the SAME rest down —
- *  two surfaces, one clock, each matched by its exact shape. */
-const COOLDOWN_CARD_LINE = new RegExp(
-  `${EMPLOYER_NAME} needs you again in \\d+s — grab water or rest\\.`
-);
+/** The countdown reason line under the pill ("<employer> needs you again in Ns"). */
+const COOLDOWN_REASON = new RegExp(`${EMPLOYER_NAME} needs you again in \\d+s`);
 
 // ── Robot helpers (mirrors of earnAndEat.spec.ts) ────────────────────────────
 
@@ -139,6 +132,39 @@ async function holdUntil(
 }
 
 /**
+ * Enter the 0.9 m job disc (centre (−122.9, −2.4)) and stop near its
+ * CENTRE — same rationale as earnAndEat.spec.ts's creepIntoJobSpot: a
+ * full-speed release at the r 0.9 edge coasts the capsule back OUT of
+ * the disc on a slow/loaded runner (HUD-poll lag + post-release
+ * inertia), so the fast legs halt on position predicates only and this
+ * burst-creep (160 ms press / 120 ms pause, axis + direction re-chosen
+ * every burst) settles the capsule at r ≤ 0.5, where the burst coast
+ * cannot reach the edge. Disc interior collider-clear (probe: zero
+ * boxes under the r 1.2 bounding square).
+ */
+async function creepIntoJobSpot(page: Page, what: string): Promise<void> {
+  const start = Date.now();
+  for (;;) {
+    const p = await readPos(page);
+    const r2 = (p.x + 122.9) ** 2 + (p.z + 2.4) ** 2;
+    if (r2 <= 0.25) return; // r ≤ 0.5 — inside the disc with edge margin
+    if (Date.now() - start > 150_000) {
+      throw new Error(`creep into the job spot stalled (${what}) at ${JSON.stringify(p)}`);
+    }
+    const dx = p.x + 122.9;
+    const dz = p.z + 2.4;
+    const code =
+      Math.abs(dz) > Math.abs(dx)
+        ? dz > 0 ? 'ArrowUp' : 'ArrowDown'
+        : dx > 0 ? 'ArrowLeft' : 'ArrowRight';
+    await pressKey(page, code, true);
+    await page.waitForTimeout(160);
+    await pressKey(page, code, false);
+    await page.waitForTimeout(120);
+  }
+}
+
+/**
  * G-008c item 5 — the payout tap, the setNeeds that arms the waakye
  * offer, and `taps` rapid pointerdowns all inside ONE evaluate call: a
  * single synchronous JS task, so the whole burst lands within a few ms
@@ -188,46 +214,57 @@ async function pacedClick(page: Page, locator: ReturnType<Page['getByRole']>): P
 }
 
 /**
- * The G-008d walk from spawn to the JOB SPOT (collider-aware): east along
- * the south pavement, north past the counter, south into the road, east
- * into the kiosk–bench corridor, north beside the kiosk's east wall, west
- * into the 0.9 m job-spot zone — the same route earnAndEat.spec.ts
- * drives. G-008e merge fix: the corridor between the crate stack (x ≤
- * 17.62) and the bench mesh (x ≥ 20.7) is clear since the okada moved
- * east of the bench, so the robot turns north at x 19 — the old x 20
- * line drove its capsule straight into the bench mesh's south face.
+ * The G-008e walk from spawn to the JOB SPOT on the MERGED world (Agent
+ * 3's #28 moved the okada to 23.6, 2.85 — footprint x 22.64–24.56 —
+ * sealing the old okada–bench pavement gap but OPENING the pavement west
+ * of the bench): east along the south pavement, north past the counter,
+ * east along the north pavement (the bench west face pins any overshoot
+ * harmlessly past the x 18.6 goal), north into the job-spot band
+ * (descent target z 0.85 keeps the freeze inside the zone's westbound
+ * flip band |z| ≤ 0.9 even at full ~1.6 m poll drift), west into the
+ * 0.9 m zone — the same route earnAndEat.spec.ts drives.
  */
 async function walkToJobSpot(page: Page): Promise<void> {
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 15.0, 'eastbound');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 3.4, 'north past the counter');
-  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'south into the road');
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 19.0, 'east into the corridor');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.6, 'north beside the kiosk wall');
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.5, 'west into the job spot');
+  // ACCRA MAP route: east out of the sleep yard (zone x1 = −131), then
+  // east along the clear z ≈ −2 corridor (0.25 m north of the kiosk face),
+  // two-stage into the 0.9 m job disc at (−122.9, −2.4).
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -130.6, 'east out of the sleep yard');
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= -1.5, 'south onto the pavement line');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -124.3, 'east along the plot to the job-spot column');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -2.0, 'north into the job-spot band');
+  // Final approach keys on the ZONE itself (the same disc the probe
+  // uses, r 0.9 at (−122.9, −2.4)) — a button-locator condition would
+  // block on the pill relabelling between zones. The creep stops at the
+  // disc centre so the prompt flips ON and stays on through the press.
+  await creepIntoJobSpot(page, 'walkToJobSpot');
 }
 
 /**
  * The JOB SPOT → COUNTER walk (meals live at the front counter now):
- * south into the road (nothing solid sits south of the job spot since
- * the okada moved east of the bench), west along it, north into the
- * counter's zone.
+ * ACCRA MAP (collider-probed): south onto the pavement line (z −1.4,
+ * north of the counter slab — clear all the way), then WEST into the
+ * counter's r 2.5 zone (flip at x ≤ −124.03; −124.5 stops 0.5 m inside).
  */
 async function walkToCounter(page: Page): Promise<void> {
-  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'south into the road');
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 16.8, 'west along the road');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 3.4, 'north to the counter');
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= -1.4, 'south onto the pavement line');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= -124.5, 'west into the counter zone');
 }
 
 /**
- * The COUNTER → JOB SPOT walk back: south into the road, east into the
- * kiosk–bench corridor (x 19 — clear of the bench mesh's west face),
- * north beside the kiosk wall, west into the zone.
+ * The COUNTER → JOB SPOT walk back (G-008e): east along the pavement
+ * past the job-spot column, south into the band, west into the zone.
  */
 async function walkBackToJobSpot(page: Page): Promise<void> {
-  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 4.7, 'back south into the road');
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 19.0, 'back east into the corridor');
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.6, 'back north beside the wall');
-  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= 18.5, 'back west into the job spot');
+  // ACCRA MAP: east along the pavement, NORTH into the job-spot band
+  // (z −2.0 — the disc at z −1.5 would sit exactly on the 0.9 m boundary
+  // and a 0.36 m poll step could overshoot past it), then east into the
+  // 0.9 m job disc.
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -124.3, 'back east to the job-spot column');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -2.0, 'north into the job-spot band');
+  // (the disc at z −1.5 would sit exactly on the 0.9 m boundary and a
+  // 0.36 m poll step could overshoot past it) — the creep entry stops at
+  // the disc centre so the prompt flips ON and stays on through the press.
+  await creepIntoJobSpot(page, 'walkBackToJobSpot');
 }
 
 test('(a) sleep zone: the whole yard offers Sleep and +55 energy', async ({
@@ -252,15 +289,18 @@ test('(a) sleep zone: the whole yard offers Sleep and +55 energy', async ({
   await expect(sleepButton).toBeVisible();
   await expect(sleepButton).toHaveAttribute('aria-disabled', 'false');
 
-  // Walk INTO the yard — south through the 3 m gate opening (+z is south):
-  // past the gate point's 2.5 m radius (z > 15.9) the ZONE, not the point,
-  // is what keeps Sleep on the button. Walk to the house door area.
-  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= 17, 'into the yard');
+  // Walk INTO the yard — north across the mats (−z): past the yard edge
+  // the ZONE, not any point, is what keeps Sleep on the button. Walk to
+  // the yard centre (clear of the clothesline props at z ≈ −3.5).
+  // dodge east of the clothesline first (its x-band −137.2…−135.2 seals
+  // the direct north walk from the spawn), then north into the yard
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -134.5, 'east clear of the clothesline');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -6, 'into the yard');
   const inYard = await readPos(page);
-  expect(inYard.x).toBeGreaterThanOrEqual(-16); // inside the SLEEP_ZONE AABB
-  expect(inYard.x).toBeLessThanOrEqual(-4);
-  expect(inYard.z).toBeGreaterThanOrEqual(13);
-  expect(inYard.z).toBeGreaterThan(15.9); // OUTSIDE the old 2.5 m gate point
+  expect(inYard.x).toBeGreaterThanOrEqual(-142); // inside the SLEEP_ZONE AABB
+  expect(inYard.x).toBeLessThanOrEqual(-130);
+  expect(inYard.z).toBeGreaterThanOrEqual(-12);
+  expect(inYard.z).toBeLessThanOrEqual(-5); // deep in the yard, off the apron
   await expect(sleepButton).toHaveAttribute('aria-disabled', 'false');
 
   await page.screenshot({ path: shot('05-sleep-in-yard-390x844.png') });
@@ -284,7 +324,13 @@ test('(a) sleep zone: the whole yard offers Sleep and +55 energy', async ({
 test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown to the second shift', async ({
   page,
 }, testInfo: TestInfo) => {
-  test.setTimeout(600_000);
+  // 20 m: (c)+(d) spans the burst → payout → two meals → a SECOND full
+  // shift, and between them a cooldown expiry that runs on GAME time —
+  // the CI runner's game clock crawls (SwiftShader rAF), so that wait
+  // alone can burn its whole 300 s ceiling. 600 s killed the test mid
+  // second-shift (the first CI run died inside the 'Get paid' click);
+  // the ceiling must cover: pre-(d) ≈ 4.5 m + wait ≤ 5 m + shift ≈ 1.5 m.
+  test.setTimeout(1_200_000);
   const shot = (name: string) => testInfo.outputPath(name);
 
   // Work the real loop to a payout: hire at the JOB SPOT → grab → bench
@@ -304,31 +350,51 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
   await expect(grabButton).toHaveAttribute('aria-disabled', 'false');
   await pacedClick(page, grabButton); // step 1 (job spot)
 
-  // Walk to Daavi's bench on the north pavement (G-008d): east along the
-  // kiosk's north side (clear of the okada's z-band), then south into
-  // the zone. The stop keys on the button flipping ENABLED — 'Carry
-  // Pans' also renders disabled at wrong spots mid-shift.
+  // Walk to Daavi's bench — the G-008e ROAD LOOP around the merged
+  // world's solids: east passing NORTH of the relocated okada, south
+  // into the road east of it, west to the bench column, north until the
+  // r 2.5 bench zone flips 'Carry Pans' on. The stop keys on the button
+  // flipping ENABLED — 'Carry Pans' also renders disabled at wrong
+  // spots mid-shift.
   const carryButton = page.getByRole('button', { name: CARRY_VERB });
-  await expect(carryButton).toHaveAttribute('aria-disabled', 'true'); // not there yet
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.0, 'east to the bench line');
-  await holdUntil(
-    page,
-    'ArrowDown',
-    async () => (await carryButton.getAttribute('aria-disabled')) === 'false',
-    'south into the bench zone'
-  );
+  await expect(carryButton).toHaveAttribute('aria-disabled', 'true'); // not there yet (≥ 3 m from the bench zone)
+  // ACCRA MAP (collider-probed): the straight west walk at z −2.4 is
+  // SEALED (kiosk body + counter slab) — south onto the z ≈ −1.5 pavement
+  // line first (the −1.5 target leaves ~1.9 m of headroom to the bollard
+  // pocket at (−125.2, 0.8); the HUD position lags the true capsule by up
+  // to ~1.1 m under software GL and an overshoot past +0.37 pins the west
+  // walk — seen live with a −0.6 target), then west into the bench zone
+  // (x ≤ −131 keeps drift overshoots inside the r 2.5 zone). Position-only
+  // legs — NO button-locator conditions inside holdUntil: between zones
+  // the Act pill relabels to bare 'Act', the 'Carry Pans' locator goes
+  // absent, and a getAttribute condition would block the poll while the
+  // key walks the robot into the far solids. The stop (−131, −1.5) sits
+  // 1.75 m from the bench waypoint, so the flip is guaranteed by
+  // geometry; the expect below does the waiting.
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= -1.5, 'south onto the pavement line');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= -131.0, 'west along the pavement into the bench zone');
   await expect(carryButton).toHaveAttribute('aria-disabled', 'false'); // the bench zone
   await pacedClick(page, carryButton); // step 2 at the bench
 
-  // Back to the job spot for the final lift + pay.
+  // Back to the job spot for the final lift + pay — the ACCRA MAP return:
+  // east along the pavement line (probed clear at z −1.5…−1.0), north
+  // into the job-spot band, east into the 0.9 m disc.
   const payButton = page.getByRole('button', { name: PAY_VERB });
   await expect(payButton).toHaveAttribute('aria-disabled', 'true'); // not there yet
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.6, 'north beside the wall');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -124.3, 'east along the corridor to the job-spot column');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -2.0, 'north into the job-spot band');
+  // Final approach keys on the ZONE itself (the same disc the probe
+  // uses, r 0.9 at (−122.9, −2.4)) — a button-locator condition would
+  // block on the pill relabelling between zones (see the bench legs
+  // above).
   await holdUntil(
     page,
-    'ArrowLeft',
-    async () => (await payButton.getAttribute('aria-disabled')) === 'false',
-    'west into the job spot'
+    'ArrowRight',
+    async () => {
+      const p = await readPos(page);
+      return (p.x + 122.9) ** 2 + (p.z + 2.4) ** 2 <= 0.81;
+    },
+    'east into the job spot'
   );
   await expect(payButton).toHaveAttribute('aria-disabled', 'false');
 
@@ -349,10 +415,14 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
   await expect(coolingButton).toHaveAttribute('aria-disabled', 'true');
   expect(COOLDOWN_PROMPT.enabled).toBe(false);
   expect(COOLDOWN_PROMPT.label).not.toContain('waakye'); // the meal stays gated
-  await expect(page.getByText(COOLDOWN_REASON)).toBeVisible(); // the pill
-  // G-008e: the objective card reads the cooldown too — one clock on two
-  // surfaces, so the hint can't contradict the button mid-rest.
-  await expect(page.getByText(COOLDOWN_CARD_LINE)).toBeVisible();
+  // G-008e: the countdown now renders in TWO places — the Act reason pill
+  // AND the idle objective card (with its "grab water or rest" tail) — so
+  // the old bare getByText hit Playwright strict mode. Assert each spot
+  // explicitly: the pill by testid, the card by its unique tail.
+  const reasonPill = page.getByTestId('act-reason');
+  await expect(reasonPill).toBeVisible();
+  await expect(reasonPill).toHaveText(COOLDOWN_REASON);
+  await expect(page.getByText('grab water or rest')).toBeVisible();
   // The pill settles into its greyed style (200 ms background transition —
   // mirrors earnAndEat.spec.ts) so the screenshot below is truthful.
   await expect(coolingButton).toHaveCSS('background-color', 'rgba(100, 116, 139, 0.3)');
@@ -385,28 +455,33 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
   // its own — the wallet can never dead-end — and a full second shift
   // pays ₵15 again.
   await walkBackToJobSpot(page);
-  await expect(helpButton).toHaveAttribute('aria-disabled', 'false', { timeout: 90_000 });
+  // 300 s: the 45 s cooldown runs on GAME time (the drain cadence) — on a
+  // slow CI runner game-time advances far slower than wall-clock, and the
+  // first CI run outgrew the old 90 s ceiling while the robot stood on the
+  // spot with "Help Daavi" still greyed. The expiry predicate is unchanged;
+  // only the wall-clock ceiling grew (the spec budget is 20 m — see
+  // setTimeout above; healthy runs still re-enable in ~45–60 s).
+  await expect(helpButton).toHaveAttribute('aria-disabled', 'false', { timeout: 300_000 });
   await pacedClick(page, helpButton);
   await expect(page.getByText('Job accepted')).toBeVisible();
 
   await expect(grabButton).toHaveAttribute('aria-disabled', 'false'); // step 1 here
   await pacedClick(page, grabButton);
 
-  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= 20.0, '2nd: east to the bench line');
-  await holdUntil(
-    page,
-    'ArrowDown',
-    async () => (await carryButton.getAttribute('aria-disabled')) === 'false',
-    '2nd: south into the bench zone'
-  );
+  await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= -1.5, '2nd: south onto the pavement line');
+  await holdUntil(page, 'ArrowLeft', async () => (await readPos(page)).x <= -131.0, '2nd: west into the bench zone');
   await expect(carryButton).toHaveAttribute('aria-disabled', 'false');
   await pacedClick(page, carryButton); // step 2 at the bench
 
-  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= 0.6, '2nd: north beside the wall');
+  await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -124.3, '2nd: east back to the job-spot column');
+  await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -2.0, '2nd: north into the job-spot band');
   await holdUntil(
     page,
-    'ArrowLeft',
-    async () => (await payButton.getAttribute('aria-disabled')) === 'false',
+    'ArrowRight',
+    async () => {
+      const p = await readPos(page);
+      return (p.x + 122.9) ** 2 + (p.z + 2.4) ** 2 <= 0.81;
+    },
     '2nd: west into the job spot'
   );
   await expect(payButton).toHaveAttribute('aria-disabled', 'false');

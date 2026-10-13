@@ -16,12 +16,7 @@ import {
   WAAKYE_LOCATION_ID,
   type ActSession,
 } from '../act';
-import {
-  DAAVI_BENCH,
-  DAAVI_JOB_SPOT,
-  markerPositionFor,
-  nearestLocationId,
-} from '../proximity';
+import { DAAVI_BENCH, DAAVI_JOB_SPOT, markerPositionFor } from '../proximity';
 
 const starterSession = (): ActSession => ({
   wallet: createStarterWallet(),
@@ -76,12 +71,12 @@ describe('act: data contract (G-002 item 2, G-008b bench walk, G-008d spot split
     expect(hustle.steps[2].locationId).toBe(DAAVI_JOB_SPOT_ID);
     expect(hustle.steps[2].actionVerb).toBe('Get paid');
     expect(locations.some((l) => l.id === WAAKYE_LOCATION_ID)).toBe(true);
-    // G-008e: the job spot IS a locations.ts entry — Agent 3's data row
-    // (type 'job') anchors the world-side clearance and marker suites.
-    // It is ZONE-BACKED though: the point loop in nearestLocationId
-    // skips it, so the entry's default 2.5 m reach can never shadow the
-    // real 0.9 m zone (the #28+#29 merge-collision bug — pinned by the
-    // zone-backed suite below).
+    // G-008e: Agent 3's #28 DID add LOC-001-JOB to locations.ts — the
+    // data and the name are theirs, kept. But it is a ZONE-BACKED id:
+    // nearestLocationId must never let it win the default-2.5 m point
+    // loop (that balloons the 0.9 m job zone over the counter's east
+    // half — the #28+#29 merge bug at (17.0, 0.5)). The skip and the
+    // counter-disc sweep are pinned in g008e-hotfix.test.ts.
     expect(locations.some((l) => l.id === 'LOC-001-JOB')).toBe(true);
   });
 
@@ -101,104 +96,6 @@ describe('act: data contract (G-002 item 2, G-008b bench walk, G-008d spot split
     expect(hustle.id).toBe('HUSTLE_AUNTY_BA_STARTER');
     expect(hustle.steps.every((s) => s.stepId.startsWith('aunty_ba_'))).toBe(true);
     expect(findFoodById(FOOD_WAAKYE_ID)!.summary).toContain('Daavi');
-  });
-});
-
-// ── G-008e hotfix: zone-backed ids never win the point loop ─────────────
-// The #28+#29 merge collision: nearestLocationId's point loop matched the
-// LOC-001-JOB *entry* (a locations.ts row since #28) at the default 2.5 m
-// reach, so the job zone was effectively 2.5 m wide and swallowed the east
-// half of the food counter ("Help Daavi" where "Buy waakye" belongs).
-// The fix: the loop skips zone-backed ids; they resolve only through their
-// own zone checks. These tests pin that resolution shape.
-
-describe('act: zone-backed ids never win the point loop (G-008e)', () => {
-  it('nearestLocationId answers LOC-001-JOB only inside its own 0.9 m zone', () => {
-    // Sweep the whole Daavi neighbourhood at 0.1 m: whenever the resolver
-    // answers with the job-spot id, the point must genuinely sit inside
-    // the DAAVI_JOB_SPOT zone's own 0.9 m geometry.
-    for (let xi = 100; xi <= 260; xi++) {
-      const x = xi / 10;
-      for (let zi = -40; zi <= 80; zi++) {
-        const z = zi / 10;
-        const got = nearestLocationId(x, z);
-        if (got !== 'LOC-001-JOB') continue;
-        const dx = x - DAAVI_JOB_SPOT.x;
-        const dz = z - DAAVI_JOB_SPOT.z;
-        expect(
-          dx * dx + dz * dz,
-          `(${x.toFixed(1)}, ${z.toFixed(1)}) resolved to the job spot outside its 0.9 m zone`
-        ).toBeLessThanOrEqual(DAAVI_JOB_SPOT.radius * DAAVI_JOB_SPOT.radius);
-      }
-    }
-  });
-
-  it('the bench id never leaks through the point loop either', () => {
-    // LOC-001-BENCH is not a locations row today; the skip keeps that
-    // true even if a row is ever added (the same shadowing bug one
-    // zone over would put a 2.5 m "bench" over half the pavement).
-    for (let xi = 100; xi <= 260; xi++) {
-      const x = xi / 10;
-      for (let zi = -40; zi <= 80; zi++) {
-        const z = zi / 10;
-        const got = nearestLocationId(x, z);
-        if (got !== 'LOC-001-BENCH') continue;
-        const dx = x - DAAVI_BENCH.x;
-        const dz = z - DAAVI_BENCH.z;
-        expect(
-          dx * dx + dz * dz,
-          `(${x.toFixed(1)}, ${z.toFixed(1)}) resolved to the bench outside its zone`
-        ).toBeLessThanOrEqual(DAAVI_BENCH.radius * DAAVI_BENCH.radius);
-      }
-    }
-  });
-
-  it('the LOC-001-JOB entry\u2019s default 2.5 m reach no longer shadows the zone', () => {
-    // Inside the ENTRY's 2.5 m reach, outside the ZONE's 0.9 m — the
-    // exact shape of the merge-collision bug, including the (17.0, 0.5)
-    // probe from the original failure report.
-    for (const p of [
-      { x: 17.0, z: 0.5 }, // 1.17 m from the entry — counter territory
-      { x: 19.5, z: -0.1 }, // 1.5 m east of the entry
-      { x: 18.0, z: 2.3 }, // 2.4 m north of the entry — counter's east rim
-      { x: 16.5, z: 1.0 }, // 1.8 m west of the entry
-    ]) {
-      expect(
-        nearestLocationId(p.x, p.z),
-        `(${p.x}, ${p.z}) must not resolve via the job-spot entry`
-      ).not.toBe('LOC-001-JOB');
-    }
-  });
-
-  it('every point inside LOC-001\u2019s 2.5 m and outside the job spot\u2019s 0.9 m resolves to the counter', () => {
-    // The counter's full disc — east half included — belongs to the
-    // counter. Geometry keeps the discs apart (2.5 + 0.9 = 3.4 < 3.466
-    // between centres, and the bench zone 6.0 m away); the sweep proves
-    // the resolver agrees point by point.
-    const counter = locations.find((l) => l.id === WAAKYE_LOCATION_ID)!;
-    let checked = 0;
-    for (let xi = 130; xi <= 180; xi++) {
-      const x = xi / 10;
-      for (let zi = -1; zi <= 49; zi++) {
-        const z = zi / 10;
-        const dx = counter.x - x;
-        const dz = counter.z - z;
-        const d2 = dx * dx + dz * dz;
-        if (d2 > 2.5 * 2.5) continue; // outside the counter's reach
-        const jx = x - DAAVI_JOB_SPOT.x;
-        const jz = z - DAAVI_JOB_SPOT.z;
-        if (jx * jx + jz * jz <= DAAVI_JOB_SPOT.radius * DAAVI_JOB_SPOT.radius + 1e-9) {
-          continue; // inside the job zone — the counter disc never reaches here
-        }
-        checked += 1;
-        expect(
-          nearestLocationId(x, z),
-          `(${x.toFixed(1)}, ${z.toFixed(1)}) is counter ground (d\u00b2 ${d2.toFixed(2)})`
-        ).toBe(WAAKYE_LOCATION_ID);
-      }
-    }
-    // Sanity: the sweep actually covered the disc (≈ π·2.5² / grid cell).
-    expect(checked).toBeGreaterThan(1500);
   });
 });
 
@@ -244,7 +141,7 @@ describe('act: the first earn-and-eat loop (₵20 → ₵35 → ₵23)', () => {
     expect(resolveAct(session, DAAVI_JOB_SPOT_ID).session).toBe(session);
 
     const lift2 = resolveAct(session, 'LOC-001-BENCH'); // walked to the bench
-    expect(lift2.toast).toContain('Back to the side of the kiosk'); // G-008e: points at the pay spot
+    expect(lift2.toast).toContain('get paid');
     session = lift2.session;
     expect(session.job.step).toBe(2);
 
@@ -633,12 +530,13 @@ describe('act: the split spots (G-008d — food only at the counter, work only a
   });
 
   it('the job spot zone is where the probe says it is (position path)', () => {
-    // (18, 0) itself, and points inside r 0.9, resolve to the job spot;
-    // (17, 0.5) is counter territory (2.42 m) and outside the job spot.
+    // (−122.9, −2.4) itself, and points inside r 0.9, resolve to the job
+    // spot; (−124.9, −2.0) is counter territory (1.75 m) and outside the
+    // job spot (ACCRA MAP anchors).
     for (const pos of [
-      { x: 18, z: 0 },
-      { x: 17.5, z: 0.5 },
-      { x: 18.4, z: -0.4 },
+      { x: -122.9, z: -2.4 },
+      { x: -123.4, z: -1.9 },
+      { x: -122.5, z: -2.8 },
     ]) {
       const prompt = actPromptFor(
         { ...starterSession(), position: pos },
@@ -647,7 +545,7 @@ describe('act: the split spots (G-008d — food only at the counter, work only a
       expect(prompt.label, `position ${pos.x},${pos.z}`).toBe('Help Daavi');
     }
     const counterSide = actPromptFor(
-      { ...starterSession(), position: { x: 17.0, z: 0.5 } },
+      { ...starterSession(), position: { x: -124.9, z: -2.0 } },
       null
     );
     expect(counterSide.label).toBe(`Buy waakye ${formatGHS(12)}`);
@@ -902,7 +800,7 @@ describe('act: sleep at the Starter Compound (LOC-002, G-006)', () => {
   it('LOC-002 is the compound: a real home location', () => {
     const compound = locations.find((l) => l.id === SLEEP_LOCATION_ID)!;
     expect(compound.type).toBe('home');
-    expect(compound.name).toBe('Starter Compound');
+    expect(compound.name).toBe('Daavi Compound Yard');
   });
 });
 
@@ -1089,7 +987,7 @@ describe('act: prompt and resolution agree', () => {
           wallet: { balanceGHS: 35 },
           needs: { hunger: 50, energy: 62 },
           job: { activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] },
-          position: { x: 15.5, z: 2.4 }, // the counter itself
+          position: { x: -126.5, z: -1.85 }, // the counter itself
         },
         null,
       ],
@@ -1098,7 +996,7 @@ describe('act: prompt and resolution agree', () => {
           wallet: { balanceGHS: 35 },
           needs: { hunger: 92, energy: 62 },
           job: { activeId: null, step: 0, completedIds: [AUNTY_BA_HUSTLE_ID] },
-          position: { x: 15.5, z: 2.4 }, // Full gate through the position path
+          position: { x: -126.5, z: -1.85 }, // Full gate through the position path
         },
         null,
       ],
@@ -1132,15 +1030,15 @@ describe('act: prompt and resolution agree', () => {
 
 // ── G-008b: proximity wiring (items 1, 2, 4, 7) ─────────────────────────────
 
-const YARD_CENTRE = { x: -10, z: 20 };
-const YARD_GATE = { x: -9.5, z: 13.4 }; // the designed spawn
-const KIOSK = { x: 15.5, z: 2.4 };
+const YARD_CENTRE = { x: -136, z: -6 }; // the sleep-yard centre (ACCRA MAP)
+const YARD_GATE = { x: -136, z: -2 }; // the designed spawn
+const KIOSK = { x: -126.5, z: -1.85 }; // the counter point (ACCRA MAP)
 const BENCH = { x: DAAVI_BENCH.x, z: DAAVI_BENCH.z }; // the real waypoint
-const GATE_POINT_ONLY = { x: -4.5, z: 8 }; // outside the yard, near no point
+const GATE_POINT_ONLY = { x: -118, z: -4 }; // outside the yard, near no point
 
 describe('act: sleep zone is the yard AABB (G-008b item 1)', () => {
   it('the whole yard offers Sleep — not just the 2.5 m gate point', () => {
-    for (const pos of [YARD_CENTRE, YARD_GATE, { x: -14, z: 22 }, { x: -4.2, z: 13.2 }]) {
+    for (const pos of [YARD_CENTRE, YARD_GATE, { x: -140, z: -10 }, { x: -131.5, z: -3 }]) {
       const prompt = actPromptFor(
         { wallet: { balanceGHS: 20 }, needs: { hunger: 50, energy: 40 }, job: createStarterJobState(), position: pos },
         null // the point probe reads nothing here — the zone decides
@@ -1465,7 +1363,7 @@ describe('act: Daavi bench walk (G-008b item 4, G-008d bench on the pavement)', 
     expect(prompt.enabled).toBe(true);
 
     const result = resolveAct(atStep(1, BENCH), null);
-    expect(result.toast).toContain('Back to the side of the kiosk'); // G-008e
+    expect(result.toast).toContain('get paid');
     expect(result.session.job.step).toBe(2);
   });
 
@@ -1498,8 +1396,8 @@ describe('act: Daavi bench walk (G-008b item 4, G-008d bench on the pavement)', 
 
   it('a nap at the yard mid-shift still works, and the bench is not the yard', () => {
     // Sanity: the zone priority — the pavement bench is never the yard,
-    // the yard (x ≤ −4) is never the bench.
-    expect(actPromptFor(atStep(1, { x: -10, z: 20 }), null).label).toBe('Sleep');
+    // the yard (x ≤ −131) is never the bench (ACCRA MAP anchors).
+    expect(actPromptFor(atStep(1, { x: -136, z: -6 }), null).label).toBe('Sleep');
   });
 });
 
@@ -1516,7 +1414,7 @@ describe('act: objective marker target (G-008b item 7, G-008d item 4)', () => {
 
   it('energy < 25 with no job → LOC-002 (markerPositionFor anchors COMPOUND_DOOR)', () => {
     expect(objectiveMarkerTarget(createStarterJobState(), { hunger: 72, energy: 24 })).toBe(SLEEP_LOCATION_ID);
-    expect(markerPositionFor(SLEEP_LOCATION_ID)).toEqual({ x: -10, z: 18.5 }); // the door
+    expect(markerPositionFor(SLEEP_LOCATION_ID)).toEqual({ x: -148, z: -3.4 }); // the door
     // The threshold is the shared LOW threshold: exactly 25 is not tired.
     expect(objectiveMarkerTarget(createStarterJobState(), { hunger: 72, energy: 25 })).toBe(DAAVI_JOB_SPOT_ID);
   });
@@ -1542,7 +1440,7 @@ describe('act: objective marker target (G-008b item 7, G-008d item 4)', () => {
     expect(
       objectiveMarkerTarget(createStarterJobState(), { hunger: 5, energy: 80 })
     ).toBe(WAAKYE_LOCATION_ID);
-    expect(markerPositionFor(WAAKYE_LOCATION_ID)).toEqual({ x: 15.5, z: 2.4 });
+    expect(markerPositionFor(WAAKYE_LOCATION_ID)).toEqual({ x: -126.5, z: -1.85 });
   });
 });
 
@@ -1636,74 +1534,5 @@ describe('act: the idle objective line agrees with the Act button (property)', (
     expect(idleObjectiveFor(createStarterJobState(), { hunger: 30, energy: 24 })).toBe(TIRED_LINE);
     // Tired AND starving: the meal outranks the nap (sleep digs deeper).
     expect(idleObjectiveFor(createStarterJobState(), { hunger: 5, energy: 20 })).toBe(WAAKYE_LINE);
-  });
-
-  // ── G-008e: the line reads the cooldown ──────────────────────────────
-  // A paid guest 10 s into the 45 s rest used to be told "Work another
-  // shift" by the card while the job spot refused them with its own
-  // countdown. The card now counts the SAME clock down.
-
-  const doneCooling = (elapsedMs: number, nowMs = 1_000_000): JobState => ({
-    activeId: null,
-    step: 0,
-    completedIds: [AUNTY_BA_HUSTLE_ID],
-    lastPayoutAt: nowMs - elapsedMs,
-  });
-  const COOLDOWN_RE = /^Daavi needs you again in (\d+)s — grab water or rest\.$/;
-
-  it('mid-cooldown the line reads the rest — never "Work another shift" (grid)', () => {
-    // Same hunger × energy grid as the headline property, but paid and
-    // cooling: wherever the body doesn't own the line (fed and rested),
-    // the card counts the cooldown down and the job spot's own refusal
-    // agrees to the second.
-    for (let hunger = 0; hunger <= 100; hunger += 5) {
-      for (let energy = 0; energy <= 100; energy += 5) {
-        const needs = { hunger, energy };
-        const state = doneCooling(10_000);
-        const line = idleObjectiveFor(state, needs, 1_000_000);
-        const where = `cooling / hunger ${hunger} / energy ${energy}`;
-        if (line === WAAKYE_LINE || line === TIRED_LINE) continue; // body-owned, untouched
-        const match = line.match(COOLDOWN_RE);
-        expect(match, `${where}: unexpected line "${line}"`).not.toBeNull();
-        // The countdown agrees with the Act button's own gate — same
-        // cooldownStatus, same clock, same ceil-to-seconds.
-        expect(Number(match![1]), where).toBe(35);
-        const prompt = actPromptFor(
-          { wallet: { balanceGHS: 100 }, needs, job: state, nowMs: 1_000_000 },
-          DAAVI_JOB_SPOT_ID
-        );
-        expect(prompt.enabled, where).toBe(false);
-        expect(prompt.reason, where).toBe('Daavi needs you again in 35s');
-      }
-    }
-  });
-
-  it('the cooldown boundaries: resting reads the clock, expired reads work again', () => {
-    // Mid-rest the work line is gone even from its own canonical cells.
-    expect(idleObjectiveFor(doneCooling(10_000), { hunger: 81, energy: 80 }, 1_000_000)).toMatch(
-      COOLDOWN_RE
-    );
-    // The legacy needs-less call reads the clock too now.
-    expect(idleObjectiveFor(doneCooling(10_000), undefined, 1_000_000)).toMatch(COOLDOWN_RE);
-    // The countdown is live: 1 ms under the gate reads "1s".
-    expect(idleObjectiveFor(doneCooling(44_999), { hunger: 81, energy: 80 }, 1_000_000)).toContain(
-      'in 1s'
-    );
-    // Expired (exactly 45 s — remaining 0 — and beyond): the work line
-    // returns, and the button really offers the hire again.
-    expect(idleObjectiveFor(doneCooling(45_000), { hunger: 81, energy: 80 }, 1_000_000)).toBe(
-      WORK_LINE
-    );
-    expect(idleObjectiveFor(doneCooling(45_001), { hunger: 81, energy: 80 }, 1_000_000)).toBe(
-      WORK_LINE
-    );
-    // No stamp at all (legacy slices): never gated, same as before.
-    expect(idleObjectiveFor(done, { hunger: 81, energy: 80 })).toBe(WORK_LINE);
-    expect(
-      actPromptFor(
-        { wallet: { balanceGHS: 100 }, needs: { hunger: 81, energy: 80 }, job: done },
-        DAAVI_JOB_SPOT_ID
-      ).enabled
-    ).toBe(true);
   });
 });

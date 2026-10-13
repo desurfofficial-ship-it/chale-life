@@ -30,10 +30,10 @@ import { AUNTY_BA_HUSTLE_ID, SLEEP_LOCATION_ID, WATER_LOCATION_ID } from '../../
  */
 
 /** Job spot / bench / provisions / yard-inside-the-AABB coordinates. */
-const JOB_SPOT = { x: 18.0, z: 0.0 }; // DAAVI_JOB_SPOT (G-008d) — hire + steps 1/3
+const JOB_SPOT = { x: -122.9, z: -2.4 }; // DAAVI_JOB_SPOT (ACCRA MAP) — hire + steps 1/3
 const BENCH = { x: 21.4, z: 2.9 }; // DAAVI_BENCH on the north pavement (G-008d)
 const PROVISIONS = { x: -6.2, z: 2.6 };
-const YARD = { x: -9.5, z: 17.4 };
+const YARD = { x: -136, z: -5 };
 
 function standAt(pos: { x: number; z: number }, locationId: string | null): void {
   setPlayerTransform(pos.x, pos.z, 0);

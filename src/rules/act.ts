@@ -349,8 +349,10 @@ function decideAtProvisions(session: ActSession): Decision {
 }
 
 /**
- * Daavi's bench (G-008 waypoint, G-008d: north pavement; G-008e:
- * waypoint pinned at 21.5/2.45, the mesh at z 3.15–3.65):
+ * Daavi's bench (G-008 waypoint, G-008d: set-down spot; G-008e: the
+ * waypoint must keep a full capsule + margin from the bench mesh —
+ * ACCRA MAP: the plot pavement west of the kiosk, DAAVI_BENCH at
+ * (−132.5, −0.6)):
  * only the bench-targeted step advances here. Everything else is a
  * redirect or idle:
  *   - hustle steps 1/3 pending → the job spot is where the work is:

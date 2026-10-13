@@ -1,7 +1,7 @@
 /**
  * src/data/locations.ts — CONTRACT MODULE (do not break).
  *
- * Named points of interest on the starter block, in world metres
+ * Named points of interest on the Accra map (v6) — anchored on the reserved DAAVI_PLOT in James Town, in world metres
  * (1 unit = 1 m, origin at block centre, +x east, +z south).
  * Agent 3 (World & Art) owns this file; other data files belong to Agent 4.
  */
@@ -23,64 +23,66 @@ export const locations: Location[] = [
     id: 'LOC-001',
     name: "Daavi's Waakye Joint",
     type: 'food',
-    x: 15.5, // front of the yellow kiosk, north pavement — FOOD COUNTER only
-    z: 2.4,
+    // ACCRA MAP: the reserved DAAVI_PLOT kiosk (Jamestown, map x −126.5,−3.6)
+    // fronts the plot pavement (z −1.3…0.5); the counter zone sits 0.4 m in
+    // front of it — FOOD COUNTER only, clear of the Daavi St carriageway
+    // (z 0.5…7.5).
+    x: -126.5,
+    z: -1.85,
   },
   {
     id: 'LOC-001-JOB',
     name: "Daavi's Job Spot",
     type: 'job',
-    // G-008d: the kiosk's east side, just off the east wall (kiosk
-    // x 13.9–17.1), beside the crate/pan stack (world props ~x ≤ 17.62).
-    // WORK only — hire, "grab pans" (step 1) and "get paid" (step 3) happen
-    // here; food never does. Zones must not overlap: this spot is
-    // √(2.5² + 2.5²) ≈ 3.54 m from LOC-001, so with the counter's default
-    // 2.5 m reach the job-spot zone radius must stay ≤ 0.9 m (Agent 4's
-    // DAAVI_JOB_SPOT in rules/proximity.ts). z sits 0.1 south of the
-    // (18.0, 0.0) design point so the whole bench-approach band (z ≥ 2.4,
-    // e.g. 18.6, 2.4) stays outside this zone's default 2.5 m point reach —
-    // the special small-radius DAAVI_JOB_SPOT zone is unaffected.
-    x: 18.0,
-    z: -0.1,
+    // ACCRA MAP: the kiosk's east side on the plot (kiosk x −128…−125). WORK
+    // only — hire, "grab pans" (step 1) and "get paid" (step 3) happen here;
+    // food never does. 3.61 m from LOC-001 so the counter's 2.5 m reach and
+    // this zone's 0.9 m radius stay disjoint (2.5 + 0.9 = 3.4 < 3.61).
+    x: -122.9,
+    z: -2.4,
   },
   {
     id: 'LOC-002',
-    name: 'Starter Compound',
+    name: 'Daavi Compound Yard',
     type: 'home',
-    x: -9.5, // at the compound gate — player spawn
-    z: 13.4,
+    // ACCRA MAP: the reserved plot's open sleep yard (mats, clothesline,
+    // bench and drum between x −142…−130) — the player spawn, at the yard's
+    // pavement edge.
+    x: -136.0,
+    z: -2.0,
   },
   {
     id: 'LOC-003',
-    name: 'Maame Effia Provisions Store',
+    name: 'Yard Water Drum',
     type: 'shop',
-    x: -6, // shop front, north pavement
-    z: 2.6,
+    // ACCRA MAP: beside the sleep-yard drum (collider −130.5,−6.2), just
+    // outside the sleep zone so the water purchase can resolve there.
+    x: -130.6,
+    z: -5.1,
   },
   {
     id: 'LOC-004',
-    name: 'Trotro Stop',
+    name: 'Daavi Street Trotro Stop',
     type: 'transport',
-    x: 22.5, // shelter on the south pavement
-    z: 13.0,
+    // ACCRA MAP: the Daavi St pavement east of the plot.
+    x: -121.0,
+    z: -0.4,
   },
   {
     id: 'LOC-005',
     name: 'Maame Esi Chop Bar',
     type: 'food',
-    x: 3.5, // front door, south side
-    z: 14.2,
+    // ACCRA MAP: the real Nima chop bar (lib/businesses.ts nim_chop) — a
+    // far landmark for now; the plot kiosk feeds the player.
+    x: -2.75,
+    z: -41.2,
   },
   {
     id: 'LOC-006',
-    name: 'Laterite Junction',
+    name: 'James Town Lighthouse',
     type: 'landmark',
-    // G-008d: moved off the carriageway to the north pavement at the
-    // junction (was (-21, 8), mid-road). It still marks where the laterite
-    // street meets the main road — the player now stands beside it, not in
-    // it — so every location passes the world clearance test
-    // (src/world/clearance.test.ts: no location inside MAIN_ROAD/gutters).
-    x: -21,
-    z: 3.2,
+    // ACCRA MAP: the real Jamestown lighthouse south of Daavi St.
+    x: -146.0,
+    z: 22.5,
   },
 ];

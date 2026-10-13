@@ -44,13 +44,13 @@ describe('resolveSpawn', () => {
 
   it('nudges the spawn out when a collider covers the marked location', () => {
     // A hypothetical 2×2 m shed dropped right on top of the compound gate.
-    const blocker: Box = { minX: -10.5, minZ: 12.4, maxX: -8.5, maxZ: 14.4 };
-    expect(circleIntersectsBox(-9.5, 13.4, DEFAULT_MOVEMENT.radius, blocker)).toBe(true);
+    const blocker: Box = { minX: -137, minZ: -3, maxX: -135, maxZ: -1 };
+    expect(circleIntersectsBox(-136, -2, DEFAULT_MOVEMENT.radius, blocker)).toBe(true);
 
     const spawn = resolveSpawn(DEFAULT_MOVEMENT.radius, [blocker]);
     expect(circleIntersectsBox(spawn.x, spawn.z, DEFAULT_MOVEMENT.radius, blocker)).toBe(false);
     // Still the same logical location (nudged, not relocated across town).
-    expect(Math.hypot(spawn.x + 9.5, spawn.z - 13.4)).toBeLessThanOrEqual(5);
+    expect(Math.hypot(spawn.x + 136, spawn.z + 2)).toBeLessThanOrEqual(5);
   });
 
   it('never returns a point inside ANY box of a hostile fake world', () => {
@@ -70,14 +70,14 @@ describe('initializePlayerSpawn', () => {
     initializePlayerSpawn();
 
     const p = getState().player.position;
-    expect(p.x).toBeCloseTo(-9.5, 5);
-    expect(p.z).toBeCloseTo(13.4, 5);
+    expect(p.x).toBeCloseTo(-136, 5);
+    expect(p.z).toBeCloseTo(-2, 5);
     expect(p.y).toBe(0);
     expect(getState().player.yaw).toBe(SPAWN_YAW);
 
     const hud = getHud();
-    expect(hud.x).toBeCloseTo(-9.5, 5);
-    expect(hud.z).toBeCloseTo(13.4, 5);
+    expect(hud.x).toBeCloseTo(-136, 5);
+    expect(hud.z).toBeCloseTo(-2, 5);
     expect(hud.yaw).toBe(SPAWN_YAW);
   });
 });
