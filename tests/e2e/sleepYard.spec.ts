@@ -383,19 +383,15 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
   await expect(payButton).toHaveAttribute('aria-disabled', 'true'); // not there yet
   await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -124.3, 'east along the corridor to the job-spot column');
   await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -2.0, 'north into the job-spot band');
-  // Final approach keys on the ZONE itself (the same disc the probe
-  // uses, r 0.9 at (−122.9, −2.4)) — a button-locator condition would
-  // block on the pill relabelling between zones (see the bench legs
-  // above).
-  await holdUntil(
-    page,
-    'ArrowRight',
-    async () => {
-      const p = await readPos(page);
-      return (p.x + 122.9) ** 2 + (p.z + 2.4) ** 2 <= 0.81;
-    },
-    'east into the job spot'
-  );
+  // Final approach CREEPS into the zone (the same disc the probe uses,
+  // r 0.9 at (−122.9, −2.4)) — a button-locator condition would block on
+  // the pill relabelling between zones (see the bench legs above), and a
+  // full-speed release at the r 0.9 HUD edge can coast the capsule back
+  // OUT of the disc (the exact failure that killed this leg in CI at
+  // 2.5 m test time — the (a)/(b) legs already creep for this reason).
+  // The creep's burst pattern settles at r ≤ 0.5, inside the disc with
+  // edge margin, on any runner speed.
+  await creepIntoJobSpot(page, 'pay');
   await expect(payButton).toHaveAttribute('aria-disabled', 'false');
 
   // (c) THE DETERMINISTIC BURST: payout + arm + 10 taps in one evaluate —
@@ -475,15 +471,9 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
 
   await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -124.3, '2nd: east back to the job-spot column');
   await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -2.0, '2nd: north into the job-spot band');
-  await holdUntil(
-    page,
-    'ArrowRight',
-    async () => {
-      const p = await readPos(page);
-      return (p.x + 122.9) ** 2 + (p.z + 2.4) ** 2 <= 0.81;
-    },
-    '2nd: west into the job spot'
-  );
+  // Same hardening as the first-shift pay leg: burst-creep to r ≤ 0.5 —
+  // the raw r 0.9-edge release coasted back out of the disc on CI.
+  await creepIntoJobSpot(page, '2nd: pay');
   await expect(payButton).toHaveAttribute('aria-disabled', 'false');
   await pacedClick(page, payButton); // final lift → second payout
 
