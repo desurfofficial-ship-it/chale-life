@@ -132,6 +132,39 @@ async function holdUntil(
 }
 
 /**
+ * Enter the 0.9 m job disc (centre (−122.9, −2.4)) and stop near its
+ * CENTRE — same rationale as earnAndEat.spec.ts's creepIntoJobSpot: a
+ * full-speed release at the r 0.9 edge coasts the capsule back OUT of
+ * the disc on a slow/loaded runner (HUD-poll lag + post-release
+ * inertia), so the fast legs halt on position predicates only and this
+ * burst-creep (160 ms press / 120 ms pause, axis + direction re-chosen
+ * every burst) settles the capsule at r ≤ 0.5, where the burst coast
+ * cannot reach the edge. Disc interior collider-clear (probe: zero
+ * boxes under the r 1.2 bounding square).
+ */
+async function creepIntoJobSpot(page: Page, what: string): Promise<void> {
+  const start = Date.now();
+  for (;;) {
+    const p = await readPos(page);
+    const r2 = (p.x + 122.9) ** 2 + (p.z + 2.4) ** 2;
+    if (r2 <= 0.25) return; // r ≤ 0.5 — inside the disc with edge margin
+    if (Date.now() - start > 150_000) {
+      throw new Error(`creep into the job spot stalled (${what}) at ${JSON.stringify(p)}`);
+    }
+    const dx = p.x + 122.9;
+    const dz = p.z + 2.4;
+    const code =
+      Math.abs(dz) > Math.abs(dx)
+        ? dz > 0 ? 'ArrowUp' : 'ArrowDown'
+        : dx > 0 ? 'ArrowLeft' : 'ArrowRight';
+    await pressKey(page, code, true);
+    await page.waitForTimeout(160);
+    await pressKey(page, code, false);
+    await page.waitForTimeout(120);
+  }
+}
+
+/**
  * G-008c item 5 — the payout tap, the setNeeds that arms the waakye
  * offer, and `taps` rapid pointerdowns all inside ONE evaluate call: a
  * single synchronous JS task, so the whole burst lands within a few ms
@@ -201,16 +234,9 @@ async function walkToJobSpot(page: Page): Promise<void> {
   await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -2.0, 'north into the job-spot band');
   // Final approach keys on the ZONE itself (the same disc the probe
   // uses, r 0.9 at (−122.9, −2.4)) — a button-locator condition would
-  // block on the pill relabelling between zones.
-  await holdUntil(
-    page,
-    'ArrowRight',
-    async () => {
-      const p = await readPos(page);
-      return (p.x + 122.9) ** 2 + (p.z + 2.4) ** 2 <= 0.81;
-    },
-    'east into the job-spot disc'
-  );
+  // block on the pill relabelling between zones. The creep stops at the
+  // disc centre so the prompt flips ON and stays on through the press.
+  await creepIntoJobSpot(page, 'walkToJobSpot');
 }
 
 /**
@@ -235,15 +261,10 @@ async function walkBackToJobSpot(page: Page): Promise<void> {
   // 0.9 m job disc.
   await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -124.3, 'back east to the job-spot column');
   await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -2.0, 'north into the job-spot band');
-  await holdUntil(
-    page,
-    'ArrowRight',
-    async () => {
-      const p = await readPos(page);
-      return (p.x + 122.9) ** 2 + (p.z + 2.4) ** 2 <= 0.81;
-    },
-    'back east into the job spot'
-  );
+  // (the disc at z −1.5 would sit exactly on the 0.9 m boundary and a
+  // 0.36 m poll step could overshoot past it) — the creep entry stops at
+  // the disc centre so the prompt flips ON and stays on through the press.
+  await creepIntoJobSpot(page, 'walkBackToJobSpot');
 }
 
 test('(a) sleep zone: the whole yard offers Sleep and +55 energy', async ({
@@ -428,7 +449,13 @@ test('(c) deterministic burst after a payout, (b) the dead-end fix, (d) cooldown
   // its own — the wallet can never dead-end — and a full second shift
   // pays ₵15 again.
   await walkBackToJobSpot(page);
-  await expect(helpButton).toHaveAttribute('aria-disabled', 'false', { timeout: 90_000 });
+  // 300 s: the 45 s cooldown runs on GAME time (the drain cadence) — on a
+  // slow CI runner game-time advances far slower than wall-clock, and the
+  // first CI run outgrew the old 90 s ceiling while the robot stood on the
+  // spot with "Help Daavi" still greyed. The expiry predicate is unchanged;
+  // only the wall-clock ceiling grew (worst case ≈ 8.3 m < the 10 m spec
+  // timeout; healthy runs still re-enable in ~45–60 s).
+  await expect(helpButton).toHaveAttribute('aria-disabled', 'false', { timeout: 300_000 });
   await pacedClick(page, helpButton);
   await expect(page.getByText('Job accepted')).toBeVisible();
 

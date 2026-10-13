@@ -177,6 +177,43 @@ async function holdUntil(
 }
 
 /**
+ * Enter the 0.9 m job disc (centre (−122.9, −2.4)) and stop near its
+ * CENTRE: a full-speed holdUntil release AT the r 0.9 edge coasts the
+ * capsule out of the disc on a slow/loaded runner (HUD-poll lag plus
+ * post-release inertia — the first CI run's hire press then found the
+ * pill relabelled to bare 'Act', and the two-leg run-in/creep-back
+ * dance fights itself: each leg's release adds coast out of the OPPOSITE
+ * edge). So the fast legs halt on position predicates only, and this
+ * creep finishes the entry in short bursts (160 ms press / 120 ms
+ * pause), re-choosing the axis and direction every burst — burst speed
+ * caps both the lag and the coast, so the capsule settles at r ≤ 0.5
+ * where even the burst coast cannot reach the 0.9 m edge. The disc
+ * interior is collider-clear (probe: zero boxes under the r 1.2
+ * bounding square).
+ */
+async function creepIntoJobSpot(page: Page, what: string): Promise<void> {
+  const start = Date.now();
+  for (;;) {
+    const p = await readPos(page);
+    const r2 = (p.x + 122.9) ** 2 + (p.z + 2.4) ** 2;
+    if (r2 <= 0.25) return; // r ≤ 0.5 — inside the disc with edge margin
+    if (Date.now() - start > 150_000) {
+      throw new Error(`creep into the job spot stalled (${what}) at ${JSON.stringify(p)}`);
+    }
+    const dx = p.x + 122.9;
+    const dz = p.z + 2.4;
+    const code =
+      Math.abs(dz) > Math.abs(dx)
+        ? dz > 0 ? 'ArrowUp' : 'ArrowDown'
+        : dx > 0 ? 'ArrowLeft' : 'ArrowRight';
+    await pressKey(page, code, true);
+    await page.waitForTimeout(160);
+    await pressKey(page, code, false);
+    await page.waitForTimeout(120);
+  }
+}
+
+/**
  * Human-paced Act tap (G-008b): the 600 ms debounce swallows robot-speed
  * clicks and PURCHASES stay locked 1000 ms after a payout — the robot taps
  * like a person, and buys a beat later still (ms defaults to 700; pass
@@ -266,18 +303,11 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
   await holdUntil(page, 'ArrowDown', async () => (await readPos(page)).z >= -1.5, 'south onto the pavement line');
   await holdUntil(page, 'ArrowRight', async () => (await readPos(page)).x >= -124.3, 'east along the plot to the job-spot column');
   await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -2.0, 'north into the job-spot band');
-  await holdUntil(
-    page,
-    'ArrowRight',
-    async () => {
-      const p = await readPos(page);
-      return (p.x + 122.9) ** 2 + (p.z + 2.4) ** 2 <= 0.81;
-    },
-    'east into the job-spot disc'
-  );
-  // The proximity probe (the 0.9 m job-spot zone) flips the Act prompt.
+  // The proximity probe (the 0.9 m job-spot zone) flips the Act prompt —
+  // the entry creeps to the disc centre (see creepIntoJobSpot) so the
+  // prompt flips ON and STAYS on through the hire press.
+  await creepIntoJobSpot(page, 'hire');
   const helpButton = page.getByRole('button', { name: HELP_LABEL });
-  await holdUntil(page, 'ArrowLeft', async () => helpButton.isVisible(), 'west into the job spot');
   await expect(helpButton).toHaveAttribute('aria-disabled', 'false');
   // The prompt is rule-derived: it MUST name the employer from the data.
   expect(HELP_LABEL).toContain(EMPLOYER_NAME);
@@ -323,16 +353,9 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
   await holdUntil(page, 'ArrowUp', async () => (await readPos(page)).z <= -2.0, 'north into the job-spot band');
   // Final approach keys on the ZONE itself (the same disc the probe uses,
   // r 0.9 at (−122.9, −2.4)) — a button-locator condition would block on
-  // the pill relabelling between zones.
-  await holdUntil(
-    page,
-    'ArrowRight',
-    async () => {
-      const p = await readPos(page);
-      return (p.x + 122.9) ** 2 + (p.z + 2.4) ** 2 <= 0.81;
-    },
-    'east into the job spot'
-  );
+  // the pill relabelling between zones. The creep entry stops at the disc
+  // centre so the prompt flips ON and stays on through the pay press.
+  await creepIntoJobSpot(page, 'pay');
   await expect(payButton).toHaveAttribute('aria-disabled', 'false');
   await pacedClick(page, payButton); // final lift → payout
 
@@ -365,8 +388,25 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
   await page.screenshot({ path: shot('04-wallet-23-390x844.png') });
 
   // ── 6. Walk away: no location nearby → Act disabled, wallet untouched ───
+  // CI-hardened route (probe evidence, scripts scans): the straight south
+  // walk from the waakye stop pins on the counter slab for west-drift
+  // stops (a box blocks x ≤ −125.5 at z ≈ −1.70; CI's slower dt profile
+  // never slides the capsule around it — the pin cost the first CI run
+  // this spec). So: first reposition EAST onto the slab-safe column —
+  // eastward legs are HUD-lag-safe (the true capsule is always further
+  // east than the polled HUD x, so done() at x ≥ −124.45 guarantees the
+  // true capsule clears the slab) — then straight south: the counter disc
+  // flips to bare Act at z ≈ −0.5…−0.35 and the corridor stays bare and
+  // collider-clear past z +3 (the job-spot disc never reaches x −124.4;
+  // LOC-004's zone stays ≥ 3.7 m east).
+  await holdUntil(
+    page,
+    'ArrowRight',
+    async () => (await readPos(page)).x >= -124.45,
+    'east onto the slab-safe column'
+  );
   const idleButton = page.getByRole('button', { name: 'Act', exact: true });
-  await holdUntil(page, 'ArrowDown', async () => idleButton.isVisible(), 'away from the counter');
+  await holdUntil(page, 'ArrowDown', async () => idleButton.isVisible(), 'south off the plot, away from every zone');
   await expect(idleButton).toHaveAttribute('aria-disabled', 'true');
   await expect(page.getByText(formatGHS(23), { exact: true })).toBeVisible();
 
