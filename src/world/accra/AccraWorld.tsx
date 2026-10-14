@@ -40,6 +40,7 @@ import { Infrastructure } from '@/components/world/districts/Infrastructure'
 import { TownLife } from '@/components/world/districts/TownLife'
 import { NewLands } from '@/components/world/districts/NewLands'
 import { CommunityQuarter } from '@/components/world/districts/CommunityQuarter'
+import { TycoonLayer, type TycoonWorldProps } from '@/world/tycoon'
 
 // ───────────────────────────────────────────────── map-edge skirts ──────────
 // The diorama plate is finite; sea + land skirts fade into the sky haze so
@@ -138,7 +139,7 @@ function SeaAndSkirts() {
 // the shadow map every ~0.4 s (static world; animated objects' shadows lag
 // imperceptibly at dusk).
 
-export function AccraWorld() {
+export function AccraWorld({ tycoon }: { tycoon?: TycoonWorldProps | null } = {}) {
   const groundTex = useMemo(() => buildGroundTexture(), [])
   // Sea band overlay: SEA = { z0: 46, z1: 116 } (mapConfig) → the animated
   // water covers the plate's southern 70 m ONLY (centre z 81, depth 70),
@@ -182,7 +183,7 @@ export function AccraWorld() {
       <Chorkor />
       <Nungua />
       <ChaleIsland />
-      <LandForSale />
+      <LandForSale ownedPlotIds={tycoon?.ownedPlotIds ?? []} />
       <CivicCenter />
       <MakolaQuarter />
       <Jamestown />
@@ -200,6 +201,8 @@ export function AccraWorld() {
       <TownLife />
       <NewLands />
       <CommunityQuarter />
+
+      {tycoon ? <TycoonLayer {...tycoon} /> : null}
 
       {/* merge the static plain-coloured world into few draw calls */}
       <SceneBatcher />
