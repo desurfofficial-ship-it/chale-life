@@ -1,5 +1,7 @@
 'use client'
 
+import { useMemo } from 'react'
+
 // ─── District: Land-for-Sale plots (Task 11) ─────────────────────────────────
 // Buyable land across Accra: every plot is a cleared laterite rect marked by
 // four white corner beacons and the classic Ghana "LAND FOR SALE" board, then
@@ -122,16 +124,24 @@ const up = (items: { p: [number, number]; s?: number; r?: number }[]) => items.m
 /** every buyable plot (LAND_PLOTS): pads, beacons, boards, overgrowth.
  *  W-007: pass ownedPlotIds to clear shrubs/signs on purchased plots. */
 export function LandForSale({ ownedPlotIds = [] }: { ownedPlotIds?: readonly string[] }) {
-  const owned = new Set(ownedPlotIds)
-  const free = LAND_PLOTS.filter((p) => !p.id || !owned.has(p.id))
-  const ground = free.filter((p) => !p.y)
-  const raised = free.filter((p) => !!p.y)
-  const mainProps = plotProps(ground, 11)
-  const islandProps = plotProps(raised, 77)
-  const shrubs = [...mainProps.shrubs, ...up(islandProps.shrubs)]
-  const trees = [...mainProps.trees, ...up(islandProps.trees)]
-  const palms = [...mainProps.palms, ...up(islandProps.palms)]
-  const grass = [...mainProps.grass, ...up(islandProps.grass)]
+  // ownedPlotIds identity changes often; key by joined ids for memo
+  const ownedKey = ownedPlotIds.join('|')
+  const { free, shrubs, trees, palms, grass } = useMemo(() => {
+    const owned = new Set(ownedPlotIds)
+    const free = LAND_PLOTS.filter((p) => !p.id || !owned.has(p.id))
+    const ground = free.filter((p) => !p.y)
+    const raised = free.filter((p) => !!p.y)
+    const mainProps = plotProps(ground, 11)
+    const islandProps = plotProps(raised, 77)
+    return {
+      free,
+      shrubs: [...mainProps.shrubs, ...up(islandProps.shrubs)],
+      trees: [...mainProps.trees, ...up(islandProps.trees)],
+      palms: [...mainProps.palms, ...up(islandProps.palms)],
+      grass: [...mainProps.grass, ...up(islandProps.grass)],
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ownedKey])
 
   return (
     <group>

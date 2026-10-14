@@ -22,6 +22,9 @@ import {
 } from '../world/tycoon';
 import { findBusinessType } from '../data/businesses';
 
+/** Module-level so money pops fire once per revenue increase, not every frame. */
+const prevRevenueToday = new Map<string, number>();
+
 function useTycoonSnapshot(): ReturnType<typeof getTycoonState> {
   return useSyncExternalStore(subscribeTycoon, getTycoonState, getTycoonState);
 }
@@ -48,7 +51,12 @@ function toProps(s: ReturnType<typeof getTycoonState>): TycoonWorldProps | null 
       open: b.open,
       customersVisible: Math.min(8, Math.floor(b.customersToday / 4)),
       staff: b.staff,
-      lastSaleGHS: b.revenueToday > 0 ? 12 : 0,
+      lastSaleGHS: (() => {
+        const prev = prevRevenueToday.get(b.id) ?? 0;
+        const delta = b.revenueToday - prev;
+        prevRevenueToday.set(b.id, b.revenueToday);
+        return delta > 0 ? Math.round(delta * 100) / 100 : 0;
+      })(),
     };
   });
 
