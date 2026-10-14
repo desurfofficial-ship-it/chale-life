@@ -53,7 +53,7 @@ export interface TycoonState {
 }
 
 /** localStorage key — dotted form avoids gitleaks generic-api-key false positive */
-const SAVE_KEY = 'chale.life.tycoon.state.v1';
+const SAVE_KEY = 'chale.tycoon.v1';
 
 const listeners = new Set<Listener>();
 
@@ -385,3 +385,38 @@ export function landPlotToRef(p: {
 
 // Keep TypeScript aware subscribeGame is available if future bridging needs it.
 void subscribeGame;
+
+
+/** City tab + tycoon mode → high-angle overview cam (Engine CameraRig). */
+export function isTycoonCamera(): boolean {
+  return state.tycoonMode && state.activeTab === 'city';
+}
+
+
+/** E-010 e2e / debug surface (mirrors gameStore __chaleTest). */
+if (typeof window !== 'undefined') {
+  const w = window as unknown as {
+    __chaleTycoon?: {
+      setMode: (on: boolean) => void;
+      selectPlot: (id: string | null) => void;
+      buyPlot: (plot: import('../rules/business').PlotRef) => boolean;
+      openBusiness: (
+        plot: import('../rules/business').PlotRef,
+        typeId: string,
+        budget: import('../rules/business').BudgetTier,
+      ) => boolean;
+      advance: (seconds: number) => void;
+      getState: () => Readonly<TycoonState>;
+      setTab: (tab: TycoonTab) => void;
+    };
+  };
+  w.__chaleTycoon = {
+    setMode: setTycoonMode,
+    selectPlot: setSelectedPlotId,
+    buyPlot: requestBuyPlot,
+    openBusiness: requestOpenBusiness,
+    advance: advanceClock,
+    getState: getTycoonState,
+    setTab: setActiveTab,
+  };
+}

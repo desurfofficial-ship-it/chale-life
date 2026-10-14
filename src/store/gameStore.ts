@@ -474,6 +474,9 @@ if (
       state.needs.energy = clampNeed(energy);
       notify();
     },
+    setWallet: (balanceGHS: number): void => {
+      setWalletBalanceGHS(balanceGHS);
+    },
     // G-008d item 7: force a specific Act label/enabled/reason — the
     // layout spec pushes the longest real strings through this (the
     // wrong-spot bench reason is the longest reason in the game).

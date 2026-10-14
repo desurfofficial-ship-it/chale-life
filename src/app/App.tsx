@@ -58,6 +58,7 @@ import {
   weatherIcon,
 } from '../store/tycoonStore';
 import { LAND_PLOTS } from '../lib/mapConfig';
+import { onWorldEvent } from '../world/tycoon/worldEvents';
 import { Hud, TycoonHud, useCountdownNow } from '../ui';
 import type { PlotRef } from '../rules/business';
 import { DebugOverlay } from './DebugOverlay';
@@ -112,14 +113,23 @@ function applyPromptOverride(
 export function App() {
   const [webglOk] = useState(isWebGLAvailable);
 
-  // E-010: ?tycoon=1 enables the overlay (World plot-tap comes in W-007)
+  // E-010: ?tycoon=1 enables the overlay; World emits plotSelected (W-007)
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (new URLSearchParams(window.location.search).get('tycoon') === '1') {
+    const q = new URLSearchParams(window.location.search);
+    if (q.get('tycoon') === '1' || q.get('tycoonDemo') === '1') {
       setTycoonMode(true);
-      const first = LAND_PLOTS[0];
-      if (first?.id) setSelectedPlotId(first.id);
+      // Don't pre-select when demo — wait for plotSelected / e2e
+      if (q.get('tycoon') === '1' && q.get('e2e') !== '1') {
+        const first = LAND_PLOTS[0];
+        if (first?.id) setSelectedPlotId(first.id);
+      }
     }
+    return onWorldEvent('plotSelected', ({ plotId }) => {
+      setTycoonMode(true);
+      setSelectedPlotId(plotId);
+      setActiveTab('property');
+    });
   }, []);
 
   // E-010: game clock + offline catch-up

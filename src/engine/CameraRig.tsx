@@ -31,9 +31,12 @@ import {
   movementInput,
   setZoom,
 } from '../store/gameStore';
+import { isTycoonCamera } from '../store/tycoonStore';
 
 /** Fixed 45° top-down offset (direction only — ortho size is zoom-driven). */
 const OFFSET = new THREE.Vector3(0, 30, 30);
+/** High-angle overview when City tab is active (E-010). */
+const TYCOON_OFFSET = new THREE.Vector3(0, 55, 55);
 /** Latest player screen position in canvas CSS pixels (updated every frame). */
 export const projectedPlayerScreen = { x: 0, y: 0 };
 const _proj = new THREE.Vector3();
@@ -97,10 +100,11 @@ export function CameraRig() {
     const frameOffsetZ =
       ((0.5 - PLAYER_FROM_TOP) * viewH) / Math.sin(Math.PI / 4);
 
+    const off = isTycoonCamera() ? TYCOON_OFFSET : OFFSET;
     camera.position.set(
-      target.current.x + OFFSET.x,
-      OFFSET.y,
-      target.current.z + frameOffsetZ + OFFSET.z,
+      target.current.x + off.x,
+      off.y,
+      target.current.z + frameOffsetZ + off.z,
     );
     camera.lookAt(target.current.x, 0, target.current.z + frameOffsetZ);
 
