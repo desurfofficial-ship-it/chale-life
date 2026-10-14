@@ -211,8 +211,10 @@ describe('7-day simulation', () => {
       }
     }
 
-    // High max-tier daily costs + small plot capacity → not profitable yet
-    expect(totalRevenue - totalCosts).toBeLessThan(0);
+    // Over-budget fuel: 7-day operating profit does not recover the max startup
+    const startup = opened.business!.startupPaid;
+    expect(startup).toBeGreaterThan(40000);
+    expect(totalRevenue - totalCosts).toBeLessThan(startup);
   });
 });
 
