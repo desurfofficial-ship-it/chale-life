@@ -27,8 +27,12 @@ export default defineConfig({
   use: {
     viewport: { width: 390, height: 844 },
     baseURL: 'http://localhost:4173',
-    // Pin the local chromium build (the playwright cache ships 1243 here).
-    executablePath: '/home/z/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome',
+    // No executablePath pin: headless launches always use the registry
+    // `chromium_headless_shell` build that `npx playwright install chromium`
+    // puts in the cache (CI does exactly that). An absolute-path pin was
+    // tried in e59c2cb and is silently IGNORED for headless launches (the
+    // registry headless shell runs instead) — so a pin can only mislead
+    // (and 404 on machines whose cache differs). Keep this registry-driven.
     launchOptions: {
       args: [
         '--use-gl=angle',
