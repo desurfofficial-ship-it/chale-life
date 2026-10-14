@@ -211,10 +211,9 @@ describe('7-day simulation', () => {
       }
     }
 
-    // Over-budget fuel: 7-day operating profit does not recover the max startup
-    const startup = opened.business!.startupPaid;
-    expect(startup).toBeGreaterThan(40000);
-    expect(totalRevenue - totalCosts).toBeLessThan(startup);
+    // Over-budget fuel on a small plot: operating net is negative (high cost/day)
+    expect(opened.business!.startupPaid).toBeGreaterThan(40000);
+    expect(totalRevenue - totalCosts).toBeLessThan(0);
   });
 });
 
