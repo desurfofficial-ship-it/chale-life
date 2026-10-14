@@ -1,9 +1,5 @@
 /**
- * Furniture catalogue — ported from the salvage housing data
- * (docs/housing-economic-balance.md starter catalog + the furniture ids
- * referenced by salvage/game/Housing/FurnitureMeshes.ts and
- * PlacementEngine.ts, which imported FURNITURE_CATALOG from the
- * unpreserved game/Home/HomeSystem.ts).
+ * Furniture catalogue — home items + business kit props (G-009).
  *
  * Resale is 50% of cost everywhere (standard for the catalog).
  * Gameplay-effect items are deliberately Tier 1–2 affordable
@@ -15,25 +11,15 @@
 export type FurnitureRarity = 'basic' | 'standard' | 'premium';
 
 export interface FurnitureEffects {
-  /** Comfort points contributed to the home's comfort score. */
   readonly comfort: number;
-  /** Extra energy restored on top of the tier's sleepEnergyRestore. */
   readonly sleepEnergyBonus?: number;
-  /** Multiplier applied to passive energy decay (lower = better). */
   readonly energyDecayMult?: number;
-  /** Multiplier applied to passive fun decay (lower = better). */
   readonly funDecayMult?: number;
-  /** Instant fun restored when used. */
   readonly funRestore?: number;
-  /** Instant hygiene restored when used. */
   readonly hygieneRestore?: number;
-  /** Instant bladder relief when used. */
   readonly bladderRestore?: number;
-  /** Enables cooking at home (₵5/meal, hunger +38). */
   readonly enablesCooking?: boolean;
-  /** Food storage — groceries keep longer. */
   readonly foodStorage?: boolean;
-  /** Immunity to dumsor (power cuts) — lights and fan keep running. */
   readonly dumsorImmunity?: boolean;
 }
 
@@ -43,9 +29,10 @@ export interface FurnitureCatalogItem {
   readonly costGHS: number;
   readonly rarity: FurnitureRarity;
   readonly effects: FurnitureEffects;
-  /** XZ footprint in meters (placement collision). Omit for wall items. */
   readonly dimensions?: { readonly widthMeters: number; readonly depthMeters: number };
   readonly summary: string;
+  /** When true, used in tycoon business kits (not home placement). */
+  readonly businessKit?: boolean;
 }
 
 export const FURNITURE_CATALOG: ReadonlyArray<FurnitureCatalogItem> = [
@@ -252,6 +239,148 @@ export const FURNITURE_CATALOG: ReadonlyArray<FurnitureCatalogItem> = [
     effects: { comfort: 15, dumsorImmunity: true },
     dimensions: { widthMeters: 0.8, depthMeters: 0.6 },
     summary: 'Dumsor immunity. The whole compound hears you have power.',
+  },
+
+  // ── Business kit (G-009 / T-001) — tycoon interiors, not home ─────────────
+  {
+    id: 'biz_counter',
+    title: 'Shop Counter',
+    costGHS: 200,
+    rarity: 'standard',
+    effects: { comfort: 0 },
+    dimensions: { widthMeters: 1.6, depthMeters: 0.6 },
+    summary: 'Serve customers across this counter.',
+    businessKit: true,
+  },
+  {
+    id: 'biz_bench',
+    title: 'Waiting Bench',
+    costGHS: 80,
+    rarity: 'basic',
+    effects: { comfort: 0 },
+    dimensions: { widthMeters: 1.4, depthMeters: 0.45 },
+    summary: 'Customers sit while they wait.',
+    businessKit: true,
+  },
+  {
+    id: 'biz_stool',
+    title: 'Shop Stool',
+    costGHS: 25,
+    rarity: 'basic',
+    effects: { comfort: 0 },
+    dimensions: { widthMeters: 0.4, depthMeters: 0.4 },
+    summary: 'Staff or customer stool.',
+    businessKit: true,
+  },
+  {
+    id: 'biz_chair',
+    title: 'Shop Chair',
+    costGHS: 45,
+    rarity: 'basic',
+    effects: { comfort: 0 },
+    dimensions: { widthMeters: 0.5, depthMeters: 0.5 },
+    summary: 'Simple indoor chair.',
+    businessKit: true,
+  },
+  {
+    id: 'biz_cooker',
+    title: 'Commercial Cooker',
+    costGHS: 350,
+    rarity: 'standard',
+    effects: { comfort: 0, enablesCooking: true },
+    dimensions: { widthMeters: 0.9, depthMeters: 0.7 },
+    summary: 'Chop-bar and waakye heat.',
+    businessKit: true,
+  },
+  {
+    id: 'biz_shelf',
+    title: 'Stock Shelf',
+    costGHS: 120,
+    rarity: 'basic',
+    effects: { comfort: 0 },
+    dimensions: { widthMeters: 1.2, depthMeters: 0.4 },
+    summary: 'Goods on display.',
+    businessKit: true,
+  },
+  {
+    id: 'biz_display',
+    title: 'Display Case',
+    costGHS: 280,
+    rarity: 'standard',
+    effects: { comfort: 0 },
+    dimensions: { widthMeters: 1.0, depthMeters: 0.5 },
+    summary: 'Glass case for phones, meds, or accessories.',
+    businessKit: true,
+  },
+  {
+    id: 'biz_fridge',
+    title: 'Commercial Fridge',
+    costGHS: 900,
+    rarity: 'premium',
+    effects: { comfort: 0, foodStorage: true },
+    dimensions: { widthMeters: 0.8, depthMeters: 0.8 },
+    summary: 'Cold drinks and perishables.',
+    businessKit: true,
+  },
+  {
+    id: 'biz_barber_chair',
+    title: 'Barber Chair',
+    costGHS: 450,
+    rarity: 'standard',
+    effects: { comfort: 0 },
+    dimensions: { widthMeters: 0.7, depthMeters: 0.8 },
+    summary: 'Hydraulic seat for the cut.',
+    businessKit: true,
+  },
+  {
+    id: 'biz_salon_chair',
+    title: 'Salon Chair',
+    costGHS: 520,
+    rarity: 'standard',
+    effects: { comfort: 0 },
+    dimensions: { widthMeters: 0.7, depthMeters: 0.8 },
+    summary: 'Styling chair with headrest.',
+    businessKit: true,
+  },
+  {
+    id: 'biz_mirror',
+    title: 'Wall Mirror',
+    costGHS: 90,
+    rarity: 'basic',
+    effects: { comfort: 0 },
+    dimensions: { widthMeters: 0.8, depthMeters: 0.1 },
+    summary: 'Barber and salon mirror.',
+    businessKit: true,
+  },
+  {
+    id: 'biz_fuel_pump',
+    title: 'Fuel Pump',
+    costGHS: 4000,
+    rarity: 'premium',
+    effects: { comfort: 0 },
+    dimensions: { widthMeters: 1.0, depthMeters: 0.8 },
+    summary: 'Petrol / diesel pump island.',
+    businessKit: true,
+  },
+  {
+    id: 'biz_canopy',
+    title: 'Station Canopy',
+    costGHS: 2500,
+    rarity: 'premium',
+    effects: { comfort: 0 },
+    dimensions: { widthMeters: 4, depthMeters: 3 },
+    summary: 'Shade over the pumps.',
+    businessKit: true,
+  },
+  {
+    id: 'biz_umbrella',
+    title: 'Street Umbrella',
+    costGHS: 60,
+    rarity: 'basic',
+    effects: { comfort: 0 },
+    dimensions: { widthMeters: 1.5, depthMeters: 1.5 },
+    summary: 'Waakye stand shade.',
+    businessKit: true,
   },
 ];
 
