@@ -3,19 +3,11 @@
  * in here; E-002 mounts the real World and the real HUD; E-003 wires the
  * Earn-and-eat loop through it).
  *
- * Canvas is orthographic: R3F keeps the frustum correct on resize while the
- * rig (src/engine/CameraRig.tsx) owns zoom/follow at runtime. Component order
- * inside the Canvas matters — <GameLoop /> mounts (and subscribes) first so
- * the transform it writes this frame is what <Player />, <CameraRig /> and
- * <ObjectiveMarker /> consume this same frame. <AccraWorld /> (the Accra map,
- * v6) owns ALL scene lighting (its SceneLights) — this file adds no lights.
- * The world is 1:1 metres at city scale (plate x −280…340); the dusk rig,
- * fog and skyline come from the map itself.
- *
- * `shadows="percentage"` enables the shadow-map pass the World's Lighting
- * expects (its meshes set castShadow/receiveShadow) — three r186 only ships
- * PCF shadow maps, so this is the closest match to the intended soft look.
- * Cost: one extra draw pass, still far under the 150-call budget (?debug=1).
+ * G-008e follow-up — CODE-SPLIT: the whole 3D subtree (three.js + R3F + the
+ * Accra map, ~2 MB of the old single bundle) moved to GameCanvas.tsx and is
+ * lazy-loaded below. This file stays the light shell: WebGL gate, store
+ * wiring, HUD, joystick, keyboard, debug overlay. The HUD paints while the
+ * world chunk streams in, and a no-WebGL visitor never downloads it.
  *
  * DOM overlays (HUD, joystick, Recenter, ?debug=1) are plain siblings above
  * the canvas — no <Html distanceFactor> under the ortho camera, ever (CI
@@ -37,19 +29,13 @@
  * stable while a shift advances; it flips only when a payout latches.
  */
 
-import { Canvas } from '@react-three/fiber';
-import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
-import { CameraRig } from '../engine/CameraRig';
-import { GameLoop } from '../engine/GameLoop';
-import { ObjectiveMarker } from '../engine/ObjectiveMarker';
+import { lazy, Suspense, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { initializePlayerSpawn } from '../engine/spawn';
 import { initKeyboardInput } from '../input/inputManager';
 import { Joystick } from '../input/Joystick';
 import { RecenterButton } from '../input/RecenterButton';
-import { Player } from '../player/Player';
-import { actPromptFor } from '../rules/act';
+import { actPromptFor, promptCooldownLive } from '../rules/act';
 import {
-  INITIAL_ZOOM,
   getActPromptOverride,
   getState,
   requestAct,
@@ -57,10 +43,14 @@ import {
   type ActPromptOverride,
   type GameState,
 } from '../store/gameStore';
-import { Hud } from '../ui';
-import { AccraWorld } from '../world';
+import { Hud, useCountdownNow } from '../ui';
 import { DebugOverlay } from './DebugOverlay';
 import { isWebGLAvailable } from './webgl';
+
+// The 3D world — three.js + R3F + the whole Accra map live behind this
+// boundary (see GameCanvas.tsx). Loaded only after first paint, and never
+// for a no-WebGL visitor (the WebGL gate below returns before rendering it).
+const GameCanvas = lazy(() => import('./GameCanvas'));
 
 // Spawn ONCE at composition-root import, before React renders: the store,
 // camera and HUD start at the starter compound gate (LOC-002), never inside
@@ -119,16 +109,27 @@ export function App() {
   const nearLocationId = useStoreValue((s) => s.nearLocationId);
   const toastMessage = useStoreValue((s) => s.toast.message);
 
+  // G-008e follow-up: the prompt clock is a STANDALONE 1 Hz tick, not the
+  // drain cadence — both countdown reasons ("Daavi needs you again in Ns",
+  // "Water again in Ns") must tick every second even when the needs drain
+  // is paused (capped needs commit nothing, and the old Date.now() read
+  // only re-evaluated on a re-render). With no countdown live the clock
+  // is frozen and no timer runs at all.
+  const nowMs = useCountdownNow(lastPayoutAt ?? lastWaterAt, (t) =>
+    promptCooldownLive(t, lastPayoutAt, lastWaterAt)
+  );
+
   // Pure rules projection of the store snapshot — what the Act button says.
   // G-008c: nowMs is the wall-clock NOW the job cooldown counts against;
-  // the ~1 Hz needs drain keeps this component re-rendering, so the
-  // "Daavi needs you again in Ns" reason ticks down live under the pill.
+  // the standalone 1 Hz prompt clock keeps this component re-rendering
+  // while a countdown is live, so the "Daavi needs you again in Ns" reason
+  // ticks down live under the pill.
   const rulesPrompt = actPromptFor(
     {
       wallet: { balanceGHS: balance },
       needs: { hunger, energy, lastWaterAt },
       job: { activeId, step, completedIds, lastPayoutAt },
-      nowMs: Date.now(),
+      nowMs,
     },
     nearLocationId
   );
@@ -158,21 +159,11 @@ export function App() {
 
   return (
     <>
-      <Canvas
-        orthographic
-        shadows="percentage"
-        dpr={[1, 1.25]}
-        gl={{ antialias: false, alpha: false, powerPreference: 'high-performance' }}
-        camera={{ position: [0, 60, 60], zoom: INITIAL_ZOOM, near: 0.1, far: 900 }}
-        style={{ position: 'absolute', inset: 0 }}
-      >
-        {/* Background + fog owned by Lighting (B-003b — no duplicate). */}
-        <GameLoop />
-        <AccraWorld />
-        <Player />
-        <ObjectiveMarker />
-        <CameraRig />
-      </Canvas>
+      {/* Code-split world: the shell (HUD, joystick, debug) paints while
+          this chunk streams in; the fallback disappears with it. */}
+      <Suspense fallback={<CanvasLoading />}>
+        <GameCanvas />
+      </Suspense>
       {/* G-001 HUD + E-003 Act wiring: label/enabled from actPromptFor on the
           store snapshot, toast from resolveAct via the store (2 s lifetime
           is the Hud's own). */}
@@ -181,6 +172,28 @@ export function App() {
       <RecenterButton />
       <DebugOverlay />
     </>
+  );
+}
+
+/** Chunk-load placeholder — paints while the world code-split streams in. */
+function CanvasLoading() {
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        inset: 0,
+        display: 'grid',
+        placeItems: 'center',
+        color: '#94a3b8',
+        fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+        fontSize: 14,
+        fontWeight: 700,
+        letterSpacing: '0.08em',
+      }}
+    >
+      Loading Accra…
+    </div>
   );
 }
 
