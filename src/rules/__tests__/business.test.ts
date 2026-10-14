@@ -206,9 +206,10 @@ describe('7-day simulation', () => {
       for (let h = 6; h < 22; h++) {
         const t = tick(biz, 60, 'clear', h, demand);
         totalRevenue += t.revenue;
-        totalCosts += t.costs;
         biz = t.business;
       }
+      // Full daily opex (rent, staff, utilities) — not just the open-hour fraction
+      totalCosts += biz.costPerDay;
     }
 
     // Over-budget fuel on a small plot: operating net is negative (high cost/day)
