@@ -149,74 +149,140 @@ describe('tick', () => {
 });
 
 describe('7-day simulation', () => {
-  it('sensible chop bar is profitable over 7 game days', () => {
-    let wallet = { balanceGHS: 20000 };
-    // buy plot
+  /** Full daily opex once per game day (not the hour-fraction tick costs). */
+  function runDays(
+    biz: BusinessState,
+    plot: PlotRef,
+    days: number,
+    hourRange: { start: number; end: number },
+  ): { revenue: number; costs: number; business: BusinessState } {
+    const demand = districtDemand(plot);
+    let revenue = 0;
+    let costs = 0;
+    let b = biz;
+    for (let day = 0; day < days; day++) {
+      for (let h = hourRange.start; h < hourRange.end; h++) {
+        const t = tick(b, 60, 'clear', h, demand);
+        revenue += t.revenue;
+        b = t.business;
+      }
+      costs += b.costPerDay;
+    }
+    return { revenue, costs, business: b };
+  }
+
+  it('sensible chop bar is profitable over 7 game days (net after startup)', () => {
+    const wallet = { balanceGHS: 20000 };
     const bought = buyPlot(wallet, samplePlot);
     expect(bought.ok).toBe(true);
-    wallet = bought.wallet;
-
-    const opened = openBusiness(wallet, {
+    const opened = openBusiness(bought.wallet, {
       typeId: 'chop_bar',
       plot: samplePlot,
       budget: 'suggested',
       businessId: 'sim-chop',
     });
     expect(opened.ok).toBe(true);
-    wallet = opened.wallet;
-    let biz = opened.business!;
-    const demand = districtDemand(samplePlot);
-
-    let totalRevenue = 0;
-    let totalCosts = 0;
-    // 7 days × 12 operating hours × 60 min, midday clear weather
-    for (let day = 0; day < 7; day++) {
-      for (let h = 8; h < 20; h++) {
-        const t = tick(biz, 60, 'clear', h, demand);
-        totalRevenue += t.revenue;
-        totalCosts += t.costs;
-        biz = t.business;
-        wallet = { balanceGHS: wallet.balanceGHS + t.revenue - t.costs };
-      }
-    }
-
-    expect(totalRevenue).toBeGreaterThan(totalCosts);
-    expect(wallet.balanceGHS).toBeGreaterThan(20000 - samplePlot.price - 1500);
+    const startup = opened.business!.startupPaid;
+    const { revenue, costs } = runDays(opened.business!, samplePlot, 7, {
+      start: 8,
+      end: 20,
+    });
+    // Net = revenue − daily costs − startup  (ticket rule)
+    const net = revenue - costs - startup;
+    expect(net).toBeGreaterThan(0);
   });
 
-  it('over-budget fuel station is not profitable in 7 days on a small plot', () => {
-    let wallet = { balanceGHS: 100000 };
+  it('over-budget fuel station is not profitable over 7 days on a small plot', () => {
     const fuelPlot: PlotRef = { ...samplePlot, id: 'fuel-plot', w: 6, d: 5, price: 2000 };
-    wallet = buyPlot(wallet, fuelPlot).wallet;
-
-    const opened = openBusiness(wallet, {
+    const wallet = { balanceGHS: 100000 };
+    const bought = buyPlot(wallet, fuelPlot);
+    expect(bought.ok).toBe(true);
+    const opened = openBusiness(bought.wallet, {
       typeId: 'fuel_station',
       plot: fuelPlot,
-      budget: 'max', // over-budget
+      budget: 'max',
       businessId: 'sim-fuel',
     });
     expect(opened.ok).toBe(true);
-    wallet = opened.wallet;
-    let biz = opened.business!;
-    const demand = districtDemand(fuelPlot);
-
-    let totalRevenue = 0;
-    let totalCosts = 0;
-    for (let day = 0; day < 7; day++) {
-      for (let h = 6; h < 22; h++) {
-        const t = tick(biz, 60, 'clear', h, demand);
-        totalRevenue += t.revenue;
-        biz = t.business;
-      }
-      // Full daily opex (rent, staff, utilities) — not just the open-hour fraction
-      totalCosts += biz.costPerDay;
-    }
-
-    // Over-budget fuel on a small plot: operating net is negative (high cost/day)
     const startup = opened.business!.startupPaid;
     expect(startup).toBeGreaterThan(40000);
-    // Max-tier fuel on a tiny plot: 7-day net recovers under 5% of startup (not viable yet)
-    expect(totalRevenue - totalCosts).toBeLessThan(startup * 0.05);
+    const { revenue, costs } = runDays(opened.business!, fuelPlot, 7, {
+      start: 6,
+      end: 22,
+    });
+    const net = revenue - costs - startup;
+    expect(net).toBeLessThan(0);
+  });
+});
+
+describe('balance payback window', () => {
+  const avgPlot: PlotRef = {
+    id: 'avg-plot',
+    x: 0,
+    z: 0,
+    w: 7,
+    d: 5.6,
+    zone: 'chorkor',
+    price: 1600,
+  };
+
+  it('every business at Suggested recovers startup in 3–30 game days', () => {
+    const types = [
+      'chop_bar',
+      'waakye_stand',
+      'phone_shop',
+      'barber',
+      'salon',
+      'provisions',
+      'pharmacy',
+      'fuel_station',
+    ] as const;
+
+    for (const typeId of types) {
+      const opened = openBusiness(
+        { balanceGHS: 200000 },
+        {
+          typeId,
+          plot: avgPlot,
+          budget: 'suggested',
+          businessId: `pb-${typeId}`,
+        },
+      );
+      expect(opened.ok, typeId).toBe(true);
+      const startup = opened.business!.startupPaid;
+      const demand = districtDemand(avgPlot);
+      let revenue = 0;
+      let costs = 0;
+      let b = opened.business!;
+      let paybackDay: number | null = null;
+      for (let day = 1; day <= 30; day++) {
+        const hours =
+          typeId === 'fuel_station'
+            ? { start: 6, end: 22 }
+            : { start: 8, end: 20 };
+        for (let h = hours.start; h < hours.end; h++) {
+          const t = tick(b, 60, 'clear', h, demand);
+          revenue += t.revenue;
+          b = t.business;
+        }
+        costs += b.costPerDay;
+        if (revenue - costs >= startup && paybackDay === null) {
+          paybackDay = day;
+        }
+      }
+      expect(
+        paybackDay,
+        `${typeId} never recovered startup in 30 days (rev=${revenue} costs=${costs} startup=${startup})`,
+      ).not.toBeNull();
+      expect(
+        paybackDay!,
+        `${typeId} recovered too fast (${paybackDay}d < 3)`,
+      ).toBeGreaterThanOrEqual(3);
+      expect(
+        paybackDay!,
+        `${typeId} recovered too slow (${paybackDay}d > 30)`,
+      ).toBeLessThanOrEqual(30);
+    }
   });
 });
 
