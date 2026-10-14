@@ -117,31 +117,33 @@ export function plotProps(
   return { shrubs, trees, palms, grass }
 }
 
-const GROUND_PLOTS = LAND_PLOTS.filter((p) => !p.y)
-const RAISED_PLOTS = LAND_PLOTS.filter((p) => !!p.y)
-const MAINLAND_PLOT_PROPS = plotProps(GROUND_PLOTS, 11)
-const ISLAND_PLOT_PROPS = plotProps(RAISED_PLOTS, 77)
 const up = (items: { p: [number, number]; s?: number; r?: number }[]) => items.map((i) => ({ ...i, y: 0.44 }))
-const PLOT_SHRUBS = [...MAINLAND_PLOT_PROPS.shrubs, ...up(ISLAND_PLOT_PROPS.shrubs)]
-const PLOT_TREES = [...MAINLAND_PLOT_PROPS.trees, ...up(ISLAND_PLOT_PROPS.trees)]
-const PLOT_PALMS = [...MAINLAND_PLOT_PROPS.palms, ...up(ISLAND_PLOT_PROPS.palms)]
-const PLOT_GRASS = [...MAINLAND_PLOT_PROPS.grass, ...up(ISLAND_PLOT_PROPS.grass)]
 
-/** every buyable plot (LAND_PLOTS): pads, beacons, boards, overgrowth. Island
- *  plots (y 0.44) sit on their plinth tops. The game reads id / zone / near /
- *  price from LAND_PLOTS and names the plot group `plot:<id>`. */
-export function LandForSale() {
+/** every buyable plot (LAND_PLOTS): pads, beacons, boards, overgrowth.
+ *  W-007: pass ownedPlotIds to clear shrubs/signs on purchased plots. */
+export function LandForSale({ ownedPlotIds = [] }: { ownedPlotIds?: readonly string[] }) {
+  const owned = new Set(ownedPlotIds)
+  const free = LAND_PLOTS.filter((p) => !p.id || !owned.has(p.id))
+  const ground = free.filter((p) => !p.y)
+  const raised = free.filter((p) => !!p.y)
+  const mainProps = plotProps(ground, 11)
+  const islandProps = plotProps(raised, 77)
+  const shrubs = [...mainProps.shrubs, ...up(islandProps.shrubs)]
+  const trees = [...mainProps.trees, ...up(islandProps.trees)]
+  const palms = [...mainProps.palms, ...up(islandProps.palms)]
+  const grass = [...mainProps.grass, ...up(islandProps.grass)]
+
   return (
     <group>
-      {LAND_PLOTS.map((p, i) => (
+      {free.map((p, i) => (
         <group key={p.id ?? i} position={[0, p.y ?? 0, 0]} name={`plot:${p.id}`} userData={{ plot: { id: p.id, zone: p.zone, near: p.near, price: p.price } }}>
           <LandPlot x={p.x} z={p.z} w={p.w} d={p.d} signRot={((i * 37) % 4) * (Math.PI / 2)} />
         </group>
       ))}
-      <InstancedShrubs items={PLOT_SHRUBS} />
-      <InstancedTrees items={PLOT_TREES} />
-      <InstancedPalms items={PLOT_PALMS} />
-      <InstancedGrassTufts items={PLOT_GRASS} />
+      <InstancedShrubs items={shrubs} />
+      <InstancedTrees items={trees} />
+      <InstancedPalms items={palms} />
+      <InstancedGrassTufts items={grass} />
     </group>
   )
 }

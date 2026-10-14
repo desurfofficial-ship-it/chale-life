@@ -13,3 +13,12 @@
  */
 export { AccraWorld } from './accra/AccraWorld';
 export { colliders, worldBounds, type ColliderBox } from './colliders';
+
+/** W-007 tycoon world overlay + plotSelected event bus */
+export {
+  TycoonLayer,
+  onWorldEvent,
+  emitWorldEvent,
+  buildTycoonDemoProps,
+} from './tycoon';
+export type { TycoonWorldProps, TycoonBusinessView, TycoonWeather } from './tycoon';
