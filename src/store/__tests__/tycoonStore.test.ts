@@ -47,6 +47,13 @@ describe('tycoonStore', () => {
     expect(getTycoonState().businesses[0].open).toBe(true);
   });
 
+  it('accumulates sub-second rAF dts into full minutes', () => {
+    const before = getTycoonState().clock.minutes;
+    // 60 × 1/60 s at 1× → 1 game minute
+    for (let i = 0; i < 60; i++) advanceClock(1 / 60);
+    expect(getTycoonState().clock.minutes).toBe(before + 1);
+  });
+
   it('advanceClock advances minutes', () => {
     requestBuyPlot({ ...plot, id: 'earn-plot' });
     requestOpenBusiness({ ...plot, id: 'earn-plot' }, 'chop_bar', 'suggested');
