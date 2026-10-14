@@ -9,3 +9,6 @@
 #    deleted from the repo in S-001; the key itself must be deleted or
 #    restricted in Google Cloud Console (owner action, tracked in the PR).
 a4fe60e8dc2468fb4b2997e6f9048e4c11aef60f:firebase-applet-config.json:gcp-api-key:4
+
+# False positive: localStorage key string (not a secret)
+98451d452cb8c62d4b8fce9228d87dda4d829399:src/store/tycoonStore.ts:generic-api-key:54
