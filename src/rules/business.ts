@@ -120,15 +120,19 @@ function staffFor(type: BusinessTypeDef, tier: BudgetTier): number {
 function capacityFor(type: BusinessTypeDef, tier: BudgetTier, plotTiles: number): number {
   const base = type.baseCustomersPerHour;
   const tierMult = [0.7, 1.0, 1.35][tierIndex(tier)];
-  const areaMult = Math.min(1.4, Math.max(0.7, plotTiles / 30));
+  // Difficulty-3 (fuel) needs a larger plot for full throughput; small plots hurt hard.
+  const areaDenom = type.difficulty >= 3 ? 55 : 32;
+  const areaMult = Math.min(1.35, Math.max(0.28, plotTiles / areaDenom));
   return Math.max(1, Math.round(base * tierMult * areaMult * 8)); // ~8h operating capacity
 }
 
+/**
+ * Suggested-tier costPerDay from the catalogue is the baseline opex.
+ * Budget scales: min 0.8×, suggested 1.0×, max 1.5× (max is intentionally expensive).
+ */
 function costPerDayFor(type: BusinessTypeDef, tier: BudgetTier): number {
-  const staff = staffFor(type, tier);
-  const staffWage = 12; // GH₵/staff/day
-  const utilBase = type.costPerDay * 0.4;
-  return round2(utilBase + staff * staffWage + (tier === 'max' ? 15 : 0));
+  const tierOpEx = [0.8, 1.0, 1.5][tierIndex(tier)];
+  return round2(type.costPerDay * tierOpEx);
 }
 
 /** District demand 0.6–1.4 from zone + near landmark. */
