@@ -140,7 +140,13 @@ function SeaAndSkirts() {
 
 export function AccraWorld() {
   const groundTex = useMemo(() => buildGroundTexture(), [])
-  const seaGeo = useMemo(() => new THREE.PlaneGeometry(980, 260), [])
+  // Sea band overlay: SEA = { z0: 46, z1: 116 } (mapConfig) → the animated
+  // water covers the plate's southern 70 m ONLY (centre z 81, depth 70),
+  // exactly like the lagoon plane mirrors LAGOON's footprint. The plane used
+  // to be 260 m deep (z −49…211): it flooded the whole playable city south
+  // of z −49 — Daavi's plot, Makola, Oxford St, the CBD fronts and the beach
+  // all rendered under 0.34 m of opaque water (ground canvas + roads hidden).
+  const seaGeo = useMemo(() => new THREE.PlaneGeometry(980, 70), [])
   const lagoonGeo = useMemo(() => new THREE.PlaneGeometry(26, 8), [])
 
   return (
