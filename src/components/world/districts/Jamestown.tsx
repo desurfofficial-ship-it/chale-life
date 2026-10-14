@@ -67,6 +67,68 @@ function SleepYard() {
   )
 }
 
+// ─── Daavi's plot dressing — the game's two interaction markers ─────────────
+// The v6 map hands the plot over bare: the two spots the hustle lives on
+// need their physical markers back (the old starter block had both; they
+// went with it in the map swap).
+//
+// 1. JOB-SPOT CRATE + PAN STACK — G-008d item 8, carried verbatim in
+//    proximity.ts's DAAVI_JOB_SPOT comment ("Agent 3 marks it visually with
+//    crates / a pan stack against the east wall"). The job spot
+//    (LOC-001-JOB / DAAVI_JOB_SPOT at −122.9, −2.4) is the kiosk's east
+//    side, so the stack hugs the east wall (x −125) inside the wall band
+//    (z −4.6…−2.6): two crates + a washed pan on top + a pan leaning on the
+//    wall. Footprint x −125.0…−124.4, z −4.05…−2.85 — 1.6 m from the job
+//    spot's standing point (≥ the 0.6 m capsule+margin bar jobs.test pins
+//    for plot solids) and clear of the job→bench walk line (which crosses
+//    the wall at z ≈ −2.1, north of the stack).
+// 2. SET-DOWN BENCH — the hustle's step 2 ("carry the pans to the bench")
+//    points at DAAVI_BENCH (−132.5, −0.6) on the plot pavement; without a
+//    bench mesh the marker points at bare ground. The Bench (1.9 × 0.6 m,
+//    rotation 0 → seat faces south, toward Daavi St) sits at the yard's
+//    east edge, 2.3 m north of the waypoint and inside its 2.5 m zone:
+//    footprint x −133.45…−131.55, z −3.5…−2.9 — 0.55 m north of the
+//    spawn→pavement walk line (z ≈ −2.0) and clear of the sleepYard robot
+//    legs. DRESSING ONLY: these props are not in the captured collider set
+//    (world/accra/data/colliders.json); both footprints already satisfy the
+//    clearance bars the jobs.test suite pins, so wiring an in-game collider
+//    capture later cannot turn them into route blockers.
+function DaaviPlotDressing() {
+  return (
+    <group>
+      {/* job-spot marker: crate + pan stack against the kiosk's east wall */}
+      <group position={[-124.72, 0, -3.15]}>
+        <mesh position={[0, 0.26, 0]} castShadow receiveShadow>
+          <boxGeometry args={[0.55, 0.52, 0.55]} />
+          <meshStandardMaterial color="#9a6a3c" roughness={0.9} />
+        </mesh>
+        {/* washed pan resting on the crate */}
+        <mesh position={[0, 0.57, 0]} castShadow>
+          <cylinderGeometry args={[0.24, 0.2, 0.1, 12]} />
+          <meshStandardMaterial color="#3d4147" roughness={0.5} metalness={0.55} />
+        </mesh>
+      </group>
+      <group position={[-124.72, 0, -3.75]}>
+        <mesh position={[0, 0.26, 0]} castShadow receiveShadow>
+          <boxGeometry args={[0.55, 0.52, 0.55]} />
+          <meshStandardMaterial color="#8a5c34" roughness={0.9} />
+        </mesh>
+        <mesh position={[0, 0.57, 0]} castShadow>
+          <cylinderGeometry args={[0.22, 0.19, 0.09, 12]} />
+          <meshStandardMaterial color="#454a51" roughness={0.5} metalness={0.55} />
+        </mesh>
+      </group>
+      {/* empty pan leaning on the wall between the two crates */}
+      <mesh position={[-124.93, 0.42, -3.45]} rotation={[0, 0, -0.32]} castShadow>
+        <cylinderGeometry args={[0.23, 0.19, 0.09, 12]} />
+        <meshStandardMaterial color="#383c42" roughness={0.5} metalness={0.55} />
+      </mesh>
+      {/* the step-2 set-down bench on the yard's east edge, facing the street */}
+      <Bench position={[-132.5, 0, -3.2]} rotation={0} />
+    </group>
+  )
+}
+
 export function DaaviPlot() {
   return (
     <group>
@@ -80,12 +142,16 @@ export function DaaviPlot() {
         d={6.4}
         variant={1}
       />}
-      {/* kiosk by the street corner */}
-      <Kiosk position={[-126.5, 0, -3.6]} sign="KIOSK" signBg="#e4b93f" />
+      {/* kiosk by the street corner — the sign carries the joint's name
+          (W-002: the old starter's "AUNTY BA" board renamed DAAVI; the
+          starter went with the map swap, so the name lives here now) */}
+      <Kiosk position={[-126.5, 0, -3.6]} sign="DAAVI WAAKYE" signBg="#e4b93f" />
       {/* open sleep yard in between — kept clear for the game */}
       <SleepYard />
       {/* street name sign on the pavement */}
       <StreetSign position={[-125.2, 0, 0.9]} text="DAAVI ST" />
+      {/* the hustle's two physical markers (see placement contract above) */}
+      <DaaviPlotDressing />
     </group>
   )
 }
