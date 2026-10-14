@@ -2,7 +2,7 @@
 
 import type { TycoonWorldProps } from './types';
 import { PlotMarkers } from './PlotMarkers';
-import { BusinessShells } from './BusinessShells';
+import { BusinessShells } from './BusinessShell';
 import { InstancedFurniture } from './InstancedFurniture';
 import { InstancedPeople } from './InstancedPeople';
 import { MoneyPops } from './MoneyPops';
