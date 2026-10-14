@@ -13,6 +13,8 @@ import {
   type BudgetTier,
   type BusinessTypeDef,
 } from '../data/businesses';
+
+export type { BudgetTier } from '../data/businesses';
 import { buy, canAfford, type WalletState } from './economy';
 
 // ── Types (published for Agents 2 & 3) ───────────────────────────────────────
