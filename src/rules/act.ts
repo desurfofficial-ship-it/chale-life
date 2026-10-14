@@ -465,6 +465,28 @@ function decideAct(session: ActSession, nearLocationId: string | null): Decision
 }
 
 /**
+ * Whether ANY countdown that feeds the Act prompt's reason line rests
+ * live at nowMs (G-008e follow-up) — the starter hustle's payout
+ * cooldown ("Daavi needs you again in Ns") or the sachet-water rest
+ * ("Water again in Ns"). The composition root's standalone 1 Hz prompt
+ * clock runs exactly this long; with both rests off the clock is frozen
+ * and actPromptFor renders from it unchanged (identical output to a
+ * Date.now() read, just with no timer running behind it). Pure data in,
+ * boolean out — the same convention as every rule here.
+ */
+export function promptCooldownLive(
+  nowMs: number | undefined,
+  lastPayoutAt: number | undefined,
+  lastWaterAt: number | undefined
+): boolean {
+  const hustle = findJobById(AUNTY_BA_HUSTLE_ID);
+  if (hustle && cooldownStatus(hustle, nowMs, lastPayoutAt).onCooldown) {
+    return true;
+  }
+  return cooldownRemaining(SACHET_WATER.cooldownSeconds ?? 0, nowMs, lastWaterAt).onCooldown;
+}
+
+/**
  * Where the objective marker should sit right now (G-008b item 7,
  * G-008d item 4 — mirrored branch-for-branch with idleObjectiveFor so
  * the beacon can never disagree with the hint copy):
