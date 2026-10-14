@@ -150,6 +150,7 @@ export function loadTycoon(): void {
 
 /** Reset in-memory tycoon state (tests). */
 export function __resetTycoonForTests(): void {
+  clockRemainder = 0;
   state = {
     ownedPlotIds: [],
     businesses: [],
