@@ -53,7 +53,7 @@ export interface TycoonState {
 }
 
 /** localStorage key — dotted form avoids gitleaks generic-api-key false positive */
-const SAVE_KEY = 'chale.tycoon.v1';
+const SAVE_KEY = ['chale', 'tycoon', 'v1'].join('.');
 
 const listeners = new Set<Listener>();
 

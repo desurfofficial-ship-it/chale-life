@@ -11,6 +11,7 @@ import { LAND_PLOTS } from '../../src/lib/mapConfig';
 const BASE = '/chale-life/';
 const plot = LAND_PLOTS[0];
 if (!plot?.id) throw new Error('LAND_PLOTS[0] missing id');
+const plotId: string = plot.id;
 
 test.describe('tycoon buyAndOpen', () => {
   test('buy plot → chop bar → open → cash rises → reload keeps ownership', async ({
@@ -32,7 +33,7 @@ test.describe('tycoon buyAndOpen', () => {
     });
 
     const plotRef = {
-      id: plot.id!,
+      id: plotId,
       x: plot.x,
       z: plot.z,
       w: plot.w,
@@ -52,7 +53,7 @@ test.describe('tycoon buyAndOpen', () => {
       ).__chaleTycoon;
       t.setMode(true);
       t.selectPlot(id);
-    }, plot.id);
+    }, plotId);
 
     await expect(page.getByTestId('tycoon-hud')).toBeVisible();
     await expect(page.getByTestId('plot-sheet')).toBeVisible();

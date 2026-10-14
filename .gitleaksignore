@@ -10,3 +10,9 @@
 #    restricted in Google Cloud Console (owner action, tracked in the PR).
 a4fe60e8dc2468fb4b2997e6f9048e4c11aef60f:firebase-applet-config.json:gcp-api-key:4
 
+# E-010 localStorage save key false positives (generic-api-key on non-secrets)
+134f2e2a11fdb97ba089d5464e45438d4f4d7def:src/store/tycoonStore.ts:generic-api-key:56
+0a3b72427f72fa94c32bf75db150956aa5162bde:src/store/tycoonStore.ts:generic-api-key:54
+5131fd03:src/store/tycoonStore.ts:generic-api-key:54
+98451d452cb8c62d4b8fce9228d87dda4d829399:src/store/tycoonStore.ts:generic-api-key:54
+38aec1cadb29ba9237249b9300c9861e0b0bae80:src/store/tycoonStore.ts:generic-api-key:54
