@@ -20,6 +20,7 @@ import {
   type WeatherKind,
 } from '../rules/business';
 import { getState, setWalletBalanceGHS, subscribe as subscribeGame } from './gameStore';
+import { LAND_PLOTS } from '../lib/mapConfig';
 import type { TycoonTab } from '../ui/tycoon/TycoonHud';
 
 type Listener = () => void;
@@ -56,6 +57,9 @@ export interface TycoonState {
 const SAVE_KEY = ['chale', 'tycoon', 'v1'].join('.');
 
 const listeners = new Set<Listener>();
+
+/** Fractional game-minutes not yet applied (rAF dt is ~16ms). */
+let clockRemainder = 0;
 
 let state: TycoonState = {
   ownedPlotIds: [],
@@ -262,12 +266,14 @@ export function requestOpenBusiness(
 export function advanceClock(realDtSeconds: number, opts?: { offlineCapHours?: number }): void {
   if (state.clock.speed === 0 || realDtSeconds <= 0) return;
 
-  // 1 real second at 1× = 1 game minute
-  let gameMinutes = realDtSeconds * state.clock.speed;
+  // 1 real second at 1× = 1 game minute. Accumulate sub-minute remainders so
+  // rAF (~16ms) ticks eventually step the clock (floor alone never advanced).
+  let gameMinutes = realDtSeconds * state.clock.speed + clockRemainder;
   const cap = (opts?.offlineCapHours ?? 8) * 60;
   if (gameMinutes > cap) gameMinutes = cap;
 
   const steps = Math.floor(gameMinutes);
+  clockRemainder = gameMinutes - steps;
   if (steps <= 0) return;
 
   let minutes = state.clock.minutes + steps;
@@ -305,7 +311,8 @@ export function advanceClock(realDtSeconds: number, opts?: { offlineCapHours?: n
   const nextBiz: BusinessState[] = [];
 
   for (const b of state.businesses) {
-    const demand = 1.0;
+    const raw = LAND_PLOTS.find((p) => p.id === b.plotId);
+    const demand = raw ? districtDemand(landPlotToRef(raw)) : 1.0;
     const t = tick(b, steps, state.weather, hour, demand);
     if (t.revenue > 0 || t.costs > 0) {
       wallet += t.revenue - t.costs;
