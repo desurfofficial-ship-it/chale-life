@@ -1,31 +1,77 @@
 /**
- * GameCanvas — the 3D world subtree, code-split out of the main chunk
- * (G-008e follow-up: the 2.2 MB single-bundle build).
+ * GameCanvas — the 3D world subtree, code-split out of the main chunk.
  *
- * W-007: ?tycoonDemo=1 injects four open businesses so World can prove the
- * tycoon layer before E-010 wires the store. Props are pure view data —
- * no store imports inside AccraWorld / TycoonLayer.
+ * E-010: when tycoonMode is on, pass live store businesses into AccraWorld.
+ * ?tycoonDemo=1 still fakes four opens if the store is empty (W-007 harness).
+ * Store imports here are fine — this chunk already loads after first paint.
  */
 
-import { useMemo } from 'react';
+import { useSyncExternalStore } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { CameraRig } from '../engine/CameraRig';
 import { GameLoop } from '../engine/GameLoop';
 import { ObjectiveMarker } from '../engine/ObjectiveMarker';
 import { Player } from '../player/Player';
 import { INITIAL_ZOOM } from '../store/gameStore';
+import { getTycoonState, subscribeTycoon } from '../store/tycoonStore';
 import { AccraWorld } from '../world';
-import { buildTycoonDemoProps, type TycoonWorldProps } from '../world/tycoon';
+import {
+  buildTycoonDemoProps,
+  type TycoonBusinessView,
+  type TycoonWorldProps,
+} from '../world/tycoon';
+import { findBusinessType } from '../data/businesses';
 
-function readTycoonProps(): TycoonWorldProps | null {
-  if (typeof window === 'undefined') return null;
-  const q = new URLSearchParams(window.location.search);
-  if (q.get('tycoonDemo') === '1') return buildTycoonDemoProps();
-  return null;
+function useTycoonSnapshot(): ReturnType<typeof getTycoonState> {
+  return useSyncExternalStore(subscribeTycoon, getTycoonState, getTycoonState);
+}
+
+function toProps(s: ReturnType<typeof getTycoonState>): TycoonWorldProps | null {
+  if (!s.tycoonMode) {
+    if (
+      typeof window !== 'undefined' &&
+      new URLSearchParams(window.location.search).get('tycoonDemo') === '1'
+    ) {
+      return buildTycoonDemoProps();
+    }
+    return null;
+  }
+
+  const businesses: TycoonBusinessView[] = s.businesses.map((b) => {
+    const type = findBusinessType(b.typeId);
+    return {
+      id: b.id,
+      plotId: b.plotId,
+      typeId: b.typeId,
+      category: type?.category ?? 'services',
+      layout: b.layout,
+      open: b.open,
+      customersVisible: Math.min(8, Math.floor(b.customersToday / 4)),
+      staff: b.staff,
+      lastSaleGHS: b.revenueToday > 0 ? 12 : 0,
+    };
+  });
+
+  if (
+    businesses.length === 0 &&
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('tycoonDemo') === '1'
+  ) {
+    return buildTycoonDemoProps();
+  }
+
+  return {
+    ownedPlotIds: s.ownedPlotIds,
+    businesses,
+    weather: s.weather,
+    hour: Math.floor(s.clock.minutes / 60),
+    selectedPlotId: s.selectedPlotId,
+  };
 }
 
 export default function GameCanvas() {
-  const tycoon = useMemo(() => readTycoonProps(), []);
+  const snap = useTycoonSnapshot();
+  const tycoon = toProps(snap);
 
   return (
     <Canvas
@@ -36,7 +82,6 @@ export default function GameCanvas() {
       camera={{ position: [0, 60, 60], zoom: INITIAL_ZOOM, near: 0.1, far: 900 }}
       style={{ position: 'absolute', inset: 0 }}
     >
-      {/* Background + fog owned by Lighting (B-003b — no duplicate). */}
       <GameLoop />
       <AccraWorld tycoon={tycoon} />
       <Player />

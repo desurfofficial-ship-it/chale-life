@@ -1,6 +1,6 @@
 /**
- * World → shell event bus (W-007).
- * No store imports. Engine / App subscribe and commit.
+ * World → shell event bus (shared contract).
+ * Pure TypeScript — safe in the shell chunk (no three.js).
  */
 
 export type WorldEventMap = {

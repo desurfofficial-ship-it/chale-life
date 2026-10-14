@@ -238,7 +238,7 @@ function BottomTabs({ active, onTab }: { active: TycoonTab; onTab: (t: TycoonTab
     { id: 'property', label: 'Property', live: true },
     { id: 'manage', label: 'Manage', live: true },
     { id: 'alerts', label: 'Alerts', live: true },
-    { id: 'city', label: 'City', live: false },
+    { id: 'city', label: 'City', live: true },
     { id: 'shop', label: 'Shop', live: false },
     { id: 'finance', label: 'Finance', live: false },
     { id: 'report', label: 'Report', live: false },
@@ -473,7 +473,7 @@ function SetupSheet({
         <div>Expected daily profit: {formatGHS(est.expectedDailyProfit)}</div>
       </div>
       <FloorPlanPreview typeId={type.id} budget={budget} plot={plot} />
-      <button type="button" style={btnPrimary} onClick={() => onConfirm(budget)}>
+      <button type="button" data-testid="buy-and-arrange" style={btnPrimary} onClick={() => onConfirm(budget)}>
         Buy &amp; arrange · {formatGHS(est.startupCost)}
       </button>
     </div>
@@ -670,7 +670,7 @@ export function TycoonHud(props: TycoonHudProps) {
     onCloseSheet,
   } = props;
 
-  const comingSoon = activeTab === 'city' || activeTab === 'shop' || activeTab === 'finance' || activeTab === 'report';
+  const comingSoon = activeTab === 'shop' || activeTab === 'finance' || activeTab === 'report';
 
   return (
     <div
@@ -697,6 +697,13 @@ export function TycoonHud(props: TycoonHudProps) {
         />
       )}
 
+      {!selectedPlot && activeTab === 'city' && (
+        <div style={{ position: 'absolute', top: 56, left: 12, right: 12, zIndex: 25, pointerEvents: 'none' }}>
+          <div style={{ background: 'rgba(245,240,230,0.92)', borderRadius: 10, padding: '8px 12px', fontSize: 12, fontWeight: 700, color: '#2d5a3d', fontFamily: FONT }}>
+            City view — pinch zoom · drag to pan · tap a plot ring
+          </div>
+        </div>
+      )}
       {!selectedPlot && activeTab === 'manage' && <ManagePanel businesses={businesses} />}
       {!selectedPlot && activeTab === 'alerts' && <AlertsPanel alerts={alerts} />}
       {!selectedPlot && comingSoon && (

@@ -43,7 +43,24 @@ import {
   type ActPromptOverride,
   type GameState,
 } from '../store/gameStore';
-import { Hud, useCountdownNow } from '../ui';
+import {
+  advanceClock,
+  clockLabel,
+  getTycoonState,
+  landPlotToRef,
+  onVisibilityChange,
+  requestBuyPlot,
+  requestOpenBusiness,
+  setActiveTab,
+  setSelectedPlotId,
+  setTycoonMode,
+  subscribeTycoon,
+  weatherIcon,
+} from '../store/tycoonStore';
+import { LAND_PLOTS } from '../lib/mapConfig';
+import { onWorldEvent } from '../world/tycoon/worldEvents';
+import { Hud, TycoonHud, useCountdownNow } from '../ui';
+import type { PlotRef } from '../rules/business';
 import { DebugOverlay } from './DebugOverlay';
 import { isWebGLAvailable } from './webgl';
 
@@ -61,6 +78,18 @@ initializePlayerSpawn();
 function useStoreValue<T>(select: (state: GameState) => T): T {
   return useSyncExternalStore(subscribe, () => select(getState()));
 }
+
+/** Tycoon store subscribe (primitive selector). */
+function useTycoonValue<T>(select: (s: ReturnType<typeof getTycoonState>) => T): T {
+  return useSyncExternalStore(subscribeTycoon, () => select(getTycoonState()));
+}
+
+function plotById(id: string | null): PlotRef | null {
+  if (!id) return null;
+  const raw = LAND_PLOTS.find((p) => (p.id ?? '') === id);
+  return raw ? landPlotToRef(raw) : null;
+}
+
 
 /** Merge the e2e prompt override over the rules prompt (field-by-field). */
 function applyPromptOverride(
@@ -83,6 +112,45 @@ function applyPromptOverride(
 
 export function App() {
   const [webglOk] = useState(isWebGLAvailable);
+
+  // E-010: ?tycoon=1 enables the overlay; World emits plotSelected (W-007)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const q = new URLSearchParams(window.location.search);
+    if (q.get('tycoon') === '1' || q.get('tycoonDemo') === '1') {
+      setTycoonMode(true);
+      // Don't pre-select when demo — wait for plotSelected / e2e
+      if (q.get('tycoon') === '1' && q.get('e2e') !== '1') {
+        const first = LAND_PLOTS[0];
+        if (first?.id) setSelectedPlotId(first.id);
+      }
+    }
+    return onWorldEvent('plotSelected', ({ plotId }) => {
+      setTycoonMode(true);
+      setSelectedPlotId(plotId);
+      setActiveTab('property');
+    });
+  }, []);
+
+  // E-010: game clock + offline catch-up
+  useEffect(() => {
+    let last = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const dt = (now - last) / 1000;
+      last = now;
+      if (getTycoonState().tycoonMode) advanceClock(dt);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    const onVis = () => onVisibilityChange(document.hidden);
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      cancelAnimationFrame(raf);
+      document.removeEventListener('visibilitychange', onVis);
+    };
+  }, []);
+
 
   // Keyboard input for the whole app (WASD/arrows + E/Space Act, E-003);
   // disposed on unmount (StrictMode-safe).
@@ -155,6 +223,20 @@ export function App() {
     [prompt.label, prompt.enabled, prompt.reason, toastMessage]
   );
 
+
+  const tycoonMode = useTycoonValue((s) => s.tycoonMode);
+  const tycoonCash = useStoreValue((s) => s.wallet.balanceGHS);
+  const tycoonDay = useTycoonValue((s) => s.clock.day);
+  const tycoonClock = useTycoonValue((s) => s.clock);
+  const tycoonWeather = useTycoonValue((s) => s.weather);
+  const tycoonQuest = useTycoonValue((s) => s.quest);
+  const tycoonSelectedId = useTycoonValue((s) => s.selectedPlotId);
+  const tycoonOwned = useTycoonValue((s) => s.ownedPlotIds);
+  const tycoonBiz = useTycoonValue((s) => s.businesses);
+  const tycoonAlerts = useTycoonValue((s) => s.alerts);
+  const tycoonTab = useTycoonValue((s) => s.activeTab);
+  const selectedPlot = plotById(tycoonSelectedId);
+
   if (!webglOk) return <WebGLFallback />;
 
   return (
@@ -168,6 +250,24 @@ export function App() {
           store snapshot, toast from resolveAct via the store (2 s lifetime
           is the Hud's own). */}
       {hud}
+      {tycoonMode ? (
+        <TycoonHud
+          cashGHS={tycoonCash}
+          day={tycoonDay}
+          clockLabel={clockLabel(tycoonClock)}
+          weatherIcon={weatherIcon(tycoonWeather)}
+          quest={tycoonQuest}
+          selectedPlot={selectedPlot}
+          ownedPlotIds={tycoonOwned}
+          businesses={tycoonBiz}
+          alerts={tycoonAlerts}
+          activeTab={tycoonTab}
+          onTab={setActiveTab}
+          onBuyPlot={requestBuyPlot}
+          onOpenBusiness={requestOpenBusiness}
+          onCloseSheet={() => setSelectedPlotId(null)}
+        />
+      ) : null}
       <Joystick />
       <RecenterButton />
       <DebugOverlay />

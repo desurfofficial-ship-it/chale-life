@@ -453,6 +453,17 @@ export function publishHud(snapshot: HudSnapshot): void {
  * the sleep test needs an uncapped +55 (energy ≤ 45 at the door), the Full
  * gate pins hunger 92. No secrets, no state exports beyond this setter.
  */
+/**
+ * E-010: set wallet balance (tycoon buy/open/tick commits).
+ * Prefer pure rules for the amount; this only latches the number.
+ */
+export function setWalletBalanceGHS(balanceGHS: number): void {
+  const next = Math.round(balanceGHS * 100) / 100;
+  if (state.wallet.balanceGHS === next) return;
+  state.wallet.balanceGHS = next;
+  notify();
+}
+
 if (
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('e2e') === '1'
@@ -462,6 +473,9 @@ if (
       state.needs.hunger = clampNeed(hunger);
       state.needs.energy = clampNeed(energy);
       notify();
+    },
+    setWallet: (balanceGHS: number): void => {
+      setWalletBalanceGHS(balanceGHS);
     },
     // G-008d item 7: force a specific Act label/enabled/reason — the
     // layout spec pushes the longest real strings through this (the
