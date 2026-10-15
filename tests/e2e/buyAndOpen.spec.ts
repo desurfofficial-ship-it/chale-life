@@ -51,6 +51,12 @@ test.describe('tycoon buyAndOpen', () => {
     page,
   }) => {
     test.setTimeout(180_000);
+    // Wallet seeds ABOVE the current asking price of LAND_PLOTS[0]
+    // (t11-01-chorkor: 39 tiles → ₵147,500 via plotAskingPrice). The old
+    // ₵50,000 seed predated the city land-price rework in 23c38a5 and the
+    // buy/open commits rejected for insufficient funds — the open wait at
+    // the bottom then timed out. Fixture update only; the flow assertions
+    // (buy → open → advance → reload persists) are unchanged.
 
     await page.goto(`${BASE}?tycoon=1&e2e=1`);
     await page.waitForFunction(() => {
@@ -61,7 +67,7 @@ test.describe('tycoon buyAndOpen', () => {
     await page.evaluate(() => {
       (
         window as unknown as { __chaleTest: { setWallet: (n: number) => void } }
-      ).__chaleTest.setWallet(50_000);
+      ).__chaleTest.setWallet(250_000);
     });
 
     const plotRef = {
