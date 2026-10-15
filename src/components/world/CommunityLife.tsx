@@ -13,9 +13,11 @@
 // the loop lanes are proven clear by community.spec.ts.
 // Neither NPCs nor moving vehicles produce colliders (names are not in the
 // exporter's instanced table); parked vehicles get hand boxes (colliderExport).
-import { useLayoutEffect, useMemo, useRef } from 'react'
+import { useLayoutEffect, useMemo, useRef, useEffect } from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
+import { buildSegments, gapSpeedScale, laneOffset, pathLength, poseAt, roundCorners, type Pose } from '@/world/airport/paths'
+import { registerAmbient } from '@/engine/ambient'
 import { COMMUNITY, type CommunityData } from '@/lib/communityLayout'
 import { npcGeometries, vehicleGeometry } from '@/lib/communityKit'
 
@@ -238,61 +240,109 @@ const VEH_KINDS = ['trotro', 'taxi', 'car', 'okada', 'okada-empty'] as const
 const TAXI_TINTS = ['#ffffff', '#c8d6e5', '#e9e1cf', '#a8c3a0', '#f2c6b4']
 
 function Vehicles({ data: D }: { data: CommunityData }) {
-  const path = useMemo(() => loopPath(D), [D])
-  const cum = useMemo(() => { const L = [0]; for (let i = 1; i <= path.length; i++) { const a = path[i - 1], b = path[i % path.length]; L.push(L[i - 1] + Math.hypot(b[0] - a[0], b[1] - a[1])) } return L }, [path])
-  const total = cum[cum.length - 1]
-  // instance lists per kind: parked first, then the moving fleet
-  const plan = useMemo(() => {
-    const per: Record<string, { x: number; z: number; r: number; y: number; tint: string; moving: number }[]> = {}
-    for (const k of VEH_KINDS) per[k] = []
-    for (const p of D.parked) {
-      const kind = p.k === 'okada' ? 'okada-empty' : p.k
-      per[kind].push({ x: p.x, z: p.z, r: p.r, y: p.broken ? 0.32 : 0, tint: p.k === 'taxi' ? TAXI_TINTS[per[kind].length % TAXI_TINTS.length] : p.tint, moving: -1 })
-    }
-    D.loop.fleet.forEach(([k, tint], i) => per[k].push({ x: 0, z: 0, r: 0, y: 0, tint: k === 'taxi' ? TAXI_TINTS[(i + 2) % TAXI_TINTS.length] : tint, moving: i }))
-    return per
-  }, [])
   const refs = useRef<Record<string, THREE.InstancedMesh | null>>({})
-  const n = D.loop.fleet.length
-  const place = (s: number) => {
-    s = ((s % total) + total) % total
-    let i = 1
-    while (i < cum.length - 1 && cum[i] < s) i++
-    const a = path[i - 1], b = path[i % path.length]
-    const u = (s - cum[i - 1]) / (cum[i] - cum[i - 1] || 1)
-    return { x: a[0] + (b[0] - a[0]) * u, z: a[1] + (b[1] - a[1]) * u, yaw: Math.atan2(-(b[1] - a[1]), b[0] - a[0]) }
-  }
-  const write = (t: number, first: boolean) => {
-    const c = new THREE.Color()
+  const dummy = useMemo(() => new THREE.Object3D(), [])
+  const plan = useMemo(() => {
+    const out: Record<string, { x: number; y: number; z: number; r: number; tint: string; moving: number }[]> = {}
+    for (const k of VEH_KINDS) out[k] = []
+    // parked
+    for (const v of D.parked ?? []) {
+      const kind = v.k
+      if (!out[kind]) out[kind] = []
+      out[kind].push({ x: v.x, y: 0, z: v.z, r: v.r, tint: v.tint, moving: -1 })
+    }
+    // moving fleet: [kind, tint][]
+    ;(D.loop?.fleet ?? []).forEach((pair, i) => {
+      const kind = pair[0]
+      const tint = pair[1] ?? '#c0c4c8'
+      if (!out[kind]) out[kind] = []
+      out[kind].push({ x: 0, y: 0, z: 0, r: 0, tint, moving: i })
+    })
+    return out
+  }, [D])
+
+  const path = useMemo(() => {
+    const raw = loopPath(D, 0.75)
+    if (raw.length < 2) return null
+    const pts = raw.map((p) => ({ x: p[0], z: p[1] }))
+    const segs = buildSegments(pts, true)
+    return { segs, len: pathLength(segs) }
+  }, [D])
+
+  const distances = useRef<number[]>([])
+  const speeds = useRef<number[]>([])
+  const tintColor = useMemo(() => new THREE.Color(), [])
+
+  useEffect(() => {
+    if (!path) return
+    // init distances staggered
+    let movingCount = 0
     for (const k of VEH_KINDS) {
-      const m = refs.current[k]
-      if (!m) continue
+      for (const v of plan[k]) {
+        if (v.moving >= 0) movingCount++
+      }
+    }
+    distances.current = Array.from({ length: movingCount }, (_, i) => (i / Math.max(1, movingCount)) * path.len)
+    speeds.current = Array.from({ length: movingCount }, (_, i) => (D.loop?.speed ?? 6) * (0.75 + (i % 5) * 0.08))
+
+    return registerAmbient((dt) => {
+      if (!path || path.len <= 0) return
+      const out: Pose = { x: 0, z: 0, yaw: 0 }
+      let mi = 0
+      for (const k of VEH_KINDS) {
+        const mesh = refs.current[k]
+        if (!mesh) { mi += plan[k].filter((v) => v.moving >= 0).length; continue }
+        plan[k].forEach((v, j) => {
+          if (v.moving < 0) return
+          const idx = mi
+          mi++
+          const scale = gapSpeedScale(distances.current, idx, path.len, 4, speeds.current)
+          distances.current[idx] = (distances.current[idx] + speeds.current[idx] * scale * dt) % path.len
+          poseAt(path.segs, path.len, distances.current[idx], out)
+          const lane = (idx % 2 === 0 ? 1 : -1) * 1.6
+          laneOffset(out, lane, out)
+          dummy.position.set(out.x, 0, out.z)
+          dummy.rotation.set(0, out.yaw, 0)
+          dummy.scale.set(1, 1, 1)
+          dummy.updateMatrix()
+          mesh.setMatrixAt(j, dummy.matrix)
+        })
+        mesh.instanceMatrix.needsUpdate = true
+      }
+    })
+  }, [path, plan, D])
+
+  useLayoutEffect(() => {
+    for (const k of VEH_KINDS) {
+      const mesh = refs.current[k]
+      if (!mesh) continue
       plan[k].forEach((v, j) => {
-        if (v.moving >= 0) {
-          const p = place((v.moving * total) / n + t * D.loop.speed)
-          dummy.position.set(p.x, 0, p.z)
-          dummy.rotation.set(0, p.yaw, 0)
-        } else if (first) {
+        if (v.moving < 0) {
           dummy.position.set(v.x, v.y, v.z)
           dummy.rotation.set(0, v.r, 0)
-        } else return
-        dummy.scale.set(1, 1, 1)
-        dummy.updateMatrix()
-        m.setMatrixAt(j, dummy.matrix)
-        if (first) m.setColorAt(j, c.set(v.tint))
+          dummy.scale.set(1, 1, 1)
+          dummy.updateMatrix()
+          mesh.setMatrixAt(j, dummy.matrix)
+        }
+        if (mesh.instanceColor) mesh.setColorAt(j, tintColor.set(v.tint))
       })
-      m.instanceMatrix.needsUpdate = true
-      if (first && m.instanceColor) m.instanceColor.needsUpdate = true
+      mesh.instanceMatrix.needsUpdate = true
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
     }
-  }
-  useLayoutEffect(() => { write(0, true) })
-  useFrame(({ clock }) => write(clock.elapsedTime, false))
+  }, [plan, dummy, tintColor])
+
   const mat = useMemo(() => new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0.25 }), [])
-  void tmpV
   return (
     <group name="t14-vehicles">
       {VEH_KINDS.map((k) => plan[k].length ? (
-        <instancedMesh key={k} ref={(m) => { refs.current[k] = m }} name={`t14-veh-${k}`} args={[vehicleGeometry(k), mat, plan[k].length]} castShadow frustumCulled={false} />
+        <instancedMesh
+          key={k}
+          ref={(m) => { refs.current[k] = m }}
+          name={`t14-veh-${k}`}
+          args={[vehicleGeometry(k), mat, plan[k].length]}
+          castShadow
+          frustumCulled
+        />
       ) : null)}
     </group>
   )

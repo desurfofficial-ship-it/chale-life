@@ -110,7 +110,7 @@ export const colliders: ColliderBox[] = [
 /** The playable plate — PLATE from the map config (x −280…340, z −116…116). */
 export const worldBounds: ColliderBox = {
   minX: -280,
-  minZ: -116,
+  minZ: -140,
   maxX: 340,
   maxZ: 116,
 };
