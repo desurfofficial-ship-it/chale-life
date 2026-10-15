@@ -350,13 +350,13 @@ export function App() {
           onCloseSheet={() => setSelectedPlotId(null)}
         />
       ) : null}
-      {tycoonMode ? (
+      {!isOnboardingActive() ? (
         <CameraRail
           onZoomIn={() => setZoom(getZoom() * 1.25)}
           onZoomOut={() => setZoom(getZoom() / 1.25)}
           onRotate={() => requestRotate90()}
           onFitCity={() => requestFitCity()}
-        onFitBusinesses={() => requestFitMyBusinesses()}
+          onFitBusinesses={() => requestFitMyBusinesses()}
         />
       ) : null}
       {!isOnboardingActive() ? (
