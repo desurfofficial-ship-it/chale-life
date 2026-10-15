@@ -213,43 +213,15 @@ function ApronAndRunway() {
   );
 }
 
-function JetBridge({
-  gateX,
-  gateZ,
-  extend,
-}: {
-  gateX: number;
-  gateZ: number;
-  extend: number;
-}) {
-  // Bridge from terminal airside toward plane door
-  const len = 2 + extend * 6;
-  return (
-    <group position={[gateX, 3.2, gateZ + 6]}>
-      <mesh position={[0, 0, -len / 2]} castShadow>
-        <boxGeometry args={[1.4, 1.1, len]} />
-        <meshStandardMaterial color="#9aa3aa" metalness={0.35} roughness={0.45} />
-      </mesh>
-      <mesh position={[0, 0, -len]} castShadow>
-        <boxGeometry args={[1.6, 1.3, 1.2]} />
-        <meshStandardMaterial color="#7a848c" metalness={0.3} roughness={0.5} />
-      </mesh>
-    </group>
-  );
-}
-
-/** Shared low-poly airliner — instanced across gates. */
-
-/** Readable low-poly airliner (white body, wings, engines, Ghana-green tail). */
 function Airliner({
-  body = '#f4f1ea',
+  body = '#ffffff',
   accent = '#006b3f',
 }: {
   body?: string;
   accent?: string;
 }) {
   return (
-    <group>
+    <group scale={1.2}>
       {/* fuselage along +X (nose +X) */}
       <mesh position={[0, 2.05, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
         <capsuleGeometry args={[1.05, 9.2, 6, 14]} />
@@ -337,7 +309,7 @@ function Airliner({
   );
 }
 
-const PLANE_BODIES = ['#f7f4ee', '#eef4ff', '#fff8ec', '#f2fff6', '#faf6f0'] as const;
+const PLANE_BODIES = ['#ffffff', '#f0f5ff', '#fffaf0', '#f5fff8', '#fff8f0'] as const;
 const PLANE_ACCENTS = ['#006b3f', '#1a4a8a', '#8b1a1a', '#2d6b4f', '#0a3d4a'] as const;
 
 function GatePlane({ gateIndex }: { gateIndex: number }) {
@@ -447,48 +419,209 @@ function PlanesAndBridges() {
   );
 }
 
-function ServiceTrucks() {
-  // Simple fuel truck + tug cycling depot → gate 2 → depot on a path
-  const meshRef = useRef<THREE.InstancedMesh>(null);
-  const COUNT = 5;
 
+/** Shared wheel set for ground vehicles. */
+function Wheels({ xs, z = 0.85, y = 0.32, r = 0.32 }: { xs: number[]; z?: number; y?: number; r?: number }) {
+  return (
+    <>
+      {xs.flatMap((x) =>
+        [-1, 1].map((s) => (
+          <mesh key={`${x}-${s}`} position={[x, y, s * z]} rotation={[0, 0, Math.PI / 2]} castShadow>
+            <cylinderGeometry args={[r, r, 0.28, 10]} />
+            <meshStandardMaterial color="#1a1c20" roughness={0.9} />
+          </mesh>
+        )),
+      )}
+    </>
+  );
+}
+
+/** Yellow fuel tanker. */
+function FuelTruck() {
+  return (
+    <group>
+      <mesh position={[0.2, 0.85, 0]} castShadow>
+        <boxGeometry args={[2.4, 0.9, 1.35]} />
+        <meshStandardMaterial color="#e8b84a" roughness={0.45} metalness={0.15} />
+      </mesh>
+      {/* tank */}
+      <mesh position={[-1.5, 1.15, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+        <cylinderGeometry args={[0.7, 0.7, 2.6, 14]} />
+        <meshStandardMaterial color="#f0c860" roughness={0.35} metalness={0.25} />
+      </mesh>
+      <mesh position={[1.15, 1.15, 0]} castShadow>
+        <boxGeometry args={[1.0, 1.0, 1.25]} />
+        <meshStandardMaterial color="#2a3a4a" roughness={0.5} />
+      </mesh>
+      {/* cab windows */}
+      <mesh position={[1.35, 1.35, 0.64]}>
+        <boxGeometry args={[0.7, 0.45, 0.06]} />
+        <meshStandardMaterial color="#9fd4e8" metalness={0.4} roughness={0.2} />
+      </mesh>
+      <Wheels xs={[-2.2, -0.4, 1.1]} z={0.72} />
+      {/* beacon */}
+      <mesh position={[1.15, 1.85, 0]}>
+        <sphereGeometry args={[0.12, 8, 8]} />
+        <meshStandardMaterial color="#ff4040" emissive="#ff2020" emissiveIntensity={1.8} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Blue baggage tug + one cart. */
+function BaggageTug() {
+  return (
+    <group>
+      <mesh position={[0.6, 0.7, 0]} castShadow>
+        <boxGeometry args={[1.6, 0.85, 1.15]} />
+        <meshStandardMaterial color="#3a7ab8" roughness={0.5} metalness={0.2} />
+      </mesh>
+      <mesh position={[0.85, 1.05, 0.58]}>
+        <boxGeometry args={[0.9, 0.4, 0.05]} />
+        <meshStandardMaterial color="#b8dce8" metalness={0.35} roughness={0.25} />
+      </mesh>
+      <Wheels xs={[0.1, 1.0]} z={0.62} r={0.28} />
+      {/* cart */}
+      <mesh position={[-1.5, 0.55, 0]} castShadow>
+        <boxGeometry args={[1.4, 0.7, 1.0]} />
+        <meshStandardMaterial color="#c8ccd0" roughness={0.6} />
+      </mesh>
+      <mesh position={[-1.5, 0.95, 0]} castShadow>
+        <boxGeometry args={[1.35, 0.12, 0.95]} />
+        <meshStandardMaterial color="#8a9098" roughness={0.55} />
+      </mesh>
+      <Wheels xs={[-2.0, -1.0]} z={0.55} r={0.22} y={0.25} />
+    </group>
+  );
+}
+
+/** White catering high-box truck. */
+function CateringTruck() {
+  return (
+    <group>
+      <mesh position={[0.9, 0.75, 0]} castShadow>
+        <boxGeometry args={[1.5, 0.9, 1.2]} />
+        <meshStandardMaterial color="#e8ecf0" roughness={0.5} />
+      </mesh>
+      <mesh position={[-0.7, 1.5, 0]} castShadow>
+        <boxGeometry args={[2.4, 2.0, 1.35]} />
+        <meshStandardMaterial color="#f5f7fa" roughness={0.45} metalness={0.1} />
+      </mesh>
+      {/* lift stripe */}
+      <mesh position={[-0.7, 1.5, 0.7]}>
+        <boxGeometry args={[2.2, 1.6, 0.06]} />
+        <meshStandardMaterial color="#2a6b9a" roughness={0.4} />
+      </mesh>
+      <Wheels xs={[-1.5, 0.3, 1.3]} z={0.68} />
+      <mesh position={[0.9, 1.4, 0]}>
+        <sphereGeometry args={[0.1, 8, 8]} />
+        <meshStandardMaterial color="#ffb020" emissive="#ff9000" emissiveIntensity={1.5} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Small orange pushback / follow-me. */
+function PushbackTug({ color = '#e07020' }: { color?: string }) {
+  return (
+    <group>
+      <mesh position={[0, 0.65, 0]} castShadow>
+        <boxGeometry args={[2.0, 0.85, 1.2]} />
+        <meshStandardMaterial color={color} roughness={0.5} metalness={0.15} />
+      </mesh>
+      <mesh position={[0.55, 1.05, 0.62]}>
+        <boxGeometry args={[0.85, 0.4, 0.05]} />
+        <meshStandardMaterial color="#d0e8f0" metalness={0.35} roughness={0.2} />
+      </mesh>
+      {/* hitch */}
+      <mesh position={[-1.15, 0.45, 0]} castShadow>
+        <boxGeometry args={[0.5, 0.25, 0.35]} />
+        <meshStandardMaterial color="#3a3e44" roughness={0.7} />
+      </mesh>
+      <Wheels xs={[-0.65, 0.65]} z={0.65} r={0.3} />
+      <mesh position={[0, 1.3, 0]}>
+        <sphereGeometry args={[0.11, 8, 8]} />
+        <meshStandardMaterial color="#ff3030" emissive="#ff1010" emissiveIntensity={1.6} />
+      </mesh>
+    </group>
+  );
+}
+
+const TRUCK_KINDS = ['fuel', 'baggage', 'cater', 'pushback', 'follow'] as const;
+
+function ServiceVehicle({ kind, gateIndex }: { kind: (typeof TRUCK_KINDS)[number]; gateIndex: number }) {
+  const ref = useRef<THREE.Group>(null);
   useEffect(() => {
     return registerAmbient((_dt, gameTime) => {
-      const m = meshRef.current;
-      if (!m) return;
+      const root = ref.current;
+      if (!root) return;
+      const g = AIRPORT.gates[gateIndex % AIRPORT.gates.length];
       const depot = AIRPORT.depot;
-      for (let i = 0; i < COUNT; i++) {
-        const g = AIRPORT.gates[i % AIRPORT.gates.length];
-        const { phase, phaseT } = phaseAt(gameTime, i % AIRPORT.gates.length);
-        let x = depot.x;
-        let z = depot.z;
-        // park beside plane during refuel / unload
-        if (phase === 'refuel' || phase === 'unload' || phase === 'cater') {
-          x = g.x + (i % 2 === 0 ? 4.5 : -4.5);
-          z = g.z + 1.5;
-        } else if (phase === 'arrive' && phaseT > 0.6) {
-          x = THREE.MathUtils.lerp(depot.x, g.x + 4, (phaseT - 0.6) / 0.4);
-          z = THREE.MathUtils.lerp(depot.z, g.z, (phaseT - 0.6) / 0.4);
-        }
-        _p.set(x, 0.55, z);
-        _e.set(0, 0, 0);
-        _q.setFromEuler(_e);
-        _s.set(1, 1, 1);
-        _m.compose(_p, _q, _s);
-        m.setMatrixAt(i, _m);
-        _c.set(i === 0 ? '#e8b84a' : i === 1 ? '#3a7ab8' : '#c0c4c8');
-        m.setColorAt(i, _c);
+      const { phase, phaseT } = phaseAt(gameTime, gateIndex % AIRPORT.gates.length);
+      let x = depot.x + (kind === 'fuel' ? 0 : kind === 'baggage' ? 4 : kind === 'cater' ? 8 : kind === 'pushback' ? 12 : 16);
+      let z = depot.z;
+      let yaw = 0;
+      let show = true;
+
+      const slotX = g.x + (kind === 'fuel' || kind === 'cater' ? 5.2 : -5.2);
+      const slotZ = g.z + (kind === 'baggage' ? 3.2 : kind === 'pushback' ? -2.5 : 1.2);
+
+      if (kind === 'fuel' && (phase === 'refuel' || (phase === 'arrive' && phaseT > 0.75))) {
+        x = slotX;
+        z = slotZ;
+        yaw = g.yaw + Math.PI / 2;
+      } else if (kind === 'baggage' && (phase === 'unload' || phase === 'deboard')) {
+        x = slotX;
+        z = slotZ;
+        yaw = g.yaw;
+      } else if (kind === 'cater' && (phase === 'cater' || phase === 'board')) {
+        x = slotX;
+        z = slotZ;
+        yaw = g.yaw + Math.PI / 2;
+      } else if (kind === 'pushback' && (phase === 'pushback' || (phase === 'board' && phaseT > 0.8))) {
+        x = g.x;
+        z = g.z - 7;
+        yaw = g.yaw;
+      } else if (kind === 'follow' && (phase === 'taxi' || phase === 'arrive')) {
+        x = THREE.MathUtils.lerp(depot.x, g.x, phase === 'taxi' ? 1 - phaseT : phaseT);
+        z = THREE.MathUtils.lerp(depot.z, g.z + 8, phase === 'taxi' ? 1 - phaseT : phaseT);
+        yaw = Math.atan2(-(z - depot.z), x - depot.x);
+      } else if (phase === 'gone' || phase === 'takeoff') {
+        // stay at depot
       }
-      m.instanceMatrix.needsUpdate = true;
-      if (m.instanceColor) m.instanceColor.needsUpdate = true;
+
+      root.position.set(x, 0, z);
+      root.rotation.y = yaw;
+      root.visible = show;
     });
-  }, []);
+  }, [kind, gateIndex]);
 
   return (
-    <instancedMesh ref={meshRef} args={[undefined as unknown as THREE.BufferGeometry, undefined as unknown as THREE.Material, COUNT]} castShadow>
-      <boxGeometry args={[2.2, 1.1, 1.2]} />
-      <meshStandardMaterial vertexColors roughness={0.55} metalness={0.2} />
-    </instancedMesh>
+    <group ref={ref}>
+      {kind === 'fuel' && <FuelTruck />}
+      {kind === 'baggage' && <BaggageTug />}
+      {kind === 'cater' && <CateringTruck />}
+      {(kind === 'pushback' || kind === 'follow') && (
+        <PushbackTug color={kind === 'follow' ? '#f0d020' : '#e07020'} />
+      )}
+    </group>
+  );
+}
+
+function ServiceTrucks() {
+  // One full set at gates 0 and 2 so the apron stays busy without 25 meshes
+  return (
+    <group name="kotoka-ground-vehicles">
+      {TRUCK_KINDS.map((k) => (
+        <ServiceVehicle key={`g0-${k}`} kind={k} gateIndex={0} />
+      ))}
+      {TRUCK_KINDS.map((k) => (
+        <ServiceVehicle key={`g2-${k}`} kind={k} gateIndex={2} />
+      ))}
+      {TRUCK_KINDS.map((k) => (
+        <ServiceVehicle key={`g4-${k}`} kind={k} gateIndex={4} />
+      ))}
+    </group>
   );
 }
 
