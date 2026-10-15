@@ -368,6 +368,11 @@ function DecorateRoomChip() {
       }}
       style={{
         ...GLASS,
+        // The HUD root is pointer-events:none so the canvas keeps gestures —
+        // interactive children MUST re-enable it or clicks fall through to
+        // the canvas and the chip silently never fires (the Act pill already
+        // does exactly this).
+        pointerEvents: 'auto',
         border: 'none',
         cursor: 'pointer',
         padding: '10px 14px',
@@ -379,9 +384,10 @@ function DecorateRoomChip() {
         alignItems: 'center',
         gap: 8,
         maxWidth: 'min(64vw, 280px)',
+        touchAction: 'manipulation',
+        WebkitTapHighlightColor: 'transparent',
       }}
     >
-      <span aria-hidden>🏠</span>
       Decorate room
     </button>
   );

@@ -18,6 +18,7 @@ import { MOODS, type RoomMats } from '../room/materials'
 import { COLORS } from '@/lib/mapConfig'
 import { getState } from '../store/gameStore'
 import { isInsideGyanHouse } from '../world/colliders'
+import { useAnimatedRef } from '../components/world/SceneBatcher'
 
 /** True when the intro camera + Gyan house path should run. */
 export function isOnboardingActive(): boolean {
@@ -199,13 +200,19 @@ export function GyanHouse({ mats }: { mats?: RoomMats }) {
   const fw = FRONT_WINDOW
   const wall = COLORS.wallTeal
   const glow = useRef<THREE.PointLight>(null)
-  const exteriorRef = useRef<THREE.Group>(null)
+  // The exterior is the CUTAWAY group — its visibility flips every time the
+  // walker crosses the door threshold, so it must never be frozen into a
+  // SceneBatcher merge (batched geometry renders from the scene-root batch
+  // mesh and would keep the roof/walls/beacon visible while "inside").
+  // Registering it animated keeps the batcher's hands off the whole subtree.
+  const exteriorRef = useAnimatedRef<THREE.Group>()
   const doorW = 1.15
   const doorX = 2.2 // local — matches COMPOUND_DOOR / collider gap
 
   useFrame(({ clock }) => {
     if (glow.current) glow.current.intensity = 5 + Math.sin(clock.elapsedTime * 2.1) * 0.25
-    // Cutaway: hide exterior (walls + roof) so the player sees the room from above
+    // Cutaway: hide the whole exterior group (walls + roof + lamps + the
+    // find-home beacon) so the player sees ONLY the room from above.
     const p = getState().player.position
     const inside = isInsideGyanHouse(p.x, p.z)
     if (exteriorRef.current) exteriorRef.current.visible = !inside
@@ -306,6 +313,20 @@ export function GyanHouse({ mats }: { mats?: RoomMats }) {
         <mesh position={[0, Hh + 0.12, 0]}>
           <boxGeometry args={[W, 0.3, D]} />
           <meshStandardMaterial color="#d9cfbd" roughness={0.9} />
+        </mesh>
+        {/* Find-home beacon — soft pulse over the roof so the plot is readable
+            from the street. Lives INSIDE the cutaway group (moved here from
+            Jamestown's DaaviPlot): the batcher froze the old copy into a
+            scene-root merge that ignored the cutaway, so a stray yellow dot
+            + ground ring floated over the room whenever the player was
+            inside. Same world position as before (group is at GYAN_HOUSE). */}
+        <mesh position={[0, 5.2, 0]} userData={{ noCollide: true }} name="home-beacon">
+          <sphereGeometry args={[0.35, 10, 8]} />
+          <meshStandardMaterial color="#fcd116" emissive="#fcd116" emissiveIntensity={1.4} transparent opacity={0.85} />
+        </mesh>
+        <mesh position={[0, 0.04, 0]} rotation={[-Math.PI / 2, 0, 0]} userData={{ noCollide: true }} name="home-beacon-ring">
+          <ringGeometry args={[1.6, 2.1, 32]} />
+          <meshBasicMaterial color="#fcd116" transparent opacity={0.35} depthWrite={false} />
         </mesh>
       </group>
 

@@ -4,7 +4,7 @@
  */
 
 import { useMemo, useSyncExternalStore } from 'react';
-import { getHud, subscribeHud, setPlayerPosition, publishHud } from '../store/gameStore';
+import { getHud, subscribeHud, requestTeleport, publishHud } from '../store/gameStore';
 import { DISTRICT_TABS, LANDMARKS } from '../lib/mapConfig';
 
 function flyToDistrict(id: string | null) {
@@ -17,7 +17,10 @@ function flyToDistrict(id: string | null) {
   // target is the look-at point on the ground; pos is camera framing
   const x = lm.target?.[0] ?? lm.pos[0];
   const z = lm.target?.[2] ?? lm.pos[2];
-  setPlayerPosition(x, 0, z);
+  // THROUGH the game loop: GameLoop owns the live transform (its kinematics
+  // rewrite the store every frame), so a bare setPlayerPosition here was
+  // clobbered on the next frame and the district jump silently no-opped.
+  requestTeleport(x, z);
   publishHud({ ...getHud(), x, z });
 }
 
