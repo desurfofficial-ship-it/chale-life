@@ -343,6 +343,7 @@ export function App() {
           onZoomOut={() => setZoom(getZoom() / 1.25)}
           onRotate={() => requestRotate90()}
           onFitCity={() => requestFitCity()}
+        onFitBusinesses={() => requestFitMyBusinesses()}
         />
       ) : null}
       {!isOnboardingActive() ? (
