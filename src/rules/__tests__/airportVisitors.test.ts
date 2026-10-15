@@ -19,7 +19,8 @@ describe('airport visitor boost', () => {
       { t: 200, kind: 'takeoff' },
       { t: 500, kind: 'landing' },
     ];
-    expect(countLandingsInWindow(ev, 4000, 3600)).toBe(2);
+    expect(countLandingsInWindow(ev, 4000, 3600)).toBe(1);
+    expect(countLandingsInWindow(ev, 600, 600)).toBe(2);
     expect(countLandingsInWindow(ev, 400, 50)).toBe(0);
   });
 });
