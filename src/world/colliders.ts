@@ -38,7 +38,62 @@ interface RawBox {
  * or whose base is above 1.2 m (head-height signs, awnings — walk-under)
  * are excluded, exactly like the map sim's own head-height rule.
  */
-export const colliders: ColliderBox[] = (rawBoxes as unknown as { boxes: RawBox[] }).boxes
+/** Gyan house (Daavi plot) — exterior shell in world metres. */
+export const GYAN_HOUSE_WORLD = {
+  x: -146.8,
+  z: -7,
+  /** outer width / depth including walls */
+  w: 6.92,
+  d: 6.32,
+  wall: 0.22,
+  /** door centre in local space (matches GyanHouse door mesh) */
+  doorLocalX: 2.2,
+  doorWidth: 1.15,
+} as const;
+
+function gyanHouseWallColliders(): ColliderBox[] {
+  const { x, z, w, d, wall: t, doorLocalX, doorWidth } = GYAN_HOUSE_WORLD;
+  const minX = x - w / 2;
+  const maxX = x + w / 2;
+  const minZ = z - d / 2;
+  const maxZ = z + d / 2;
+  const doorCx = x + doorLocalX;
+  const doorL = doorCx - doorWidth / 2;
+  const doorR = doorCx + doorWidth / 2;
+  // slight pad so the capsule (r≈0.45) can clear the jamb
+  const pad = 0.08;
+  const walls: ColliderBox[] = [
+    // back
+    { minX: minX - pad, minZ: minZ - pad, maxX: maxX + pad, maxZ: minZ + t },
+    // left
+    { minX: minX - pad, minZ: minZ, maxX: minX + t, maxZ: maxZ },
+    // right
+    { minX: maxX - t, minZ: minZ, maxX: maxX + pad, maxZ: maxZ },
+    // front left of door
+    { minX: minX - pad, minZ: maxZ - t, maxX: doorL, maxZ: maxZ + pad },
+    // front right of door
+    { minX: doorR, minZ: maxZ - t, maxX: maxX + pad, maxZ: maxZ + pad },
+  ];
+  return walls;
+}
+
+/** True if a captured box is the solid Gyan-house shell (blocks the whole room). */
+function isGyanHouseSolid(b: ColliderBox): boolean {
+  const { x, z, w, d } = GYAN_HOUSE_WORLD;
+  const cx = (b.minX + b.maxX) / 2;
+  const cz = (b.minZ + b.maxZ) / 2;
+  const bw = b.maxX - b.minX;
+  const bd = b.maxZ - b.minZ;
+  // the captured mesh AABB is ~7.25 × 6.67 centred on the house
+  return (
+    Math.abs(cx - x) < 1.5 &&
+    Math.abs(cz - z) < 1.5 &&
+    bw > 5 &&
+    bd > 5
+  );
+}
+
+const mapped: ColliderBox[] = (rawBoxes as unknown as { boxes: RawBox[] }).boxes
   .filter((b) => b.min[1] <= 1.2 && b.max[1] >= 0.3)
   .map((b) => ({
     minX: b.min[0],
@@ -46,6 +101,11 @@ export const colliders: ColliderBox[] = (rawBoxes as unknown as { boxes: RawBox[
     maxX: b.max[0],
     maxZ: b.max[2],
   }));
+
+export const colliders: ColliderBox[] = [
+  ...mapped.filter((b) => !isGyanHouseSolid(b)),
+  ...gyanHouseWallColliders(),
+];
 
 /** The playable plate — PLATE from the map config (x −280…340, z −116…116). */
 export const worldBounds: ColliderBox = {
