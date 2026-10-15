@@ -123,8 +123,10 @@ function DaaviPlotDressing() {
         <cylinderGeometry args={[0.23, 0.19, 0.09, 12]} />
         <meshStandardMaterial color="#383c42" roughness={0.5} metalness={0.55} />
       </mesh>
-      {/* the step-2 set-down bench on the yard's east edge, facing the street */}
-      <Bench position={[-132.5, 0, -3.2]} rotation={0} />
+      {/* step-2 set-down bench — MUST match DAAVI_BENCH in proximity.ts
+          (−132.5, −0.6). Old z −3.2 sat inside the sleep yard, so standing
+          at the visible bench resolved LOC-002 (Sleep) instead of Carry Pans. */}
+      <Bench position={[-132.5, 0, -0.6]} rotation={0} />
     </group>
   )
 }

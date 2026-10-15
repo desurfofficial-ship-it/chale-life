@@ -81,6 +81,13 @@ describe('G-008e: bench waypoint ' + DASH + ' the pavement set-down stays off th
     expect(DAAVI_BENCH.z).toBeLessThan(0.5);
     expect(DAAVI_BENCH.z).toBeGreaterThan(-1.3);
   });
+  it('standing at the step-2 bench mesh resolves LOC-001-BENCH (not the sleep yard)', () => {
+    // Mesh is placed at DAAVI_BENCH (Jamestown DaaviPlotDressing). The old
+    // mesh at z −3.2 was inside SLEEP_ZONE and returned LOC-002.
+    expect(nearestLocationId(DAAVI_BENCH.x, DAAVI_BENCH.z)).toBe(DAAVI_BENCH.locationId);
+    expect(nearestLocationId(-132.5, -3.2)).toBe('LOC-002'); // still sleep yard
+  });
+
 
   it('the bench waypoint clears every plot solid by the capsule + margin bar', () => {
     const caps = 0.35 + 0.25;

@@ -90,7 +90,7 @@ export function ObjectiveMarker() {
     }
     if (beamRef.current) {
       (beamRef.current.material as MeshBasicMaterial).opacity =
-        0.1 + 0.05 * Math.sin(t * 2.4);
+        0.22 + 0.1 * Math.sin(t * 2.4);
     }
   });
 
@@ -98,12 +98,12 @@ export function ObjectiveMarker() {
     <group ref={groupRef} visible={false}>
       {/* Flat glowing ring on the ground — draw call 1 of 2. */}
       <mesh ref={ringRef} rotation-x={-Math.PI / 2} position={[0, 0.15, 0]}>
-        <torusGeometry args={[1.15, 0.09, 8, 40]} />
-        <meshBasicMaterial color="#facc15" transparent opacity={0.9} depthWrite={false} />
+        <torusGeometry args={[1.35, 0.12, 8, 40]} />
+        <meshBasicMaterial color="#fde047" transparent opacity={1} depthWrite={false} toneMapped={false} />
       </mesh>
       {/* Faint additive beam — draw call 2 of 2 (open-ended, DoubleSide). */}
-      <mesh ref={beamRef} position={[0, 2.2, 0]}>
-        <cylinderGeometry args={[0.42, 0.42, 4.4, 12, 1, true]} />
+      <mesh ref={beamRef} position={[0, 3.0, 0]}>
+        <cylinderGeometry args={[0.5, 0.5, 6.0, 12, 1, true]} />
         <meshBasicMaterial
           color="#fde047"
           transparent
