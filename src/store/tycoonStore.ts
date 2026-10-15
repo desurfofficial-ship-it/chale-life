@@ -35,7 +35,7 @@ import {
   CITY_BOUNDS,
   DEFAULT_HUD_INSETS,
 } from '../engine/zoomFit';
-import { LAND_PLOTS } from '../lib/mapConfig';
+import { LAND_PLOTS, plotAskingPrice } from '../lib/mapConfig';
 import type { TycoonTab } from '../ui/tycoon/TycoonHud';
 
 type Listener = () => void;
@@ -422,7 +422,7 @@ export function landPlotToRef(p: {
     w: p.w,
     d: p.d,
     zone: p.zone,
-    price: p.price ?? Math.round((p.w * p.d * 420) / 100) * 100,
+    price: plotAskingPrice(p),
     near: p.near ?? '',
     y: p.y ?? 0,
   };

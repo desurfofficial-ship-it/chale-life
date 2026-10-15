@@ -342,9 +342,61 @@ const BASE_LAND_PLOTS: LandPlotDef[] = [
 
 /** every buyable plot: Task 11 plots (ids assigned) + Chalé Island + the Task
  *  13 plots generated and audited by tools/t13_layout.py (lib/t13Layout.ts) */
+/** Zone multipliers — CBD / landmarks cost serious money. */
+const ZONE_PRICE_MULT: Record<string, number> = {
+  cbd: 3.4,
+  blacksquare: 3.2,
+  jamestown: 2.6,
+  trotro: 1.8,
+  nima: 1.5,
+  osu: 2.2,
+  chorkor: 1.35,
+  nungua: 0.85,
+  airport: 2.0,
+  legon: 1.9,
+}
+
+/**
+ * Plot asking price (GH₵). Area base × zone mult + landmark proximity premium.
+ * Plots next to named landmarks / city core are intentionally expensive.
+ */
+export function plotAskingPrice(p: {
+  x: number
+  z: number
+  w: number
+  d: number
+  zone?: string
+  price?: number
+}): number {
+  if (p.price != null && Number.isFinite(p.price)) return p.price
+  const area = Math.max(1, p.w * p.d)
+  const zoneMult = ZONE_PRICE_MULT[p.zone ?? ''] ?? 1.2
+  let base = Math.round((area * 520 * zoneMult) / 100) * 100
+  // Landmark proximity premium
+  let premium = 0
+  for (const lm of LANDMARKS) {
+    const dx = p.x - lm.pos[0]
+    const dz = p.z - lm.pos[2]
+    const dist = Math.hypot(dx, dz)
+    if (dist < 35) premium = Math.max(premium, 120_000)
+    else if (dist < 70) premium = Math.max(premium, 55_000)
+    else if (dist < 110) premium = Math.max(premium, 22_000)
+  }
+  return base + premium
+}
+
 export const LAND_PLOTS: LandPlotDef[] = [
-  ...BASE_LAND_PLOTS.map((p, i) => ({ ...p, id: p.id ?? `t11-${String(i + 1).padStart(2, '0')}-${p.zone}`, near: p.near ?? '', y: 0, price: p.price ?? Math.round((p.w * p.d * 420) / 100) * 100 })),
-  ...(T13_PLOTS as LandPlotDef[]),
+  ...BASE_LAND_PLOTS.map((p, i) => ({
+    ...p,
+    id: p.id ?? `t11-${String(i + 1).padStart(2, '0')}-${p.zone}`,
+    near: p.near ?? '',
+    y: 0,
+    price: plotAskingPrice(p),
+  })),
+  ...(T13_PLOTS as LandPlotDef[]).map((p) => ({
+    ...p,
+    price: plotAskingPrice(p),
+  })),
 ]
 
 export const OVERVIEW = {

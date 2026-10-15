@@ -62,21 +62,9 @@ export function Tree({ position, scale = 1 }: { position: [number, number, numbe
 const SKIN_TONES = ['#8a5a3b', '#6e4226', '#a06a42', '#5b3520']
 const CLOTH_COLORS = ['#ce1126', '#fcd116', '#2e7fa8', '#4f9e4f', '#e08a3c', '#d97b8f', '#f4f1ea', '#3aa08f']
 
-export function Person({ position, rotation = 0 }: { position: [number, number, number]; rotation?: number }) {
-  const skin = useMemo(() => SKIN_TONES[Math.floor(Math.random() * SKIN_TONES.length)], [])
-  const cloth = useMemo(() => CLOTH_COLORS[Math.floor(Math.random() * CLOTH_COLORS.length)], [])
-  return (
-    <group position={position} rotation={[0, rotation, 0]}>
-      <mesh position={[0, 0.62, 0]} castShadow>
-        <capsuleGeometry args={[0.22, 0.75, 3, 8]} />
-        <meshStandardMaterial color={cloth} roughness={0.9} />
-      </mesh>
-      <mesh position={[0, 1.32, 0]}>
-        <sphereGeometry args={[0.2, 8, 8]} />
-        <meshStandardMaterial color={skin} roughness={0.85} />
-      </mesh>
-    </group>
-  )
+/** Static capsule people removed (looked unfinished). CommunityLife has the proper NPCs. */
+export function Person(_props: { position: [number, number, number]; rotation?: number }) {
+  return null
 }
 
 // ───────────────────────────────────────────────────── waving Ghana flag ────
