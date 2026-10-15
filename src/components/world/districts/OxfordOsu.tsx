@@ -45,7 +45,7 @@ export function OxfordOsu() {
           ew1 (was z=4 → footprint cut 2.6 m into the road band); houses moved
           north of the band (z ≥ 14.5) and re-seated clear of the nsE1 spine
           (x 120.5–127.5) — the old plots at x 118 / 128 covered its edges */}
-      <ApartmentBlock position={[106, 0, 0.5]} rotation={0.03} wall="#efe6da" />
+      {/* O-001: (106, 0.5) is now Adom FM Radio & Newsroom (src/world/office) */}
       <CompoundHouse position={[116.6, 0, 17.4]} wall={COLORS.wallOrange} />
       <CompoundHouse position={[131.5, 0, 17.4]} rotation={0.04} wall={COLORS.wallGreen} />
       <Shop position={[100, 0, 17.8]} sign="PHARMACY" signBg="#f4f1ea" wall={COLORS.wallCream} />

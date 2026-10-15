@@ -72,6 +72,7 @@ import { Hud, TycoonHud, useCountdownNow } from '../ui';
 import { CameraRail } from '../ui/tycoon/CameraRail';
 import type { PlotRef } from '../rules/business';
 import { DebugOverlay } from './DebugOverlay';
+import { OfficePanel } from '../ui/office/OfficePanel';
 import { isWebGLAvailable } from './webgl';
 
 // The 3D world — three.js + R3F + the whole Accra map live behind this
@@ -366,6 +367,7 @@ export function App() {
           <RecenterButton />
         </>
       ) : null}
+      {!isOnboardingActive() ? <OfficePanel /> : null}
       <DebugOverlay />
     </>
   );

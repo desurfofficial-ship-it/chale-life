@@ -18,7 +18,7 @@ export function CBD() {
       {T13_TOWERS.map(([x, z, w, d, h, hue], i) => (
         <GlassTower key={i} position={[x, 0, z]} height={h} w={w} d={d} hue={hue} />
       ))}
-      <Building position={[33, 3, -41]} size={[16, 6, 8]} wall={COLORS.wallCream} facadeKey="podium-a" rows={2} cols={6} litRatio={0.6} />
+      {/* O-001: (33, −41) is now the Lands & Permits Office (src/world/office) */}
       <Building position={[4, 5.5, -41]} size={[8, 11, 8]} wall={COLORS.wallTeal} facadeKey="mid-a" rows={4} cols={3} litRatio={0.6} />
       <Building position={[15, 6.5, -41]} size={[8, 13, 7]} wall={COLORS.wallOrange} facadeKey="mid-b" rows={4} cols={3} litRatio={0.55} />
     </group>
