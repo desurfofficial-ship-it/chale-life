@@ -17,6 +17,7 @@ import { GyanRoom, ROOM, FRONT_WINDOW } from '../room/GyanRoom'
 import { MOODS, type RoomMats } from '../room/materials'
 import { COLORS } from '@/lib/mapConfig'
 import { getState } from '../store/gameStore'
+import { isInsideGyanHouse } from '../world/colliders'
 
 /** True when the intro camera + Gyan house path should run. */
 export function isOnboardingActive(): boolean {
@@ -204,13 +205,9 @@ export function GyanHouse({ mats }: { mats?: RoomMats }) {
 
   useFrame(({ clock }) => {
     if (glow.current) glow.current.intensity = 5 + Math.sin(clock.elapsedTime * 2.1) * 0.25
-    // Cutaway: hide exterior shell when the player is inside the room
+    // Cutaway: hide exterior (walls + roof) so the player sees the room from above
     const p = getState().player.position
-    const inside =
-      p.x > H.x - W / 2 + 0.35 &&
-      p.x < H.x + W / 2 - 0.35 &&
-      p.z > H.z - D / 2 + 0.35 &&
-      p.z < H.z + D / 2 - 0.35
+    const inside = isInsideGyanHouse(p.x, p.z)
     if (exteriorRef.current) exteriorRef.current.visible = !inside
   })
 

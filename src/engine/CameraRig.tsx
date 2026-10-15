@@ -7,6 +7,7 @@
  */
 
 import { useFrame, useThree } from '@react-three/fiber';
+import { isInsideGyanHouse } from '../world/colliders';
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import {
@@ -35,6 +36,8 @@ import {
 } from './zoomFit';
 
 const OFFSET = new THREE.Vector3(0, 30, 30);
+/** Tighter high angle so the single room fills the view when inside. */
+const ROOM_OFFSET = new THREE.Vector3(0, 11, 9);
 const TYCOON_OFFSET = new THREE.Vector3(0, 48, 48);
 export const projectedPlayerScreen = { x: 0, y: 0 };
 const _proj = new THREE.Vector3();
@@ -157,7 +160,21 @@ export function CameraRig() {
     const frameOffsetZ =
       tycoon ? 0 : ((0.5 - PLAYER_FROM_TOP) * viewH) / Math.sin(Math.PI / 4);
 
-    const base = tycoon ? TYCOON_OFFSET : OFFSET;
+    const playerPos = getState().player.position;
+    const insideRoom = !tycoon && isInsideGyanHouse(playerPos.x, playerPos.z);
+
+    if (insideRoom) {
+      follow.current = true;
+      frameGoal.current = null;
+    }
+
+    const base = tycoon ? TYCOON_OFFSET : insideRoom ? ROOM_OFFSET : OFFSET;
+    // When inside, zoom in so the room fills the phone screen
+    if (insideRoom) {
+      const want = Math.max(getZoom(), 52);
+      if (Math.abs(getZoom() - want) > 0.5) setZoom(getZoom() + (want - getZoom()) * Math.min(1, dt * 3));
+    }
+
     const off = rotateOffsetXZ(base.x, base.y, base.z, yawSmoothed.current);
     const lookZ = target.current.z + frameOffsetZ;
     camera.position.set(

@@ -121,7 +121,8 @@ export type Collider = ColliderBox;
 /** True when (x,z) is inside Gyan's room (past the door, not on the street). */
 export function isInsideGyanHouse(x: number, z: number): boolean {
   const { x: hx, z: hz, w, d, wall } = GYAN_HOUSE_WORLD;
-  const margin = wall + 0.15;
+  // Small margin so the door threshold still counts as "inside"
+  const margin = Math.max(0.05, wall - 0.05);
   return (
     x > hx - w / 2 + margin &&
     x < hx + w / 2 - margin &&
