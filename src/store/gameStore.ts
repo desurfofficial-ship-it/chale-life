@@ -132,6 +132,37 @@ export function setPlayerTransform(x: number, z: number, yaw: number): void {
 /** Joystick / keyboard input written each frame by the input layer. */
 export const movementInput = { x: 0, z: 0, sprint: false };
 
+/**
+ * Engine-owned teleport request (capture probes / e2e). GameLoop OWNS the
+ * live transform (its kinematics ref rewrites the store every frame), so an
+ * external setPlayerPosition is clobbered on the next frame. A teleport must
+ * go THROUGH the loop: bump this token and the loop re-seeds its kinematics
+ * from the requested point on the next frame.
+ */
+export interface TeleportRequest {
+  x: number;
+  z: number;
+  token: number;
+}
+let teleportReq: TeleportRequest | null = null;
+let teleportToken = 0;
+
+/** Ask the game loop to re-seed the walker at (x, z) next frame. */
+export function requestTeleport(x: number, z: number): void {
+  teleportToken += 1;
+  teleportReq = { x, z, token: teleportToken };
+  // Write the store too so the same-frame camera/HUD read sees the target
+  // (the loop re-seeds kinematics from this point, so it sticks).
+  setPlayerPosition(x, 0, z);
+}
+
+/** Consume the pending teleport (GameLoop only). Null when none is pending. */
+export function consumeTeleport(): TeleportRequest | null {
+  const req = teleportReq;
+  teleportReq = null;
+  return req;
+}
+
 /* ───────────────────────── E-001 additions (Engine) ───────────────────────── */
 
 /** Orthographic camera zoom limits (zoom = px → world-m scale factor). */
@@ -551,6 +582,17 @@ if (
     // wrong-spot bench reason is the longest reason in the game).
     setActPrompt: (o: ActPromptOverride | null): void => {
       __setActPromptOverrideForTests(o);
+    },
+    // Teleport the walker (visual-audit / e2e probes): goes through the
+    // loop-owned request path — a bare setPlayerPosition is clobbered
+    // next frame by the kinematics.
+    teleport: (x: number, z: number): void => {
+      requestTeleport(x, z);
+    },
+    // Read-only probe (camera zoom + walker position) for capture scripts.
+    probe: (): { x: number; z: number; zoom: number } => {
+      const p = state.player.position;
+      return { x: p.x, z: p.z, zoom: getZoom() };
     },
   };
 }

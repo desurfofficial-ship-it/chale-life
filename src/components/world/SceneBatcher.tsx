@@ -301,6 +301,9 @@ export function SceneBatcher() {
       raf2 = requestAnimationFrame(() => {
         if (cancelled || !scene) return
         const w = window as unknown as { __ACCRA?: { scene?: THREE.Scene } }
+        // (Re)publish the debug handle the batch pass already consumes —
+        // probes / headless audit tools traverse the graph through it.
+        w.__ACCRA = { ...(w.__ACCRA ?? {}), scene }
         runBatch(w.__ACCRA?.scene ?? scene)
       })
     })
