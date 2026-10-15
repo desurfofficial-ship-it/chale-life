@@ -57,7 +57,7 @@ export function CameraRail({
         ↻
       </button>
       <button type="button" style={{ ...btn, fontSize: 11 }} onClick={onFitCity} aria-label="Fit city">
-        City
+        Map
       </button>
       <button
         type="button"

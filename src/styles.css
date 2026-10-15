@@ -53,17 +53,20 @@ body {
 
 .recenter-btn {
   position: fixed;
-  top: calc(14px + env(safe-area-inset-top));
-  right: calc(14px + env(safe-area-inset-right));
-  z-index: 10;
-  padding: 10px 18px;
+  top: calc(12px + env(safe-area-inset-top));
+  /* Leave room for the City / Walk mode pill (right: 12, ~72px wide + gap) */
+  right: calc(92px + env(safe-area-inset-right));
+  z-index: 32;
+  padding: 10px 14px;
   border: 1px solid rgba(250, 204, 21, 0.35);
-  border-radius: 999px;
-  background: rgba(9, 13, 22, 0.88);
+  border-radius: 12px;
+  background: rgba(9, 13, 22, 0.92);
   color: #f8fafc;
-  font: 600 14px system-ui, -apple-system, sans-serif;
+  font: 700 13px system-ui, -apple-system, sans-serif;
   cursor: pointer;
   touch-action: manipulation;
+  min-height: 44px;
+  pointer-events: auto;
 }
 
 .recenter-btn:active {
