@@ -8,7 +8,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { AIRPORT } from './layout';
-import { phaseAt, bridgeExtended, planeOnStand, type TurnPhase } from './turnaround';
+import { phaseAt, bridgeExtended, planeOnStand } from './turnaround';
 import { getAmbientGameTime, registerAmbient } from '../../engine/ambient';
 import { signTexture } from '@/lib/mapTextures';
 
@@ -37,8 +37,25 @@ function Terminal() {
       {/* main pier body */}
       <mesh position={[0, h / 2, 0]} castShadow receiveShadow>
         <boxGeometry args={[w, h, d]} />
-        <meshStandardMaterial color="#eef2f4" roughness={0.7} />
+        <meshStandardMaterial color="#f4f7f9" roughness={0.65} metalness={0.05} />
       </mesh>
+      {/* horizontal floor bands (reads as multi-storey glass pier) */}
+      {[2.2, 4.4, 6.6].map((yy) => (
+        <mesh key={yy} position={[0, yy, -d / 2 - 0.06]}>
+          <boxGeometry args={[w * 0.94, 0.12, 0.08]} />
+          <meshStandardMaterial color="#d0e8ee" metalness={0.3} roughness={0.25} />
+        </mesh>
+      ))}
+      {/* structural fins on airside */}
+      {Array.from({ length: 9 }, (_, i) => {
+        const xx = -w / 2 + 6 + i * ((w - 12) / 8);
+        return (
+          <mesh key={xx} position={[xx, h * 0.45, -d / 2 - 0.2]} castShadow>
+            <boxGeometry args={[0.35, h * 0.75, 0.35]} />
+            <meshStandardMaterial color="#e8ecef" roughness={0.5} />
+          </mesh>
+        );
+      })}
       {/* airside glass curtain (−z) */}
       <mesh position={[0, h * 0.45, -d / 2 - 0.05]}>
         <planeGeometry args={[w * 0.92, h * 0.7]} />
@@ -222,112 +239,210 @@ function JetBridge({
 }
 
 /** Shared low-poly airliner — instanced across gates. */
-function PlanesAndBridges() {
-  const meshRef = useRef<THREE.InstancedMesh>(null);
-  const tailRef = useRef<THREE.InstancedMesh>(null);
-  const n = AIRPORT.gates.length;
-  const bridgeExt = useRef<number[]>(AIRPORT.gates.map(() => 0));
+
+/** Readable low-poly airliner (white body, wings, engines, Ghana-green tail). */
+function Airliner({
+  body = '#f4f1ea',
+  accent = '#006b3f',
+}: {
+  body?: string;
+  accent?: string;
+}) {
+  return (
+    <group>
+      {/* fuselage along +X (nose +X) */}
+      <mesh position={[0, 2.05, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+        <capsuleGeometry args={[1.05, 9.2, 6, 14]} />
+        <meshStandardMaterial color={body} roughness={0.32} metalness={0.12} />
+      </mesh>
+      {/* nose tip */}
+      <mesh position={[5.5, 2.05, 0]} castShadow>
+        <sphereGeometry args={[1.0, 12, 10]} />
+        <meshStandardMaterial color={body} roughness={0.3} metalness={0.15} />
+      </mesh>
+      {/* cockpit windows */}
+      <mesh position={[5.35, 2.55, 0.15]} rotation={[0, 0.15, 0]}>
+        <boxGeometry args={[0.9, 0.45, 1.3]} />
+        <meshStandardMaterial color="#1a2834" metalness={0.7} roughness={0.15} />
+      </mesh>
+      {/* cabin window strip */}
+      {[-3.2, -2.0, -0.8, 0.4, 1.6, 2.8].map((dx) => (
+        <mesh key={dx} position={[dx, 2.55, 1.0]}>
+          <boxGeometry args={[0.55, 0.28, 0.08]} />
+          <meshStandardMaterial color="#ffd98f" emissive="#ffcf7d" emissiveIntensity={0.85} />
+        </mesh>
+      ))}
+      {/* main wings */}
+      <mesh position={[-0.3, 1.55, 0]} castShadow>
+        <boxGeometry args={[2.8, 0.2, 13.2]} />
+        <meshStandardMaterial color="#e4e0d6" roughness={0.4} metalness={0.08} />
+      </mesh>
+      {/* wing tips slight up */}
+      {[-1, 1].map((s) => (
+        <mesh key={s} position={[-0.2, 1.7, s * 6.3]} rotation={[s * 0.12, 0, 0]} castShadow>
+          <boxGeometry args={[1.6, 0.12, 1.2]} />
+          <meshStandardMaterial color="#d8d4ca" roughness={0.4} />
+        </mesh>
+      ))}
+      {/* engines under wings */}
+      {[-3.0, 3.0].map((dz) => (
+        <group key={dz} position={[-0.4, 1.0, dz]}>
+          <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
+            <cylinderGeometry args={[0.55, 0.62, 2.0, 12]} />
+            <meshStandardMaterial color="#a8b0b8" metalness={0.55} roughness={0.3} />
+          </mesh>
+          <mesh position={[1.05, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.48, 0.52, 0.3, 12]} />
+            <meshStandardMaterial color="#2a2e34" metalness={0.4} roughness={0.5} />
+          </mesh>
+        </group>
+      ))}
+      {/* vertical stabiliser — Ghana green */}
+      <mesh position={[-5.4, 3.7, 0]} castShadow>
+        <boxGeometry args={[2.2, 3.0, 0.28]} />
+        <meshStandardMaterial color={accent} roughness={0.45} />
+      </mesh>
+      {/* black star proxy on tail */}
+      <mesh position={[-5.35, 4.0, 0.2]}>
+        <sphereGeometry args={[0.28, 8, 8]} />
+        <meshStandardMaterial color="#111" roughness={0.8} />
+      </mesh>
+      {/* horizontal stabilisers */}
+      <mesh position={[-5.5, 2.35, 0]} castShadow>
+        <boxGeometry args={[1.4, 0.14, 4.2]} />
+        <meshStandardMaterial color={body} roughness={0.4} />
+      </mesh>
+      {/* landing gear */}
+      {[
+        [3.4, 0],
+        [-4.2, -1.15],
+        [-4.2, 1.15],
+      ].map(([dx, dz], i) => (
+        <mesh key={i} position={[dx, 0.45, dz]} castShadow>
+          <cylinderGeometry args={[0.38, 0.38, 0.55, 10]} />
+          <meshStandardMaterial color="#1a1c20" roughness={0.9} />
+        </mesh>
+      ))}
+      {/* belly stripe accent */}
+      <mesh position={[0.5, 1.55, 0]}>
+        <boxGeometry args={[8, 0.15, 2.05]} />
+        <meshStandardMaterial color={accent} roughness={0.5} />
+      </mesh>
+      {/* beacon */}
+      <mesh position={[0.2, 3.35, 0]}>
+        <sphereGeometry args={[0.14, 8, 8]} />
+        <meshStandardMaterial color="#ff3030" emissive="#ff1010" emissiveIntensity={2} />
+      </mesh>
+    </group>
+  );
+}
+
+const PLANE_BODIES = ['#f7f4ee', '#eef4ff', '#fff8ec', '#f2fff6', '#faf6f0'] as const;
+const PLANE_ACCENTS = ['#006b3f', '#1a4a8a', '#8b1a1a', '#2d6b4f', '#0a3d4a'] as const;
+
+function GatePlane({ gateIndex }: { gateIndex: number }) {
+  const group = useRef<THREE.Group>(null);
+  const g = AIRPORT.gates[gateIndex];
+  const body = PLANE_BODIES[gateIndex % PLANE_BODIES.length];
+  const accent = PLANE_ACCENTS[gateIndex % PLANE_ACCENTS.length];
+
   useEffect(() => {
     return registerAmbient((_dt, gameTime) => {
-      const body = meshRef.current;
-      const tail = tailRef.current;
-      if (!body) return;
-      for (let i = 0; i < n; i++) {
-        const g = AIRPORT.gates[i];
-        const { phase, phaseT } = phaseAt(gameTime, i);
-        bridgeExt.current[i] = bridgeExtended(phase, phaseT);
+      const root = group.current;
+      if (!root) return;
+      const { phase, phaseT } = phaseAt(gameTime, gateIndex);
 
-        let x = g.x;
-        let z = g.z;
-        let y = 0;
-        let yaw = g.yaw;
-        let visible = true;
+      let x = g.x;
+      let z = g.z;
+      let y = 0;
+      let yaw = g.yaw;
+      let visible = true;
 
-        if (phase === 'gone') {
-          visible = false;
-        } else if (phase === 'arrive') {
-          // land on runway then taxi to stand
-          if (phaseT < 0.45) {
-            x = AIRPORT.runway.x0 + phaseT / 0.45 * (g.x - AIRPORT.runway.x0);
-            z = AIRPORT.runway.z;
-            y = Math.max(0, 8 * (1 - phaseT / 0.35));
-            yaw = 0;
-          } else {
-            const u = (phaseT - 0.45) / 0.55;
-            x = THREE.MathUtils.lerp(g.x, g.x, 1);
-            z = THREE.MathUtils.lerp(AIRPORT.runway.z, g.z, u);
-            yaw = THREE.MathUtils.lerp(0, g.yaw, Math.min(1, u * 1.4));
-          }
-        } else if (planeOnStand(phase)) {
-          x = g.x;
-          z = g.z;
-          yaw = g.yaw;
-        } else if (phase === 'taxi') {
-          const u = phaseT;
-          x = THREE.MathUtils.lerp(g.x, AIRPORT.runway.x1 - 20, u);
-          z = THREE.MathUtils.lerp(g.z, AIRPORT.runway.z, Math.min(1, u * 1.2));
-          yaw = THREE.MathUtils.lerp(g.yaw, 0, u);
-        } else if (phase === 'takeoff') {
-          x = AIRPORT.runway.x0 + 30 + phaseT * (AIRPORT.runway.x1 - AIRPORT.runway.x0 - 40);
+      if (phase === 'gone') {
+        visible = false;
+      } else if (phase === 'arrive') {
+        if (phaseT < 0.45) {
+          x = AIRPORT.runway.x0 + (phaseT / 0.45) * (g.x - AIRPORT.runway.x0);
           z = AIRPORT.runway.z;
-          y = phaseT * phaseT * 28;
+          y = Math.max(0, 10 * (1 - phaseT / 0.32));
           yaw = 0;
-          if (phaseT > 0.95) visible = false;
+        } else {
+          const u = (phaseT - 0.45) / 0.55;
+          x = g.x;
+          z = THREE.MathUtils.lerp(AIRPORT.runway.z, g.z, u);
+          yaw = THREE.MathUtils.lerp(0, g.yaw, Math.min(1, u * 1.5));
         }
-
-        _p.set(x, y + 2.0, z);
-        _e.set(0, yaw, 0);
-        _q.setFromEuler(_e);
-        _s.set(visible ? 1 : 0.001, visible ? 1 : 0.001, visible ? 1 : 0.001);
-        _m.compose(_p, _q, _s);
-        body.setMatrixAt(i, _m);
-        _c.set(LIVERIES[i % LIVERIES.length]);
-        body.setColorAt(i, _c);
-
-        // tail behind along −forward of yaw (local −x when yaw=0 along +x... nose is +x for plane mesh)
-        // Our plane mesh is oriented along +x; yaw rotates it.
-        const back = 5.2;
-        _p.set(x - Math.cos(yaw) * back, y + 3.4, z + Math.sin(yaw) * back);
-        _s.set(visible ? 1 : 0.001, visible ? 1 : 0.001, visible ? 1 : 0.001);
-        _m.compose(_p, _q, _s);
-        if (tail) {
-          tail.setMatrixAt(i, _m);
-          _c.set(TAIL_GREEN);
-          tail.setColorAt(i, _c);
-        }
+      } else if (planeOnStand(phase)) {
+        x = g.x;
+        z = g.z;
+        yaw = g.yaw;
+      } else if (phase === 'taxi') {
+        const u = phaseT;
+        x = THREE.MathUtils.lerp(g.x, AIRPORT.runway.x1 - 25, u);
+        z = THREE.MathUtils.lerp(g.z, AIRPORT.runway.z, Math.min(1, u * 1.3));
+        yaw = THREE.MathUtils.lerp(g.yaw, 0, u);
+      } else if (phase === 'takeoff') {
+        x = AIRPORT.runway.x0 + 40 + phaseT * (AIRPORT.runway.x1 - AIRPORT.runway.x0 - 50);
+        z = AIRPORT.runway.z;
+        y = phaseT * phaseT * 32;
+        yaw = 0;
+        if (phaseT > 0.92) visible = false;
       }
-      body.instanceMatrix.needsUpdate = true;
-      if (body.instanceColor) body.instanceColor.needsUpdate = true;
-      if (tail) {
-        tail.instanceMatrix.needsUpdate = true;
-        if (tail.instanceColor) tail.instanceColor.needsUpdate = true;
-      }
+
+      root.visible = visible;
+      root.position.set(x, y, z);
+      root.rotation.y = yaw;
     });
-  }, [n]);
-
-  // React bridges need phase from ambient — poll lightly
-  const bridgeState = useRef(0);
-  useFrame(() => {
-    bridgeState.current = getAmbientGameTime();
-  });
-  const t = getAmbientGameTime();
+  }, [gateIndex, g.x, g.z, g.yaw]);
 
   return (
+    <group ref={group} position={[g.x, 0, g.z]} rotation={[0, g.yaw, 0]}>
+      <Airliner body={body} accent={accent} />
+    </group>
+  );
+}
+
+function AnimatedBridge({ gateIndex }: { gateIndex: number }) {
+  const g = AIRPORT.gates[gateIndex];
+  const ref = useRef<THREE.Group>(null);
+  useFrame(() => {
+    const root = ref.current;
+    if (!root) return;
+    const { phase, phaseT } = phaseAt(getAmbientGameTime(), gateIndex);
+    const ext = bridgeExtended(phase, phaseT);
+    const len = 2 + ext * 6;
+    // child 0 is the tunnel, child 1 the head
+    const tunnel = root.children[0] as THREE.Mesh | undefined;
+    const head = root.children[1] as THREE.Mesh | undefined;
+    if (tunnel) {
+      tunnel.scale.z = Math.max(0.05, len / 4);
+      tunnel.position.z = -len / 2;
+    }
+    if (head) head.position.z = -len;
+  });
+  return (
+    <group ref={ref} position={[g.x, 3.2, g.z + 6]}>
+      <mesh position={[0, 0, -2]} castShadow>
+        <boxGeometry args={[1.5, 1.15, 4]} />
+        <meshStandardMaterial color="#8a949c" metalness={0.35} roughness={0.4} />
+      </mesh>
+      <mesh position={[0, 0, -4]} castShadow>
+        <boxGeometry args={[1.7, 1.35, 1.3]} />
+        <meshStandardMaterial color="#6a747c" metalness={0.3} roughness={0.45} />
+      </mesh>
+    </group>
+  );
+}
+
+function PlanesAndBridges() {
+  return (
     <group name="kotoka-planes">
-      <instancedMesh ref={meshRef} args={[undefined as unknown as THREE.BufferGeometry, undefined as unknown as THREE.Material, n]} castShadow>
-        <capsuleGeometry args={[1.0, 8.5, 4, 10]} />
-        <meshStandardMaterial vertexColors roughness={0.35} metalness={0.15} />
-      </instancedMesh>
-      {/* wings as second instance set — approximate with thin boxes via scale in matrix; skip for perf use body only */}
-      <instancedMesh ref={tailRef} args={[undefined as unknown as THREE.BufferGeometry, undefined as unknown as THREE.Material, n]}>
-        <boxGeometry args={[0.25, 2.6, 2.0]} />
-        <meshStandardMaterial vertexColors roughness={0.5} />
-      </instancedMesh>
-      {AIRPORT.gates.map((g, i) => {
-        const { phase, phaseT } = phaseAt(t, i);
-        const ext = bridgeExtended(phase, phaseT);
-        return <JetBridge key={g.id} gateX={g.x} gateZ={g.z} extend={ext} />;
-      })}
+      {AIRPORT.gates.map((g, i) => (
+        <GatePlane key={g.id} gateIndex={i} />
+      ))}
+      {AIRPORT.gates.map((g, i) => (
+        <AnimatedBridge key={`br-${g.id}`} gateIndex={i} />
+      ))}
     </group>
   );
 }

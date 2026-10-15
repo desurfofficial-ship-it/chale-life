@@ -1,7 +1,7 @@
 /**
  * Camera rig — orthographic follow + tycoon free cam (C-001).
  *
- * Walking: follow player, zoom [MIN_ZOOM, MAX_ZOOM], fixed yaw.
+ * Walking: follow player, zoom [MIN_ZOOM, MAX_ZOOM], free yaw (twist / rail ↻).
  * Tycoon: wide zoom (fit-city … ×25), rotate (twist / +90°), pan with
  * inertia, double-tap zoom 2×, framing presets via requestFrame().
  */
@@ -280,8 +280,8 @@ export function CameraRig() {
           }
         }
         prevPinchDist = d;
-        // Twist → yaw (tycoon only)
-        if (isTycoonCamera()) {
+        // Two-finger twist → orbit yaw (walking + tycoon)
+        {
           const ang = pinchAngle();
           let dang = ang - prevAngle;
           if (dang > Math.PI) dang -= Math.PI * 2;
