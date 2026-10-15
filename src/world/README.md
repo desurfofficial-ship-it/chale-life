@@ -9,11 +9,28 @@ community-realism rounds — mounted inside the game's own Canvas.
 ```ts
 import { AccraWorld } from '@/world';                              // the map
 import { colliders, worldBounds, type ColliderBox } from '@/world'; // the contract
+import { TycoonLayer, onWorldEvent } from '@/world';               // W-007 overlay
 ```
 
-The engine mounts `<AccraWorld />` in one line. It brings its own dusk
-lights, sky dome, fog, sea/land skirts and scene batching — the game's
-CameraRig / Player / Hud own everything else (camera, character, UI).
+The engine mounts `<AccraWorld />` in one line. It brings its own
+sky dome, day/night lighting, fog, sea/land skirts and scene batching —
+the game's CameraRig / Player / Hud own everything else (camera,
+character, UI).
+
+### AccraWorld props (L-001 day/night contract)
+
+```ts
+<AccraWorld tycoon={props | null} hour={number} weather={'clear' | 'cloudy' | 'rain'} />
+```
+
+- `hour` — game time 0…24, drives sky colours, sun/moon/fog/exposure and
+  window/sign glow via `src/components/scene/dayCycle.ts` (pure keyframes;
+  unit-tested) + `SceneLights` / `SkyDome` / `DayCycleFog`.
+- `weather` — dims sun / greys fog (no particles in walk mode).
+- The engine resolves the time: tycoon mode uses the tycoon clock, walking
+  mode uses `src/store/ambientClock.ts` (starts 09:00, 1 real min = 10 game
+  min, offline catch-up capped at 8 h); `?hour=` / `?weather=` URL params
+  override (GameCanvas).
 
 ## Contract (World → Engine): `src/world/colliders.ts`
 
@@ -63,3 +80,22 @@ to a generic point-reach loop (the G-008e takeover bug).
   point loop; the counter/job zone disjointness (2.5 + 0.9 < 3.61 m).
 - Draw-call budget: 450 at street view (e2e-enforced; the whole city batches
   through `SceneBatcher` — keep new props plain-coloured so they merge).
+  Emissive and textured materials batch in their own buckets (lamps, facade
+  atlas, sign atlas) — that is expected; keep the street-view total under
+  the budget (`tests/e2e/worldVehicles.spec.ts`, `earnAndEat.spec.ts`).
+
+## Tycoon layer (W-007, `src/world/tycoon/`)
+
+`TycoonLayer` renders bought plots (BusinessShell + instanced furniture/
+people + MoneyPops) and emits `plotSelected` via the `worldEvents` bus —
+App listens and opens the tycoon HUD. Weather visuals for tycoon mode live
+in `TycoonWeather`; the L-001 ambient/tycoon clock drives the same lighting
+contract as walking mode (props above).
+
+## Palette note
+
+`src/world/palette.ts` is the starter-block colour system and is now
+**vestigial** (zero runtime imports — the Accra map draws from
+`COLORS` in `src/lib/mapConfig.ts` plus the facade/sign atlases). Kept as
+the ART_BIBLE colour reference; do not wire it back into district code.
+
