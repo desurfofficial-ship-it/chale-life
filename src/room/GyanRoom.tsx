@@ -15,6 +15,8 @@ import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { RoundedBox } from '@react-three/drei'
 import { swatchTexture, SWATCH, type RoomMats, type Slot } from './materials'
 import { useAnimatedRef } from '../components/world/SceneBatcher'
+import { isInsideGyanHouse } from '../world/colliders'
+import { getState } from '../store/gameStore'
 
 export const ROOM = { w: 6.6, d: 6.0, h: 3.0, wall: 0.16 }
 // front window (street side) — the onboarding camera passes through it
@@ -115,6 +117,16 @@ export function GyanRoom({
   const doll = mode === 'dollhouse'
   const stub = 0.55 // cut wall height in the dollhouse
   const fw = FRONT_WINDOW
+  const ceilingRef = useRef<THREE.Group>(null)
+  const frontWallRef = useRef<THREE.Group>(null)
+  useFrame(() => {
+    if (mode !== 'world') return
+    const p = getState().player.position
+    const inside = isInsideGyanHouse(p.x, p.z)
+    // Open the room from above (and open the street face) while the player is inside
+    if (ceilingRef.current) ceilingRef.current.visible = !inside
+    if (frontWallRef.current) frontWallRef.current.visible = !inside
+  })
 
   return (
     <group>
@@ -172,25 +184,29 @@ export function GyanRoom({
         </mesh>
       ) : (
         <>
-          <WallWithWindow
-            length={w}
-            height={h}
-            win={{ c: fw.x, w: fw.w, sill: fw.sill, h: fw.h }}
-            material={M.walls}
-            position={[0, 0, d / 2]}
-            rotationY={Math.PI}
-            tagProps={tag('walls')}
-          />
-          <mesh position={[0, h, 0]} rotation={[Math.PI / 2, 0, 0]} material={fixed.ceiling}>
-            <planeGeometry args={[w, d]} />
-          </mesh>
-          {/* ceiling bulb */}
-          <mesh position={[0.6, h - 0.25, -0.4]} material={fixed.bulb}>
-            <sphereGeometry args={[0.09, 12, 10]} />
-          </mesh>
-          <mesh position={[0.6, h - 0.12, -0.4]} material={fixed.metal}>
-            <cylinderGeometry args={[0.01, 0.01, 0.24]} />
-          </mesh>
+          <group ref={frontWallRef}>
+            <WallWithWindow
+              length={w}
+              height={h}
+              win={{ c: fw.x, w: fw.w, sill: fw.sill, h: fw.h }}
+              material={M.walls}
+              position={[0, 0, d / 2]}
+              rotationY={Math.PI}
+              tagProps={tag('walls')}
+            />
+          </group>
+          <group ref={ceilingRef}>
+            <mesh position={[0, h, 0]} rotation={[Math.PI / 2, 0, 0]} material={fixed.ceiling}>
+              <planeGeometry args={[w, d]} />
+            </mesh>
+            {/* ceiling bulb */}
+            <mesh position={[0.6, h - 0.25, -0.4]} material={fixed.bulb}>
+              <sphereGeometry args={[0.09, 12, 10]} />
+            </mesh>
+            <mesh position={[0.6, h - 0.12, -0.4]} material={fixed.metal}>
+              <cylinderGeometry args={[0.01, 0.01, 0.24]} />
+            </mesh>
+          </group>
         </>
       )}
 
