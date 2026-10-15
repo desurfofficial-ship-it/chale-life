@@ -1,12 +1,12 @@
 /**
  * GameCanvas — the 3D world subtree, code-split out of the main chunk.
  *
- * E-010: when tycoonMode is on, pass live store businesses into AccraWorld.
- * ?tycoonDemo=1 still fakes four opens if the store is empty (W-007 harness).
- * Store imports here are fine — this chunk already loads after first paint.
+ * Play mode: orthographic follow cam + Player + objective marker.
+ * Onboarding (first visit or ?onboarding=1): perspective cinematic cam;
+ * Gyan house is already dressed by Jamestown via isOnboardingActive().
  */
 
-import { useSyncExternalStore } from 'react';
+import { Suspense, useSyncExternalStore } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { CameraRig } from '../engine/CameraRig';
 import { GameLoop } from '../engine/GameLoop';
@@ -21,8 +21,12 @@ import {
   type TycoonWorldProps,
 } from '../world/tycoon';
 import { findBusinessType } from '../data/businesses';
+import {
+  isOnboardingActive,
+  OnboardingCamera,
+  STOPS,
+} from '../onboarding/Onboarding';
 
-/** Module-level so money pops fire once per revenue increase, not every frame. */
 const prevRevenueToday = new Map<string, number>();
 
 function useTycoonSnapshot(): ReturnType<typeof getTycoonState> {
@@ -80,21 +84,45 @@ function toProps(s: ReturnType<typeof getTycoonState>): TycoonWorldProps | null 
 export default function GameCanvas() {
   const snap = useTycoonSnapshot();
   const tycoon = toProps(snap);
+  const onboarding = isOnboardingActive();
+  const start = STOPS[0];
 
   return (
     <Canvas
-      orthographic
+      orthographic={!onboarding}
       shadows="percentage"
       dpr={[1, 1.25]}
       gl={{ antialias: false, alpha: false, powerPreference: 'high-performance' }}
-      camera={{ position: [0, 60, 60], zoom: INITIAL_ZOOM, near: 0.1, far: 900 }}
+      camera={
+        onboarding
+          ? {
+              fov: 40,
+              position: start.pos,
+              near: 0.5,
+              far: 900,
+            }
+          : {
+              position: [0, 60, 60],
+              zoom: INITIAL_ZOOM,
+              near: 0.1,
+              far: 900,
+            }
+      }
       style={{ position: 'absolute', inset: 0 }}
     >
       <GameLoop />
-      <AccraWorld tycoon={tycoon} />
-      <Player />
-      <ObjectiveMarker />
-      <CameraRig />
+      <Suspense fallback={null}>
+        <AccraWorld tycoon={onboarding ? null : tycoon} />
+      </Suspense>
+      {onboarding ? (
+        <OnboardingCamera />
+      ) : (
+        <>
+          <Player />
+          <ObjectiveMarker />
+          <CameraRig />
+        </>
+      )}
     </Canvas>
   );
 }

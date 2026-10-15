@@ -14,7 +14,7 @@ import { StreetSign } from '../../scene/Expansion5'
 import { Bench } from '../../scene/Expansion2'
 import * as THREE from 'three'
 import { COLORS } from '@/lib/mapConfig'
-import { ONBOARDING } from '@/onboarding/Onboarding'
+import { GyanHouse } from '@/onboarding/Onboarding'
 
 // sleep-yard dressing: mats, clothesline, water drum — all low, removable props
 function SleepYard() {
@@ -136,14 +136,10 @@ export function DaaviPlot() {
     <group>
       {/* compound house at the west end, door opening toward the street
           (onboarding swaps in Gyan's house with a real room on this footprint) */}
-      {!ONBOARDING && <CompoundHouse
-        position={[-146.8, 0, -7]}
-        rotation={0.04}
-        wall={COLORS.wallTeal}
-        w={7}
-        d={6.4}
-        variant={1}
-      />}
+      {/* Player house: Gyan's shell + enterable room (onboarding + play).
+          CompoundHouse was a solid prop with no interior — players could not
+          find "their" house or the room dresser. */}
+      <GyanHouse />
       {/* kiosk by the street corner — the sign carries the joint's name
           (W-002: the old starter's "AUNTY BA" board renamed DAAVI; the
           starter went with the map swap, so the name lives here now) */}
