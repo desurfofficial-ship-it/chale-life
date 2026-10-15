@@ -13,6 +13,7 @@ import {
   type BudgetTier,
   type BusinessTypeDef,
 } from '../data/businesses';
+import { findFurnitureById } from '../data/furniture';
 
 export type { BudgetTier } from '../data/businesses';
 import { buy, canAfford, type WalletState } from './economy';
@@ -233,7 +234,13 @@ export function arrange(
   const type = findBusinessType(typeId);
   if (!type) return [];
 
-  const kit = type.furnitureKit;
+  const kit = type.furnitureKit.filter((id) => {
+    if (!findFurnitureById(id)) {
+      if (typeof console !== 'undefined') console.warn(`[arrange] unknown furniture ${id} in ${type.id}`);
+      return false;
+    }
+    return true;
+  });
   const w = Math.max(3, Math.floor(plotTiles.w));
   const d = Math.max(3, Math.floor(plotTiles.d));
   const placements: FurniturePlacement[] = [];

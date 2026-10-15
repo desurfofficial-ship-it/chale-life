@@ -88,6 +88,11 @@ import {
   LOW_THRESHOLD,
   SLEEP_ENERGY_RESTORE,
   SLEEP_GATE_ENERGY,
+} from './needs';
+import { findHousingTierById } from '../data/housing';
+import { sleepEnergyBonusFromOwned } from '../data/furniture';
+import {
+  // re-close needs - fix below
   WAAKYE_MAX_HUNGER,
   WATER_MAX_HUNGER,
   type NeedsState,
@@ -119,6 +124,14 @@ export interface ActSession {
    * keeps every pre-G-008c caller and legacy slice compiling.
    */
   readonly nowMs?: number;
+  /**
+   * Home projection for sleep bonuses (housing tier + owned furniture).
+   * Optional so HUD prompt path stays light; store always supplies it.
+   */
+  readonly home?: {
+    readonly tierId: string;
+    readonly furnitureIds: readonly string[];
+  };
 }
 
 /** What the HUD's Act button should show right now. */
@@ -654,14 +667,24 @@ export function resolveAct(
     case 'sleep': {
       // Free, and the job (even a live one) rides through untouched —
       // the store's identity check skips the wallet/job slices.
+      // Housing tier + owned furniture can boost base sleep energy.
+      const tier = session.home
+        ? findHousingTierById(session.home.tierId)
+        : undefined;
+      const base = tier?.sleepEnergyRestore ?? SLEEP_ENERGY_RESTORE;
+      const furnBonus = session.home
+        ? sleepEnergyBonusFromOwned(session.home.furnitureIds)
+        : 0;
+      const total = base + furnBonus;
+      const bonusOverDefault = total - SLEEP_ENERGY_RESTORE;
       return {
         session: {
           ...session,
           wallet: session.wallet,
-          needs: applySleep(session.needs),
+          needs: applySleep(session.needs, bonusOverDefault),
           job: session.job,
         },
-        toast: `Slept at the compound — +${SLEEP_ENERGY_RESTORE} energy`,
+        toast: `Slept at the compound — +${total} energy`,
         kind: 'sleep',
         purchased: false,
         paidOut: false,

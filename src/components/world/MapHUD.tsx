@@ -1,5 +1,7 @@
 'use client'
 
+// LEGACY map-explorer HUD. District tab fly-to is wired into DebugOverlay (?debug=1).
+// Do not mount this full overlay in the play shell (conflicts with Hud / TycoonHud).
 // ─── Map HUD — DOM overlay, fully separated from the 3D world ───────────────
 // The Chalé Life game can drop this component entirely and mount its own HUD:
 // the world (AccraScene's <Canvas>) exposes the same callbacks and works

@@ -6,7 +6,10 @@
 // first collider box, so the camera never enters a building and never loses
 // sight of the player.
 //
-// Pure data in, numbers out: feed it the collider boxes exported with the map
+// STATUS: not wired to CameraRig — the live game uses an orthographic
+// follow cam (src/engine/CameraRig.tsx). Wire this when a third-person
+// perspective mode ships (e.g. street-level walk). Pure data in, numbers out:
+// feed it the collider boxes exported with the map
 // (sim/data/colliders.json — metres, Y-up, world origin). Use it every frame:
 //
 //   const arm = createSpringArm(colliders.boxes)

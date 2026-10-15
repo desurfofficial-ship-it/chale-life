@@ -392,3 +392,66 @@ export function furnitureResaleValue(item: FurnitureCatalogItem): number {
 export function findFurnitureById(id: string): FurnitureCatalogItem | undefined {
   return FURNITURE_CATALOG.find((f) => f.id === id);
 }
+
+
+/** Home-placement items (excludes business kit props). */
+export function listHomeFurniture(): ReadonlyArray<FurnitureCatalogItem> {
+  return FURNITURE_CATALOG.filter((f) => !f.businessKit);
+}
+
+/** Tycoon business kit props. */
+export function listBusinessFurniture(): ReadonlyArray<FurnitureCatalogItem> {
+  return FURNITURE_CATALOG.filter((f) => !!f.businessKit);
+}
+
+/**
+ * Comfort 0–100 from owned home furniture ids.
+ * Sum of effect.comfort, soft-capped so a full single-room still needs upgrades
+ * before the next housing tier (48% gate).
+ */
+export function comfortPctFromOwned(ownedIds: readonly string[]): number {
+  let sum = 0;
+  for (const id of ownedIds) {
+    const item = findFurnitureById(id);
+    if (!item || item.businessKit) continue;
+    sum += item.effects.comfort;
+  }
+  // 1 comfort point ≈ 4% — a basic starter set (~12 pts) ≈ 48%
+  return Math.max(0, Math.min(100, Math.round(sum * 4)));
+}
+
+/** Extra energy on sleep from beds / AC / etc. */
+export function sleepEnergyBonusFromOwned(ownedIds: readonly string[]): number {
+  let bonus = 0;
+  for (const id of ownedIds) {
+    const item = findFurnitureById(id);
+    if (!item) continue;
+    bonus += item.effects.sleepEnergyBonus ?? 0;
+  }
+  return bonus;
+}
+
+/** Every id in a business furnitureKit must exist in the catalogue. */
+export function validateFurnitureKit(kit: readonly string[]): string[] {
+  return kit.filter((id) => !findFurnitureById(id));
+}
+
+/** Footprint [w, h, d] metres for world placement; falls back to 0.5 cube. */
+export function furnitureSizeMeters(id: string): [number, number, number] {
+  const item = findFurnitureById(id);
+  if (item?.dimensions) {
+    const w = item.dimensions.widthMeters;
+    const d = item.dimensions.depthMeters;
+    // height heuristic by kind
+    let h = 0.5;
+    if (id.includes('shelf') || id.includes('display') || id.includes('fridge')) h = 1.4;
+    else if (id.includes('counter')) h = 0.9;
+    else if (id.includes('fuel') || id.includes('mirror')) h = 1.2;
+    else if (id.includes('canopy')) h = 0.12;
+    else if (id.includes('umbrella')) h = 1.6;
+    else if (id.includes('chair') || id.includes('stool') || id.includes('bench')) h = 0.5;
+    else if (id.includes('cooker')) h = 0.7;
+    return [w, h, d];
+  }
+  return [0.5, 0.5, 0.5];
+}
