@@ -17,8 +17,31 @@ import { GyanRoom, ROOM, FRONT_WINDOW } from '../room/GyanRoom'
 import { MOODS, type RoomMats } from '../room/materials'
 import { COLORS } from '@/lib/mapConfig'
 
-export const ONBOARDING =
-  typeof window !== 'undefined' && !!new URLSearchParams(window.location.search).get('onboarding')
+/** True when the intro camera + Gyan house path should run. */
+export function isOnboardingActive(): boolean {
+  if (typeof window === 'undefined') return false
+  const q = new URLSearchParams(window.location.search)
+  // CI / playtests never run the cinematic
+  // CI playtests and debug probes stay in play mode
+  if (q.get('e2e') === '1' || q.get('debug') === '1' || q.get('onboarding') === '0') return false
+  if (q.get('onboarding') === '1') return true
+  try {
+    return !window.localStorage.getItem('chale-onboarding-done')
+  } catch {
+    return false
+  }
+}
+
+export function markOnboardingDone(): void {
+  try {
+    window.localStorage.setItem('chale-onboarding-done', '1')
+  } catch {
+    /* private mode */
+  }
+}
+
+/** Module-load snapshot for world dress (Jamestown). Prefer isOnboardingActive() at runtime. */
+export const ONBOARDING = isOnboardingActive()
 
 // Gyan's house replaces the Daavi-plot compound house (same footprint)
 export const GYAN_HOUSE = { x: -146.8, z: -7 }
@@ -341,7 +364,17 @@ export function OnboardingOverlay() {
             <p className="mt-1.5 text-[14.5px] leading-snug text-white/80">One room on Daavi Street, a fan, a bed, big plans. Make it yours.</p>
             <div className="mt-4 grid grid-cols-2 gap-2">
               <a href="?mood=1" className="rounded-2xl border border-white/20 py-3.5 text-center text-[14px] font-bold text-white">Set the mood</a>
-              <button className="rounded-2xl bg-[#fcd116] py-3.5 text-[14px] font-extrabold text-[#141018]">Start playing</button>
+              <button
+                type="button"
+                className="rounded-2xl bg-[#fcd116] py-3.5 text-[14px] font-extrabold text-[#141018]"
+                onClick={() => {
+                  markOnboardingDone()
+                  // Drop onboarding query; land in play mode
+                  const u = new URL(window.location.href)
+                  u.searchParams.delete('onboarding')
+                  window.location.href = u.pathname + (u.search || '') + u.hash
+                }}
+              >Start playing</button>
             </div>
           </div>
         )}

@@ -31,6 +31,8 @@
 
 import { lazy, Suspense, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { initializePlayerSpawn } from '../engine/spawn';
+import { isOnboardingActive, OnboardingOverlay } from '../onboarding/Onboarding';
+import SetTheMood from '../room/SetTheMood';
 import { initKeyboardInput } from '../input/inputManager';
 import { Joystick } from '../input/Joystick';
 import { RecenterButton } from '../input/RecenterButton';
@@ -111,6 +113,11 @@ function applyPromptOverride(
 }
 
 export function App() {
+  // Room dresser (Gyan house interior) — standalone mode from onboarding CTA
+  if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('mood') === '1') {
+    return <SetTheMood />;
+  }
+
   const [webglOk] = useState(isWebGLAvailable);
 
   // E-010: ?tycoon=1 enables the overlay; World emits plotSelected (W-007)
@@ -249,7 +256,8 @@ export function App() {
       {/* G-001 HUD + E-003 Act wiring: label/enabled from actPromptFor on the
           store snapshot, toast from resolveAct via the store (2 s lifetime
           is the Hud's own). */}
-      {hud}
+      {isOnboardingActive() ? <OnboardingOverlay /> : hud}
+      {/* During cinematic, skip joystick/recenter — cards own the taps */}
       {tycoonMode ? (
         <TycoonHud
           cashGHS={tycoonCash}
@@ -268,8 +276,12 @@ export function App() {
           onCloseSheet={() => setSelectedPlotId(null)}
         />
       ) : null}
-      <Joystick />
-      <RecenterButton />
+      {!isOnboardingActive() ? (
+        <>
+          <Joystick />
+          <RecenterButton />
+        </>
+      ) : null}
       <DebugOverlay />
     </>
   );
