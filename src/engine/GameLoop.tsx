@@ -33,6 +33,7 @@ import {
   setPlayerTransform,
   tickNeedsDrain,
 } from '../store/gameStore';
+import { tickAmbient } from './ambient';
 
 const MAX_DT = 1 / 20;
 
@@ -66,6 +67,7 @@ export function GameLoop() {
 
   useFrame((state, rawDt) => {
     const dt = Math.min(rawDt, MAX_DT);
+    tickAmbient(dt);
 
     kin.current = movementStep(kin.current, movementInput, dt, colliders, {
       bounds: worldBounds,

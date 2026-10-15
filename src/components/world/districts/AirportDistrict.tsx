@@ -1,7 +1,7 @@
 'use client'
 
-// ─── District: Kotoka Airport — terminal, parked plane, and Airport City ────
-import { AirportTerminal, ParkedPlane } from '../../scene/Expansion'
+// ─── District: Kotoka Airport (A-001) + Airport City towers ────────────────
+import { AirportLayer } from '@/world/airport/AirportLayer'
 import { GlassTower, Building } from '../../scene/Buildings'
 import { ApartmentBlock } from '../../scene/Expansion2'
 import { ParkingDeck } from '../../scene/Expansion3'
@@ -24,13 +24,10 @@ const APC_PEOPLE: PropItem[] = [
 export function AirportDistrict() {
   return (
     <group>
-      <AirportTerminal position={[30, 0, -94.5]} />
-      {/* plane re-parked on the west apron, nose-in toward the terminal: the
-          old spot (18, -99.5) rammed the tail fin and rear fuselage straight
-          through the terminal body (x 17–43, z −98…−91) */}
-      <ParkedPlane position={[10, 0, -96.5]} rotation={0} />
+      {/* A-001 rebuilt airside + terminal (landside +z, runway −z) */}
+      <AirportLayer />
 
-      {/* ── AIRPORT CITY towers + hotels ── */}
+      {/* ── AIRPORT CITY towers + hotels (landside / city road) ── */}
       <GlassTower position={[78, 0, -95.5]} height={22} w={9} d={9} />
       <GlassTower position={[92, 0, -95.5]} height={27} w={10} d={10} hue="#2d5a4e" />
       <GlassTower position={[106, 0, -95.5]} height={21} w={9} d={9} hue="#54396b" />
@@ -41,7 +38,7 @@ export function AirportDistrict() {
       <ApartmentBlock position={[-112, 0, -97]} rotation={0.05} wall="#efe6da" roof="#7a5a9e" />
       <Building position={[-96, 4, -97]} size={[12, 8, 8]} wall={COLORS.wallCream} facadeKey="apcity-office" rows={2} cols={5} litRatio={0.6} />
       <InstancedLamps items={APC_LAMPS} />
-      <GhanaFlag position={[68, 0, -92]} />
+      <GhanaFlag position={[68, 0, -82]} />
       <InstancedPalms items={APC_PALMS} />
       <InstancedPeople items={APC_PEOPLE} />
     </group>

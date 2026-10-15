@@ -409,7 +409,7 @@ export const OVERVIEW = {
 // camera-target clamps used by the fly-to rig
 export const CAMERA_LIMITS = {
   targetX: [-270, 330] as [number, number],
-  targetZ: [-112, 112] as [number, number],
+  targetZ: [-140, 112] as [number, number],
   targetY: [0, 40] as [number, number],
   minDistance: 30,
   maxDistance: 800,
