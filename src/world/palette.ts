@@ -13,8 +13,8 @@ export const PALETTE = {
   // Ground & road
   dirt: '#c4a984',
   dirtYard: '#b89a6f',
-  asphalt: '#3f4348',
-  asphaltEdge: '#33373b',
+  asphalt: '#5d6168',
+  asphaltEdge: '#4a4e54',
   roadLine: '#d8c46a',
   laterite: '#a8502c',
   lateriteDark: '#8c431f',

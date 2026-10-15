@@ -1,19 +1,25 @@
 /**
  * GameCanvas — the 3D world subtree, code-split out of the main chunk.
  *
- * Play mode: orthographic follow cam + Player + objective marker.
- * Onboarding (first visit or ?onboarding=1): perspective cinematic cam;
- * Gyan house is already dressed by Jamestown via isOnboardingActive().
+ * L-001: passes hour + weather into AccraWorld for the day/night cycle.
+ * Tycoon mode uses the tycoon clock; walking mode uses ambientClock
+ * (starts 09:00, 1 real min = 10 game min). ?hour= and ?weather= override.
  */
 
-import { Suspense, useSyncExternalStore } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Suspense, useSyncExternalStore, useEffect, useState } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 import { CameraRig } from '../engine/CameraRig';
 import { GameLoop } from '../engine/GameLoop';
 import { ObjectiveMarker } from '../engine/ObjectiveMarker';
 import { Player } from '../player/Player';
 import { INITIAL_ZOOM } from '../store/gameStore';
 import { getTycoonState, subscribeTycoon } from '../store/tycoonStore';
+import {
+  getAmbientHour,
+  getAmbientWeather,
+  tickAmbientClock,
+} from '../store/ambientClock';
 import { AccraWorld } from '../world';
 import {
   buildTycoonDemoProps,
@@ -26,6 +32,7 @@ import {
   OnboardingCamera,
   STOPS,
 } from '../onboarding/Onboarding';
+import type { WeatherKind } from '../components/scene/dayCycle';
 
 const prevRevenueToday = new Map<string, number>();
 
@@ -81,18 +88,70 @@ function toProps(s: ReturnType<typeof getTycoonState>): TycoonWorldProps | null 
   };
 }
 
+/** Resolve display hour/weather for the world (tycoon clock or ambient). */
+function useWorldTime(tycoon: TycoonWorldProps | null): { hour: number; weather: WeatherKind } {
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    let id = 0;
+    const loop = () => {
+      tickAmbientClock(1 / 30); // coarse; AmbientTick does precise
+      setTick((n) => n + 1);
+      id = window.setTimeout(loop, 2000); // UI hour changes slowly
+    };
+    id = window.setTimeout(loop, 2000);
+    return () => clearTimeout(id);
+  }, []);
+  void tick;
+
+  if (typeof window !== 'undefined') {
+    const q = new URLSearchParams(window.location.search);
+    const h = q.get('hour');
+    if (h != null && h !== '' && Number.isFinite(Number(h))) {
+      const weather = (q.get('weather') as WeatherKind) || getAmbientWeather();
+      return { hour: Number(h), weather: weather === 'rain' || weather === 'cloudy' ? weather : 'clear' };
+    }
+  }
+  if (tycoon) {
+    const w = tycoon.weather;
+    const weather: WeatherKind =
+      w === 'rain' || w === 'cloudy' ? w : 'clear';
+    return { hour: tycoon.hour, weather };
+  }
+  return { hour: getAmbientHour(), weather: getAmbientWeather() };
+}
+
+function AmbientTick() {
+  useFrame((_, dt) => {
+    tickAmbientClock(dt);
+  });
+  return null;
+}
+
 export default function GameCanvas() {
   const snap = useTycoonSnapshot();
   const tycoon = toProps(snap);
   const onboarding = isOnboardingActive();
   const start = STOPS[0];
+  const { hour, weather } = useWorldTime(tycoon);
 
   return (
     <Canvas
       orthographic={!onboarding}
       shadows="percentage"
       dpr={[1, 1.25]}
-      gl={{ antialias: false, alpha: false, powerPreference: 'high-performance' }}
+      gl={{
+        antialias: false,
+        alpha: false,
+        powerPreference: 'high-performance',
+        preserveDrawingBuffer:
+          typeof window !== 'undefined' &&
+          new URLSearchParams(window.location.search).get('e2e') === '1',
+      }}
+      onCreated={({ gl }) => {
+        gl.toneMapping = THREE.ACESFilmicToneMapping;
+        gl.toneMappingExposure = 1.1;
+        gl.outputColorSpace = THREE.SRGBColorSpace;
+      }}
       camera={
         onboarding
           ? {
@@ -111,8 +170,13 @@ export default function GameCanvas() {
       style={{ position: 'absolute', inset: 0 }}
     >
       <GameLoop />
+      {!onboarding && <AmbientTick />}
       <Suspense fallback={null}>
-        <AccraWorld tycoon={onboarding ? null : tycoon} />
+        <AccraWorld
+          tycoon={onboarding ? null : tycoon}
+          hour={hour}
+          weather={weather}
+        />
       </Suspense>
       {onboarding ? (
         <OnboardingCamera />

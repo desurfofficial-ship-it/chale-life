@@ -1,10 +1,12 @@
 'use client'
 
 // ─── Dusk sky dome, sun glow, stars and scene lighting ──────────────────────
-import { useMemo } from 'react'
+import { useMemo, useRef, useEffect } from 'react'
 import * as THREE from 'three'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import { Stars } from '@react-three/drei'
+import { lightingAt, type WeatherKind } from './dayCycle'
+import { getState } from '@/store/gameStore'
 
 const skyVert = /* glsl */ `
   varying vec3 vDir;
@@ -16,21 +18,19 @@ const skyVert = /* glsl */ `
 
 const skyFrag = /* glsl */ `
   varying vec3 vDir;
+  uniform vec3 uHorizon;
+  uniform vec3 uMid;
+  uniform vec3 uTop;
+  uniform vec3 uHaze;
+  uniform vec3 uSunDir;
+  uniform float uSunBand;
   void main() {
     float h = clamp(vDir.y * 0.5 + 0.5, 0.0, 1.0);
-    vec3 horizon = vec3(1.0, 0.58, 0.32);
-    vec3 mid = vec3(0.55, 0.26, 0.46);
-    vec3 top = vec3(0.10, 0.07, 0.24);
-    vec3 col = mix(horizon, mid, smoothstep(0.42, 0.62, h));
-    col = mix(col, top, smoothstep(0.60, 0.95, h));
-    // warm band around the sun azimuth (south-west)
-    vec3 sunDir = normalize(vec3(-0.45, 0.06, 0.89));
-    float sunAmt = pow(max(dot(normalize(vDir), sunDir), 0.0), 6.0);
-    col += vec3(1.0, 0.55, 0.25) * sunAmt * 0.55;
-    // below the horizon the dome must match the scene fog (#41305e) so the
-    // sea/land skirts melt into haze — never an orange void at full zoom-out
-    vec3 haze = vec3(0.255, 0.188, 0.369);
-    col = mix(col, haze, smoothstep(0.5, 0.4, h));
+    vec3 col = mix(uHorizon, uMid, smoothstep(0.42, 0.62, h));
+    col = mix(col, uTop, smoothstep(0.60, 0.95, h));
+    float sunAmt = pow(max(dot(normalize(vDir), normalize(uSunDir)), 0.0), 6.0);
+    col += vec3(1.0, 0.72, 0.35) * sunAmt * uSunBand;
+    col = mix(col, uHaze, smoothstep(0.5, 0.4, h));
     gl_FragColor = vec4(col, 1.0);
   }
 `
@@ -82,7 +82,12 @@ const waterFrag = /* glsl */ `
   }
 `
 
-export function SkyDome() {
+function hexToVec3(hex: string): THREE.Vector3 {
+  const c = new THREE.Color(hex)
+  return new THREE.Vector3(c.r, c.g, c.b)
+}
+
+export function SkyDome({ hour = 12, weather = 'clear' as WeatherKind }: { hour?: number; weather?: WeatherKind }) {
   const material = useMemo(
     () =>
       new THREE.ShaderMaterial({
@@ -91,9 +96,33 @@ export function SkyDome() {
         side: THREE.BackSide,
         depthWrite: false,
         fog: false,
+        uniforms: {
+          uHorizon: { value: hexToVec3('#d8e6ee') },
+          uMid: { value: hexToVec3('#9ec0e0') },
+          uTop: { value: hexToVec3('#4a7ab8') },
+          uHaze: { value: hexToVec3('#d8e6ee') },
+          uSunDir: { value: new THREE.Vector3(-0.35, 0.55, 0.2) },
+          uSunBand: { value: 0.55 },
+        },
       }),
     []
   )
+  const lastH = useRef(-99)
+  const lastW = useRef<string>('')
+  useFrame(() => {
+    if (Math.abs(lastH.current - hour) < 0.05 && lastW.current === weather) return
+    lastH.current = hour
+    lastW.current = weather
+    const L = lightingAt(hour, weather)
+    const u = material.uniforms
+    const hz = hexToVec3(L.horizon)
+    u.uHorizon.value.copy(hz)
+    u.uMid.value.copy(hexToVec3(L.mid))
+    u.uTop.value.copy(hexToVec3(L.top))
+    u.uHaze.value.copy(hexToVec3(L.haze))
+    u.uSunDir.value.set(L.sunDir[0], L.sunDir[1], L.sunDir[2])
+    u.uSunBand.value = L.sunBand
+  })
   return (
     <mesh material={material} renderOrder={-10}>
       <sphereGeometry args={[820, 32, 20]} />
@@ -132,31 +161,130 @@ function getWaterMaterial(): THREE.ShaderMaterial {
   return waterMaterialSingleton
 }
 
-export function SceneLights() {
+const SUN_DIST = 220
+const SHADOW_HALF = 35 // ~70 m orthographic box
+
+export function SceneLights({
+  hour = 12,
+  weather = 'clear' as WeatherKind,
+}: {
+  hour?: number
+  weather?: WeatherKind
+}) {
+  const hemiRef = useRef<THREE.HemisphereLight>(null)
+  const ambRef = useRef<THREE.AmbientLight>(null)
+  const sunRef = useRef<THREE.DirectionalLight>(null)
+  const moonRef = useRef<THREE.DirectionalLight>(null)
+  const starsGroup = useRef<THREE.Group>(null)
+  const { gl } = useThree()
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 600
+  const mapSize = isMobile ? 1024 : 2048
+
+  // Reused colours — no per-frame allocations
+  const hemiSkyC = useMemo(() => new THREE.Color(), [])
+  const hemiGndC = useMemo(() => new THREE.Color(), [])
+  const ambC = useMemo(() => new THREE.Color(), [])
+  const sunC = useMemo(() => new THREE.Color(), [])
+  const moonC = useMemo(() => new THREE.Color(), [])
+
+  useEffect(() => {
+    gl.toneMapping = THREE.ACESFilmicToneMapping
+    gl.outputColorSpace = THREE.SRGBColorSpace
+  }, [gl])
+
+  useFrame(() => {
+    const L = lightingAt(hour, weather)
+    hemiSkyC.set(L.hemiSky)
+    hemiGndC.set(L.hemiGround)
+    ambC.set(L.ambientColor)
+    sunC.set(L.sunColor)
+    moonC.set(L.moonColor)
+
+    if (hemiRef.current) {
+      hemiRef.current.color.copy(hemiSkyC)
+      hemiRef.current.groundColor.copy(hemiGndC)
+      hemiRef.current.intensity = L.hemiIntensity
+    }
+    if (ambRef.current) {
+      ambRef.current.color.copy(ambC)
+      ambRef.current.intensity = L.ambientIntensity
+    }
+    if (sunRef.current) {
+      const s = sunRef.current
+      s.color.copy(sunC)
+      s.intensity = L.sunIntensity
+      const d = L.sunDirPos
+      // Follow player so the tight shadow box stays useful
+      const p = getState().player.position
+      s.position.set(p.x + d[0] * SUN_DIST, d[1] * SUN_DIST, p.z + d[2] * SUN_DIST)
+      s.target.position.set(p.x, 0, p.z)
+      s.target.updateMatrixWorld()
+      s.castShadow = L.shadowStrength > 0.15
+      if (s.shadow) {
+        const cam = s.shadow.camera as THREE.OrthographicCamera
+        cam.left = -SHADOW_HALF
+        cam.right = SHADOW_HALF
+        cam.top = SHADOW_HALF
+        cam.bottom = -SHADOW_HALF
+        cam.near = 10
+        cam.far = SUN_DIST * 2.2
+        cam.updateProjectionMatrix()
+      }
+    }
+    if (moonRef.current) {
+      const m = moonRef.current
+      m.color.copy(moonC)
+      m.intensity = L.moonIntensity
+      const d = L.moonDirPos
+      const p = getState().player.position
+      m.position.set(p.x + d[0] * SUN_DIST, d[1] * SUN_DIST, p.z + d[2] * SUN_DIST)
+    }
+    gl.toneMappingExposure = L.exposure
+    if (starsGroup.current) {
+      starsGroup.current.visible = L.starsOpacity > 0.08
+    }
+  })
+
   return (
     <group>
-      <hemisphereLight args={['#6a4a8f', '#3a2e28', 1.0]} />
-      <ambientLight intensity={0.42} color="#5a4a78" />
+      <hemisphereLight ref={hemiRef} args={['#e6eef7', '#cdb98f', 1.0]} />
+      <ambientLight ref={ambRef} intensity={0.3} color="#f0ece4" />
       <directionalLight
-        color="#ffb46b"
-        intensity={1.55}
-        position={[-120, 130, 170]}
+        ref={sunRef}
+        color="#fff4e0"
+        intensity={2.4}
+        position={[-80, 160, 40]}
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-left={-240}
-        shadow-camera-right={240}
-        shadow-camera-top={190}
-        shadow-camera-bottom={-190}
+        shadow-mapSize-width={mapSize}
+        shadow-mapSize-height={mapSize}
+        shadow-camera-left={-SHADOW_HALF}
+        shadow-camera-right={SHADOW_HALF}
+        shadow-camera-top={SHADOW_HALF}
+        shadow-camera-bottom={-SHADOW_HALF}
         shadow-camera-near={10}
-        shadow-camera-far={620}
-        shadow-bias={-0.0006}
+        shadow-camera-far={480}
+        shadow-bias={-0.0004}
       />
-      {/* fill light from the opposite side keeps night sides readable */}
-      <directionalLight color="#4a5fae" intensity={0.45} position={[130, 80, -140]} />
-      {/* NOTE: the old sun-glow sprite was removed — it swept across the HUD
-          (the "stray orb top-right"). The sky shader keeps its own warm band. */}
-      <Stars radius={600} depth={60} count={1400} factor={5} saturation={0} fade speed={0.6} />
+      <directionalLight ref={moonRef} color="#a9bde0" intensity={0} position={[100, 180, -80]} />
+      <group ref={starsGroup} visible={false}>
+        <Stars radius={600} depth={60} count={1400} factor={5} saturation={0} fade speed={0.4} />
+      </group>
     </group>
   )
 }
+
+/** Fog + sky driven by the same lightingAt snapshot. */
+export function DayCycleFog({ hour = 12, weather = 'clear' as WeatherKind }: { hour?: number; weather?: WeatherKind }) {
+  const fogRef = useRef<THREE.FogExp2>(null)
+  const col = useMemo(() => new THREE.Color('#d8e6ee'), [])
+  useFrame(() => {
+    const L = lightingAt(hour, weather)
+    col.set(L.fogColor)
+    if (fogRef.current) {
+      fogRef.current.color.copy(col)
+      fogRef.current.density = L.fogDensity
+    }
+  })
+  return <fogExp2 ref={fogRef} attach="fog" args={['#d8e6ee', 0.00055]} />
+}
+
