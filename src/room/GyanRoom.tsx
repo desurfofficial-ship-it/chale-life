@@ -84,6 +84,7 @@ export function GyanRoom({
       glass: new THREE.MeshStandardMaterial({ color: '#9fc6e8', transparent: true, opacity: 0.22, roughness: 0.05, metalness: 0.1 }),
       leaf: plain('#2f6b3a', 0.8),
       pot: plain('#b0623e', 0.9),
+      redPlastic: plain('#e23b2f', 0.75),
       shade: new THREE.MeshStandardMaterial({ color: '#f2e2c4', emissive: '#ffb75e', emissiveIntensity: 0.6, roughness: 0.9, side: THREE.DoubleSide }),
       frame: plain('#1c1a18', 0.6),
       edge: plain('#15131a', 0.9),
@@ -225,11 +226,118 @@ export function GyanRoom({
       )}
 
       {/* ════════════ furniture ════════════ */}
+
+      {/* ═══════════════════════════════════════════════════════════════
+          STARTER single-room (world): bed + cheap table + buckets + mat.
+          Everything lives in one room — wash, sleep, cook corner.
+          Dollhouse mode keeps the fuller set so Set-the-Mood has slots.
+         ═══════════════════════════════════════════════════════════════ */}
+      {mode === 'world' ? (
+        <group name="starter-room">
+          {/* thin floor mat (cheap plastic / rubber) */}
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0.2, 0.012, 0.3]} receiveShadow material={M.rug} {...tag('rug')}>
+            <planeGeometry args={[2.4, 1.8]} />
+          </mesh>
+
+          {/* simple mattress bed against back wall (no fancy headboard) */}
+          <group position={[1.6, 0, -d / 2 + 1.0]}>
+            <mesh position={[0, 0.12, 0]} material={fixed.metal} castShadow>
+              <boxGeometry args={[1.9, 0.18, 1.1]} />
+            </mesh>
+            <RoundedBox args={[1.85, 0.14, 1.05]} radius={0.04} position={[0, 0.28, 0]} material={M.bedding} castShadow {...tag('bedding')} />
+            <RoundedBox args={[0.55, 0.12, 0.32]} radius={0.05} position={[0, 0.36, -0.35]} material={M.bedding} castShadow {...tag('bedding')} />
+          </group>
+
+          {/* cheap wood table (cook / eat corner) */}
+          <group position={[-1.8, 0, -1.4]}>
+            <mesh position={[0, 0.72, 0]} material={M.woodwork} castShadow {...tag('woodwork')}>
+              <boxGeometry args={[0.9, 0.05, 0.55]} />
+            </mesh>
+            {[[-0.38, -0.2], [0.38, -0.2], [-0.38, 0.2], [0.38, 0.2]].map(([x, z], i) => (
+              <mesh key={i} position={[x, 0.36, z]} material={M.woodwork}>
+                <boxGeometry args={[0.05, 0.72, 0.05]} />
+              </mesh>
+            ))}
+            {/* small green charcoal / stove pot on table */}
+            <mesh position={[0.15, 0.82, 0]} material={fixed.metal}>
+              <cylinderGeometry args={[0.12, 0.14, 0.18, 12]} />
+            </mesh>
+            <mesh position={[0.15, 0.94, 0]} material={fixed.pot}>
+              <cylinderGeometry args={[0.1, 0.1, 0.08, 12]} />
+            </mesh>
+          </group>
+
+          {/* second cheap table by the window */}
+          <group position={[-1.9, 0, 1.2]}>
+            <mesh position={[0, 0.55, 0]} material={M.woodwork} castShadow {...tag('woodwork')}>
+              <boxGeometry args={[0.7, 0.04, 0.5]} />
+            </mesh>
+            {[[-0.28, -0.18], [0.28, -0.18], [-0.28, 0.18], [0.28, 0.18]].map(([x, z], i) => (
+              <mesh key={i} position={[x, 0.27, z]} material={M.woodwork}>
+                <boxGeometry args={[0.04, 0.54, 0.04]} />
+              </mesh>
+            ))}
+          </group>
+
+          {/* plastic monobloc chair (red — Accra classic) */}
+          <group position={[0.15, 0, -0.2]}>
+            <mesh position={[0, 0.42, 0]} material={fixed.redPlastic} castShadow>
+              <boxGeometry args={[0.42, 0.06, 0.42]} />
+            </mesh>
+            <mesh position={[0, 0.55, -0.18]} material={fixed.redPlastic}>
+              <boxGeometry args={[0.42, 0.32, 0.05]} />
+            </mesh>
+            {[[-0.16, -0.16], [0.16, -0.16], [-0.16, 0.16], [0.16, 0.16]].map(([x, z], i) => (
+              <mesh key={i} position={[x, 0.2, z]} material={fixed.redPlastic}>
+                <boxGeometry args={[0.04, 0.4, 0.04]} />
+              </mesh>
+            ))}
+          </group>
+
+          {/* blue cooler (eat / drink) */}
+          <mesh position={[2.2, 0.28, 1.6]} material={fixed.chrome} castShadow>
+            <boxGeometry args={[0.55, 0.55, 0.4]} />
+          </mesh>
+          <mesh position={[2.2, 0.58, 1.6]} material={fixed.metal}>
+            <boxGeometry args={[0.55, 0.06, 0.4]} />
+          </mesh>
+
+          {/* wash corner: buckets + basin (bathroom in the same room) */}
+          <group position={[2.2, 0, -1.8]}>
+            <mesh position={[0, 0.22, 0]} material={fixed.chrome} castShadow>
+              <cylinderGeometry args={[0.22, 0.2, 0.42, 14]} />
+            </mesh>
+            <mesh position={[-0.45, 0.16, 0.15]} material={fixed.pot} castShadow>
+              <cylinderGeometry args={[0.16, 0.14, 0.32, 12]} />
+            </mesh>
+            <mesh position={[-0.2, 0.08, 0.45]} material={fixed.metal} castShadow>
+              <cylinderGeometry args={[0.14, 0.12, 0.16, 12]} />
+            </mesh>
+          </group>
+
+          {/* yellow jerrycan */}
+          <mesh position={[1.5, 0.2, 1.8]} material={fixed.leaf} castShadow>
+            <boxGeometry args={[0.28, 0.4, 0.2]} />
+          </mesh>
+
+          {/* single wall shelf (no books wall of fame) */}
+          <mesh position={[-0.3, 1.55, -d / 2 + 0.08]} material={M.woodwork} castShadow {...tag('woodwork')}>
+            <boxGeometry args={[1.1, 0.06, 0.22]} />
+          </mesh>
+          <mesh position={[-0.3, 1.72, -d / 2 + 0.06]} material={fixed.metal}>
+            <boxGeometry args={[0.5, 0.28, 0.08]} />
+          </mesh>
+
+          {/* soft ceiling bulb only */}
+        </group>
+      ) : (
+        <>
       {/* rug under the lounge */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-1.55, 0.012, -1.35]} receiveShadow material={M.rug} {...tag('rug')}>
-        <planeGeometry args={[2.6, 1.9]} />
+        <planeGeometry args={[2.6, 2.0]} />
       </mesh>
 
+      {/* sofa (back-left, facing the room) */}
       {/* sofa (back-left, facing the room) */}
       <group position={[-1.55, 0, -2.45]}>
         <RoundedBox args={[2.2, 0.42, 0.9]} radius={0.08} position={[0, 0.3, 0]} material={M.upholstery} castShadow {...tag('upholstery')} />
@@ -400,6 +508,10 @@ export function GyanRoom({
       <Plant position={[-w / 2 + 0.35, 0, -d / 2 + 0.35]} pot={fixed.pot} leaf={fixed.leaf} scale={1.15} />
       <Plant position={[w / 2 - 0.4, 0, -0.2]} pot={fixed.pot} leaf={fixed.leaf} scale={0.9} />
       <Plant position={[-0.7, 0, 2.6]} pot={fixed.pot} leaf={fixed.leaf} scale={0.75} />
+
+
+        </>
+      )}
 
       {/* ── room lights (warm lamps; brightness follows lampsOn) ── */}
       <pointLight position={[0.6, h - 0.35, -0.4]} intensity={(mode === 'world' ? 6 : 3) + lampsOn * 5} distance={9} decay={1.6} color="#ffc98a" />

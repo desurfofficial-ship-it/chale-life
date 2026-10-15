@@ -345,6 +345,26 @@ export default function SetTheMood() {
         <IdleDrift active={idle} />
       </Canvas>
 
+      {/* back to play — mood is an in-room editor only */}
+      <button
+        type="button"
+        onClick={() => {
+          try {
+            sessionStorage.removeItem('chale.moodOk')
+          } catch { /* */ }
+          const u = new URL(window.location.href)
+          u.searchParams.delete('mood')
+          u.searchParams.delete('from')
+          window.location.href = u.pathname + (u.search || '') + u.hash
+        }}
+        style={{
+          position: 'absolute', top: 12, left: 12, zIndex: 40,
+          padding: '8px 12px', borderRadius: 10, border: 'none',
+          background: 'rgba(0,0,0,0.55)', color: '#fff', fontWeight: 700, fontSize: 13,
+        }}
+      >
+        ← Back to street
+      </button>
       {/* ── top: title, undo/redo, mood meter ── */}
       <div className="pointer-events-none absolute inset-x-0 top-0 p-4 pt-[max(1rem,env(safe-area-inset-top))]">
         <div className="flex items-start justify-between">

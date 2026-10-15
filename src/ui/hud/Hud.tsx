@@ -31,6 +31,7 @@ import {
 } from '../../rules/jobs';
 import { isLow, lowNeedsHints, LOW_THRESHOLD } from '../../rules/needs';
 import { useCountdownNow } from '../useTicker';
+import { isInsideGyanHouse } from '../../world/colliders';
 
 export interface HudProps {
   /** Called by the Act button — the Engine decides what "Act" means. */
@@ -344,6 +345,48 @@ function ActButton({
 
 // ── Root ─────────────────────────────────────────────────────────────────────
 
+
+function DecorateRoomChip() {
+  const x = useStoreValue((s) => s.player.position.x);
+  const z = useStoreValue((s) => s.player.position.z);
+  const inside = isInsideGyanHouse(x, z);
+  if (!inside) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        try {
+          sessionStorage.setItem('chale.moodOk', '1');
+          localStorage.setItem('chale.moodOk', '1');
+        } catch {
+          /* private */
+        }
+        const u = new URL(window.location.href);
+        u.searchParams.set('mood', '1');
+        u.searchParams.set('from', 'home');
+        window.location.href = u.pathname + u.search + u.hash;
+      }}
+      style={{
+        ...GLASS,
+        border: 'none',
+        cursor: 'pointer',
+        padding: '10px 14px',
+        borderRadius: 12,
+        color: TEXT,
+        fontSize: 13,
+        fontWeight: 700,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        maxWidth: 'min(64vw, 280px)',
+      }}
+    >
+      <span aria-hidden>🏠</span>
+      Decorate room
+    </button>
+  );
+}
+
 export function Hud({ onAct, actLabel, actEnabled = true, actReason = null, toast = null }: HudProps) {
   // Toast lifetime is component-local (never touches the store): visible
   // while `toast` is set, hidden TOAST_MS after the latest message arrived.
@@ -409,6 +452,7 @@ export function Hud({ onAct, actLabel, actEnabled = true, actReason = null, toas
           }}
         >
           <ObjectiveCard />
+          <DecorateRoomChip />
           {toast !== null && toastVisible && (
             <div
               role="status"

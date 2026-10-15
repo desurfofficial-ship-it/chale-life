@@ -122,7 +122,20 @@ function applyPromptOverride(
 
 export function App() {
   // Room dresser (Gyan house interior) — standalone mode from onboarding CTA
+  // Set-the-Mood is room editing — only from inside the house (or first-run onboarding).
   if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('mood') === '1') {
+    const ok =
+      sessionStorage.getItem('chale.moodOk') === '1' ||
+      localStorage.getItem('chale.moodOk') === '1' ||
+      new URLSearchParams(window.location.search).get('from') === 'home';
+    if (!ok) {
+      // Bounce back to play with a hint
+      const u = new URL(window.location.href);
+      u.searchParams.delete('mood');
+      u.searchParams.set('needHome', '1');
+      window.location.replace(u.pathname + u.search + u.hash);
+      return null;
+    }
     return <SetTheMood />;
   }
 
