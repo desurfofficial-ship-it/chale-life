@@ -17,8 +17,13 @@ function load(): Saved {
     const raw = localStorage.getItem(KEY);
     if (!raw) return { minutes: 9 * 60, savedAtMs: Date.now() };
     const p = JSON.parse(raw) as Saved;
-    if (!Number.isFinite(p.minutes)) return { minutes: 9 * 60, savedAtMs: Date.now() };
-    return p;
+    // BOTH fields validated — a corrupt savedAtMs (NaN) used to poison the
+    // catch-up math into NaN minutes and the clock never recovered (the
+    // lighting path clamps NaN to noon, but the clock stayed broken).
+    if (!Number.isFinite(p.minutes) || !Number.isFinite(p.savedAtMs)) {
+      return { minutes: 9 * 60, savedAtMs: Date.now() };
+    }
+    return { minutes: Math.min(24 * 60, Math.max(0, p.minutes)), savedAtMs: p.savedAtMs };
   } catch {
     return { minutes: 9 * 60, savedAtMs: Date.now() };
   }

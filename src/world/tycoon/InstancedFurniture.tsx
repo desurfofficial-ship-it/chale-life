@@ -59,10 +59,15 @@ export function InstancedFurniture({ businesses }: { businesses: readonly Tycoon
       const originZ = plot.z - plot.d / 2;
       const y0 = plot.y ?? 0;
       for (const p of b.layout) {
+        const [sx, sy, sz] = furnSize(p.furnitureId);
+        // Overhead items: the canopy is a ceiling slab (12 cm thick), not a
+        // floor plate — center it at ~2.45 m or it renders as a trip-hazard
+        // on the ground (FurniturePlacement carries no height field).
+        const yOverhead = p.furnitureId.includes('canopy') ? 2.45 : 0;
         const list = g.get(p.furnitureId) ?? [];
         list.push({
           x: originX + p.tx + 0.5,
-          y: y0 + furnSize(p.furnitureId)[1] / 2,
+          y: y0 + yOverhead + sy / 2,
           z: originZ + p.tz + 0.5,
           rot: (p.rot * Math.PI) / 180,
         });

@@ -4,10 +4,11 @@
  * Building shell per owned plot — category colours, door gap, cutaway roof.
  * Shell walls are thin solids with a door opening on +z (walkable).
  */
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { LAND_PLOTS } from '@/lib/mapConfig';
+import { MIN_ZOOM } from '@/store/gameStore';
 import type { TycoonBusinessView } from './types';
 
 const WALL = {
@@ -43,12 +44,20 @@ function ShellMesh({
       }),
     [],
   );
+  // Hand-built material attached via <primitive> — R3F does NOT dispose it
+  // on unmount (closing/removing a business leaked one material + program).
+  useEffect(() => () => roofMat.dispose(), [roofMat]);
 
-  // Cutaway: high overview (low ortho zoom) → roof fades out
+  // Cutaway: zoom OUT (toward MIN_ZOOM) → roof fades out; street zoom → solid
   useFrame(() => {
-    const zoom = 'zoom' in camera ? (camera as THREE.OrthographicCamera).zoom : 12;
-    // zoom ~6–10 overview, ~18–28 street
-    const t = THREE.MathUtils.clamp((zoom - 8) / 14, 0, 1);
+    // The ortho zoom range is MIN_ZOOM…MAX_ZOOM = 14…70 (gameStore) — the
+    // old 8…28 window was tuned for a zoom range the game can't reach, so
+    // at the widest real zoom the roof still sat at ~44 % opacity and the
+    // interiors never fully opened.
+    const zoom = (camera as THREE.OrthographicCamera).isOrthographicCamera
+      ? camera.zoom
+      : MIN_ZOOM;
+    const t = THREE.MathUtils.clamp((zoom - MIN_ZOOM) / 12, 0, 1);
     roofMat.opacity = 0.05 + t * 0.9;
     roofMat.depthWrite = t > 0.55;
   });

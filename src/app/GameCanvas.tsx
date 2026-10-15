@@ -34,8 +34,6 @@ import {
 } from '../onboarding/Onboarding';
 import type { WeatherKind } from '../components/scene/dayCycle';
 
-const prevRevenueToday = new Map<string, number>();
-
 function useTycoonSnapshot(): ReturnType<typeof getTycoonState> {
   return useSyncExternalStore(subscribeTycoon, getTycoonState, getTycoonState);
 }
@@ -51,6 +49,10 @@ function toProps(s: ReturnType<typeof getTycoonState>): TycoonWorldProps | null 
     return null;
   }
 
+  // MoneyPops derives the per-window sale delta itself from the CUMULATIVE
+  // revenueToday (see the dedupe note there) — computing it here used to
+  // mutate a module map during render, which double-invoked renders would
+  // read twice (dropping every pop under StrictMode/concurrent discards).
   const businesses: TycoonBusinessView[] = s.businesses.map((b) => {
     const type = findBusinessType(b.typeId);
     return {
@@ -62,12 +64,7 @@ function toProps(s: ReturnType<typeof getTycoonState>): TycoonWorldProps | null 
       open: b.open,
       customersVisible: Math.min(8, Math.floor(b.customersToday / 4)),
       staff: b.staff,
-      lastSaleGHS: (() => {
-        const prev = prevRevenueToday.get(b.id) ?? 0;
-        const delta = b.revenueToday - prev;
-        prevRevenueToday.set(b.id, b.revenueToday);
-        return delta > 0 ? Math.round(delta * 100) / 100 : 0;
-      })(),
+      revenueToday: b.revenueToday,
     };
   });
 
@@ -94,7 +91,10 @@ function useWorldTime(tycoon: TycoonWorldProps | null): { hour: number; weather:
   useEffect(() => {
     let id = 0;
     const loop = () => {
-      tickAmbientClock(1 / 30); // coarse; AmbientTick does precise
+      // NO clock tick here — AmbientTick (per-frame, dt-clamped) owns the
+      // ambient clock. This loop ticked it too, double-counting ~1.7 % of
+      // ambient time. It only refreshes the RESOLVED hour so the walking-
+      // mode sky moves without a store commit to piggyback on.
       setTick((n) => n + 1);
       id = window.setTimeout(loop, 2000); // UI hour changes slowly
     };
@@ -122,7 +122,9 @@ function useWorldTime(tycoon: TycoonWorldProps | null): { hour: number; weather:
 
 function AmbientTick() {
   useFrame((_, dt) => {
-    tickAmbientClock(dt);
+    // Clamp — useFrame's dt is the RAW frame delta; after a tab switch it
+    // can be the whole hidden duration, fast-forwarding the sky clock.
+    tickAmbientClock(Math.min(dt, 2));
   });
   return null;
 }

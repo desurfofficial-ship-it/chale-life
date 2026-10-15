@@ -85,14 +85,15 @@ function SleepYard() {
 // 2. SET-DOWN BENCH — the hustle's step 2 ("carry the pans to the bench")
 //    points at DAAVI_BENCH (−132.5, −0.6) on the plot pavement; without a
 //    bench mesh the marker points at bare ground. The Bench (1.9 × 0.6 m,
-//    rotation 0 → seat faces south, toward Daavi St) sits at the yard's
-//    east edge, 2.3 m north of the waypoint and inside its 2.5 m zone:
-//    footprint x −133.45…−131.55, z −3.5…−2.9 — 0.55 m north of the
-//    spawn→pavement walk line (z ≈ −2.0) and clear of the sleepYard robot
-//    legs. DRESSING ONLY: these props are not in the captured collider set
-//    (world/accra/data/colliders.json); both footprints already satisfy the
-//    clearance bars the jobs.test suite pins, so wiring an in-game collider
-//    capture later cannot turn them into route blockers.
+//    rotation 0 → seat faces south, toward Daavi St) sits ON the waypoint
+//    (64be673 moved it from the old 2.3 m-north spot — the mesh used to sit
+//    inside the sleep-yard walk band): footprint x −133.45…−131.55,
+//    z −0.9…−0.3, centred on the 2.5 m DAAVI_BENCH zone and clear of the
+//    sleepYard robot legs. DRESSING ONLY: these props are not in the
+//    captured collider set (world/accra/data/colliders.json); both
+//    footprints already satisfy the clearance bars the jobs.test suite
+//    pins, so wiring an in-game collider capture later cannot turn them
+//    into route blockers.
 function DaaviPlotDressing() {
   return (
     <group>

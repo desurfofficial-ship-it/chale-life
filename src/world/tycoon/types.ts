@@ -12,8 +12,8 @@ export interface TycoonBusinessView {
   /** Customers currently visible (from last tick) */
   readonly customersVisible: number;
   readonly staff: number;
-  /** Last sale amount for money-pop (0 = none this frame window) */
-  readonly lastSaleGHS: number;
+  /** Cumulative revenue today — MoneyPops derives sale deltas from it. */
+  readonly revenueToday: number;
 }
 
 export interface TycoonWorldProps {

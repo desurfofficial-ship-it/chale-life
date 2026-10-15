@@ -274,10 +274,15 @@ describe('balance payback window', () => {
         paybackDay,
         `${typeId} never recovered startup in 30 days (rev=${revenue} costs=${costs} startup=${startup})`,
       ).not.toBeNull();
+      // Lower bound 2 (was 3): the fractional-customer carry serves the
+      // sub-1 customers every hour used to DROP, which is a few % more
+      // daily revenue — waakye now pays back in 2 days. The bound guards
+      // against instant-payback degeneracies, not against a street stand
+      // turning a honest 2-day profit.
       expect(
         paybackDay!,
-        `${typeId} recovered too fast (${paybackDay}d < 3)`,
-      ).toBeGreaterThanOrEqual(3);
+        `${typeId} recovered too fast (${paybackDay}d < 2)`,
+      ).toBeGreaterThanOrEqual(2);
       expect(
         paybackDay!,
         `${typeId} recovered too slow (${paybackDay}d > 30)`,
@@ -312,5 +317,83 @@ describe('quest chapter 1', () => {
     expect(q.step).toBe('hire_second');
     q = advanceQuest(q, 'staff_hired', 0, 2);
     expect(q.stepsDone).toContain('hire_second');
+  });
+});
+
+describe('live 1-minute tick cadence (the rAF path)', () => {
+  function openChop(): BusinessState {
+    const r = openBusiness(
+      { balanceGHS: 10000 },
+      { typeId: 'chop_bar', plot: samplePlot, budget: 'suggested', businessId: 'live-chop' },
+    );
+    return r.business!;
+  }
+
+  it('serves customers and earns revenue at 1 game-minute ticks (floor-eat regression)', () => {
+    // The ORIGINAL floor per tick served 0 customers at this cadence —
+    // a venue paid ₵144/day costs and earned ₵0 forever; the earn_500
+    // quest was unreachable in live play (only offline catch-up earned).
+    const biz0 = openChop();
+    const demand = districtDemand(samplePlot);
+    let b = biz0;
+    let revenue = 0;
+    let costs = 0;
+    let customers = 0;
+    for (let m = 0; m < 1440; m++) {
+      const hour = Math.floor(m / 60);
+      const t = tick(b, 1, 'clear', hour, demand);
+      revenue += t.revenue;
+      costs += t.costs;
+      customers += t.customers;
+      b = t.business;
+    }
+    expect(customers).toBeGreaterThan(0);
+    expect(revenue).toBeGreaterThan(0);
+    expect(b.revenueToday).toBeGreaterThan(0);
+    // fractional carry always below one unserved customer
+    expect(b.pendingCustomers ?? 0).toBeLessThan(1);
+  });
+
+  it('costs per day sum to costPerDay at the 1-minute cadence (rounding-drift regression)', () => {
+    // Per-tick round2 of the INCREMENT compounded up to +6 %/day
+    // (₵95/day waakye charged ₵100.80). The unrounded accumulator must
+    // land on the day rate within a pesewa.
+    for (const typeId of ['chop_bar', 'waakye_stand', 'barber', 'fuel_station'] as const) {
+      const r = openBusiness(
+        { balanceGHS: 100000 },
+        { typeId, plot: samplePlot, budget: 'suggested', businessId: `cost-${typeId}` },
+      );
+      const type = findBusinessType(typeId)!;
+      let b = r.business!;
+      for (let m = 0; m < 1440; m++) {
+        b = tick(b, 1, 'clear', Math.floor(m / 60), 1).business;
+      }
+      expect(Math.abs(b.costsToday - type.costPerDay)).toBeLessThanOrEqual(0.01);
+      expect(Math.abs((b.costAcc ?? 0) - type.costPerDay)).toBeLessThanOrEqual(0.01);
+    }
+  });
+
+  it('capacity still gates an oversized offline window', () => {
+    const biz = openChop();
+    const t = tick(biz, 480, 'clear', 12, districtDemand(samplePlot));
+    // capacity is the ~8h operating ceiling — an 8h offline catch-up must
+    // not serve more than it
+    expect(t.customers).toBeLessThanOrEqual(biz.capacity);
+  });
+});
+
+describe('arrange tile collisions', () => {
+  it('never places two furniture items on the same tile, even on a 3×3 plot', () => {
+    for (const type of ['chop_bar', 'fuel_station', 'barber', 'provisions'] as const) {
+      for (const budget of ['min', 'suggested', 'max'] as const) {
+        const layout = arrange(type, budget, { w: 3, d: 3 });
+        const cells = new Set<string>();
+        for (const p of layout) {
+          const key = `${p.tx},${p.tz}`;
+          expect(cells.has(key), `${type}/${budget}: duplicate tile ${key}`).toBe(false);
+          cells.add(key);
+        }
+      }
+    }
   });
 });

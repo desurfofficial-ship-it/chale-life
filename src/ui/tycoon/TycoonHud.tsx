@@ -18,6 +18,7 @@ import {
 import { formatGHS } from '../../rules/economy';
 import {
   arrange,
+  districtDemand,
   estimate,
   type BudgetTier,
   type BusinessState,
@@ -96,8 +97,10 @@ export interface TycoonHudProps {
   readonly alerts: readonly AlertItem[];
   readonly activeTab: TycoonTab;
   readonly onTab: (tab: TycoonTab) => void;
-  readonly onBuyPlot: (plot: PlotRef) => void;
-  readonly onOpenBusiness: (plot: PlotRef, typeId: string, budget: BudgetTier) => void;
+  /** Store commit — returns false when the purchase was rejected. */
+  readonly onBuyPlot: (plot: PlotRef) => boolean;
+  /** Store commit — returns false when the opening was rejected. */
+  readonly onOpenBusiness: (plot: PlotRef, typeId: string, budget: BudgetTier) => boolean;
   readonly onCloseSheet: () => void;
   readonly onEstimate?: (typeId: string, plot: PlotRef, budget: BudgetTier) => void;
 }
@@ -209,7 +212,7 @@ function QuestCard({ quest }: { quest: QuestProgress }) {
       </div>
       <div style={{ fontSize: 13, fontWeight: 600, color: INK, marginTop: 2 }}>
         Next: {nextLabel}
-        {quest.step === 'earn_500' ? ` (${Math.floor(quest.earnedToward)}/500)` : ''}
+        {quest.step === 'earn_500' ? ` (${Math.floor(quest.earnedToward)}/${quest.earnTarget})` : ''}
       </div>
       <div
         style={{
@@ -252,7 +255,11 @@ function BottomTabs({ active, onTab }: { active: TycoonTab; onTab: (t: TycoonTab
         right: 0,
         bottom: 0,
         zIndex: 32,
-        pointerEvents: 'auto',
+        // The bar spans the full width ABOVE the joystick (z 10) — a
+        // pointerEvents:auto container swallowed every dead-space tap,
+        // including the bottom band of the stick. Only the buttons take
+        // pointers; the strip's padding/gaps fall through.
+        pointerEvents: 'none',
         display: 'flex',
         gap: 2,
         padding: '6px 6px calc(6px + env(safe-area-inset-bottom))',
@@ -280,6 +287,7 @@ function BottomTabs({ active, onTab }: { active: TycoonTab; onTab: (t: TycoonTab
             touchAction: 'manipulation',
             cursor: 'pointer',
             opacity: t.live ? 1 : 0.65,
+            pointerEvents: 'auto',
           }}
         >
           {t.label}
@@ -342,13 +350,11 @@ function BusinessTypeGrid({
   filter,
   onFilter,
   onPick,
-  onEstimate,
   plot,
 }: {
   filter: BusinessCategory | 'all';
   onFilter: (c: BusinessCategory | 'all') => void;
   onPick: (t: BusinessTypeDef) => void;
-  onEstimate?: (t: BusinessTypeDef) => void;
   plot: PlotRef;
 }) {
   const list =
@@ -400,20 +406,8 @@ function BusinessTypeGrid({
               <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
                 <button
                   type="button"
-                  onClick={() => onEstimate?.(t)}
-                  style={{
-                    ...chipBase,
-                    background: 'transparent',
-                    flex: 1,
-                    minHeight: 44,
-                  }}
-                >
-                  Estimate
-                </button>
-                <button
-                  type="button"
                   onClick={() => onPick(t)}
-                  style={{ ...btnPrimary, flex: 1.4, minHeight: 44 }}
+                  style={{ ...btnPrimary, flex: 1, minHeight: 44 }}
                 >
                   Choose
                 </button>
@@ -483,23 +477,28 @@ function SetupSheet({
 function PlotSheet({
   plot,
   owned,
+  hasBusiness,
   onBuy,
   onClose,
   onOpenBusiness,
 }: {
   plot: PlotRef;
   owned: boolean;
-  onBuy: () => void;
+  hasBusiness: boolean;
+  onBuy: () => boolean;
   onClose: () => void;
-  onOpenBusiness: (typeId: string, budget: BudgetTier) => void;
+  onOpenBusiness: (typeId: string, budget: BudgetTier) => boolean;
 }) {
-  const [step, setStep] = useState<0 | 1 | 2 | 3>(owned ? 1 : 0);
+  // Step state keys off the PLOT (the parent mounts this with
+  // key={plot.id}, so a plot switch resets it — reusing the instance used
+  // to carry a half-finished setup for plot A onto plot B).
+  const [step, setStep] = useState<0 | 1 | 2 | 3>(hasBusiness ? 3 : owned ? 1 : 0);
   const [filter, setFilter] = useState<BusinessCategory | 'all'>('all');
   const [picked, setPicked] = useState<BusinessTypeDef | null>(null);
   const tiles = Math.round(plot.w * plot.d);
-  const demandPct = Math.round(
-    (plot.zone === 'cbd' || plot.zone === 'adabraka' ? 1.25 : 1) * 100,
-  );
+  // Engine truth (rules/business districtDemand) — the old hardcode said
+  // 100 % for 7 of 9 zones and 125 % for cbd when the sim uses 95–140 %.
+  const demandPct = Math.round(districtDemand(plot) * 100);
 
   const tracker = ['Buy land', 'Choose industry', 'Set up', 'Open'];
 
@@ -553,7 +552,16 @@ function PlotSheet({
       </div>
 
       {step === 0 && (
-        <button type="button" style={btnPrimary} onClick={() => { onBuy(); setStep(1); }}>
+        <button
+          type="button"
+          style={btnPrimary}
+          onClick={() => {
+            // Advance ONLY on a committed purchase — the store rejects
+            // (insufficient cash, already owned elsewhere) and the sheet
+            // used to jump to "Choose industry" for land you don't own.
+            if (onBuy()) setStep(1);
+          }}
+        >
           Buy land · {formatGHS(plot.price)}
         </button>
       )}
@@ -579,8 +587,9 @@ function PlotSheet({
             setStep(1);
           }}
           onConfirm={(budget) => {
-            onOpenBusiness(picked.id, budget);
-            setStep(3);
+            // Same gate as the buy step — a rejected open (no land, plot
+            // already occupied) must not show "✓ Venue open".
+            if (onOpenBusiness(picked.id, budget)) setStep(3);
           }}
         />
       )}
@@ -689,8 +698,10 @@ export function TycoonHud(props: TycoonHudProps) {
 
       {selectedPlot && (
         <PlotSheet
+          key={selectedPlot.id}
           plot={selectedPlot}
           owned={ownedPlotIds.includes(selectedPlot.id)}
+          hasBusiness={businesses.some((b) => b.plotId === selectedPlot.id)}
           onBuy={() => onBuyPlot(selectedPlot)}
           onClose={onCloseSheet}
           onOpenBusiness={(typeId, budget) => onOpenBusiness(selectedPlot, typeId, budget)}

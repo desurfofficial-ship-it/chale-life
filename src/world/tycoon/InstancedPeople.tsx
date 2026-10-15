@@ -20,7 +20,9 @@ export function InstancedPeople({ businesses }: { businesses: readonly TycoonBus
     for (const b of businesses) {
       const plot = byPlot.get(b.plotId);
       if (!plot) continue;
-      const y0 = (plot.y ?? 0) + 0.55;
+      // capsule total height = 0.55 + 2×0.18 = 0.91 → feet-on-floor centre
+      // is 0.455 (the old 0.55 left people hovering ~9.5 cm in the air)
+      const y0 = (plot.y ?? 0) + 0.46;
       for (let i = 0; i < b.staff; i++) {
         out.push({
           x: plot.x - plot.w * 0.25 + i * 0.55,
@@ -37,7 +39,7 @@ export function InstancedPeople({ businesses }: { businesses: readonly TycoonBus
     for (const b of businesses) {
       const plot = byPlot.get(b.plotId);
       if (!plot) continue;
-      const y0 = (plot.y ?? 0) + 0.55;
+      const y0 = (plot.y ?? 0) + 0.46; // see staff note — feet on the floor
       const n = Math.min(8, Math.max(0, b.customersVisible));
       for (let i = 0; i < n; i++) {
         out.push({

@@ -145,9 +145,12 @@ export function LandForSale({ ownedPlotIds = [] }: { ownedPlotIds?: readonly str
 
   return (
     <group>
-      {free.map((p, i) => (
-        <group key={p.id ?? i} position={[0, p.y ?? 0, 0]} name={`plot:${p.id}`} userData={{ plot: { id: p.id, zone: p.zone, near: p.near, price: p.price } }}>
-          <LandPlot x={p.x} z={p.z} w={p.w} d={p.d} signRot={((i * 37) % 4) * (Math.PI / 2)} />
+      {free.map((p) => (
+        <group key={p.id ?? `plot-${p.x}-${p.z}`} position={[0, p.y ?? 0, 0]} name={`plot:${p.id}`} userData={{ plot: { id: p.id, zone: p.zone, near: p.near, price: p.price } }}>
+          {/* sign rotation keyed off the plot ID — the old free-list index
+              shifted every surviving plot's board when any earlier plot was
+              bought */}
+          <LandPlot x={p.x} z={p.z} w={p.w} d={p.d} signRot={((p.id?.length ?? 0) * 37 % 4) * (Math.PI / 2)} />
         </group>
       ))}
       <InstancedShrubs items={shrubs} />

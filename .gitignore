@@ -19,3 +19,9 @@ firebase-applet-config.json
 # Only optimised output (public/models/) is committed, with a row in
 # docs/assets/LICENSES.csv per file (checked in CI).
 asset-sources/
+
+# Security-scan tool binaries are never repo content (a 22 MB gitleaks
+# executable was accidentally committed in the L-001 wave).
+gitleaks
+gitleaks-*
+*.exe

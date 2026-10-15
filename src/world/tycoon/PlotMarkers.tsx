@@ -42,16 +42,14 @@ export function PlotMarkers({
                 depthWrite={false}
               />
             </mesh>
-            {/* invisible hit plane for pointer */}
+            {/* invisible hit plane for pointer — onClick only: R3F already
+                synthesizes it after pointerdown+up on the same object; the
+                extra onPointerDown fired EVERY tap twice */}
             <mesh
               rotation={[-Math.PI / 2, 0, 0]}
               position={[0, 0.02, 0]}
               userData={{ noCollide: true, plotId: id }}
               onClick={(e) => {
-                e.stopPropagation();
-                emitWorldEvent('plotSelected', { plotId: id });
-              }}
-              onPointerDown={(e) => {
                 e.stopPropagation();
                 emitWorldEvent('plotSelected', { plotId: id });
               }}

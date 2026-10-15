@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import type { TycoonWorldProps } from './types';
 import { PlotMarkers } from './PlotMarkers';
 import { BusinessShells } from './BusinessShell';
@@ -12,7 +13,13 @@ import { TycoonWeatherFX } from './TycoonWeather';
  * Tycoon world overlay (W-007). Presentation only — props from Engine / demo.
  */
 export function TycoonLayer(props: TycoonWorldProps) {
-  const openBiz = props.businesses.filter((b) => b.open);
+  // Memo the open-business filter — a fresh array identity every render
+  // (and the 2 s ambient ticker re-renders GameCanvas) defeated every
+  // child's useMemo([businesses]) below.
+  const openBiz = useMemo(
+    () => props.businesses.filter((b) => b.open),
+    [props.businesses],
+  );
 
   return (
     <group name="tycoon-layer">

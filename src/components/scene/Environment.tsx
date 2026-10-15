@@ -32,6 +32,13 @@ const skyFrag = /* glsl */ `
     col += vec3(1.0, 0.72, 0.35) * sunAmt * uSunBand;
     col = mix(col, uHaze, smoothstep(0.5, 0.4, h));
     gl_FragColor = vec4(col, 1.0);
+    // The uniforms are LINEAR colours (three's ColorManagement converts the
+    // authored sRGB hex inside new THREE.Color(hex)). This raw ShaderMaterial
+    // used to write them straight into the sRGB framebuffer — the sky
+    // rendered 2–5× darker than authored and stopped matching the scene fog
+    // (built-in materials run linear → ACES → sRGB). Run the same pipeline:
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
   }
 `
 
@@ -238,6 +245,12 @@ export function SceneLights({
       const d = L.moonDirPos
       const p = getState().player.position
       m.position.set(p.x + d[0] * SUN_DIST, d[1] * SUN_DIST, p.z + d[2] * SUN_DIST)
+      // A DirectionalLight shines from position toward target — which
+      // defaults to the world ORIGIN and never moves. Without this the moon
+      // direction skewed toward straight-down the farther the player was
+      // from (0,0) (spawn is ~147 m west: the X component flipped).
+      m.target.position.set(p.x, 0, p.z)
+      m.target.updateMatrixWorld()
     }
     gl.toneMappingExposure = L.exposure
     if (starsGroup.current) {

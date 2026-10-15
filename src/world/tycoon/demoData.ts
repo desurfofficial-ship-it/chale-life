@@ -34,7 +34,7 @@ export function buildTycoonDemoProps(): TycoonWorldProps {
       open: true,
       customersVisible: 3 + (spec.plotIndex % 3),
       staff: type.staffByTier.suggested,
-      lastSaleGHS: spec.typeId === 'chop_bar' ? 12 : spec.typeId === 'fuel_station' ? 60 : 25,
+      revenueToday: spec.typeId === 'chop_bar' ? 132 : spec.typeId === 'fuel_station' ? 540 : 175,
     });
   }
 

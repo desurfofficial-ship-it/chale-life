@@ -73,12 +73,22 @@ let state: TycoonState = {
   activeTab: 'property',
 };
 
+/**
+ * useSyncExternalStore contract: getSnapshot must return a NEW identity only
+ * when state actually changed. The mutators below mutate `state` fields in
+ * place, so the snapshot handed to React is a shallow copy rebuilt on every
+ * notify() — consumers (GameCanvas tycoon props) re-render on commit instead
+ * of only when the 2 s ambient ticker happened to force it.
+ */
+let snapshot: TycoonState = state;
+
 function notify(): void {
+  snapshot = { ...state };
   for (const fn of listeners) fn();
 }
 
 export function getTycoonState(): Readonly<TycoonState> {
-  return state;
+  return snapshot;
 }
 
 export function subscribeTycoon(fn: Listener): () => void {
@@ -120,6 +130,7 @@ export function setSaveBackend(b: SaveBackend): void {
 }
 
 export function saveTycoon(): void {
+  lastSaveMs = Date.now();
   const payload = {
     ownedPlotIds: state.ownedPlotIds,
     businesses: state.businesses,
@@ -131,15 +142,43 @@ export function saveTycoon(): void {
   backend.save(JSON.stringify(payload));
 }
 
+/** Wall-clock throttle for the per-game-minute advanceClock save. */
+let lastSaveMs = 0;
+function saveThrottled(): void {
+  if (Date.now() - lastSaveMs < 5_000) return;
+  saveTycoon();
+}
+
 export function loadTycoon(): void {
   const raw = backend.load();
   if (!raw) return;
   try {
     const data = JSON.parse(raw) as Partial<TycoonState>;
-    if (Array.isArray(data.ownedPlotIds)) state.ownedPlotIds = data.ownedPlotIds;
-    if (Array.isArray(data.businesses)) state.businesses = data.businesses as BusinessState[];
-    if (data.clock) state.clock = { ...state.clock, ...data.clock };
-    if (data.weather) state.weather = data.weather;
+    if (Array.isArray(data.ownedPlotIds)) {
+      state.ownedPlotIds = data.ownedPlotIds.filter((id): id is string => typeof id === 'string');
+    }
+    if (Array.isArray(data.businesses)) {
+      state.businesses = data.businesses.filter(
+        (b): b is BusinessState =>
+          !!b && typeof b === 'object' && typeof (b as BusinessState).id === 'string' &&
+          typeof (b as BusinessState).plotId === 'string' &&
+          typeof (b as BusinessState).typeId === 'string',
+      ) as BusinessState[];
+    }
+    if (data.clock) {
+      const c = data.clock as Partial<GameClock>;
+      // Normalize — a stale/corrupt clock (minutes ≥ 1440, speed 99) used to
+      // leak straight into clockLabel/tick and the lighting hour.
+      const minutes = Number.isFinite(c.minutes)
+        ? Math.min(1439, Math.max(0, Math.floor(c.minutes as number)))
+        : state.clock.minutes;
+      const day = Number.isFinite(c.day) ? Math.max(1, Math.floor(c.day as number)) : state.clock.day;
+      const speed = c.speed === 0 || c.speed === 1 || c.speed === 2 ? c.speed : state.clock.speed;
+      state.clock = { day, minutes, speed };
+    }
+    if (data.weather === 'clear' || data.weather === 'cloudy' || data.weather === 'rain' || data.weather === 'night') {
+      state.weather = data.weather;
+    }
     if (Array.isArray(data.alerts)) state.alerts = data.alerts as AlertItem[];
     if (data.quest) state.quest = data.quest as QuestProgress;
     notify();
@@ -279,10 +318,15 @@ export function advanceClock(realDtSeconds: number, opts?: { offlineCapHours?: n
 
   let minutes = state.clock.minutes + steps;
   let day = state.clock.day;
+  let rolled = false;
   while (minutes >= 1440) {
     minutes -= 1440;
     day += 1;
-    const roll = (day + minutes) % 5;
+    rolled = true;
+    // Deterministic 5-day rotation on the DAY index — the old
+    // (day + minutes) % 5 depended on which minute the roll landed on,
+    // so offline catch-up produced a different week than live play.
+    const roll = day % 5;
     const nextWeather: WeatherKind =
       roll === 0 ? 'rain' : roll === 1 ? 'cloudy' : roll === 2 ? 'night' : 'clear';
     if (nextWeather !== state.weather) {
@@ -302,11 +346,16 @@ export function advanceClock(realDtSeconds: number, opts?: { offlineCapHours?: n
       revenueToday: 0,
       costsToday: 0,
       customersToday: 0,
+      pendingCustomers: 0,
+      costAcc: 0,
     }));
   }
   state.clock = { ...state.clock, day, minutes };
 
-  const hour = Math.floor(minutes / 60);
+  // Business ticks price the window with the hour it STARTED in (the old
+  // code used the END hour, so an offline catch-up landing at 14:00 got the
+  // lunch bump on all 8 catch-up hours).
+  const hour = Math.floor((state.clock.minutes - steps + 1440 * 8) % 1440 / 60);
   let wallet = getWallet().balanceGHS;
   let changedBiz = false;
   const nextBiz: BusinessState[] = [];
@@ -327,7 +376,8 @@ export function advanceClock(realDtSeconds: number, opts?: { offlineCapHours?: n
     setWalletBalanceGHS(wallet);
   }
 
-  saveTycoon();
+  if (rolled) saveTycoon();
+  else saveThrottled();
   notify();
 }
 

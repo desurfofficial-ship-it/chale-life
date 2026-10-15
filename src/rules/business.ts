@@ -56,6 +56,21 @@ export interface BusinessState {
   readonly revenueToday: number;
   readonly costsToday: number;
   readonly customersToday: number;
+  /**
+   * Fractional customers carried across ticks (served when they reach 1).
+   * Optional for save compatibility — undefined reads as 0. At the live
+   * 1-game-minute cadence a whole customer almost never fits in one tick;
+   * without the carry `Math.floor` served ZERO customers per tick and the
+   * venue paid costs while earning nothing, forever.
+   */
+  readonly pendingCustomers?: number;
+  /**
+   * Unrounded cost accumulator for today (costsToday is its 2-dp view).
+   * Optional for save compatibility — undefined reads as 0. Rounding the
+   * PER-TICK increment to pesewas compounded up to +6 %/day at the live
+   * cadence (₵95/day waakye charged ₵100.80).
+   */
+  readonly costAcc?: number;
 }
 
 export interface EstimateResult {
@@ -238,17 +253,25 @@ export function arrange(
   const d = Math.max(3, Math.floor(plotTiles.d));
   const placements: FurniturePlacement[] = [];
   let idx = 0;
+  // Occupancy set consulted by EVERY placement phase — on small plots
+  // (3×3) the counter, specialty, shelf and seat rows all want the same
+  // centre tiles, and stacked furniture rendered z-fighting overlapping
+  // boxes in the world.
+  const used = new Set<string>();
+  const take = (tx: number, tz: number): boolean => {
+    const key = `${tx},${tz}`;
+    if (used.has(key)) return false;
+    used.add(key);
+    return true;
+  };
 
   // Counter along the front (z=0 row), staff side
   const counterId = kit.find((k) => k.includes('counter')) ?? kit[0];
   if (counterId) {
-    placements.push({
-      id: `p${idx++}`,
-      furnitureId: counterId,
-      tx: Math.floor(w / 2),
-      tz: 1,
-      rot: 0,
-    });
+    const tx = Math.floor(w / 2);
+    if (take(tx, 1)) {
+      placements.push({ id: `p${idx++}`, furnitureId: counterId, tx, tz: 1, rot: 0 });
+    }
   }
 
   // Specialty item (pump / barber chair / cooker) near centre-back
@@ -261,25 +284,20 @@ export function arrange(
       k.includes('fridge'),
   );
   if (specialty && specialty !== counterId) {
-    placements.push({
-      id: `p${idx++}`,
-      furnitureId: specialty,
-      tx: Math.floor(w / 2),
-      tz: Math.max(2, d - 2),
-      rot: 0,
-    });
+    const tx = Math.floor(w / 2);
+    const tz = Math.max(2, d - 2);
+    if (take(tx, tz)) {
+      placements.push({ id: `p${idx++}`, furnitureId: specialty, tx, tz, rot: 0 });
+    }
   }
 
   // Shelves / displays along left wall
   const storage = kit.filter((k) => k.includes('shelf') || k.includes('display'));
   storage.forEach((fid, i) => {
-    placements.push({
-      id: `p${idx++}`,
-      furnitureId: fid,
-      tx: 1,
-      tz: Math.min(d - 1, 2 + i),
-      rot: 90,
-    });
+    const tz = Math.min(d - 1, 2 + i);
+    if (take(1, tz)) {
+      placements.push({ id: `p${idx++}`, furnitureId: fid, tx: 1, tz, rot: 90 });
+    }
   });
 
   // Seating / stools along right
@@ -288,24 +306,19 @@ export function arrange(
   );
   const seatCount = budget === 'min' ? 1 : budget === 'suggested' ? 2 : 3;
   seats.slice(0, seatCount).forEach((fid, i) => {
-    placements.push({
-      id: `p${idx++}`,
-      furnitureId: fid,
-      tx: Math.max(1, w - 2),
-      tz: Math.min(d - 1, 2 + i),
-      rot: 270,
-    });
+    const tx = Math.max(1, w - 2);
+    const tz = Math.min(d - 1, 2 + i);
+    if (take(tx, tz)) {
+      placements.push({ id: `p${idx++}`, furnitureId: fid, tx, tz, rot: 270 });
+    }
   });
 
   // Fill remaining kit items in open cells (deterministic scan)
-  const used = new Set(placements.map((p) => `${p.tx},${p.tz}`));
   for (const fid of kit) {
     if (placements.some((p) => p.furnitureId === fid)) continue;
     outer: for (let tz = 1; tz < d - 1; tz++) {
       for (let tx = 1; tx < w - 1; tx++) {
-        const key = `${tx},${tz}`;
-        if (used.has(key)) continue;
-        used.add(key);
+        if (!take(tx, tz)) continue;
         placements.push({ id: `p${idx++}`, furnitureId: fid, tx, tz, rot: 0 });
         break outer;
       }
@@ -393,19 +406,28 @@ export function tick(
   const hours = gameMinutes / 60;
   const wMod = weatherModifier(type, weather, hour);
   const staffMod = Math.min(1.2, 0.6 + business.staff * 0.15);
-  const rawCustomers =
-    type.baseCustomersPerHour * hours * demand * wMod * staffMod;
-  // Capacity gate: can't serve more than capacity scaled to the tick window
-  const capacityThisTick = (business.capacity / 8) * hours;
-  const customers = Math.max(0, Math.floor(Math.min(rawCustomers, capacityThisTick)));
+  const pending = business.pendingCustomers ?? 0;
+  const inflow = pending + type.baseCustomersPerHour * hours * demand * wMod * staffMod;
+  // Capacity gate: can't serve more than capacity scaled to the tick window.
+  // The carried backlog counts against capacity but stays serviceable (those
+  // customers were already inside the door when this window opened); only
+  // fresh flow beyond the window's capacity is turned away.
+  const capacityThisTick = (business.capacity / 8) * hours + pending;
+  const served = Math.min(inflow, capacityThisTick);
+  const customers = Math.max(0, Math.floor(served));
   const revenue = round2(customers * type.averageTicket);
-  // Costs accrue continuously (day rate × fraction of day)
-  const costs = round2(business.costPerDay * (hours / 24));
+  // Costs accrue continuously (day rate × fraction of day). The WALLET gets
+  // the exact increment; the display/persist field rounds the unrounded
+  // accumulator, so a day of 1-minute ticks still sums to costPerDay.
+  const costAcc = (business.costAcc ?? 0) + business.costPerDay * (hours / 24);
+  const costs = business.costPerDay * (hours / 24);
 
   const next: BusinessState = {
     ...business,
+    pendingCustomers: served - customers,
+    costAcc,
     revenueToday: round2(business.revenueToday + revenue),
-    costsToday: round2(business.costsToday + costs),
+    costsToday: round2(costAcc),
     customersToday: business.customersToday + customers,
   };
 

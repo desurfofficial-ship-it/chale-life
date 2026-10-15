@@ -2,6 +2,13 @@
 
 /**
  * Pooled "+GH₵X" sprites — no per-frame allocations of meshes.
+ *
+ * Sale identity: businesses carry CUMULATIVE revenueToday; a pop spawns
+ * when a business's cumulative total moves past the last seen value. The
+ * previous scheme compared the DELTA amount — but revenue deltas repeat
+ * constantly (every waakye sale is exactly ₵7), so the value-equality
+ * dedupe swallowed every repeat sale and each business popped at most
+ * once per distinct amount, then went silent forever.
  */
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
@@ -34,6 +41,9 @@ function makeCanvasTexture(label: string): THREE.CanvasTexture {
   ctx.strokeText(label, 64, 32);
   ctx.fillText(label, 64, 32);
   const tex = new THREE.CanvasTexture(c);
+  // Raw canvas pixels are sRGB — without this three r152+ samples them as
+  // linear and the label renders washed-out/bright.
+  tex.colorSpace = THREE.SRGBColorSpace;
   tex.needsUpdate = true;
   return tex;
 }
@@ -50,7 +60,27 @@ export function MoneyPops({ businesses }: { businesses: readonly TycoonBusinessV
     })),
   );
   const sprites = useRef<(THREE.Sprite | null)[]>(Array(POOL).fill(null));
-  const lastSale = useRef<Map<string, number>>(new Map());
+  // business id → cumulative revenueToday at the last spawn decision
+  const lastRev = useRef<Map<string, number>>(new Map());
+  // label → texture cache (one GPU upload per distinct amount, not per sprite)
+  const texCache = useRef<Map<string, THREE.CanvasTexture>>(new Map());
+  const getTex = (label: string): THREE.CanvasTexture => {
+    let t = texCache.current.get(label);
+    if (!t) {
+      t = makeCanvasTexture(label);
+      texCache.current.set(label, t);
+    }
+    return t;
+  };
+  // Dispose the cached textures on unmount (R3F disposes materials, never
+  // the map textures assigned to them).
+  useEffect(
+    () => () => {
+      for (const t of texCache.current.values()) t.dispose();
+      texCache.current.clear();
+    },
+    [],
+  );
 
   const byPlot = useMemo(() => {
     const m = new Map<string, (typeof LAND_PLOTS)[number]>();
@@ -58,13 +88,14 @@ export function MoneyPops({ businesses }: { businesses: readonly TycoonBusinessV
     return m;
   }, []);
 
-  // Spawn when lastSaleGHS changes
+  // Spawn when the CUMULATIVE revenue moves (dedupe on identity, not amount)
   useEffect(() => {
     for (const b of businesses) {
-      if (b.lastSaleGHS <= 0) continue;
-      const prev = lastSale.current.get(b.id) ?? 0;
-      if (b.lastSaleGHS === prev) continue;
-      lastSale.current.set(b.id, b.lastSaleGHS);
+      const prev = lastRev.current.get(b.id) ?? 0;
+      if (b.revenueToday === prev) continue;
+      lastRev.current.set(b.id, b.revenueToday);
+      const delta = Math.round((b.revenueToday - prev) * 100) / 100;
+      if (delta <= 0) continue; // day-roll reset / reload — nothing to celebrate
       const plot = byPlot.get(b.plotId);
       if (!plot) continue;
       const slot = slots.current.find((s) => !s.active);
@@ -74,7 +105,7 @@ export function MoneyPops({ businesses }: { businesses: readonly TycoonBusinessV
       slot.y = (plot.y ?? 0) + 3.2;
       slot.z = plot.z;
       slot.age = 0;
-      slot.text = `+GH₵${Math.round(b.lastSaleGHS)}`;
+      slot.text = `+GH₵${delta}`;
     }
   }, [businesses, byPlot]);
 
@@ -92,13 +123,16 @@ export function MoneyPops({ businesses }: { businesses: readonly TycoonBusinessV
       sp.position.set(s.x, s.y, s.z);
       sp.visible = true;
       const mat = sp.material as THREE.SpriteMaterial;
+      // The slot text is written at spawn — swap the map when it differs
+      // (every sprite used to share one "+GH₵" texture with NO amount).
+      if (mat.map !== getTex(s.text)) {
+        mat.map = getTex(s.text);
+        mat.needsUpdate = true;
+      }
       mat.opacity = Math.max(0, 1 - s.age / 1.4);
       if (s.age > 1.4) s.active = false;
     }
   });
-
-  // Pre-build a few textures for common amounts — reuse one default
-  const defaultTex = useMemo(() => makeCanvasTexture('+GH₵'), []);
 
   return (
     <group name="tycoon-money-pops">
@@ -111,7 +145,7 @@ export function MoneyPops({ businesses }: { businesses: readonly TycoonBusinessV
           scale={[1.6, 0.6, 1]}
           visible={false}
         >
-          <spriteMaterial map={defaultTex} transparent depthWrite={false} />
+          <spriteMaterial map={getTex('+GH₵')} transparent depthWrite={false} />
         </sprite>
       ))}
     </group>

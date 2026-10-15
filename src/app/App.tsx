@@ -113,11 +113,6 @@ function applyPromptOverride(
 }
 
 export function App() {
-  // Room dresser (Gyan house interior) — standalone mode from onboarding CTA
-  if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('mood') === '1') {
-    return <SetTheMood />;
-  }
-
   const [webglOk] = useState(isWebGLAvailable);
 
   // E-010: ?tycoon=1 enables the overlay; World emits plotSelected (W-007)
@@ -150,7 +145,14 @@ export function App() {
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    const onVis = () => onVisibilityChange(document.hidden);
+    const onVis = () => {
+      // The hidden window is committed by onVisibilityChange's catch-up —
+      // resetting the rAF anchor here stops the FIRST frame after return
+      // from re-committing the whole hidden duration (offline time was
+      // being applied twice, up to 2×8 game-hours + double revenue).
+      last = performance.now();
+      onVisibilityChange(document.hidden);
+    };
     document.addEventListener('visibilitychange', onVis);
     return () => {
       cancelAnimationFrame(raf);
@@ -190,7 +192,16 @@ export function App() {
   // is paused (capped needs commit nothing, and the old Date.now() read
   // only re-evaluated on a re-render). With no countdown live the clock
   // is frozen and no timer runs at all.
-  const nowMs = useCountdownNow(lastPayoutAt ?? lastWaterAt, (t) =>
+  //
+  // The stamp is the LATEST of the two anchors: `lastPayoutAt ??
+  // lastWaterAt` froze on the payout stamp — buy water after the job
+  // cooldown expired and the interval stayed cleared (stamp never moved),
+  // so the water countdown displayed a frozen now until the next payout.
+  const cooldownStamp =
+    lastPayoutAt != null || lastWaterAt != null
+      ? Math.max(lastPayoutAt ?? 0, lastWaterAt ?? 0)
+      : undefined;
+  const nowMs = useCountdownNow(cooldownStamp, (t) =>
     promptCooldownLive(t, lastPayoutAt, lastWaterAt)
   );
 
@@ -244,6 +255,13 @@ export function App() {
   const tycoonTab = useTycoonValue((s) => s.activeTab);
   const selectedPlot = plotById(tycoonSelectedId);
 
+  // Room dresser (Gyan house interior) — standalone mode from onboarding CTA.
+  // Checked AFTER all hooks (an early return before them is a rules-of-hooks
+  // violation one client-side navigation away from crashing React).
+  if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('mood') === '1') {
+    return <SetTheMood />;
+  }
+
   if (!webglOk) return <WebGLFallback />;
 
   return (
@@ -257,8 +275,11 @@ export function App() {
           store snapshot, toast from resolveAct via the store (2 s lifetime
           is the Hud's own). */}
       {isOnboardingActive() ? <OnboardingOverlay /> : hud}
-      {/* During cinematic, skip joystick/recenter — cards own the taps */}
-      {tycoonMode ? (
+      {/* Tycoon overlay waits for the cinematic — ?tycoon=1 on a fresh
+          profile used to stack TycoonHud (pre-selected PlotSheet) ON TOP of
+          the onboarding cards. After onboarding completes its reload the
+          URL effect re-arms tycoon mode. */}
+      {tycoonMode && !isOnboardingActive() ? (
         <TycoonHud
           cashGHS={tycoonCash}
           day={tycoonDay}
