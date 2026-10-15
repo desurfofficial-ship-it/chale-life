@@ -96,8 +96,24 @@ export interface TycoonHudProps {
   readonly alerts: readonly AlertItem[];
   readonly activeTab: TycoonTab;
   readonly onTab: (tab: TycoonTab) => void;
-  readonly onBuyPlot: (plot: PlotRef) => void;
-  readonly onOpenBusiness: (plot: PlotRef, typeId: string, budget: BudgetTier) => void;
+  /**
+   * Buy a plot. Returns true when the purchase actually committed (the store
+   * verified the wallet could cover the price), false when it was rejected
+   * (insufficient cash, already owned, not for sale, etc.). The PlotSheet uses
+   * this to decide whether to advance the 4-step tracker — the OLD contract
+   * was `() => void`, so the sheet always moved to "Choose industry" even when
+   * the wallet was short, which made players think they had bought the land
+   * while nothing was actually persisted. See FIX note on PlotSheet below.
+   */
+  readonly onBuyPlot: (plot: PlotRef) => boolean;
+  /**
+   * Open a business on an owned plot. Returns true when the business actually
+   * opened (wallet covered the startup cost), false when the store rejected
+   * it (insufficient cash, plot not owned, already has a business). The
+   * PlotSheet uses this to decide whether to advance to the "Venue open ✓"
+   * screen — same FIX rationale as onBuyPlot above.
+   */
+  readonly onOpenBusiness: (plot: PlotRef, typeId: string, budget: BudgetTier) => boolean;
   readonly onCloseSheet: () => void;
   readonly onEstimate?: (typeId: string, plot: PlotRef, budget: BudgetTier) => void;
 }
@@ -489,13 +505,35 @@ function PlotSheet({
 }: {
   plot: PlotRef;
   owned: boolean;
-  onBuy: () => void;
+  /**
+   * FIX: returns boolean — true when the purchase actually committed (wallet
+   * covered the price, plot was not already owned). The OLD contract was
+   * `() => void`, which forced the sheet to advance to "Choose industry" no
+   * matter what the store decided, so a player with insufficient cash still
+   * saw the industry grid and assumed the land was theirs. We now gate
+   * `setStep(1)` on a true return and surface a visible error when it fails
+   * (the store also pushes an alert, but that lives in the Alerts tab which
+   * is not the active tab during the buy flow).
+   */
+  onBuy: () => boolean;
   onClose: () => void;
-  onOpenBusiness: (typeId: string, budget: BudgetTier) => void;
+  /**
+   * FIX: returns boolean — true when the business actually opened (wallet
+   * covered the startup cost). Same rationale as `onBuy`: the old `() => void`
+   * contract let the sheet advance to the "Venue open ✓" screen even when the
+   * store rejected the open, so the player thought they had a business while
+   * nothing was persisted.
+   */
+  onOpenBusiness: (typeId: string, budget: BudgetTier) => boolean;
 }) {
   const [step, setStep] = useState<0 | 1 | 2 | 3>(owned ? 1 : 0);
   const [filter, setFilter] = useState<BusinessCategory | 'all'>('all');
   const [picked, setPicked] = useState<BusinessTypeDef | null>(null);
+  // FIX: inline error message — when the store rejects the buy or the open,
+  // show the reason right under the action button so the player immediately
+  // sees why nothing happened (the Alerts tab is one tap away and easy to
+  // miss during the buy flow). Cleared on the next attempt and on close.
+  const [error, setError] = useState<string | null>(null);
   const tiles = Math.round(plot.w * plot.d);
   const demandPct = Math.round(
     (plot.zone === 'cbd' || plot.zone === 'adabraka' ? 1.25 : 1) * 100,
@@ -514,7 +552,10 @@ function PlotSheet({
         </div>
         <button
           type="button"
-          onClick={onClose}
+          onClick={() => {
+            setError(null);
+            onClose();
+          }}
           aria-label="Close"
           style={{
             minWidth: 44,
@@ -552,8 +593,55 @@ function PlotSheet({
         ))}
       </div>
 
+      {/* FIX: inline error banner — red brick background, cream text, sits
+          above the action button. Role=alert so screen readers announce it
+          the moment a buy/open is rejected. */}
+      {error && (
+        <div
+          role="alert"
+          data-testid="plot-sheet-error"
+          style={{
+            marginTop: 4,
+            marginBottom: 8,
+            padding: '10px 12px',
+            borderRadius: 10,
+            background: BRICK,
+            color: CREAM,
+            fontSize: 12,
+            fontWeight: 700,
+            lineHeight: 1.4,
+          }}
+        >
+          {error}
+        </div>
+      )}
+
       {step === 0 && (
-        <button type="button" style={btnPrimary} onClick={() => { onBuy(); setStep(1); }}>
+        <button
+          type="button"
+          style={btnPrimary}
+          data-testid="buy-land-btn"
+          onClick={() => {
+            // FIX: gate the step advance on the store's commit. Only move to
+            // "Choose industry" when the wallet actually covered the price and
+            // the plot is now in ownedPlotIds. On failure, surface the reason
+            // inline so the player understands the button "didn't work"
+            // instead of seeing the next step and assuming the buy landed.
+            setError(null);
+            const ok = onBuy();
+            if (ok) {
+              setStep(1);
+            } else {
+              // The store pushes a precise reason (with the wallet shortfall)
+              // to the Alerts tab via pushAlert, but the player is on the
+              // Property tab during the buy flow. Mirror a plain-English
+              // reason here so they see it without changing tabs.
+              setError(
+                `Not enough cash to buy this plot. Earn more from jobs, or pick a cheaper plot. Tap Alerts for the exact shortfall.`,
+              );
+            }
+          }}
+        >
           Buy land · {formatGHS(plot.price)}
         </button>
       )}
@@ -579,8 +667,19 @@ function PlotSheet({
             setStep(1);
           }}
           onConfirm={(budget) => {
-            onOpenBusiness(picked.id, budget);
-            setStep(3);
+            // FIX: gate the "Venue open ✓" screen on the store's commit.
+            // requestOpenBusiness returns false if the wallet can't cover the
+            // startup cost; without this check the sheet would show the green
+            // success check while no business was actually persisted.
+            setError(null);
+            const ok = onOpenBusiness(picked.id, budget);
+            if (ok) {
+              setStep(3);
+            } else {
+              setError(
+                `Not enough cash to open this business. Try a lower budget tier or earn more first.`,
+              );
+            }
           }}
         />
       )}
