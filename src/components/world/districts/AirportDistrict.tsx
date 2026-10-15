@@ -28,7 +28,8 @@ export function AirportDistrict() {
       <AirportLayer />
 
       {/* ── AIRPORT CITY towers + hotels (landside / city road) ── */}
-      <GlassTower position={[78, 0, -95.5]} height={22} w={9} d={9} />
+      {/* O-001: (78, −95.5) is now the Akwaaba Telecom call centre (src/world/office) —
+          the office shell takes the old GlassTower footprint (same collider rect) */}
       <GlassTower position={[92, 0, -95.5]} height={27} w={10} d={10} hue="#2d5a4e" />
       <GlassTower position={[106, 0, -95.5]} height={21} w={9} d={9} hue="#54396b" />
       <GlassTower position={[120, 0, -95.5]} height={24} w={10} d={10} hue="#6b3b32" />
@@ -36,7 +37,7 @@ export function AirportDistrict() {
       <ParkingDeck position={[130, 0, -95.5]} />
       <ApartmentBlock position={[-128, 0, -97]} wall="#f4f1ea" />
       <ApartmentBlock position={[-112, 0, -97]} rotation={0.05} wall="#efe6da" roof="#7a5a9e" />
-      <Building position={[-96, 4, -97]} size={[12, 8, 8]} wall={COLORS.wallCream} facadeKey="apcity-office" rows={2} cols={5} litRatio={0.6} />
+      {/* O-001: (−96, −97) is now the Kotoka Tech Hub (src/world/office) */}
       <InstancedLamps items={APC_LAMPS} />
       <GhanaFlag position={[68, 0, -82]} />
       <InstancedPalms items={APC_PALMS} />

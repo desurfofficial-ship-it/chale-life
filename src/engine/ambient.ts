@@ -39,6 +39,11 @@ export function tickAmbient(dt: number): void {
   }
 }
 
+/** Reduced-motion preference (read once at module load). */
+export function isReducedMotion(): boolean {
+  return reducedMotion;
+}
+
 /** Test helper */
 export function __resetAmbientForTests(): void {
   steppers.length = 0;

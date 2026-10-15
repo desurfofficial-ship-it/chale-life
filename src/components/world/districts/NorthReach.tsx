@@ -213,8 +213,7 @@ export function NorthReach() {
       <group position={[106, 0, -156]}><Mall name="AKWAABA MALL" w={30} d={16} /></group>
 
       {/* ── BUSINESS PARK + PROPERTIES ── */}
-      <group position={[146, 0, -152]}><OfficeBlock name="ADOM HOLDINGS" h={20} hue="#2f5d7c" /></group>
-      <group position={[163, 0, -152]}><OfficeBlock name="GOLD COAST BANK" h={16} w={11} hue="#3d6b52" bg="#9c7a1e" /></group>
+      {/* O-001: ADOM HOLDINGS + GOLD COAST BANK are now world-run offices (src/world/office) on these footprints */}
       <group position={[180, 0, -152]}><PropertyListing label="FOR SALE" bg="#ce1126" wall="#e8dcc2" storeys={2} /></group>
       <group position={[193, 0, -152]}><PropertyListing label="FOR RENT" bg="#2e7fa8" wall="#d97b8f" /></group>
       <group position={[180, 0, -136]}><PropertyListing label="FOR SALE" bg="#ce1126" wall="#7fae57" w={7} d={6} /></group>
