@@ -24,7 +24,7 @@ export const AIRPORT = {
   hangar: { x: -50, z: -100 },
   cargo: { x: -65, z: -92 },
   depot: { x: 75, z: -105 },
-} as const;
+};
 
 /** Min gate spacing must exceed wingspan + 6 */
 export function gateSpacingOk(): boolean {
