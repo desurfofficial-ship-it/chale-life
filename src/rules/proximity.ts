@@ -48,19 +48,15 @@ export const DEFAULT_NEAR_RADIUS_M = 2.5;
  */
 export const SLEEP_ZONE = {
   locationId: 'LOC-002' as const,
-  // ACCRA MAP: the reserved plot's open sleep yard (mats x −142…−130) plus
-  // the pavement apron south of it (z −1.4 = the pavement strip edge), so
-  // the designed spawn at (−136, −2) can Act.
-  x0: -142,
-  // x1 −131: the yard's water drum (−130.5,−6.2) sits just outside so the
-  // sachet-water point beside it can win its own probe.
+  // Yard + Gyan house interior (player can sleep inside after walking in).
+  x0: -151,
   x1: -131,
   z0: -12,
   z1: -1.4,
 };
 
 /** House door on the south face of the compound house — marker anchor. */
-export const COMPOUND_DOOR = { x: -148, z: -3.4 };
+export const COMPOUND_DOOR = { x: -144.6, z: -3.84 };
 
 /**
  * Daavi's bench waypoint — the hustle's step-2 set-down. G-008d: MOVED

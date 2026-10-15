@@ -16,6 +16,7 @@ import { create } from 'zustand'
 import { GyanRoom, ROOM, FRONT_WINDOW } from '../room/GyanRoom'
 import { MOODS, type RoomMats } from '../room/materials'
 import { COLORS } from '@/lib/mapConfig'
+import { getState } from '../store/gameStore'
 
 /** True when the intro camera + Gyan house path should run. */
 export function isOnboardingActive(): boolean {
@@ -197,85 +198,128 @@ export function GyanHouse({ mats }: { mats?: RoomMats }) {
   const fw = FRONT_WINDOW
   const wall = COLORS.wallTeal
   const glow = useRef<THREE.PointLight>(null)
+  const exteriorRef = useRef<THREE.Group>(null)
+  const doorW = 1.15
+  const doorX = 2.2 // local — matches COMPOUND_DOOR / collider gap
+
   useFrame(({ clock }) => {
     if (glow.current) glow.current.intensity = 5 + Math.sin(clock.elapsedTime * 2.1) * 0.25
+    // Cutaway: hide exterior shell when the player is inside the room
+    const p = getState().player.position
+    const inside =
+      p.x > H.x - W / 2 + 0.35 &&
+      p.x < H.x + W / 2 - 0.35 &&
+      p.z > H.z - D / 2 + 0.35 &&
+      p.z < H.z + D / 2 - 0.35
+    if (exteriorRef.current) exteriorRef.current.visible = !inside
   })
-  // front face split around the window
-  const fx0 = fw.x - fw.w / 2
-  const fx1 = fw.x + fw.w / 2
-  const front: [number, number, number, number][] = [
-    [(-W / 2 + fx0) / 2, Hh / 2, fx0 + W / 2, Hh],
-    [(fx1 + W / 2) / 2, Hh / 2, W / 2 - fx1, Hh],
-    [fw.x, fw.sill / 2, fw.w, fw.sill],
-    [fw.x, (fw.sill + fw.h + Hh) / 2, fw.w, Hh - fw.sill - fw.h],
-  ]
+
+  // Front wall: full-height slabs with a door hole + a window hole.
+  // Segments along X on the front face (local).
+  const doorL = doorX - doorW / 2
+  const doorR = doorX + doorW / 2
+  const winL = fw.x - fw.w / 2
+  const winR = fw.x + fw.w / 2
+  const xCuts = [-W / 2, winL, winR, doorL, doorR, W / 2].sort((a, b) => a - b)
+  const front: [number, number, number, number][] = []
+  for (let i = 0; i < xCuts.length - 1; i++) {
+    const a = xCuts[i]
+    const b = xCuts[i + 1]
+    const mid = (a + b) / 2
+    const segW = b - a
+    if (segW < 0.08) continue
+    const inDoor = mid > doorL && mid < doorR
+    const inWin = mid > winL && mid < winR
+    if (inDoor) {
+      // lintel only above the doorway
+      const lh = Hh - 2.2
+      if (lh > 0.05) front.push([mid, 2.2 + lh / 2, segW, lh])
+    } else if (inWin) {
+      front.push([mid, fw.sill / 2, segW, fw.sill])
+      const topH = Hh - (fw.sill + fw.h)
+      if (topH > 0.05) front.push([mid, fw.sill + fw.h + topH / 2, segW, topH])
+    } else {
+      front.push([mid, Hh / 2, segW, Hh])
+    }
+  }
+
   return (
-    <group position={[H.x, 0, H.z]}>
-      {/* lawn + a low blockwork fence with a gate gap */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.015, D / 2 + 1.1]} receiveShadow>
+    <group position={[H.x, 0, H.z]} name="gyan-house">
+      {/* lawn */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.015, D / 2 + 1.1]} receiveShadow userData={{ noCollide: true }}>
         <planeGeometry args={[W + 2, 2.2]} />
         <meshStandardMaterial color="#5f9a45" roughness={1} />
       </mesh>
-      {/* outer walls */}
-      <mesh position={[0, Hh / 2, -D / 2 + t / 2]} castShadow receiveShadow>
-        <boxGeometry args={[W, Hh, t]} />
-        <meshStandardMaterial color={wall} roughness={0.9} />
-      </mesh>
-      {[-1, 1].map((sx) => (
-        <mesh key={sx} position={[(sx * (W - t)) / 2, Hh / 2, 0]} castShadow receiveShadow>
-          <boxGeometry args={[t, Hh, D]} />
+
+      <group ref={exteriorRef} name="gyan-exterior">
+        {/* back + side walls */}
+        <mesh position={[0, Hh / 2, -D / 2 + t / 2]} castShadow receiveShadow>
+          <boxGeometry args={[W, Hh, t]} />
           <meshStandardMaterial color={wall} roughness={0.9} />
         </mesh>
-      ))}
-      {front.map(([x, y, w, h], i) => (
-        <mesh key={i} position={[x, y, D / 2 - t / 2]} castShadow receiveShadow>
-          <boxGeometry args={[w, h, t]} />
-          <meshStandardMaterial color={wall} roughness={0.9} />
+        {[-1, 1].map((sx) => (
+          <mesh key={sx} position={[(sx * (W - t)) / 2, Hh / 2, 0]} castShadow receiveShadow>
+            <boxGeometry args={[t, Hh, D]} />
+            <meshStandardMaterial color={wall} roughness={0.9} />
+          </mesh>
+        ))}
+        {front.map(([x, y, w, h], i) =>
+          w > 0.05 && h > 0.05 ? (
+            <mesh key={i} position={[x, y, D / 2 - t / 2]} castShadow receiveShadow>
+              <boxGeometry args={[w, h, t]} />
+              <meshStandardMaterial color={wall} roughness={0.9} />
+            </mesh>
+          ) : null,
+        )}
+        {/* window shutters */}
+        {[-1, 1].map((sx) => (
+          <mesh key={sx} position={[fw.x + sx * (fw.w / 2 + 0.42), fw.sill + fw.h / 2, D / 2 + 0.05]} rotation={[0, sx * 0.35, 0]} castShadow>
+            <boxGeometry args={[0.82, fw.h + 0.05, 0.05]} />
+            <meshStandardMaterial color="#6b4428" roughness={0.75} />
+          </mesh>
+        ))}
+        <mesh position={[fw.x, fw.sill - 0.05, D / 2 + 0.09]}>
+          <boxGeometry args={[fw.w + 0.3, 0.08, 0.22]} />
+          <meshStandardMaterial color="#e8e1d2" roughness={0.8} />
         </mesh>
-      ))}
-      {/* window reveal + open wooden shutters swung out to the street */}
-      {[-1, 1].map((sx) => (
-        <mesh key={sx} position={[fw.x + sx * (fw.w / 2 + 0.42), fw.sill + fw.h / 2, D / 2 + 0.05]} rotation={[0, sx * 0.35, 0]} castShadow>
-          <boxGeometry args={[0.82, fw.h + 0.05, 0.05]} />
-          <meshStandardMaterial color="#6b4428" roughness={0.75} />
+        {/* open doorway frame (no door leaf — walk straight in) */}
+        {[-1, 1].map((sx) => (
+          <mesh key={`jamb-${sx}`} position={[doorX + sx * (doorW / 2 + 0.04), 1.1, D / 2 - t / 2 + 0.02]} castShadow>
+            <boxGeometry args={[0.08, 2.2, t + 0.04]} />
+            <meshStandardMaterial color="#5b3d28" roughness={0.8} />
+          </mesh>
+        ))}
+        {/* door step */}
+        <mesh position={[doorX, 0.06, D / 2 + 0.35]} receiveShadow userData={{ noCollide: true }}>
+          <boxGeometry args={[doorW + 0.3, 0.12, 0.6]} />
+          <meshStandardMaterial color="#cfc6b6" roughness={0.9} />
         </mesh>
-      ))}
-      <mesh position={[fw.x, fw.sill - 0.05, D / 2 + 0.09]}>
-        <boxGeometry args={[fw.w + 0.3, 0.08, 0.22]} />
-        <meshStandardMaterial color="#e8e1d2" roughness={0.8} />
-      </mesh>
-      {/* front door + step + wall lamp */}
-      <mesh position={[2.2, 1.1, D / 2 + 0.01]}>
-        <planeGeometry args={[1.0, 2.15]} />
-        <meshStandardMaterial color="#5b3d28" roughness={0.8} />
-      </mesh>
-      <mesh position={[2.2, 0.06, D / 2 + 0.35]} receiveShadow>
-        <boxGeometry args={[1.4, 0.12, 0.6]} />
-        <meshStandardMaterial color="#cfc6b6" roughness={0.9} />
-      </mesh>
-      <mesh position={[2.95, 2.25, D / 2 + 0.08]}>
-        <sphereGeometry args={[0.09, 10, 8]} />
-        <meshStandardMaterial color="#fff1cf" emissive="#ffc46b" emissiveIntensity={2.4} />
-      </mesh>
-      <pointLight position={[2.95, 2.2, D / 2 + 0.5]} intensity={2.2} distance={6} decay={1.8} color="#ffc46b" />
-      {/* window spill onto the street (the beacon that draws the camera in) */}
-      <pointLight ref={glow} position={[fw.x, WIN_Y, D / 2 + 1.0]} intensity={5} distance={9} decay={1.7} color="#ffbf70" />
-      {/* tin roof, slight overhang */}
-      <mesh position={[0, Hh + 0.32, 0]} rotation={[0.05, 0, 0]} castShadow>
-        <boxGeometry args={[W + 0.6, 0.12, D + 0.7]} />
-        <meshStandardMaterial color="#8f949a" roughness={0.5} metalness={0.4} />
-      </mesh>
-      <mesh position={[0, Hh + 0.12, 0]}>
-        <boxGeometry args={[W, 0.3, D]} />
-        <meshStandardMaterial color="#d9cfbd" roughness={0.9} />
-      </mesh>
-      {/* the room itself */}
+        {/* wall lamp */}
+        <mesh position={[doorX + 0.75, 2.25, D / 2 + 0.08]}>
+          <sphereGeometry args={[0.09, 10, 8]} />
+          <meshStandardMaterial color="#fff1cf" emissive="#ffc46b" emissiveIntensity={2.4} />
+        </mesh>
+        <pointLight position={[doorX + 0.75, 2.2, D / 2 + 0.5]} intensity={2.2} distance={6} decay={1.8} color="#ffc46b" />
+        <pointLight ref={glow} position={[fw.x, WIN_Y, D / 2 + 1.0]} intensity={5} distance={9} decay={1.7} color="#ffbf70" />
+        {/* tin roof */}
+        <mesh position={[0, Hh + 0.32, 0]} rotation={[0.05, 0, 0]} castShadow>
+          <boxGeometry args={[W + 0.6, 0.12, D + 0.7]} />
+          <meshStandardMaterial color="#8f949a" roughness={0.5} metalness={0.4} />
+        </mesh>
+        <mesh position={[0, Hh + 0.12, 0]}>
+          <boxGeometry args={[W, 0.3, D]} />
+          <meshStandardMaterial color="#d9cfbd" roughness={0.9} />
+        </mesh>
+      </group>
+
+      {/* interior always present — visible when exterior hides (cutaway) or through door */}
       <group position={[0, 0, 0]}>
         <GyanRoom mode="world" mats={roomMats} lampsOn={1} />
       </group>
     </group>
   )
 }
+
 
 // ── DOM cards ────────────────────────────────────────────────────────────────
 export function OnboardingOverlay() {

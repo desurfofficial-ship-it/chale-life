@@ -1414,7 +1414,7 @@ describe('act: objective marker target (G-008b item 7, G-008d item 4)', () => {
 
   it('energy < 25 with no job → LOC-002 (markerPositionFor anchors COMPOUND_DOOR)', () => {
     expect(objectiveMarkerTarget(createStarterJobState(), { hunger: 72, energy: 24 })).toBe(SLEEP_LOCATION_ID);
-    expect(markerPositionFor(SLEEP_LOCATION_ID)).toEqual({ x: -148, z: -3.4 }); // the door
+    expect(markerPositionFor(SLEEP_LOCATION_ID)).toEqual({ x: -144.6, z: -3.84 }); // the door
     // The threshold is the shared LOW threshold: exactly 25 is not tired.
     expect(objectiveMarkerTarget(createStarterJobState(), { hunger: 72, energy: 25 })).toBe(DAAVI_JOB_SPOT_ID);
   });

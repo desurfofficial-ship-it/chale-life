@@ -520,7 +520,7 @@ describe('jobs: Daavi walk waypoints (G-008b item 4, G-008d items 8–10 constan
 
   it('markerPositionFor resolves the bench, the job spot and the compound door anchors', () => {
     expect(markerPositionFor('LOC-001-BENCH')).toEqual({ x: DAAVI_BENCH.x, z: DAAVI_BENCH.z });
-    expect(markerPositionFor('LOC-002')).toEqual({ x: -148, z: -3.4 }); // COMPOUND_DOOR
+    expect(markerPositionFor('LOC-002')).toEqual({ x: -144.6, z: -3.84 }); // COMPOUND_DOOR
     expect(markerPositionFor('LOC-001')).toEqual({ x: -126.5, z: -1.85 });
     expect(markerPositionFor('LOC-001-JOB')).toEqual({ x: DAAVI_JOB_SPOT.x, z: DAAVI_JOB_SPOT.z });
     expect(markerPositionFor(null)).toBeNull();
