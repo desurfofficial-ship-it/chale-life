@@ -16,7 +16,6 @@ import {
 import { findFurnitureById } from '../data/furniture';
 
 export type { BudgetTier } from '../data/businesses';
-import { findFurnitureById } from '../data/furniture';
 import { buy, canAfford, type WalletState } from './economy';
 
 // ── Types (published for Agents 2 & 3) ───────────────────────────────────────
