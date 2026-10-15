@@ -1,5 +1,9 @@
 'use client'
 
+// W-008 facade palette: peach #F0AB70, sage #8DA69A, brick #B76544,
+// sand #E4C782, slate #8999A3 — cream trims. Prefer COLORS from mapConfig.
+
+
 // ─── Procedural buildings: glass towers, compound houses, shops ─────────────
 // Handover perf model: every building shell is ONE geometry whose 4 side faces
 // UV into a SHARED facade atlas (map + emissiveMap) with the wall colour baked
@@ -177,6 +181,15 @@ export function CompoundHouse({ position, rotation = 0, wall = COLORS.wallTeal, 
       <mesh position={[0, 1.15, d / 2 + 0.03]}>
         <planeGeometry args={[1.1, 2.2]} />
         <meshStandardMaterial color="#5b3d28" />
+      </mesh>
+      {/* W-008: cream cornice + rooftop polytank (reads at street LOD) */}
+      <mesh position={[0, h + 0.08, 0]} name="w008-cornice" userData={{ noCollide: true }}>
+        <boxGeometry args={[w + 0.25, 0.16, d + 0.25]} />
+        <meshStandardMaterial color="#f5f0e6" roughness={0.85} />
+      </mesh>
+      <mesh position={[w * 0.28, h + 0.85, -d * 0.2]} name="w008-polytank" userData={{ noCollide: true }}>
+        <cylinderGeometry args={[0.45, 0.48, 1.1, 8]} />
+        <meshStandardMaterial color="#8999A3" roughness={0.55} metalness={0.15} />
       </mesh>
       {/* optional front courtyard wall + metal gate */}
       {walled && (

@@ -42,6 +42,7 @@ import { TownLife } from '@/components/world/districts/TownLife'
 import { NewLands } from '@/components/world/districts/NewLands'
 import { CommunityQuarter } from '@/components/world/districts/CommunityQuarter'
 import { TycoonLayer, type TycoonWorldProps } from '@/world/tycoon'
+import { StreetLifeLayer } from '@/world/streetLife'
 
 // ───────────────────────────────────────────────── map-edge skirts ──────────
 // The diorama plate is finite; sea + land skirts fade into the sky haze so
@@ -212,6 +213,7 @@ export function AccraWorld({
       <CommunityQuarter />
 
       {tycoon ? <TycoonLayer {...tycoon} /> : null}
+      <StreetLifeLayer hour={hour} />
 
       {/* merge the static plain-coloured world into few draw calls */}
       <SceneBatcher />
