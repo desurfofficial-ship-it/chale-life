@@ -1,11 +1,10 @@
 'use client';
 
 /**
- * W-008 living streets layer — traffic, walkers, lamps, horizon.
- * Mounted once in AccraWorld. Scenery raycasts disabled.
+ * W-008 street life — lamps + horizon only for now.
+ * Box-car traffic and capsule walkers removed (looked unfinished).
+ * Proper GLB fleet + CommunityLife NPCs remain in district modules.
  */
-import { StreetTraffic } from './StreetTraffic';
-import { StreetWalkers } from './StreetWalkers';
 import { HorizonSilhouette } from './HorizonSilhouette';
 import { StreetLamps } from './StreetLamps';
 
@@ -14,10 +13,9 @@ export function StreetLifeLayer({ hour = 12 }: { hour?: number }) {
     <group name="w008-street-life">
       <HorizonSilhouette />
       <StreetLamps hour={hour} />
-      <StreetTraffic />
-      <StreetWalkers />
+      {/* StreetTraffic / StreetWalkers intentionally offline until models polish */}
     </group>
   );
 }
 
-export { StreetTraffic, StreetWalkers, HorizonSilhouette, StreetLamps };
+export { HorizonSilhouette, StreetLamps };

@@ -140,6 +140,15 @@ export function DaaviPlot() {
           CompoundHouse was a solid prop with no interior — players could not
           find "their" house or the room dresser. */}
       <GyanHouse />
+      {/* Find-home beacon — soft pulse over the roof so the plot is readable from the street */}
+      <mesh position={[-146.8, 5.2, -7]} userData={{ noCollide: true }} name="home-beacon">
+        <sphereGeometry args={[0.35, 10, 8]} />
+        <meshStandardMaterial color="#fcd116" emissive="#fcd116" emissiveIntensity={1.4} transparent opacity={0.85} />
+      </mesh>
+      <mesh position={[-146.8, 0.04, -7]} rotation={[-Math.PI / 2, 0, 0]} userData={{ noCollide: true }}>
+        <ringGeometry args={[1.6, 2.1, 32]} />
+        <meshBasicMaterial color="#fcd116" transparent opacity={0.35} depthWrite={false} />
+      </mesh>
       {/* kiosk by the street corner — the sign carries the joint's name
           (W-002: the old starter's "AUNTY BA" board renamed DAAVI; the
           starter went with the map swap, so the name lives here now) */}
