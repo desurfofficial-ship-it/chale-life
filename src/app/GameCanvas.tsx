@@ -132,7 +132,10 @@ export default function GameCanvas() {
   const tycoon = toProps(snap);
   const onboarding = isOnboardingActive();
   const start = STOPS[0];
-  const { hour, weather } = useWorldTime(tycoon);
+  const worldTime = useWorldTime(tycoon);
+  // Intro is written as dusk ("starts tonight") — pin hour so night void isn't pure black
+  const hour = onboarding ? 18.4 : worldTime.hour;
+  const weather = onboarding ? 'clear' : worldTime.weather;
 
   return (
     <Canvas
