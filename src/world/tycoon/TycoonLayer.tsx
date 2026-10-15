@@ -18,7 +18,7 @@ export function TycoonLayer(props: TycoonWorldProps) {
     <group name="tycoon-layer">
       <TycoonWeatherFX weather={props.weather} hour={props.hour} />
       <PlotMarkers ownedPlotIds={props.ownedPlotIds} selectedPlotId={props.selectedPlotId} />
-      <BusinessShells businesses={openBiz} />
+      <BusinessShells businesses={openBiz} hour={props.hour} />
       <InstancedFurniture businesses={openBiz} />
       <InstancedPeople businesses={openBiz} />
       <MoneyPops businesses={openBiz} />

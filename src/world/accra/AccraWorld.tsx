@@ -15,7 +15,8 @@ import * as THREE from 'three'
 import { useMemo } from 'react'
 import { buildGroundTexture, skirtDiscAlpha, skirtRectAlpha } from '@/lib/mapTextures'
 import { PLATE, PLATE_CX, LAGOON } from '@/lib/mapConfig'
-import { SkyDome, Water, SceneLights } from '@/components/scene/Environment'
+import { SkyDome, Water, SceneLights, DayCycleFog } from '@/components/scene/Environment'
+import type { WeatherKind } from '@/components/scene/dayCycle'
 import { SceneBatcher } from '@/components/world/SceneBatcher'
 import { CBD } from '@/components/world/districts/CBD'
 import { CivicCenter } from '@/components/world/districts/CivicCenter'
@@ -139,7 +140,15 @@ function SeaAndSkirts() {
 // the shadow map every ~0.4 s (static world; animated objects' shadows lag
 // imperceptibly at dusk).
 
-export function AccraWorld({ tycoon }: { tycoon?: TycoonWorldProps | null } = {}) {
+export function AccraWorld({
+  tycoon,
+  hour = 12,
+  weather = 'clear',
+}: {
+  tycoon?: TycoonWorldProps | null
+  hour?: number
+  weather?: WeatherKind
+} = {}) {
   const groundTex = useMemo(() => buildGroundTexture(), [])
   // Sea band overlay: SEA = { z0: 46, z1: 116 } (mapConfig) → the animated
   // water covers the plate's southern 70 m ONLY (centre z 81, depth 70),
@@ -152,9 +161,9 @@ export function AccraWorld({ tycoon }: { tycoon?: TycoonWorldProps | null } = {}
 
   return (
     <group name="accra-world">
-      <fogExp2 attach="fog" args={['#41305e', 0.00095]} />
-      <SceneLights />
-      <SkyDome />
+      <DayCycleFog hour={hour} weather={weather} />
+      <SceneLights hour={hour} weather={weather} />
+      <SkyDome hour={hour} weather={weather} />
 
       {/* sea + land skirts so the map edge never floats over a void */}
       <SeaAndSkirts />

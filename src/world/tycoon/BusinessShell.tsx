@@ -18,14 +18,17 @@ const WALL = {
 
 const TRIM = '#2d5a3d';
 const ROOF = '#a03c2e';
-const FLOOR = '#c4a984';
+const FLOOR = '#e8dcc8';
+const FLOOR_NIGHT = '#d4c8b0';
 
 function ShellMesh({
   biz,
   plot,
+  windowGlow = 0,
 }: {
   biz: TycoonBusinessView;
   plot: { x: number; z: number; w: number; d: number; y?: number };
+  windowGlow?: number;
 }) {
   const wallColor = WALL[biz.category] ?? WALL.services;
   const { camera } = useThree();
@@ -63,7 +66,12 @@ function ShellMesh({
       {/* floor pad */}
       <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow userData={{ noCollide: true }}>
         <planeGeometry args={[w, d]} />
-        <meshStandardMaterial color={FLOOR} roughness={0.95} />
+        <meshStandardMaterial
+          color={FLOOR}
+          roughness={0.92}
+          emissive="#ffcf7d"
+          emissiveIntensity={windowGlow * 0.22}
+        />
       </mesh>
 
       {/* back wall (-z) */}
@@ -110,7 +118,16 @@ function ShellMesh({
   );
 }
 
-export function BusinessShells({ businesses }: { businesses: readonly TycoonBusinessView[] }) {
+export function BusinessShells({
+  businesses,
+  hour = 12,
+}: {
+  businesses: readonly TycoonBusinessView[];
+  hour?: number;
+}) {
+  // crude night glow from hour (full path would use lightingAt; avoid import cycle)
+  const windowGlow =
+    hour >= 20 || hour < 5 ? 1 : hour >= 18 ? (hour - 18) / 2 : hour < 7 ? (7 - hour) / 2 : 0;
   const byId = useMemo(() => {
     const m = new Map<string, (typeof LAND_PLOTS)[number]>();
     for (const p of LAND_PLOTS) if (p.id) m.set(p.id, p);
@@ -122,7 +139,7 @@ export function BusinessShells({ businesses }: { businesses: readonly TycoonBusi
       {businesses.map((b) => {
         const plot = byId.get(b.plotId);
         if (!plot) return null;
-        return <ShellMesh key={b.id} biz={b} plot={plot} />;
+        return <ShellMesh key={b.id} biz={b} plot={plot} windowGlow={windowGlow} />;
       })}
     </group>
   );
