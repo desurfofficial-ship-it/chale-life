@@ -64,9 +64,9 @@ export function Player() {
   useFrame(() => {
     const g = group.current;
     if (!g) return;
-    const { position, rotationY } = getState().player;
+    const { position, yaw } = getState().player;
     g.position.set(position.x, 0, position.z);
-    g.rotation.y = rotationY;
+    g.rotation.y = yaw;
   });
 
   return (
