@@ -23,6 +23,7 @@ import { colliders, worldBounds } from '../world/colliders';
 import { MAX_TICK_SECONDS } from '../rules/needs';
 import { nearestLocationId } from '../rules/proximity';
 import {
+  consumeTeleport,
   getZoom,
   getState,
   HUD_INTERVAL_S,
@@ -67,6 +68,15 @@ export function GameLoop() {
 
   useFrame((state, rawDt) => {
     const dt = Math.min(rawDt, MAX_DT);
+
+    // Engine-owned teleport (audit probes / e2e): the loop owns the live
+    // kinematics, so an external setPlayerPosition is clobbered on the next
+    // frame. Re-seed from the request instead — velocity cleared so the
+    // walker doesn't coast after landing.
+    const tp = consumeTeleport();
+    if (tp) {
+      kin.current = { ...kin.current, x: tp.x, z: tp.z, vx: 0, vz: 0 };
+    }
     tickAmbient(dt);
 
     kin.current = movementStep(kin.current, movementInput, dt, colliders, {

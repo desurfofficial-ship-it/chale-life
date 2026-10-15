@@ -20,6 +20,7 @@ import {
   T13_CONTAINERS, T13_CRANES, T13_SHIPS, T13_CANOES, T13_OVENS, T13_BOLLARDS, T13_GATES, type T13Prop,
 } from '@/lib/t13Layout'
 import { COMMUNITY } from '@/lib/communityLayout'
+import { TEMA_FLEET, WHEEL_R, type FleetVehicle } from '@/lib/temaFleet'
 import {
   InstancedLamps, InstancedTrees, InstancedPalms, InstancedPeople, InstancedShrubs, InstancedGrassTufts,
 } from '../InstancedNature'
@@ -136,7 +137,12 @@ function Ship({ x, z, len, beam, rot, hull, name }: { x: number; z: number; len:
     <group position={[x, 0, z]} rotation={[0, rot, 0]} name={`ship:${name}`}>
       {/* hull (waterline at the sea plane y 0.34) + red antifouling band + deck */}
       <B p={[0, 0.9, 0]} s={[beam, 2.6, len * 0.86]} c={hull} rough={0.55} metal={0.35} />
-      <B p={[0, -0.3, 0]} s={[beam * 0.98, 0.5, len * 0.84]} c="#8b1e1e" rough={0.7} cast={false} />
+      {/* boot-top: the antifouling band must WRAP the hull (1.006× beam, so no
+          face is coplanar with the hull's) and sit AT the waterline — it used
+          to be centred at y −0.3, entirely below the sea plane (y 0.34) and
+          also inside the hull box: no red showed anywhere. y 0.25 puts
+          0.16 m of red above the water, the classic vessel read. */}
+      <B p={[0, 0.25, 0]} s={[beam * 1.006, 0.5, len * 0.84]} c="#8b1e1e" rough={0.7} cast={false} />
       <mesh position={[0, 0.9, len * 0.43 + len * 0.06]} rotation={[PI / 2, 0, PI / 4]} castShadow>
         <cylinderGeometry args={[0, beam * 0.72, len * 0.14, 4]} />
         <meshStandardMaterial color={hull} roughness={0.6} metalness={0.2} />
@@ -151,6 +157,133 @@ function Ship({ x, z, len, beam, rot, hull, name }: { x: number; z: number; len:
         <B key={`${i}-${j}`} p={[-beam / 2 + 1.3 + j * 2.6, 3.6 + ((i + j) % 2) * 1.3, -len * 0.18 + i * 6.4]}
           s={[2.44, 2.6 + ((i + j) % 2) * 2.6, 6.1]} c={CC[(i * 3 + j) % CC.length]} rough={0.55} metal={0.35} />
       )))}
+    </group>
+  )
+}
+
+// ── port ground fleet — static dressing (no traffic sim, no colliders) ──────
+// The audit found ships / cranes / containers but ZERO ground vehicles on the
+// port's service roads. Every part is a plain-coloured box/cylinder so
+// SceneBatcher merges the whole fleet into a handful of draws; the placement
+// data + clearance contract live in src/lib/temaFleet.ts (unit-tested against
+// the T13 arrays). Wheels touch ground (axle y = WHEEL_R). Not captured into
+// colliders.json — same dressing-only policy as DaaviPlotDressing, and the
+// port is outside every robot walk corridor.
+const FLEET_DARK = '#2b2f36'
+const FLEET_WHEEL = '#1b1e24'
+
+function FleetWheel({ x, z }: { x: number; z: number }) {
+  return (
+    <mesh position={[x, WHEEL_R, z]} rotation={[PI / 2, 0, 0]} castShadow>
+      <cylinderGeometry args={[WHEEL_R, WHEEL_R, 0.42, 10]} />
+      <meshStandardMaterial color={FLEET_WHEEL} roughness={0.85} />
+    </mesh>
+  )
+}
+
+/** rigid 4×2 tractor + container body, local length along X (facing +x) */
+function ContainerTruck({ x, z, rot, cab, box }: { x: number; z: number; rot: number; cab: string; box: string }) {
+  return (
+    <group position={[x, 0, z]} rotation={[0, rot, 0]}>
+      {[3.6, -3.1, -4.2].map((wx) => (
+        <FleetWheel key={wx} x={wx} z={0.98} />
+      ))}
+      {[3.6, -3.1, -4.2].map((wx) => (
+        <FleetWheel key={`r${wx}`} x={wx} z={-0.98} />
+      ))}
+      <B p={[0, 0.8, 0]} s={[9.6, 0.5, 2.3]} c={FLEET_DARK} rough={0.7} metal={0.25} />
+      {/* cab + dark glass band */}
+      <B p={[3.55, 1.8, 0]} s={[2.1, 2.5, 2.44]} c={cab} rough={0.55} metal={0.2} />
+      <B p={[4.62, 2.35, 0]} s={[0.06, 0.7, 2.1]} c="#20303f" rough={0.3} metal={0.4} cast={false} />
+      {/* container body + door ribs */}
+      <B p={[-1.85, 1.85, 0]} s={[6.1, 2.58, 2.44]} c={box} rough={0.55} metal={0.35} />
+      <B p={[1.22, 1.85, 0]} s={[0.06, 2.4, 2.3]} c="#3b3b3b" rough={0.55} metal={0.35} cast={false} />
+    </group>
+  )
+}
+
+/** staged skeleton trailer on its landing legs (detached from a tractor) */
+function Trailer({ x, z, rot, box }: { x: number; z: number; rot: number; box: string }) {
+  return (
+    <group position={[x, 0, z]} rotation={[0, rot, 0]}>
+      {[-2.9, -3.9].map((wx) => (
+        <FleetWheel key={wx} x={wx} z={0.98} />
+      ))}
+      {[-2.9, -3.9].map((wx) => (
+        <FleetWheel key={`r${wx}`} x={wx} z={-0.98} />
+      ))}
+      <B p={[0, 0.8, 0]} s={[8.1, 0.5, 2.3]} c={FLEET_DARK} rough={0.7} metal={0.25} />
+      {/* front landing legs (trailer is parked, detached) */}
+      {[0.98, -0.98].map((lz) => (
+        <B key={lz} p={[2.6, 0.55, lz]} s={[0.18, 1.1, 0.18]} c={FLEET_DARK} rough={0.6} metal={0.3} />
+      ))}
+      <B p={[-0.4, 1.85, 0]} s={[6.1, 2.58, 2.44]} c={box} rough={0.55} metal={0.35} />
+      <B p={[2.67, 1.85, 0]} s={[0.06, 2.4, 2.3]} c="#3b3b3b" rough={0.55} metal={0.35} cast={false} />
+    </group>
+  )
+}
+
+/** fuel tanker: tractor + barrel + end caps + catwalk */
+function Tanker({ x, z, rot }: { x: number; z: number; rot: number }) {
+  return (
+    <group position={[x, 0, z]} rotation={[0, rot, 0]}>
+      {[3.4, -2.6, -3.7].map((wx) => (
+        <FleetWheel key={wx} x={wx} z={0.98} />
+      ))}
+      {[3.4, -2.6, -3.7].map((wx) => (
+        <FleetWheel key={`r${wx}`} x={wx} z={-0.98} />
+      ))}
+      <B p={[0, 0.8, 0]} s={[9.8, 0.5, 2.3]} c={FLEET_DARK} rough={0.7} metal={0.25} />
+      <B p={[3.9, 1.55, 0]} s={[1.9, 2.1, 2.44]} c="#0b3d6b" rough={0.55} metal={0.2} />
+      <B p={[4.87, 2.0, 0]} s={[0.06, 0.6, 2.0]} c="#20303f" rough={0.3} metal={0.4} cast={false} />
+      {/* barrel: cylinder axis along local X */}
+      <mesh position={[-1.2, 1.7, 0]} rotation={[0, 0, PI / 2]} castShadow>
+        <cylinderGeometry args={[1.15, 1.15, 7.2, 14]} />
+        <meshStandardMaterial color="#c8102e" roughness={0.45} metalness={0.3} />
+      </mesh>
+      {[-4.6, 2.2].map((bx) => (
+        <mesh key={bx} position={[bx, 1.7, 0]} rotation={[0, 0, PI / 2]} castShadow>
+          <cylinderGeometry args={[1.16, 1.16, 0.2, 14]} />
+          <meshStandardMaterial color="#e9ecef" roughness={0.5} metalness={0.3} />
+        </mesh>
+      ))}
+      <B p={[-1.2, 2.95, 0]} s={[4.4, 0.1, 0.5]} c={FLEET_DARK} rough={0.7} cast={false} />
+    </group>
+  )
+}
+
+/** reach stacker: body + cab + lifting mast + fork over the pier staging lane */
+function ReachStacker({ x, z, rot }: { x: number; z: number; rot: number }) {
+  return (
+    <group position={[x, 0, z]} rotation={[0, rot, 0]}>
+      {[1.1, -1.1].map((wx) => (
+        <FleetWheel key={wx} x={wx} z={0.6} />
+      ))}
+      {[1.1, -1.1].map((wx) => (
+        <FleetWheel key={`r${wx}`} x={wx} z={-0.6} />
+      ))}
+      <B p={[0, 1.0, 0]} s={[2.7, 1.1, 1.6]} c="#fcd116" rough={0.6} />
+      <B p={[-0.2, 2.0, 0.45]} s={[1.5, 1.1, 0.9]} c={FLEET_DARK} rough={0.55} />
+      {/* telescopic mast + spreader frame */}
+      <B p={[1.45, 1.9, 0]} s={[0.28, 2.6, 1.3]} c={FLEET_DARK} rough={0.6} metal={0.3} />
+      <B p={[1.75, 0.75, 0]} s={[0.5, 0.35, 2.3]} c={FLEET_DARK} rough={0.6} metal={0.3} />
+    </group>
+  )
+}
+
+function PortFleet() {
+  return (
+    <group name="tema-fleet">
+      {TEMA_FLEET.map((v: FleetVehicle, i) => {
+        if (v.kind === 'containerTruck') {
+          const cabs = ['#0b3d6b', '#c8102e', '#1f7a3a']
+          const boxes = ['#2e7fa8', '#e08a3c', '#d4a017']
+          return <ContainerTruck key={i} x={v.x} z={v.z} rot={v.rot} cab={cabs[i % 3]} box={boxes[i % 3]} />
+        }
+        if (v.kind === 'trailer') return <Trailer key={i} x={v.x} z={v.z} rot={v.rot} box={i % 2 ? '#1f7a3a' : '#0b3d6b'} />
+        if (v.kind === 'tanker') return <Tanker key={i} x={v.x} z={v.z} rot={v.rot} />
+        return <ReachStacker key={i} x={v.x} z={v.z} rot={v.rot} />
+      })}
     </group>
   )
 }
@@ -186,6 +319,8 @@ function TemaPort() {
       {T13_SHIPS.map(([x, z, len, beam, rot, hull, name], i) => (
         <Ship key={i} x={x} z={z} len={len} beam={beam} rot={rot} hull={hull} name={name} />
       ))}
+      {/* static ground fleet on the service roads (see temaFleet.ts contract) */}
+      <PortFleet />
       {/* breakwater out in the sea */}
       <Rocks positions={Array.from({ length: 26 }, (_, i) => [222 + i * 4.4, 106 + ((i * 7) % 3) * 0.8] as [number, number])} />
     </group>
