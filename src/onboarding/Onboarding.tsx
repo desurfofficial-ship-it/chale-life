@@ -558,7 +558,15 @@ export function OnboardingOverlay() {
           </p>
           <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <a
-              href="?mood=1"
+              href="?mood=1&from=home"
+              onClick={() => {
+                try {
+                  sessionStorage.setItem('chale.moodOk', '1')
+                  localStorage.setItem('chale.moodOk', '1')
+                } catch {
+                  /* private */
+                }
+              }}
               style={{
                 ...btn,
                 marginTop: 0,
