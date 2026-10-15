@@ -44,6 +44,9 @@ import {
   subscribe,
   type ActPromptOverride,
   type GameState,
+  requestRotate90,
+  setZoom,
+  getZoom,
 } from '../store/gameStore';
 import {
   advanceClock,
@@ -56,12 +59,17 @@ import {
   setActiveTab,
   setSelectedPlotId,
   setTycoonMode,
+  requestFitCity,
+  requestFitMyBusinesses,
+  requestFocusPlot,
+
   subscribeTycoon,
   weatherIcon,
 } from '../store/tycoonStore';
 import { LAND_PLOTS } from '../lib/mapConfig';
 import { onWorldEvent } from '../world/tycoon/worldEvents';
 import { Hud, TycoonHud, useCountdownNow } from '../ui';
+import { CameraRail } from '../ui/tycoon/CameraRail';
 import type { PlotRef } from '../rules/business';
 import { DebugOverlay } from './DebugOverlay';
 import { isWebGLAvailable } from './webgl';
@@ -136,6 +144,10 @@ export function App() {
       setTycoonMode(true);
       setSelectedPlotId(plotId);
       setActiveTab('property');
+      const st = getTycoonState();
+      if (st.businesses.some((b) => b.plotId === plotId && b.open)) {
+        requestFocusPlot(plotId);
+      }
     });
   }, []);
 
@@ -257,6 +269,55 @@ export function App() {
           store snapshot, toast from resolveAct via the store (2 s lifetime
           is the Hud's own). */}
       {isOnboardingActive() ? <OnboardingOverlay /> : hud}
+      {!tycoonMode && !isOnboardingActive() ? (
+        <button
+          type="button"
+          onClick={() => setTycoonMode(true)}
+          style={{
+            position: 'absolute',
+            right: 12,
+            top: 'max(12px, env(safe-area-inset-top))',
+            zIndex: 30,
+            minHeight: 44,
+            padding: '0 14px',
+            borderRadius: 12,
+            border: 'none',
+            background: '#2d5a3d',
+            color: '#f5f0e6',
+            fontWeight: 800,
+            fontSize: 14,
+            cursor: 'pointer',
+            pointerEvents: 'auto',
+          }}
+        >
+          City
+        </button>
+      ) : null}
+      {tycoonMode ? (
+        <button
+          type="button"
+          onClick={() => setTycoonMode(false)}
+          style={{
+            position: 'absolute',
+            left: 12,
+            top: 'max(12px, env(safe-area-inset-top))',
+            zIndex: 45,
+            minHeight: 44,
+            padding: '0 14px',
+            borderRadius: 12,
+            border: 'none',
+            background: '#c4a035',
+            color: '#1a1a1a',
+            fontWeight: 800,
+            fontSize: 14,
+            cursor: 'pointer',
+            pointerEvents: 'auto',
+          }}
+        >
+          Walk
+        </button>
+      ) : null}
+
       {/* During cinematic, skip joystick/recenter — cards own the taps */}
       {tycoonMode ? (
         <TycoonHud
@@ -274,6 +335,15 @@ export function App() {
           onBuyPlot={requestBuyPlot}
           onOpenBusiness={requestOpenBusiness}
           onCloseSheet={() => setSelectedPlotId(null)}
+        />
+      ) : null}
+      {tycoonMode ? (
+        <CameraRail
+          onZoomIn={() => setZoom(getZoom() * 1.25)}
+          onZoomOut={() => setZoom(getZoom() / 1.25)}
+          onRotate={() => requestRotate90()}
+          onFitCity={() => requestFitCity()}
+        onFitBusinesses={() => requestFitMyBusinesses()}
         />
       ) : null}
       {!isOnboardingActive() ? (

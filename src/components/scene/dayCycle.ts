@@ -143,17 +143,17 @@ const KEYS: readonly Keyframe[] = [
   // morning / day peak 08–16
   {
     hour: 8,
-    horizon: '#d8e6ee',
-    mid: '#9ec0e0',
-    top: '#4a7ab8',
-    haze: '#d8e6ee',
-    hemiSky: '#e6eef7',
-    hemiGround: '#cdb98f',
-    hemiIntensity: 1.0,
-    ambientColor: '#f0ece4',
-    ambientIntensity: 0.3,
-    sunColor: '#fff4e0',
-    sunIntensity: 2.35,
+    horizon: '#ffe8d0',
+    mid: '#f0d0a8',
+    top: '#6a8ab0',
+    haze: '#ffedda',
+    hemiSky: '#fff0d8',
+    hemiGround: '#687b52',
+    hemiIntensity: 1.08,
+    ambientColor: '#ffedda',
+    ambientIntensity: 0.55,
+    sunColor: '#ffd3a2',
+    sunIntensity: 2.6,
     sunElev: 0.55,
     sunAzim: -0.35,
     moonIntensity: 0,
@@ -167,23 +167,23 @@ const KEYS: readonly Keyframe[] = [
   },
   {
     hour: 12,
-    horizon: '#c8dce8',
-    mid: '#88b4d8',
-    top: '#3a6aa8',
-    haze: '#d0e0ea',
-    hemiSky: '#e8f0f8',
-    hemiGround: '#d0b888',
-    hemiIntensity: 1.05,
-    ambientColor: '#f4f0e8',
-    ambientIntensity: 0.32,
-    sunColor: '#fff8ec',
-    sunIntensity: 2.5,
+    horizon: '#ffedda',
+    mid: '#f0d8b8',
+    top: '#7a9ab8',
+    haze: '#ffedda',
+    hemiSky: '#fff0d8',
+    hemiGround: '#687b52',
+    hemiIntensity: 1.1,
+    ambientColor: '#ffedda',
+    ambientIntensity: 0.65,
+    sunColor: '#fff2d7',
+    sunIntensity: 3.2,
     sunElev: 0.72,
     sunAzim: 0.05,
     moonIntensity: 0,
     fogColor: '#d0e4ee',
     fogDensity: 0.00048,
-    exposure: 1.08,
+    exposure: 1.12,
     windowGlow: 0,
     shadowStrength: 1,
     starsOpacity: 0,
@@ -411,6 +411,15 @@ export function lightingAt(hour: number, weather: WeatherKind = 'clear'): Lighti
     hemiIntensity = Math.max(hemiIntensity, nightFloorHemi);
   }
 
+  const windowGlowVal = lerp(a.windowGlow, b.windowGlow, t);
+  let moonIntensity = lerp(a.moonIntensity, b.moonIntensity, t);
+  let moonColor = '#a9bde0';
+  // L-001 addendum: daytime cool fill opposite the sun
+  if (windowGlowVal < 0.25 && sunIntensity > 1.2) {
+    moonIntensity = Math.max(moonIntensity, 0.8);
+    moonColor = '#c5dfdf';
+  }
+
   return {
     horizon,
     mid,
@@ -426,13 +435,13 @@ export function lightingAt(hour: number, weather: WeatherKind = 'clear'): Lighti
     sunColor: lerpHex(a.sunColor, b.sunColor, t),
     sunIntensity,
     sunDirPos,
-    moonColor: '#a9bde0',
-    moonIntensity: lerp(a.moonIntensity, b.moonIntensity, t),
+    moonColor,
+    moonIntensity,
     moonDirPos,
     fogColor,
     fogDensity,
     exposure,
-    windowGlow: lerp(a.windowGlow, b.windowGlow, t),
+    windowGlow: windowGlowVal,
     shadowStrength: lerp(a.shadowStrength, b.shadowStrength, t),
     starsOpacity: lerp(a.starsOpacity, b.starsOpacity, t),
   };
