@@ -139,7 +139,14 @@ export default function GameCanvas() {
       orthographic={!onboarding}
       shadows="percentage"
       dpr={[1, 1.25]}
-      gl={{ antialias: false, alpha: false, powerPreference: 'high-performance' }}
+      gl={{
+        antialias: false,
+        alpha: false,
+        powerPreference: 'high-performance',
+        preserveDrawingBuffer:
+          typeof window !== 'undefined' &&
+          new URLSearchParams(window.location.search).get('e2e') === '1',
+      }}
       onCreated={({ gl }) => {
         gl.toneMapping = THREE.ACESFilmicToneMapping;
         gl.toneMappingExposure = 1.1;
