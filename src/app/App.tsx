@@ -62,7 +62,6 @@ import {
   requestFitCity,
   requestFitMyBusinesses,
   requestFocusPlot,
-  requestFocusPlot,
 
   subscribeTycoon,
   weatherIcon,
