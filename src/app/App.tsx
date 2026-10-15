@@ -145,6 +145,10 @@ export function App() {
       setTycoonMode(true);
       setSelectedPlotId(plotId);
       setActiveTab('property');
+      const st = getTycoonState();
+      if (st.businesses.some((b) => b.plotId === plotId && b.open)) {
+        requestFocusPlot(plotId);
+      }
     });
   }, []);
 
