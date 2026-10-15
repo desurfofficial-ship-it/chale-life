@@ -9,7 +9,7 @@
 // Deterministic demo/proof mode: set window.__ONB_T = <seconds> and the rig
 // + cards follow the scripted DEMO timeline instead of user taps (used to
 // render the preview video frame by frame).
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import * as THREE from 'three'
 import { useFrame, useThree } from '@react-three/fiber'
 import { create } from 'zustand'
@@ -281,7 +281,6 @@ export function GyanHouse({ mats }: { mats?: RoomMats }) {
 export function OnboardingOverlay() {
   const { step, moving, name, next, setName } = useOnb()
   const [, force] = useState(0)
-  // demo mode re-renders the DOM each animation frame from __ONB_T
   useEffect(() => {
     if (demoT() === undefined) return
     let raf = 0
@@ -304,81 +303,250 @@ export function OnboardingOverlay() {
     typedName = 'Gyan'.slice(0, Math.round(Math.min(1, d.typed) * 4))
     fade = d.legT === null ? Math.min(1, d.holdT / 0.45) : 0
   }
-  const card = 'mx-4 rounded-3xl border border-white/12 bg-[#0e1018]/72 p-5 text-white shadow-2xl backdrop-blur-xl'
-  const btn = 'mt-4 w-full rounded-2xl bg-[#fcd116] py-3.5 text-[15px] font-extrabold text-[#141018] active:scale-[0.98] transition disabled:opacity-40'
+
+  const skipIntro = () => {
+    markOnboardingDone()
+    const u = new URL(window.location.href)
+    u.searchParams.delete('onboarding')
+    u.searchParams.set('onboarding', '0')
+    window.location.replace(u.pathname + '?' + u.searchParams.toString())
+  }
+
+  // Inline styles only — this repo has no Tailwind. Tailwind classNames were
+  // invisible after the canvas mounted, leaving players stuck at the sea view.
+  const shell: CSSProperties = {
+    position: 'fixed',
+    inset: 0,
+    zIndex: 50,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom), 72px)',
+    paddingLeft: 16,
+    paddingRight: 16,
+    pointerEvents: 'none',
+    opacity: show ? fade : 0,
+    transition: T === undefined ? 'opacity .45s' : undefined,
+  }
+  const card: CSSProperties = {
+    pointerEvents: 'auto',
+    marginBottom: 12,
+    borderRadius: 20,
+    border: '1px solid rgba(255,255,255,0.12)',
+    background: 'rgba(14,16,24,0.88)',
+    padding: 18,
+    color: '#fff',
+    boxShadow: '0 12px 40px rgba(0,0,0,0.45)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+  }
+  const btn: CSSProperties = {
+    marginTop: 14,
+    width: '100%',
+    minHeight: 48,
+    borderRadius: 14,
+    border: 'none',
+    background: '#fcd116',
+    color: '#141018',
+    fontSize: 16,
+    fontWeight: 800,
+    cursor: 'pointer',
+    touchAction: 'manipulation',
+  }
+  const btnGhost: CSSProperties = {
+    ...btn,
+    background: 'transparent',
+    color: 'rgba(255,255,255,0.85)',
+    border: '1px solid rgba(255,255,255,0.25)',
+    marginTop: 8,
+  }
+  const mono: CSSProperties = {
+    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+    fontSize: 11,
+    letterSpacing: '0.2em',
+    textTransform: 'uppercase',
+    color: '#fcd116',
+  }
+  const dots: CSSProperties = {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 'max(1.25rem, env(safe-area-inset-top))',
+    display: 'flex',
+    justifyContent: 'center',
+    gap: 6,
+    pointerEvents: 'none',
+  }
+
   return (
-    <div className="pointer-events-none absolute inset-0 flex flex-col justify-end pb-[max(1.25rem,env(safe-area-inset-bottom))]" style={{ opacity: show ? fade : 0, transition: T === undefined ? 'opacity .45s' : undefined }}>
-      {/* progress dots */}
-      <div className="absolute left-0 right-0 top-[max(1.25rem,env(safe-area-inset-top))] flex justify-center gap-1.5">
+    <div style={shell} data-onboarding-overlay="1">
+      <div style={dots}>
         {STOPS.map((_, i) => (
-          <span key={i} className={`h-1.5 rounded-full transition-all ${i === s ? 'w-6 bg-[#fcd116]' : i < s ? 'w-1.5 bg-white/80' : 'w-1.5 bg-white/30'}`} />
+          <span
+            key={i}
+            style={{
+              height: 6,
+              width: i === s ? 24 : 6,
+              borderRadius: 99,
+              background: i === s ? '#fcd116' : i < s ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.3)',
+              transition: 'width .25s',
+            }}
+          />
         ))}
       </div>
-      <div className="pointer-events-auto">
-        {s === 0 && (
-          <div className="mb-6 px-6 text-white">
-            <div className="flex gap-1">
-              <span className="h-1.5 w-8 rounded-full bg-[#ce1126]" />
-              <span className="h-1.5 w-8 rounded-full bg-[#fcd116]" />
-              <span className="h-1.5 w-8 rounded-full bg-[#006b3f]" />
-            </div>
-            <h1 className="mt-3 text-[44px] font-black uppercase leading-[0.9] tracking-tight drop-shadow-lg">
-              Chalé
-              <br />
-              <span className="text-[#fcd116]">Life</span>
-            </h1>
-            <p className="mt-3 max-w-[18rem] text-[15px] leading-snug text-white/85 drop-shadow">A new life in Accra starts tonight.</p>
-            <button className={btn} onClick={next}>Begin</button>
+
+      {/* Always-reachable escape hatch above Safari/Gemini chrome */}
+      <button
+        type="button"
+        onClick={skipIntro}
+        style={{
+          position: 'absolute',
+          top: 'max(12px, env(safe-area-inset-top))',
+          right: 12,
+          zIndex: 60,
+          pointerEvents: 'auto',
+          minHeight: 40,
+          padding: '0 12px',
+          borderRadius: 10,
+          border: '1px solid rgba(255,255,255,0.25)',
+          background: 'rgba(9,13,22,0.75)',
+          color: '#f8fafc',
+          fontSize: 13,
+          fontWeight: 700,
+          cursor: 'pointer',
+          touchAction: 'manipulation',
+        }}
+      >
+        Skip intro
+      </button>
+
+      {s === 0 && (
+        <div style={{ ...card, background: 'transparent', border: 'none', boxShadow: 'none', padding: 8 }}>
+          <div style={{ display: 'flex', gap: 4 }}>
+            <span style={{ height: 6, width: 32, borderRadius: 99, background: '#ce1126' }} />
+            <span style={{ height: 6, width: 32, borderRadius: 99, background: '#fcd116' }} />
+            <span style={{ height: 6, width: 32, borderRadius: 99, background: '#006b3f' }} />
           </div>
-        )}
-        {s === 1 && (
-          <div className={card}>
-            <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-[#fcd116]">James Town · 18:24</div>
-            <h2 className="mt-2 text-[28px] font-black leading-tight">Akwaaba.</h2>
-            <p className="mt-1.5 text-[14.5px] leading-snug text-white/80">From the lighthouse to Nungua beach, this whole city is yours to live in. First, let's get you home.</p>
-            <button className={btn} onClick={next}>Continue</button>
-          </div>
-        )}
-        {s === 2 && (
-          <div className={card}>
-            <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-[#fcd116]">Daavi Street</div>
-            <h2 className="mt-2 text-[24px] font-black leading-tight">What should Daavi call you?</h2>
-            <input
-              value={typedName}
-              onChange={(e) => setName(e.target.value.slice(0, 18))}
-              placeholder="Your name"
-              className="mt-3 w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3.5 text-[17px] font-bold text-white placeholder-white/35 outline-none focus:border-[#fcd116]"
-              autoComplete="off"
-              enterKeyHint="go"
-              onKeyDown={(e) => e.key === 'Enter' && typedName.trim() && next()}
-            />
-            <button className={btn} disabled={!typedName.trim()} onClick={next}>
-              Continue
+          <h1
+            style={{
+              margin: '12px 0 0',
+              fontSize: 42,
+              fontWeight: 900,
+              lineHeight: 0.95,
+              textTransform: 'uppercase',
+              color: '#fff',
+              textShadow: '0 2px 12px rgba(0,0,0,0.5)',
+            }}
+          >
+            Chalé
+            <br />
+            <span style={{ color: '#fcd116' }}>Life</span>
+          </h1>
+          <p style={{ margin: '12px 0 0', maxWidth: 280, fontSize: 15, lineHeight: 1.35, color: 'rgba(255,255,255,0.88)' }}>
+            A new life in Accra starts tonight.
+          </p>
+          <button type="button" style={btn} onClick={next}>
+            Begin
+          </button>
+          <button type="button" style={btnGhost} onClick={skipIntro}>
+            Skip — play now
+          </button>
+        </div>
+      )}
+
+      {s === 1 && (
+        <div style={card}>
+          <div style={mono}>James Town · dusk</div>
+          <h2 style={{ margin: '8px 0 0', fontSize: 24, fontWeight: 900, lineHeight: 1.15 }}>
+            This is your city.
+          </h2>
+          <p style={{ margin: '8px 0 0', fontSize: 14.5, lineHeight: 1.35, color: 'rgba(255,255,255,0.8)' }}>
+            Markets, trotros, the sea. Pinch, drag, and walk — Accra is yours to explore.
+          </p>
+          <button type="button" style={btn} onClick={next}>
+            Continue
+          </button>
+        </div>
+      )}
+
+      {s === 2 && (
+        <div style={card}>
+          <div style={mono}>Daavi Street</div>
+          <h2 style={{ margin: '8px 0 0', fontSize: 24, fontWeight: 900, lineHeight: 1.15 }}>
+            What should Daavi call you?
+          </h2>
+          <input
+            value={typedName}
+            onChange={(e) => setName(e.target.value.slice(0, 18))}
+            placeholder="Your name"
+            autoComplete="off"
+            enterKeyHint="go"
+            onKeyDown={(e) => e.key === 'Enter' && typedName.trim() && next()}
+            style={{
+              marginTop: 12,
+              width: '100%',
+              minHeight: 48,
+              borderRadius: 14,
+              border: '1px solid rgba(255,255,255,0.15)',
+              background: 'rgba(255,255,255,0.1)',
+              padding: '0 14px',
+              fontSize: 17,
+              fontWeight: 700,
+              color: '#fff',
+              outline: 'none',
+              boxSizing: 'border-box',
+            }}
+          />
+          <button type="button" style={{ ...btn, opacity: typedName.trim() ? 1 : 0.4 }} disabled={!typedName.trim()} onClick={next}>
+            Continue
+          </button>
+        </div>
+      )}
+
+      {s === 3 && (
+        <div style={card}>
+          <div style={mono}>Home</div>
+          <h2 style={{ margin: '8px 0 0', fontSize: 26, fontWeight: 900, lineHeight: 1.15 }}>
+            Welcome home, {typedName || 'Gyan'}.
+          </h2>
+          <p style={{ margin: '8px 0 0', fontSize: 14.5, lineHeight: 1.35, color: 'rgba(255,255,255,0.8)' }}>
+            One room on Daavi Street, a fan, a bed, big plans. Make it yours.
+          </p>
+          <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <a
+              href="?mood=1"
+              style={{
+                ...btn,
+                marginTop: 0,
+                background: 'transparent',
+                color: '#fff',
+                border: '1px solid rgba(255,255,255,0.25)',
+                textAlign: 'center',
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 14,
+              }}
+            >
+              Set the mood
+            </a>
+            <button
+              type="button"
+              style={{ ...btn, marginTop: 0, fontSize: 14 }}
+              onClick={() => {
+                markOnboardingDone()
+                const u = new URL(window.location.href)
+                u.searchParams.delete('onboarding')
+                window.location.href = u.pathname + (u.search || '') + u.hash
+              }}
+            >
+              Start playing
             </button>
           </div>
-        )}
-        {s === 3 && (
-          <div className={card}>
-            <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-[#fcd116]">Home</div>
-            <h2 className="mt-2 text-[26px] font-black leading-tight">Welcome home, {typedName || 'Gyan'}.</h2>
-            <p className="mt-1.5 text-[14.5px] leading-snug text-white/80">One room on Daavi Street, a fan, a bed, big plans. Make it yours.</p>
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <a href="?mood=1" className="rounded-2xl border border-white/20 py-3.5 text-center text-[14px] font-bold text-white">Set the mood</a>
-              <button
-                type="button"
-                className="rounded-2xl bg-[#fcd116] py-3.5 text-[14px] font-extrabold text-[#141018]"
-                onClick={() => {
-                  markOnboardingDone()
-                  // Drop onboarding query; land in play mode
-                  const u = new URL(window.location.href)
-                  u.searchParams.delete('onboarding')
-                  window.location.href = u.pathname + (u.search || '') + u.hash
-                }}
-              >Start playing</button>
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }
+
