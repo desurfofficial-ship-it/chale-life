@@ -5,7 +5,7 @@ import { useMemo, useRef, useEffect } from 'react'
 import * as THREE from 'three'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Stars } from '@react-three/drei'
-import { lightingAt, type WeatherKind } from './dayCycle'
+import { lightingAt, type LightingState, type WeatherKind } from './dayCycle'
 import { getState } from '@/store/gameStore'
 
 const skyVert = /* glsl */ `
@@ -180,6 +180,16 @@ export function SceneLights({
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 600
   const mapSize = isMobile ? 1024 : 2048
 
+  // E-011 change-guard (same pattern as SkyDome): hour/weather only move
+  // every few seconds at best, but this callback used to run the FULL
+  // lightingAt interpolation + five hex-string Color parses + a shadow
+  // camera updateProjectionMatrix EVERY frame — pure per-frame GC/CPU churn
+  // on the iPhone-class target. Lighting state now recomputes only when its
+  // inputs change; the sun/moon still track the player every frame.
+  const lastH = useRef(-99)
+  const lastW = useRef('')
+  const lastL = useRef<LightingState | null>(null)
+
   // Reused colours — no per-frame allocations
   const hemiSkyC = useMemo(() => new THREE.Color(), [])
   const hemiGndC = useMemo(() => new THREE.Color(), [])
@@ -193,7 +203,12 @@ export function SceneLights({
   }, [gl])
 
   useFrame(() => {
-    const L = lightingAt(hour, weather)
+    if (Math.abs(lastH.current - hour) >= 0.01 || lastW.current !== weather || !lastL.current) {
+      lastH.current = hour
+      lastW.current = weather
+      lastL.current = lightingAt(hour, weather)
+    }
+    const L = lastL.current
     hemiSkyC.set(L.hemiSky)
     hemiGndC.set(L.hemiGround)
     ambC.set(L.ambientColor)
@@ -220,16 +235,8 @@ export function SceneLights({
       s.target.position.set(p.x, 0, p.z)
       s.target.updateMatrixWorld()
       s.castShadow = L.shadowStrength > 0.15
-      if (s.shadow) {
-        const cam = s.shadow.camera as THREE.OrthographicCamera
-        cam.left = -SHADOW_HALF
-        cam.right = SHADOW_HALF
-        cam.top = SHADOW_HALF
-        cam.bottom = -SHADOW_HALF
-        cam.near = 10
-        cam.far = SUN_DIST * 2.2
-        cam.updateProjectionMatrix()
-      }
+      // Shadow box geometry is CONSTANT (set again in the JSX props below) —
+      // it used to be re-assigned + updateProjectionMatrix'd every frame.
     }
     if (moonRef.current) {
       const m = moonRef.current
@@ -277,8 +284,18 @@ export function SceneLights({
 export function DayCycleFog({ hour = 12, weather = 'clear' as WeatherKind }: { hour?: number; weather?: WeatherKind }) {
   const fogRef = useRef<THREE.FogExp2>(null)
   const col = useMemo(() => new THREE.Color('#d8e6ee'), [])
+  // E-011: same change-guard as SceneLights — fog color/density only move
+  // with hour/weather, not with frames.
+  const lastH = useRef(-99)
+  const lastW = useRef('')
+  const lastL = useRef<LightingState | null>(null)
   useFrame(() => {
-    const L = lightingAt(hour, weather)
+    if (Math.abs(lastH.current - hour) >= 0.01 || lastW.current !== weather || !lastL.current) {
+      lastH.current = hour
+      lastW.current = weather
+      lastL.current = lightingAt(hour, weather)
+    }
+    const L = lastL.current
     col.set(L.fogColor)
     if (fogRef.current) {
       fogRef.current.color.copy(col)

@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 
 // ─── District: Land-for-Sale plots (Task 11) ─────────────────────────────────
 // Buyable land across Accra: every plot is a cleared laterite rect marked by
@@ -17,6 +17,7 @@ import {
   InstancedShrubs, InstancedTrees, InstancedPalms, InstancedGrassTufts,
   type PropItem,
 } from '../InstancedNature'
+import { requestRebatch } from '../SceneBatcher'
 
 // deterministic per-plot pseudo-random (so screenshots and collider exports
 // are stable across reloads — no Math.random in world layout)
@@ -141,6 +142,15 @@ export function LandForSale({ ownedPlotIds = [] }: { ownedPlotIds?: readonly str
       grass: [...mainProps.grass, ...up(islandProps.grass)],
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ownedKey])
+
+  // E-011: the plot meshes (pad / beacons / boards — plain materials) were
+  // frozen into the SceneBatcher's merged clones at mount. Unmounting a
+  // purchased plot removes the hidden originals but NOT the clone, so the
+  // LAND FOR SALE board kept rendering on sold land (live-verified).
+  // Re-run the batch after the ownership change commits.
+  useEffect(() => {
+    if (ownedKey) requestRebatch()
   }, [ownedKey])
 
   return (

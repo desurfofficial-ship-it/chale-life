@@ -137,9 +137,55 @@ export function loadTycoon(): void {
   try {
     const data = JSON.parse(raw) as Partial<TycoonState>;
     if (Array.isArray(data.ownedPlotIds)) state.ownedPlotIds = data.ownedPlotIds;
-    if (Array.isArray(data.businesses)) state.businesses = data.businesses as BusinessState[];
-    if (data.clock) state.clock = { ...state.clock, ...data.clock };
-    if (data.weather) state.weather = data.weather;
+    // E-011: validate business rows before accepting them. A corrupt-but-
+    // valid-JSON save used to flow straight into advanceClock's tick() EVERY
+    // FRAME — one bad row crashed the whole game permanently until the save
+    // was manually cleared. Bad rows are dropped; a wrong-shaped array is
+    // ignored wholesale.
+    if (Array.isArray(data.businesses)) {
+      const clean: BusinessState[] = [];
+      for (const b of data.businesses as BusinessState[]) {
+        if (
+          b &&
+          typeof b.id === 'string' &&
+          typeof b.plotId === 'string' &&
+          typeof b.typeId === 'string' &&
+          Array.isArray(b.layout) &&
+          typeof b.staff === 'number' &&
+          Number.isFinite(b.staff) &&
+          typeof b.capacity === 'number' &&
+          Number.isFinite(b.capacity) &&
+          typeof b.costPerDay === 'number' &&
+          Number.isFinite(b.costPerDay) &&
+          typeof b.revenueToday === 'number' &&
+          Number.isFinite(b.revenueToday) &&
+          typeof b.costsToday === 'number' &&
+          Number.isFinite(b.costsToday) &&
+          typeof b.customersToday === 'number' &&
+          Number.isFinite(b.customersToday) &&
+          typeof b.startupPaid === 'number' &&
+          Number.isFinite(b.startupPaid) &&
+          (b.budgetTier === 'min' || b.budgetTier === 'suggested' || b.budgetTier === 'max') &&
+          typeof b.open === 'boolean'
+        ) {
+          clean.push(b);
+        }
+      }
+      state.businesses = clean;
+    }
+    if (data.clock) {
+      const c = data.clock as Partial<GameClock>;
+      const day = Number.isFinite(c.day) ? Math.max(1, Math.floor(c.day as number)) : state.clock.day;
+      const minutes =
+        Number.isFinite(c.minutes)
+          ? Math.min(1439, Math.max(0, Math.floor(c.minutes as number)))
+          : state.clock.minutes;
+      const speed = c.speed === 0 || c.speed === 1 || c.speed === 2 ? c.speed : state.clock.speed;
+      state.clock = { day, minutes, speed };
+    }
+    if (data.weather === 'clear' || data.weather === 'cloudy' || data.weather === 'rain' || data.weather === 'night') {
+      state.weather = data.weather;
+    }
     if (Array.isArray(data.alerts)) state.alerts = data.alerts as AlertItem[];
     if (data.quest) state.quest = data.quest as QuestProgress;
     notify();

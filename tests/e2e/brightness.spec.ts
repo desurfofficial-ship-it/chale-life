@@ -49,7 +49,10 @@ async function loadHour(page: Page, hour: number) {
 }
 
 test('L-001 day luma ≥ 0.50 and night luma ≥ 0.28', async ({ page }) => {
-  test.setTimeout(120_000);
+  // E-011: two full world loads; a COLD SwiftShader shader cache compiles
+  // every material on the first one and the old 120 s budget blew on exactly
+  // that (luma values themselves passed — verified 0.568/0.347 warm).
+  test.setTimeout(300_000);
   await loadHour(page, 12);
   const day = await meanLuma(page);
   console.log(`L-001 day mean luma (hour=12): ${day.toFixed(3)}`);

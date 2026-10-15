@@ -6,7 +6,7 @@
  * (starts 09:00, 1 real min = 10 game min). ?hour= and ?weather= override.
  */
 
-import { Suspense, useSyncExternalStore, useEffect, useState } from 'react';
+import { Suspense, useMemo, useSyncExternalStore, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CameraRig } from '../engine/CameraRig';
@@ -62,6 +62,7 @@ function toProps(s: ReturnType<typeof getTycoonState>): TycoonWorldProps | null 
       open: b.open,
       customersVisible: Math.min(8, Math.floor(b.customersToday / 4)),
       staff: b.staff,
+      revenueToday: b.revenueToday,
       lastSaleGHS: (() => {
         const prev = prevRevenueToday.get(b.id) ?? 0;
         const delta = b.revenueToday - prev;
@@ -89,18 +90,27 @@ function toProps(s: ReturnType<typeof getTycoonState>): TycoonWorldProps | null 
 }
 
 /** Resolve display hour/weather for the world (tycoon clock or ambient). */
-function useWorldTime(tycoon: TycoonWorldProps | null): { hour: number; weather: WeatherKind } {
+function useWorldTime(
+  tycoon: TycoonWorldProps | null,
+  ambientTickMounted: boolean
+): { hour: number; weather: WeatherKind } {
   const [tick, setTick] = useState(0);
   useEffect(() => {
     let id = 0;
     const loop = () => {
-      tickAmbientClock(1 / 30); // coarse; AmbientTick does precise
+      // E-011 double-tick fix: AmbientTick (useFrame) advances the ambient
+      // clock by the real frame dt whenever it is mounted — this interval
+      // also ran in walking mode, adding ~0.55% drift on top (its 1/30 s
+      // catch-up every 2 s). The fallback now runs ONLY when AmbientTick is
+      // not mounted (onboarding cinematic), keeping the clock honest in
+      // both modes.
+      if (!ambientTickMounted) tickAmbientClock(1 / 30);
       setTick((n) => n + 1);
       id = window.setTimeout(loop, 2000); // UI hour changes slowly
     };
     id = window.setTimeout(loop, 2000);
     return () => clearTimeout(id);
-  }, []);
+  }, [ambientTickMounted]);
   void tick;
 
   if (typeof window !== 'undefined') {
@@ -109,6 +119,15 @@ function useWorldTime(tycoon: TycoonWorldProps | null): { hour: number; weather:
     if (h != null && h !== '' && Number.isFinite(Number(h))) {
       const weather = (q.get('weather') as WeatherKind) || getAmbientWeather();
       return { hour: Number(h), weather: weather === 'rain' || weather === 'cloudy' ? weather : 'clear' };
+    }
+    // E-011: the onboarding cinematic is written as DUSK ("A new life in
+    // Accra starts tonight", card stamps 18:24) but the world used to sample
+    // the ambient clock's 09:00 default — a bright morning skyline under
+    // night-time copy. First-run visitors have no ?hour= override, so pin
+    // the cinematic to its scripted dusk unless the URL says otherwise.
+    // (!ambientTickMounted ⟺ onboarding cinematic is mounted.)
+    if (!ambientTickMounted) {
+      return { hour: 18.4, weather: 'clear' };
     }
   }
   if (tycoon) {
@@ -129,10 +148,30 @@ function AmbientTick() {
 
 export default function GameCanvas() {
   const snap = useTycoonSnapshot();
-  const tycoon = toProps(snap);
+  // E-011: toProps used to run on EVERY render and handed AccraWorld a fresh
+  // object, so the world subtree re-rendered every 2 s (the clock tick) even
+  // when nothing visible changed. Derive a content key instead: the memo
+  // only rebuilds the props — and with React.memo(AccraWorld) below, only
+  // re-renders the world — when one of its actual inputs moves. Skipping
+  // intermediate toProps calls is safe for the lastSaleGHS delta too: the
+  // key includes revenueToday, so prevRevenueToday is only ever stale
+  // across renders where revenue did not change.
+  const propsKey = snap.tycoonMode
+    ? `t|${snap.ownedPlotIds.join(',')}|${snap.selectedPlotId ?? ''}|${snap.weather}|${Math.floor(snap.clock.minutes / 15)}|${snap.businesses
+        .map((b) => `${b.id}:${b.open ? 1 : 0}:${Math.floor(b.customersToday / 4)}:${b.revenueToday}`)
+        .join(';')}`
+    : new URLSearchParams(window.location.search).get('tycoonDemo') === '1'
+      ? 'demo'
+      : 'walk';
+  const tycoon = useMemo(() => toProps(snap), [propsKey]); // eslint-disable-line react-hooks/exhaustive-deps
   const onboarding = isOnboardingActive();
   const start = STOPS[0];
-  const { hour, weather } = useWorldTime(tycoon);
+  const { hour, weather } = useWorldTime(tycoon, !onboarding);
+  // E-011: quantize the world's lighting hour to 15 game-minutes —
+  // lightingAt interpolates smoothly between keyframes, and a 15-min step
+  // is visually indistinguishable while cutting AccraWorld re-renders from
+  // every 2 s to ~96/day in walking mode.
+  const hourQ = Math.round(hour * 4) / 4;
 
   return (
     <Canvas
@@ -174,7 +213,7 @@ export default function GameCanvas() {
       <Suspense fallback={null}>
         <AccraWorld
           tycoon={onboarding ? null : tycoon}
-          hour={hour}
+          hour={hourQ}
           weather={weather}
         />
       </Suspense>

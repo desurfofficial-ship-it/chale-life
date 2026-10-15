@@ -113,11 +113,21 @@ function applyPromptOverride(
 }
 
 export function App() {
-  // Room dresser (Gyan house interior) — standalone mode from onboarding CTA
-  if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('mood') === '1') {
+  // E-011 hooks fix: the ?mood=1 branch used to early-return BEFORE the
+  // hooks below — a Rules-of-Hooks violation that only survived because the
+  // URL can't change without a reload. App is now a hook-free dispatcher;
+  // every stateful hook lives in GameApp, so each component's hook order is
+  // constant for its whole lifetime.
+  if (
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('mood') === '1'
+  ) {
     return <SetTheMood />;
   }
+  return <GameApp />;
+}
 
+function GameApp() {
   const [webglOk] = useState(isWebGLAvailable);
 
   // E-010: ?tycoon=1 enables the overlay; World emits plotSelected (W-007)
@@ -139,12 +149,16 @@ export function App() {
     });
   }, []);
 
-  // E-010: game clock + offline catch-up
+  // E-010: game clock + offline catch-up. The per-frame dt is CLAMPED to 1 s:
+  // rAF is suspended while the tab is hidden, so the first frame after a
+  // resume carries the whole hidden duration — onVisibilityChange already
+  // owns that catch-up (capped at 8 h); applying it here too doubled every
+  // hidden interval (verified: 30 min hidden advanced the clock ~1 h).
   useEffect(() => {
     let last = performance.now();
     let raf = 0;
     const tick = (now: number) => {
-      const dt = (now - last) / 1000;
+      const dt = Math.min((now - last) / 1000, 1);
       last = now;
       if (getTycoonState().tycoonMode) advanceClock(dt);
       raf = requestAnimationFrame(tick);

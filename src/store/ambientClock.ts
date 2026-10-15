@@ -31,10 +31,15 @@ let weather: WeatherKind = 'clear';
 function init() {
   if (typeof window === 'undefined') return;
   const s = load();
+  // E-011: clamp a corrupted save into the valid domain — a negative or
+  // huge `minutes` used to flow straight through (negative % 1440 stays
+  // negative → a negative game hour broke the day/night sampling).
+  const savedMinutes =
+    Number.isFinite(s.minutes) ? ((s.minutes % (24 * 60)) + 24 * 60) % (24 * 60) : 9 * 60;
   // Offline catch-up: 1 real min → 10 game min, cap 8 h game
   const elapsedRealMin = Math.max(0, (Date.now() - s.savedAtMs) / 60_000);
   const catchUp = Math.min(8 * 60, elapsedRealMin * 10);
-  minutes = (s.minutes + catchUp) % (24 * 60);
+  minutes = (savedMinutes + catchUp) % (24 * 60);
   lastTickMs = Date.now();
   // URL overrides
   const q = new URLSearchParams(window.location.search);

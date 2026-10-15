@@ -34,8 +34,19 @@ function CapsuleAvatar() {
   const _origin = useMemo(() => new THREE.Vector3(), []);
   const _dir = useMemo(() => new THREE.Vector3(), []);
   const _player = useMemo(() => new THREE.Vector3(), []);
+  // E-011: the occlusion probe casts against the ENTIRE scene — including
+  // the city-spanning merged batch meshes, whose bounding spheres the
+  // camera→player ray always pierces, triggering full triangle scans. Per
+  // frame that was measurable CPU on the SwiftShader/phone targets for a
+  // purely cosmetic silhouette fade. 15 Hz (every 4th frame) is
+  // imperceptible for an opacity toggle; the last result is reused between
+  // probes.
+  const OCCLUSION_EVERY = 4;
+  const frameCount = useRef(0);
 
   useFrame(() => {
+    frameCount.current += 1;
+    if (frameCount.current % OCCLUSION_EVERY !== 0) return;
     const { position } = getState().player;
     _player.set(position.x, CAPSULE_RADIUS + 0.45, position.z);
     _origin.copy(camera.position);

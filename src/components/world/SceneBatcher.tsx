@@ -68,6 +68,31 @@ interface Bucket {
 
 let activeBatch: { meshes: THREE.Mesh[]; hidden: THREE.Mesh[] } | null = null
 
+// E-011: the batch is no longer write-once. World content the batcher
+// captured CAN unmount later — buying a tycoon plot removes its pad /
+// beacons / LAND FOR SALE board from React, but the merged clone kept
+// rendering them (verified live 2026-10-15: board stayed visible after
+// requestBuyPlot committed). requestRebatch() re-runs the pass after such
+// mutations; purchases are rare, so the one-off merge hitch is fine.
+let batchScene: THREE.Scene | null = null
+let rebatchQueued = false
+
+/**
+ * Schedule a re-batch on the next two frames (same settle window as the
+ * initial pass, so post-commit scene-graph changes are included). Multiple
+ * calls in the same window coalesce. No-op before the first mount.
+ */
+export function requestRebatch(): void {
+  if (!batchScene || rebatchQueued) return
+  rebatchQueued = true
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      rebatchQueued = false
+      if (batchScene) runBatch(batchScene)
+    })
+  })
+}
+
 function undoBatch() {
   if (!activeBatch) return
   for (const m of activeBatch.meshes) m.removeFromParent()
@@ -294,6 +319,7 @@ export function SceneBatcher() {
   // left the Accra map at ~4000 draw calls.)
   const scene = useThree((s) => s.scene)
   useEffect(() => {
+    batchScene = scene
     let cancelled = false
     let raf2 = 0
     // wait two frames: the whole world must be mounted first
@@ -312,7 +338,10 @@ export function SceneBatcher() {
   }, [scene])
   // on final unmount, restore the original meshes
   useEffect(() => {
-    return () => undoBatch()
+    return () => {
+      undoBatch()
+      batchScene = null
+    }
   }, [])
   return null
 }

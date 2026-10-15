@@ -12,7 +12,7 @@
  * block.
  */
 import * as THREE from 'three'
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { buildGroundTexture, skirtDiscAlpha, skirtRectAlpha } from '@/lib/mapTextures'
 import { PLATE, PLATE_CX, LAGOON } from '@/lib/mapConfig'
 import { SkyDome, Water, SceneLights, DayCycleFog } from '@/components/scene/Environment'
@@ -140,7 +140,12 @@ function SeaAndSkirts() {
 // the shadow map every ~0.4 s (static world; animated objects' shadows lag
 // imperceptibly at dusk).
 
-export function AccraWorld({
+// E-011: React.memo — GameCanvas re-renders on every tycoon store notify and
+// on the 2 s clock tick; with memoized props (GameCanvas content-key +
+// 15-min hour quantization) the whole district subtree now re-renders only
+// when a lighting/tycoon input actually moved. All props are primitives or
+// memoized objects, so the shallow compare is sound.
+export const AccraWorld = memo(function AccraWorld({
   tycoon,
   hour = 12,
   weather = 'clear',
@@ -217,4 +222,4 @@ export function AccraWorld({
       <SceneBatcher />
     </group>
   )
-}
+})

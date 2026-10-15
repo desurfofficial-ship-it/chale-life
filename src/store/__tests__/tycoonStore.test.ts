@@ -77,4 +77,49 @@ describe('tycoonStore', () => {
     loadTycoon();
     expect(getTycoonState().ownedPlotIds).toContain(plot.id);
   });
+
+  // E-011: a corrupt-but-valid-JSON save used to flow into advanceClock's
+  // tick() every frame — one bad business row crashed the game permanently.
+  it('loadTycoon drops garbage business rows instead of crashing the clock', () => {
+    const mem = {
+      s: JSON.stringify({
+        ownedPlotIds: [plot.id],
+        // second row is garbage from a corrupted write; first row is valid
+        businesses: [
+          {
+            id: 'biz-ok',
+            plotId: plot.id,
+            typeId: 'chop_bar',
+            budgetTier: 'min',
+            startupPaid: 100,
+            staff: 1,
+            capacity: 10,
+            costPerDay: 5,
+            layout: [],
+            open: true,
+            revenueToday: 0,
+            costsToday: 0,
+            customersToday: 0,
+          },
+          { id: 42 },
+          { plotId: plot.id, revenueToday: 'lots' },
+          null,
+        ],
+        clock: { day: 3, minutes: 999999, speed: 4 }, // garbage clock fields
+      }),
+    };
+    setSaveBackend({ load: () => mem.s, save: () => {} });
+    __resetTycoonForTests();
+    expect(() => loadTycoon()).not.toThrow();
+    const s = getTycoonState();
+    expect(s.businesses.length).toBe(1);
+    expect(s.businesses[0].id).toBe('biz-ok');
+    expect(s.ownedPlotIds).toContain(plot.id);
+    // clock clamped into its domain (minutes 0..1439, speed valid, day ≥ 1)
+    expect(s.clock.minutes).toBe(1439);
+    expect(s.clock.day).toBe(3);
+    expect(s.clock.speed).toBe(1);
+    // the clock keeps advancing on the surviving row without throwing
+    expect(() => advanceClock(5)).not.toThrow();
+  });
 });
