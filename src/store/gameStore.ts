@@ -152,7 +152,71 @@ export function getZoom(): number {
 /** Clamped zoom write (pinch / wheel / Recenter-zoom all funnel through here). */
 export function setZoom(next: number): void {
   if (!Number.isFinite(next)) return;
-  zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, next));
+  zoom = Math.min(zoomCeil, Math.max(zoomFloor, next));
+}
+
+/** Dynamic zoom floor/ceil — walking uses MIN/MAX; tycoon uses fitCity…fitCity×25. */
+let zoomFloor = MIN_ZOOM;
+let zoomCeil = MAX_ZOOM;
+
+export function setZoomRange(minZ: number, maxZ: number): void {
+  if (!Number.isFinite(minZ) || !Number.isFinite(maxZ) || maxZ < minZ) return;
+  zoomFloor = minZ;
+  zoomCeil = maxZ;
+  zoom = Math.min(zoomCeil, Math.max(zoomFloor, zoom));
+}
+
+export function getZoomRange(): { min: number; max: number } {
+  return { min: zoomFloor, max: zoomCeil };
+}
+
+export function resetWalkZoomRange(): void {
+  zoomFloor = MIN_ZOOM;
+  zoomCeil = MAX_ZOOM;
+  zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom));
+}
+
+/** Camera yaw around Y (radians). 0 = default south-east offset. */
+let cameraYaw = 0;
+
+export function getCameraYaw(): number {
+  return cameraYaw;
+}
+
+export function setCameraYaw(rad: number): void {
+  if (!Number.isFinite(rad)) return;
+  // normalize to (-π, π]
+  let y = rad % (Math.PI * 2);
+  if (y > Math.PI) y -= Math.PI * 2;
+  if (y <= -Math.PI) y += Math.PI * 2;
+  cameraYaw = y;
+}
+
+/** Ease-friendly +90° step (C-001 HUD rotate button). */
+export function requestRotate90(): void {
+  cameraYaw += Math.PI / 2;
+  if (cameraYaw > Math.PI) cameraYaw -= Math.PI * 2;
+  frameToken += 1;
+}
+
+/** Framing request token — CameraRig glides to frameTarget. */
+let frameToken = 0;
+let frameTarget: { x: number; z: number; zoom: number } | null = null;
+
+export function requestFrame(x: number, z: number, nextZoom: number): void {
+  frameTarget = { x, z, zoom: nextZoom };
+  frameToken += 1;
+}
+
+export function getFrameRequest(): {
+  token: number;
+  target: { x: number; z: number; zoom: number } | null;
+} {
+  return { token: frameToken, target: frameTarget };
+}
+
+export function clearFrameRequest(): void {
+  frameTarget = null;
 }
 
 export function getRecenterToken(): number {

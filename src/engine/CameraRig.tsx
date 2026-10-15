@@ -1,72 +1,97 @@
 /**
- * Camera rig for the orthographic follow camera.
+ * Camera rig — orthographic follow + tycoon free cam (C-001).
  *
- * - Smooth follow: the look-at target exponentially approaches the player
- *   (frame-rate independent `1 - e^(-k·dt)` smoothing).
- * - Zoom: pinch (two pointers) and wheel, clamped to [MIN_ZOOM, MAX_ZOOM].
- *   The store owns the zoom value; this component applies it to the camera.
- * - Pan: one-finger / mouse drag pans and suspends follow ONLY when the
- *   pointer STARTS on the canvas (outside the joystick zone and any HUD
- *   element). A pointer that began on the joystick never pans, even if it
- *   slides onto the canvas. Pinch midpoint drift still pans. The Recenter
- *   button (recenter token in the store) snaps back onto the player and
- *   resumes follow. Joystick movement (movementInput ≠ 0) also resumes follow.
- * - Framing: look-at is offset (tilt-corrected ÷ sin 45°) so the player sits
- *   ~45 % from the top of a 390 × 844 viewport, clear of HUD / joystick.
- *
- * Canvas is orthographic (src/app/App.tsx) — screen→world scale is 1/zoom for
- * both axes, and the camera yaw is fixed (offset direction (0, 30, 30)), so
- * pan mapping stays trivial. Screen +x → world +x, screen +y → world +z.
+ * Walking: follow player, zoom [MIN_ZOOM, MAX_ZOOM], fixed yaw.
+ * Tycoon: wide zoom (fit-city … ×25), rotate (twist / +90°), pan with
+ * inertia, double-tap zoom 2×, framing presets via requestFrame().
  */
 
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import {
+  clearFrameRequest,
+  getCameraYaw,
+  getFrameRequest,
   getRecenterToken,
   getState,
   getZoom,
+  getZoomRange,
   MAX_ZOOM,
   MIN_ZOOM,
   movementInput,
+  setCameraYaw,
   setZoom,
 } from '../store/gameStore';
 import { isTycoonCamera } from '../store/tycoonStore';
+import {
+  clampTarget,
+  CITY_BOUNDS,
+  panDeltaWorld,
+  rotateOffsetXZ,
+  zoomToFitBox,
+  DEFAULT_HUD_INSETS,
+  detailLodFromRelativeZoom,
+} from './zoomFit';
 
-/** Fixed 45° top-down offset (direction only — ortho size is zoom-driven). */
 const OFFSET = new THREE.Vector3(0, 30, 30);
-/** High-angle overview when City tab is active (E-010). */
-const TYCOON_OFFSET = new THREE.Vector3(0, 55, 55);
-/** Latest player screen position in canvas CSS pixels (updated every frame). */
+const TYCOON_OFFSET = new THREE.Vector3(0, 48, 48);
 export const projectedPlayerScreen = { x: 0, y: 0 };
 const _proj = new THREE.Vector3();
-/** Exponential follow rate (1/s) — higher = tighter. */
 const FOLLOW_RATE = 5;
+const FRAME_RATE = 4;
 const WHEEL_SENSITIVITY = 0.0012;
-/** Cumulative pointer travel (px) before a drag counts as an intentional pan. */
 const PAN_SUSPEND_PX = 6;
-/**
- * Vertical framing: player sits this fraction from the top of the viewport
- * (0.45 → slightly above centre). Keeps the avatar clear of top HUD cards and
- * bottom joystick / objective cards on the product 390 × 844 target.
- */
 const PLAYER_FROM_TOP = 0.45;
+const INERTIA_DECAY = 6;
+
+/** Latest relative zoom for LOD consumers. */
+export let lastRelativeZoom = 1;
+export let lastDetailLod: 'overview' | 'mid' | 'full' = 'full';
 
 export function CameraRig() {
   const camera = useThree((s) => s.camera) as THREE.OrthographicCamera;
   const gl = useThree((s) => s.gl);
-  // Start on the player (store is spawn-initialized by src/engine/spawn.ts
-  // before App renders) — no glide from the world origin on frame 1.
   const spawn = getState().player.position;
   const target = useRef(new THREE.Vector3(spawn.x, 0, spawn.z));
   const follow = useRef(true);
   const appliedZoom = useRef(getZoom());
   const lastRecenter = useRef(getRecenterToken());
+  const lastFrameToken = useRef(0);
+  const frameGoal = useRef<{ x: number; z: number; zoom: number } | null>(null);
+  const panVel = useRef({ x: 0, z: 0 });
+  const yawSmoothed = useRef(getCameraYaw());
 
   useFrame((_, rawDt) => {
     const dt = Math.min(rawDt, 0.1);
+    const tycoon = isTycoonCamera();
 
-    // Apply store zoom (single source of truth) when it changed.
+    // Framing glide
+    const fr = getFrameRequest();
+    if (fr.token !== lastFrameToken.current && fr.target) {
+      lastFrameToken.current = fr.token;
+      frameGoal.current = { ...fr.target };
+      follow.current = false;
+      panVel.current = { x: 0, z: 0 };
+    }
+    if (frameGoal.current) {
+      const g = frameGoal.current;
+      const a = 1 - Math.exp(-FRAME_RATE * dt);
+      target.current.x += (g.x - target.current.x) * a;
+      target.current.z += (g.z - target.current.z) * a;
+      setZoom(getZoom() + (g.zoom - getZoom()) * a);
+      if (
+        Math.hypot(g.x - target.current.x, g.z - target.current.z) < 0.4 &&
+        Math.abs(g.zoom - getZoom()) < 0.15
+      ) {
+        target.current.x = g.x;
+        target.current.z = g.z;
+        setZoom(g.zoom);
+        frameGoal.current = null;
+        clearFrameRequest();
+      }
+    }
+
     const z = getZoom();
     if (z !== appliedZoom.current) {
       appliedZoom.current = z;
@@ -74,42 +99,74 @@ export function CameraRig() {
       camera.updateProjectionMatrix();
     }
 
-    // Joystick (or keyboard) movement resumes follow automatically.
-    if (movementInput.x !== 0 || movementInput.z !== 0) {
-      follow.current = true;
+    // Relative zoom for LOD
+    const cityZ = zoomToFitBox(
+      CITY_BOUNDS,
+      gl.domElement.clientWidth || 390,
+      gl.domElement.clientHeight || 844,
+      DEFAULT_HUD_INSETS,
+    );
+    lastRelativeZoom = z / Math.max(1e-6, cityZ);
+    lastDetailLod = detailLodFromRelativeZoom(lastRelativeZoom);
+    if (typeof window !== 'undefined') {
+      (window as unknown as { __ACCRA_LOD?: string }).__ACCRA_LOD = lastDetailLod;
     }
 
-    // Recenter: snap onto the player and resume following.
+    if (movementInput.x !== 0 || movementInput.z !== 0) {
+      follow.current = true;
+      frameGoal.current = null;
+    }
+
     const token = getRecenterToken();
     if (token !== lastRecenter.current) {
       lastRecenter.current = token;
       follow.current = true;
+      frameGoal.current = null;
       const p = getState().player.position;
       target.current.set(p.x, 0, p.z);
-    } else if (follow.current) {
+    } else if (follow.current && !tycoon) {
       const a = 1 - Math.exp(-FOLLOW_RATE * dt);
       const p = getState().player.position;
       target.current.x += (p.x - target.current.x) * a;
       target.current.z += (p.z - target.current.z) * a;
+    } else if (!follow.current) {
+      // pan inertia
+      const decay = Math.exp(-INERTIA_DECAY * dt);
+      target.current.x += panVel.current.x * dt;
+      target.current.z += panVel.current.z * dt;
+      panVel.current.x *= decay;
+      panVel.current.z *= decay;
+      if (Math.hypot(panVel.current.x, panVel.current.z) < 0.05) {
+        panVel.current = { x: 0, z: 0 };
+      }
     }
 
-    // Frame offset: shift look-at so the player sits at PLAYER_FROM_TOP.
-    // Camera is tilted 45° (OFFSET y=z), so a pure world-Z shift projects
-    // shorter on screen by sin(45°). Divide by that to hit the fraction.
+    // Clamp pan to city
+    const clamped = clampTarget(target.current.x, target.current.z);
+    target.current.x = clamped.x;
+    target.current.z = clamped.z;
+
+    // Smooth yaw
+    const yawTarget = getCameraYaw();
+    let dy = yawTarget - yawSmoothed.current;
+    if (dy > Math.PI) dy -= Math.PI * 2;
+    if (dy < -Math.PI) dy += Math.PI * 2;
+    yawSmoothed.current += dy * (1 - Math.exp(-8 * dt));
+
     const viewH = gl.domElement.clientHeight / camera.zoom;
     const frameOffsetZ =
-      ((0.5 - PLAYER_FROM_TOP) * viewH) / Math.sin(Math.PI / 4);
+      tycoon ? 0 : ((0.5 - PLAYER_FROM_TOP) * viewH) / Math.sin(Math.PI / 4);
 
-    const off = isTycoonCamera() ? TYCOON_OFFSET : OFFSET;
+    const base = tycoon ? TYCOON_OFFSET : OFFSET;
+    const off = rotateOffsetXZ(base.x, base.y, base.z, yawSmoothed.current);
+    const lookZ = target.current.z + frameOffsetZ;
     camera.position.set(
       target.current.x + off.x,
       off.y,
-      target.current.z + frameOffsetZ + off.z,
+      lookZ + off.z,
     );
-    camera.lookAt(target.current.x, 0, target.current.z + frameOffsetZ);
+    camera.lookAt(target.current.x, 0, lookZ);
 
-    // Project player world → canvas CSS pixels for ?debug=1 / e2e.
-    // lookAt dirties the local matrix; refresh world matrix before project().
     camera.updateMatrixWorld();
     const pp = getState().player.position;
     _proj.set(pp.x, 0, pp.z).project(camera);
@@ -118,55 +175,58 @@ export function CameraRig() {
     projectedPlayerScreen.y = (-_proj.y * 0.5 + 0.5) * el.clientHeight;
   });
 
-  // Pointer gestures + wheel on the canvas element. Cleaned up on dispose.
-  // Zoom and pan apply INCREMENTAL per-event deltas — compounding a cumulative
-  // ratio per pointermove would make pinch zoom race to its clamp on phones.
-  // Only pointers whose pointerdown landed on this canvas element may pan
-  // (one-finger). Joystick / HUD start events never reach here when they
-  // stopPropagation; the canvas-owned set is the belt-and-braces guard.
   useEffect(() => {
     const el = gl.domElement;
     const pointers = new Map<number, { x: number; y: number }>();
-    /** Pointer IDs that began on the canvas (eligible for one-finger pan). */
     const canvasOwned = new Set<number>();
     let prevPinchDist = 0;
     let prevMid: { x: number; y: number } | null = null;
-    let midTravel = 0; // cumulative midpoint drift of the active pinch
+    let prevAngle = 0;
+    let midTravel = 0;
     let dragPrev: { x: number; y: number } | null = null;
-    let dragTravel = 0; // cumulative travel of the active drag
-    /** The single pointer currently driving one-finger pan (must be canvas-owned). */
+    let dragTravel = 0;
     let panPointerId: number | null = null;
+    let lastTapAt = 0;
+    let lastTapPos = { x: 0, y: 0 };
 
     const mid = (): { x: number; y: number } => {
-      const [a, b] = [...pointers.values()];
-      if (!b) return a ? { x: a.x, y: a.y } : { x: 0, y: 0 }; // 1 pointer left (pinch release)
-      return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      const vals = [...pointers.values()];
+      if (vals.length < 2) return vals[0] ?? { x: 0, y: 0 };
+      return { x: (vals[0].x + vals[1].x) / 2, y: (vals[0].y + vals[1].y) / 2 };
     };
     const pinchDist = (): number => {
-      const [a, b] = [...pointers.values()];
-      return a && b ? Math.hypot(a.x - b.x, a.y - b.y) : 0;
+      const vals = [...pointers.values()];
+      if (vals.length < 2) return 0;
+      return Math.hypot(vals[0].x - vals[1].x, vals[0].y - vals[1].y);
     };
-    // Ortho: 1 px = 1/zoom world units. Screen +x = world +x, screen +y = +z.
+    const pinchAngle = (): number => {
+      const vals = [...pointers.values()];
+      if (vals.length < 2) return 0;
+      return Math.atan2(vals[1].y - vals[0].y, vals[1].x - vals[0].x);
+    };
+
     const pan = (dxPx: number, dyPx: number): void => {
-      const w = 1 / camera.zoom;
-      target.current.x -= dxPx * w;
-      target.current.z -= dyPx * w;
+      const d = panDeltaWorld(dxPx, dyPx, camera.zoom, yawSmoothed.current);
+      target.current.x += d.x;
+      target.current.z += d.z;
+      // inertia sample
+      panVel.current.x = d.x * 40;
+      panVel.current.z = d.z * 40;
     };
 
     const onDown = (e: PointerEvent): void => {
-      // Only accept downs that target the canvas itself (not bubbled from HUD
-      // overlays that forgot to stopPropagation). Joystick always stops.
       if (e.target !== el) return;
       try {
         el.setPointerCapture(e.pointerId);
       } catch {
-        /* capture is best-effort */
+        /* */
       }
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       canvasOwned.add(e.pointerId);
       if (pointers.size === 2) {
         prevPinchDist = pinchDist();
         prevMid = mid();
+        prevAngle = pinchAngle();
         midTravel = 0;
         dragPrev = null;
         panPointerId = null;
@@ -178,18 +238,42 @@ export function CameraRig() {
     };
 
     const onMove = (e: PointerEvent): void => {
-      const prev = pointers.get(e.pointerId);
-      if (!prev) return;
+      if (!pointers.has(e.pointerId)) return;
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
       if (pointers.size >= 2) {
-        // Pinch: incremental distance ratio → zoom; midpoint drift → pan.
-        // Pinch is always allowed (both fingers must be on canvas to register).
         const d = pinchDist();
         if (prevPinchDist > 0 && d > 0) {
-          setZoom(getZoom() * (d / prevPinchDist));
+          // Zoom toward pinch midpoint: adjust target so the world point under
+          // mid stays put (ortho: scale around mid).
+          const before = getZoom();
+          const ratio = d / prevPinchDist;
+          setZoom(before * ratio);
+          const after = getZoom();
+          if (prevMid && after !== before && isTycoonCamera()) {
+            const rect = el.getBoundingClientRect();
+            const sx = prevMid.x - rect.left - rect.width / 2;
+            const sy = prevMid.y - rect.top - rect.height / 2;
+            // world shift so midpoint anchors
+            const k = 1 / before - 1 / after;
+            const dPan = panDeltaWorld(sx, sy, 1, yawSmoothed.current);
+            // dPan was for zoom=1; scale by k
+            target.current.x += dPan.x * k * before; // approximate
+            target.current.z += dPan.z * k * before;
+          }
         }
         prevPinchDist = d;
+        // Twist → yaw (tycoon only)
+        if (isTycoonCamera()) {
+          const ang = pinchAngle();
+          let dang = ang - prevAngle;
+          if (dang > Math.PI) dang -= Math.PI * 2;
+          if (dang < -Math.PI) dang += Math.PI * 2;
+          if (Math.abs(dang) > 0.002) {
+            setCameraYaw(getCameraYaw() + dang);
+          }
+          prevAngle = ang;
+        }
         if (prevMid) {
           const m = mid();
           const dx = m.x - prevMid.x;
@@ -200,7 +284,6 @@ export function CameraRig() {
           prevMid = m;
         }
       } else if (dragPrev && panPointerId === e.pointerId && canvasOwned.has(e.pointerId)) {
-        // One-finger pan only for pointers that started on the canvas.
         const dx = e.clientX - dragPrev.x;
         const dy = e.clientY - dragPrev.y;
         pan(dx, dy);
@@ -211,27 +294,32 @@ export function CameraRig() {
     };
 
     const onUp = (e: PointerEvent): void => {
+      // double-tap zoom 2× toward tap (tycoon)
+      if (pointers.size === 1 && canvasOwned.has(e.pointerId)) {
+        const now = performance.now();
+        const dt = now - lastTapAt;
+        const dist = Math.hypot(e.clientX - lastTapPos.x, e.clientY - lastTapPos.y);
+        if (dt < 320 && dist < 28 && isTycoonCamera()) {
+          const range = getZoomRange();
+          setZoom(Math.min(range.max, getZoom() * 2));
+          follow.current = false;
+        }
+        lastTapAt = now;
+        lastTapPos = { x: e.clientX, y: e.clientY };
+      }
       pointers.delete(e.pointerId);
       canvasOwned.delete(e.pointerId);
       if (panPointerId === e.pointerId) panPointerId = null;
-      try {
-        el.releasePointerCapture(e.pointerId);
-      } catch {
-        /* already released */
-      }
       if (pointers.size < 2) {
         prevPinchDist = 0;
         prevMid = null;
       }
       if (pointers.size === 1) {
-        const remainingId = [...pointers.keys()][0]!;
-        if (canvasOwned.has(remainingId)) {
-          panPointerId = remainingId;
-          dragPrev = mid();
+        const [id, pt] = [...pointers.entries()][0];
+        if (canvasOwned.has(id)) {
+          panPointerId = id;
+          dragPrev = { x: pt.x, y: pt.y };
           dragTravel = 0;
-        } else {
-          panPointerId = null;
-          dragPrev = null;
         }
       } else {
         dragPrev = null;
@@ -240,22 +328,30 @@ export function CameraRig() {
 
     const onWheel = (e: WheelEvent): void => {
       e.preventDefault();
-      setZoom(getZoom() * Math.exp(-e.deltaY * WHEEL_SENSITIVITY));
+      const before = getZoom();
+      setZoom(before * Math.exp(-e.deltaY * WHEEL_SENSITIVITY));
+      if (isTycoonCamera()) follow.current = false;
     };
 
     el.addEventListener('pointerdown', onDown);
     el.addEventListener('pointermove', onMove);
     el.addEventListener('pointerup', onUp);
     el.addEventListener('pointercancel', onUp);
+    el.addEventListener('pointerleave', onUp);
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => {
       el.removeEventListener('pointerdown', onDown);
       el.removeEventListener('pointermove', onMove);
       el.removeEventListener('pointerup', onUp);
       el.removeEventListener('pointercancel', onUp);
+      el.removeEventListener('pointerleave', onUp);
       el.removeEventListener('wheel', onWheel);
     };
   }, [camera, gl]);
 
   return null;
 }
+
+// silence unused walk constants in tree-shake
+void MIN_ZOOM;
+void MAX_ZOOM;

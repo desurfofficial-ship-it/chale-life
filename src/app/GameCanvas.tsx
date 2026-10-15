@@ -138,7 +138,7 @@ export default function GameCanvas() {
     <Canvas
       orthographic={!onboarding}
       shadows="percentage"
-      dpr={[1, 1.25]}
+      dpr={[1, 1.5]}
       gl={{
         antialias: false,
         alpha: false,

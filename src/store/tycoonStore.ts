@@ -19,7 +19,22 @@ import {
   type QuestProgress,
   type WeatherKind,
 } from '../rules/business';
-import { getState, setWalletBalanceGHS, subscribe as subscribeGame } from './gameStore';
+import {
+  getState,
+  setWalletBalanceGHS,
+  subscribe as subscribeGame,
+  requestFrame,
+  setZoomRange,
+  resetWalkZoomRange,
+  setCameraYaw,
+} from './gameStore';
+import {
+  zoomToFitBox,
+  boxFromPoints,
+  boxCenter,
+  CITY_BOUNDS,
+  DEFAULT_HUD_INSETS,
+} from '../engine/zoomFit';
 import { LAND_PLOTS } from '../lib/mapConfig';
 import type { TycoonTab } from '../ui/tycoon/TycoonHud';
 
@@ -173,6 +188,28 @@ loadTycoon();
 export function setTycoonMode(on: boolean): void {
   if (state.tycoonMode === on) return;
   state.tycoonMode = on;
+  if (on) {
+    // City overview — Fit my businesses (or whole city if none owned)
+    // requestFitMyBusinesses sets tycoonMode again; avoid re-entry by framing only
+    const { w, h } =
+      typeof window !== 'undefined'
+        ? { w: window.innerWidth, h: window.innerHeight }
+        : { w: 390, h: 844 };
+    const owned = state.ownedPlotIds;
+    const pts = LAND_PLOTS.filter((p) => p.id && owned.includes(p.id)).map((p) => ({
+      x: p.x,
+      z: p.z,
+    }));
+    const box = pts.length ? boxFromPoints(pts, 14) : CITY_BOUNDS;
+    const z = zoomToFitBox(box, w, h, DEFAULT_HUD_INSETS);
+    const cityZ = zoomToFitBox(CITY_BOUNDS, w, h, DEFAULT_HUD_INSETS);
+    setZoomRange(cityZ, cityZ * 25);
+    const c = boxCenter(box);
+    requestFrame(c.x, c.z, z);
+  } else {
+    resetWalkZoomRange();
+    setCameraYaw(0);
+  }
   notify();
 }
 
@@ -427,4 +464,69 @@ if (typeof window !== 'undefined') {
     getState: getTycoonState,
     setTab: setActiveTab,
   };
+}
+
+
+// ── C-001 framing presets ────────────────────────────────────────────────────
+
+function canvasSize(): { w: number; h: number } {
+  if (typeof window === 'undefined') return { w: 390, h: 844 };
+  return { w: window.innerWidth, h: window.innerHeight };
+}
+
+/** Fit the whole city plate into view (tycoon overview). */
+export function requestFitCity(): void {
+  const { w, h } = canvasSize();
+  const z = zoomToFitBox(CITY_BOUNDS, w, h, DEFAULT_HUD_INSETS);
+  setZoomRange(z, z * 25);
+  const c = boxCenter(CITY_BOUNDS);
+  requestFrame(c.x, c.z, z);
+  state.tycoonMode = true;
+  notify();
+}
+
+/** Fit a box around owned plots (or city if none). */
+export function requestFitMyBusinesses(): void {
+  const { w, h } = canvasSize();
+  const owned = state.ownedPlotIds;
+  const pts = LAND_PLOTS.filter((p) => p.id && owned.includes(p.id)).map((p) => ({
+    x: p.x,
+    z: p.z,
+  }));
+  const box = pts.length ? boxFromPoints(pts, 14) : CITY_BOUNDS;
+  const z = zoomToFitBox(box, w, h, DEFAULT_HUD_INSETS);
+  const cityZ = zoomToFitBox(CITY_BOUNDS, w, h, DEFAULT_HUD_INSETS);
+  setZoomRange(cityZ, cityZ * 25);
+  const c = boxCenter(box);
+  requestFrame(c.x, c.z, z);
+  state.tycoonMode = true;
+  notify();
+}
+
+/** Focus one plot / business shell (cutaway scale). */
+export function requestFocusPlot(plotId: string): void {
+  const plot = LAND_PLOTS.find((p) => p.id === plotId);
+  if (!plot) return;
+  const { w, h } = canvasSize();
+  const box = {
+    minX: plot.x - plot.w * 0.7,
+    maxX: plot.x + plot.w * 0.7,
+    minZ: plot.z - plot.d * 0.7,
+    maxZ: plot.z + plot.d * 0.7,
+  };
+  const z = zoomToFitBox(box, w, h, DEFAULT_HUD_INSETS, 1.05);
+  const cityZ = zoomToFitBox(CITY_BOUNDS, w, h, DEFAULT_HUD_INSETS);
+  setZoomRange(cityZ, cityZ * 25);
+  requestFrame(plot.x, plot.z, z);
+  state.tycoonMode = true;
+  state.selectedPlotId = plotId;
+  notify();
+}
+
+/** Leave tycoon camera — restore walking zoom range. */
+export function exitTycoonCamera(): void {
+  state.tycoonMode = false;
+  resetWalkZoomRange();
+  setCameraYaw(0);
+  notify();
 }
