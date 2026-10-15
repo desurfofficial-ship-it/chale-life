@@ -214,35 +214,34 @@ export function GyanHouse({ mats }: { mats?: RoomMats }) {
     if (exteriorRef.current) exteriorRef.current.visible = !inside
   })
 
-  // Front wall panels around the window AND a door gap at doorX
-  const fx0 = fw.x - fw.w / 2
-  const fx1 = fw.x + fw.w / 2
+  // Front wall: full-height slabs with a door hole + a window hole.
+  // Segments along X on the front face (local).
   const doorL = doorX - doorW / 2
   const doorR = doorX + doorW / 2
-  // panels: [localX, localY, width, height] on the front face
-  const front: [number, number, number, number][] = [
-    // left of window (may be left of door too)
-    [(-W / 2 + Math.min(fx0, doorL)) / 2, Hh / 2, Math.min(fx0, doorL) + W / 2, Hh],
-    // between window and door if gap
-    ...(() => {
-      const a = Math.max(fx1, -W / 2)
-      const b = Math.min(doorL, W / 2)
-      if (b - a > 0.15) return [[(a + b) / 2, Hh / 2, b - a, Hh] as [number, number, number, number]]
-      return [] as [number, number, number, number][]
-    })(),
-    // right of door
-    ...(() => {
-      const a = Math.max(doorR, fx1, -W / 2)
-      const b = W / 2
-      if (b - a > 0.15) return [[(a + b) / 2, Hh / 2, b - a, Hh] as [number, number, number, number]]
-      return [] as [number, number, number, number][]
-    })(),
-    // window sill strip + lintel (window hole preserved)
-    [fw.x, fw.sill / 2, fw.w, fw.sill],
-    [fw.x, (fw.sill + fw.h + Hh) / 2, fw.w, Hh - fw.sill - fw.h],
-    // door lintel (above open doorway)
-    [doorX, (2.2 + Hh) / 2, doorW + 0.08, Hh - 2.2],
-  ]
+  const winL = fw.x - fw.w / 2
+  const winR = fw.x + fw.w / 2
+  const xCuts = [-W / 2, winL, winR, doorL, doorR, W / 2].sort((a, b) => a - b)
+  const front: [number, number, number, number][] = []
+  for (let i = 0; i < xCuts.length - 1; i++) {
+    const a = xCuts[i]
+    const b = xCuts[i + 1]
+    const mid = (a + b) / 2
+    const segW = b - a
+    if (segW < 0.08) continue
+    const inDoor = mid > doorL && mid < doorR
+    const inWin = mid > winL && mid < winR
+    if (inDoor) {
+      // lintel only above the doorway
+      const lh = Hh - 2.2
+      if (lh > 0.05) front.push([mid, 2.2 + lh / 2, segW, lh])
+    } else if (inWin) {
+      front.push([mid, fw.sill / 2, segW, fw.sill])
+      const topH = Hh - (fw.sill + fw.h)
+      if (topH > 0.05) front.push([mid, fw.sill + fw.h + topH / 2, segW, topH])
+    } else {
+      front.push([mid, Hh / 2, segW, Hh])
+    }
+  }
 
   return (
     <group position={[H.x, 0, H.z]} name="gyan-house">
