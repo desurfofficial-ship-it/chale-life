@@ -288,11 +288,11 @@ export function App() {
           onClick={() => setTycoonMode(true)}
           style={{
             position: 'absolute',
-            right: 12,
+            right: 'max(12px, env(safe-area-inset-right))',
             top: 'max(12px, env(safe-area-inset-top))',
-            zIndex: 30,
+            zIndex: 34,
             minHeight: 44,
-            padding: '0 14px',
+            padding: '0 16px',
             borderRadius: 12,
             border: 'none',
             background: '#2d5a3d',
@@ -301,6 +301,7 @@ export function App() {
             fontSize: 14,
             cursor: 'pointer',
             pointerEvents: 'auto',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
           }}
         >
           City
