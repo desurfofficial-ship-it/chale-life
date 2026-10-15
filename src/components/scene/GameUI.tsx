@@ -1,5 +1,7 @@
 'use client'
 
+// LEGACY ARCHIVE — old AccraScene map-explorer shell (tabs + Canvas host).
+// Live game HUD is src/ui + App.tsx. Do not mount alongside the play shell.
 // ─── Game-map UI: floating white labels, mission pins, collectibles, checkpoint
 // Labels are WebGL sprites (canvas textures) — no DOM portals, always readable.
 // Handover fixes: labels scale with distance (capped on screen), fade out when

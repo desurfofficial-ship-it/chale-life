@@ -7,6 +7,8 @@
  * them out on cheap phone panels (see docs/ART_BIBLE_MIDDLE_GROUND.md §5).
  *
  * Owned by Agent 3 (World & Art). Pure data — no three.js import.
+ * Ground/road live values used by the game are in src/lib/mapConfig.ts COLORS;
+ * keep asphalt/plaza/wall* in sync when changing either file.
  */
 
 export const PALETTE = {

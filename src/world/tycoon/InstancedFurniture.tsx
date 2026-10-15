@@ -8,6 +8,7 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { LAND_PLOTS } from '@/lib/mapConfig';
 import type { TycoonBusinessView } from './types';
+import { furnitureSizeMeters } from '@/data/furniture';
 
 const FURN_COLOR: Record<string, string> = {
   biz_counter: '#7a5a3a',
@@ -29,6 +30,9 @@ const FURN_COLOR: Record<string, string> = {
 const DEFAULT_COLOR = '#8a7a60';
 
 function furnSize(id: string): [number, number, number] {
+  // Catalogue dimensions when present; heuristics fill height.
+  const fromCat = furnitureSizeMeters(id);
+  if (fromCat[0] !== 0.5 || fromCat[2] !== 0.5) return fromCat;
   if (id.includes('counter')) return [1.4, 0.9, 0.55];
   if (id.includes('bench')) return [1.2, 0.45, 0.4];
   if (id.includes('stool') || id.includes('chair')) return [0.4, 0.55, 0.4];
@@ -39,7 +43,7 @@ function furnSize(id: string): [number, number, number] {
   if (id.includes('canopy')) return [2.2, 0.12, 1.6];
   if (id.includes('umbrella')) return [0.15, 1.6, 0.15];
   if (id.includes('mirror')) return [0.08, 1.0, 0.7];
-  return [0.5, 0.5, 0.5];
+  return fromCat;
 }
 
 export function InstancedFurniture({ businesses }: { businesses: readonly TycoonBusinessView[] }) {

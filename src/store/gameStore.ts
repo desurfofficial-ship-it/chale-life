@@ -30,6 +30,7 @@
 
 import { resolveAct, type ActSession } from '../rules/act';
 import { clampNeed, drainNeeds } from '../rules/needs';
+import { comfortPctFromOwned } from '../data/furniture';
 
 export interface Vec3 {
   x: number;
@@ -64,7 +65,7 @@ export interface GameState {
     completedIds: readonly string[];
     lastPayoutAt?: number;
   };
-  home: { tierId: string };
+  home: { tierId: string; furnitureIds: readonly string[] };
   time: { hour: number };
   /** E-003: id of the location within NEAR_LOCATION_RADIUS_M, else null. */
   nearLocationId: string | null;
@@ -83,7 +84,7 @@ const state: GameState = {
   // via src/engine/spawn.ts; the origin here is just the pre-spawn neutral.
   needs: { hunger: 72, energy: 80 },
   job: { activeId: null, step: 0, completedIds: [] },
-  home: { tierId: 'single_room' },
+  home: { tierId: 'single_room', furnitureIds: [] },
   time: { hour: 7 },
   nearLocationId: null,
   toast: { message: null, at: 0 },
@@ -331,6 +332,10 @@ export function requestAct(): void {
     // G-008c: press-time clock — the cooldown counts against THIS number,
     // keeping the rules pure (no Date.now() below src/store).
     nowMs: now,
+    home: {
+      tierId: state.home.tierId,
+      furnitureIds: state.home.furnitureIds ?? [],
+    },
   };
 
   const { session: next, toast, purchased, paidOut } = resolveAct(session, state.nearLocationId);
@@ -484,4 +489,9 @@ if (
       __setActPromptOverrideForTests(o);
     },
   };
+}
+
+/** Comfort 0–100 from owned home furniture (housing upgrade gate). */
+export function getHomeComfortPct(): number {
+  return comfortPctFromOwned(getState().home.furnitureIds ?? []);
 }

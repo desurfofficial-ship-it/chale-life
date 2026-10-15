@@ -1,5 +1,8 @@
 'use client'
 
+// LEGACY ARCHIVE — Phase2World duplicates districts already mounted in AccraWorld.
+// Do NOT mount <Phase2World /> (double Black Star / Memorial / Labadi props).
+// Kept for reference / prop salvage only.
 // ─── Phase 2 world composition ───────────────────────────────────────────────
 // A. Black Star Square + Independence Arch grounds   E. Labadi beach strip
 // B. Kwame Nkrumah Memorial Park precinct            F. Osu Oxford Street

@@ -67,7 +67,7 @@ function ShellMesh({
       <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow userData={{ noCollide: true }}>
         <planeGeometry args={[w, d]} />
         <meshStandardMaterial
-          color={FLOOR}
+          color={windowGlow > 0.4 ? FLOOR_NIGHT : FLOOR}
           roughness={0.92}
           emissive="#ffcf7d"
           emissiveIntensity={windowGlow * 0.22}
