@@ -6,8 +6,8 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useThree, type ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
-import type { BusinessDef } from '../../data/businesses';
-import { isBusinessOpen } from '../../rules/business';
+import type { BusinessDef } from '../../data/worldBusinesses';
+import { isBusinessOpen } from '../../rules/worldBusiness';
 import { registerAmbient } from '../../engine/ambient';
 import { getZoom } from '../../store/gameStore';
 import { getAmbientHour } from '../../store/ambientClock';
