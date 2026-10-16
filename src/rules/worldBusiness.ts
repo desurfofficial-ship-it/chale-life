@@ -111,14 +111,15 @@ export function tickBusiness(
   let log = state.log;
   let customers = state.customers.map((c) => ({ ...c, sinceMin: c.sinceMin + dtGameMin }));
 
-  // When closed, force staff off. When open, preserve player onShift choices.
-  let staff = state.staff.map((s) => ({ ...s, onShift: open ? s.onShift : false }));
-  if (open && staff.length > 0 && staff.every((s) => !s.onShift)) {
-    staff = staff.map((s) => ({ ...s, onShift: true }));
-  }
+  // Preserve player onShift roster always. While closed, capacity/arrivals use
+  // an effective off-shift view without wiping the saved roster.
+  const staff = state.staff;
+  const staffForOps = open
+    ? staff
+    : staff.map((s) => ({ ...s, onShift: false }));
 
   if (!open) {
-    // clear floor slowly
+    // clear floor slowly — keep roster for next open
     queue = 0;
     seated = Math.max(0, seated - dtGameMin * 0.5);
     customers = customers
@@ -129,7 +130,9 @@ export function tickBusiness(
 
   // arrivals
   const staffRatio =
-    staff.length === 0 ? 1 : staff.filter((s) => s.onShift).length / staff.length;
+    staffForOps.length === 0
+      ? 1
+      : staffForOps.filter((s) => s.onShift).length / staffForOps.length;
   const rate = customerArrivalRate(def, hour) * staffRatio; // per hour, staff-scaled
   const arrive = (rate * dtGameMin) / 60;
   // poisson-ish: accumulate fractional via hash of time is overkill — use floor+random-free fractional bank
@@ -152,7 +155,7 @@ export function tickBusiness(
   }
 
   // seat from queue
-  const cap = effectiveCapacity(def, { ...state, staff });
+  const cap = effectiveCapacity(def, { ...state, staff: staffForOps });
   const free = Math.max(0, cap - seated);
   const seatN = Math.min(free, queue, Math.max(1, Math.floor(dtGameMin / 2)));
   if (seatN > 0 && queue > 0) {
