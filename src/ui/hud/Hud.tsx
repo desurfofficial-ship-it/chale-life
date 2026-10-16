@@ -346,7 +346,7 @@ function ActButton({
 // ── Root ─────────────────────────────────────────────────────────────────────
 
 
-function DecorateRoomChip() {
+function RoomChip() {
   const x = useStoreValue((s) => s.player.position.x);
   const z = useStoreValue((s) => s.player.position.z);
   const inside = isInsideGyanHouse(x, z);
@@ -363,6 +363,7 @@ function DecorateRoomChip() {
         }
         const u = new URL(window.location.href);
         u.searchParams.set('mood', '1');
+        u.searchParams.set('room', 'shop'); // open furniture marketplace tab in room editor
         u.searchParams.set('from', 'home');
         window.location.href = u.pathname + u.search + u.hash;
       }}
@@ -381,8 +382,7 @@ function DecorateRoomChip() {
         maxWidth: 'min(64vw, 280px)',
       }}
     >
-      <span aria-hidden>🏠</span>
-      Decorate room
+      Room
     </button>
   );
 }
@@ -452,7 +452,7 @@ export function Hud({ onAct, actLabel, actEnabled = true, actReason = null, toas
           }}
         >
           <ObjectiveCard />
-          <DecorateRoomChip />
+          <RoomChip />
           {toast !== null && toastVisible && (
             <div
               role="status"
