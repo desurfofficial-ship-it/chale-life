@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BUSINESSES, SPAWN_XZ, businessesNear, findBusiness } from '../../data/businesses';
+import { BUSINESSES, SPAWN_XZ, businessesNear, findBusiness } from '../../data/worldBusinesses';
 import {
   isBusinessOpen,
   customerArrivalRate,
@@ -8,7 +8,7 @@ import {
   canBuyItem,
   footprintsOverlap,
   busyLabel,
-} from '../business';
+} from '../worldBusiness';
 
 describe('B-001 business rules', () => {
   it('defines 10 businesses (5 restaurants + 5 shops)', () => {
