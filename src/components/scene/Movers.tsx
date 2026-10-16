@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { COLORS } from '@/lib/mapConfig'
+import { seededSpanAt } from '@/lib/seeded'
 import { markAnimated, unmarkAnimated } from '../world/SceneBatcher'
 
 // ─────────────────────────────────────────────────────── parked tro-tro ─────
@@ -53,7 +54,7 @@ const BOAT_COLORS = ['#ce1126', '#2e7fa8', '#fcd116', '#4f9e4f', '#d97b8f', '#3a
 
 export function Boat({ position, colorIndex = 0, rotation = 0, bob = 1 }: { position: [number, number, number]; colorIndex?: number; rotation?: number; bob?: number }) {
   const ref = useRef<THREE.Group>(null)
-  const phase = useMemo(() => Math.random() * Math.PI * 2, [])
+  const phase = useMemo(() => seededSpanAt(position, Math.PI * 2), [position])
   const color = BOAT_COLORS[colorIndex % BOAT_COLORS.length]
   useEffect(() => {
     markAnimated(ref.current)
@@ -112,7 +113,7 @@ export function Canoe({ position, rotation = 0, colorIndex = 0 }: { position: [n
 // ───────────────────────────────────────────────────────── white yacht ──────
 export function Yacht({ position, rotation = 0 }: { position: [number, number, number]; rotation?: number }) {
   const ref = useRef<THREE.Group>(null)
-  const phase = useMemo(() => Math.random() * Math.PI * 2, [])
+  const phase = useMemo(() => seededSpanAt(position, Math.PI * 2), [position])
   useEffect(() => {
     markAnimated(ref.current)
     return () => unmarkAnimated(ref.current)

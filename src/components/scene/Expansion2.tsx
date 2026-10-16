@@ -8,6 +8,7 @@ import { useFrame } from '@react-three/fiber'
 import { COLORS } from '@/lib/mapConfig'
 import { markAnimated, unmarkAnimated } from '../world/SceneBatcher'
 import { signTexture, balloonTexture, glowTexture } from '@/lib/mapTextures'
+import { seededSpanAt } from '@/lib/seeded'
 import { BlackStar } from './Landmarks'
 import { Building } from './Buildings'
 import { GhanaFlag } from './Nature'
@@ -521,7 +522,7 @@ export function HotAirBalloon({ position, scale = 1 }: { position: [number, numb
   }, [])
   const tex = useMemo(() => balloonTexture(), [])
   const glow = useMemo(() => glowTexture('#ffb45c'), [])
-  const phase = useMemo(() => Math.random() * Math.PI * 2, [])
+  const phase = useMemo(() => seededSpanAt(position, Math.PI * 2), [position])
   useFrame((state) => {
     const t = state.clock.elapsedTime
     if (grp.current) {

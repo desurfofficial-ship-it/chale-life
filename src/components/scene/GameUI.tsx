@@ -14,6 +14,7 @@ import { useFrame } from '@react-three/fiber'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { LANDMARKS, type LandmarkDef } from '@/lib/mapConfig'
 import { checkerTexture } from '@/lib/mapTextures'
+import { seededSpan, seededSpanAt } from '@/lib/seeded'
 import { markAnimated, unmarkAnimated } from '../world/SceneBatcher'
 import { starGeo } from './Landmarks'
 
@@ -343,7 +344,7 @@ export function LandmarkLabels({
     () =>
       LANDMARKS.map((lm) => {
         const { tex, aspect } = makeLabelTexture(lm.label)
-        return { tex, aspect, phase: Math.random() * Math.PI * 2 }
+        return { tex, aspect, phase: seededSpan(lm.id, Math.PI * 2) }
       }),
     []
   )
@@ -404,7 +405,7 @@ export function MapPin({
       }),
     [color]
   )
-  const phase = useMemo(() => Math.random() * Math.PI * 2, [])
+  const phase = useMemo(() => seededSpanAt(position, Math.PI * 2), [position])
   useEffect(() => {
     markAnimated(ref.current)
     return () => unmarkAnimated(ref.current)
@@ -427,7 +428,7 @@ export function MapPin({
 export function CollectibleStar({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
   const ref = useRef<THREE.Group>(null)
   const geo = useMemo(() => starGeo(1), [])
-  const phase = useMemo(() => Math.random() * Math.PI * 2, [])
+  const phase = useMemo(() => seededSpanAt(position, Math.PI * 2), [position])
   useEffect(() => {
     markAnimated(ref.current)
     return () => unmarkAnimated(ref.current)

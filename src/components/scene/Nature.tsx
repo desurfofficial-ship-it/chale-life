@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { flagTexture } from '@/lib/mapTextures'
+import { seededSpanAt } from '@/lib/seeded'
 import { markAnimated, unmarkAnimated } from '../world/SceneBatcher'
 
 // ─────────────────────────────────────────────────────────────── palm tree ──
@@ -71,7 +72,7 @@ export function Person(_props: { position: [number, number, number]; rotation?: 
 export function GhanaFlag({ position, scale = 1, rotation = 0 }: { position: [number, number, number]; scale?: number; rotation?: number }) {
   const tex = useMemo(() => flagTexture(), [])
   const ref = useRef<THREE.Group>(null)
-  const phase = useMemo(() => Math.random() * Math.PI * 2, [])
+  const phase = useMemo(() => seededSpanAt(position, Math.PI * 2), [position])
   useEffect(() => {
     markAnimated(ref.current)
     return () => unmarkAnimated(ref.current)

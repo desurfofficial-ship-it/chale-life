@@ -24,6 +24,7 @@ import {
 } from '../../store/officeStore';
 import { markAnimated, unmarkAnimated } from '../../components/world/SceneBatcher';
 import { signTexture } from '../../lib/mapTextures';
+import { seededSpan } from '../../lib/seeded';
 import { furnitureFor, roomSeats, visitorSpots, type Part } from './officeFurniture';
 import { OfficeModels } from './OfficeModels';
 import {
@@ -550,7 +551,16 @@ function People({ def, layouts, viewFloor }: { def: OfficeDef; layouts: FloorLay
   const ring = useRef<THREE.Mesh>(null);
   const pills = useRef<(THREE.Sprite | null)[]>([]);
   const walkers = useRef<Walker[]>(
-    Array.from({ length: total }, () => ({ x: 0, z: 0, y: 0, yaw: 0, phase: Math.random() * 6, visible: false })),
+    // P2-3: walk-cycle phase seeded from the stable office id + walker index —
+    // Math.random() here re-scrambled every reload (and every Fast Refresh).
+    Array.from({ length: total }, (_, i) => ({
+      x: 0,
+      z: 0,
+      y: 0,
+      yaw: 0,
+      phase: seededSpan(`${def.id}:walker:${i}`, 6),
+      visible: false,
+    })),
   );
   const ldef = useMemo(() => liftDefFor(def), [def]);
   const core = layouts[0].core;
