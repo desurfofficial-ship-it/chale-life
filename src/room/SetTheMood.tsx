@@ -10,6 +10,8 @@ import * as THREE from 'three'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { OrbitControls, ContactShadows } from '@react-three/drei'
 import { create } from 'zustand'
+import { listHomeFurniture, findFurnitureById } from '../data/furniture'
+import { getState, subscribe, buyHomeFurniture } from '../store/gameStore'
 import { GyanRoom, ROOM } from './GyanRoom'
 import {
   MOODS, SLOTS, SWATCH, SWATCHES, moodScores, moodSentence, swatchURL,
@@ -244,10 +246,64 @@ function Plinth() {
   )
 }
 
+
+
+
+/** Furniture marketplace list — reads catalog, buys into home.furnitureIds. */
+function FurnitureShop() {
+  const [owned, setOwned] = useState<readonly string[]>(() => getState().home.furnitureIds)
+  const [balance, setBalance] = useState(() => getState().wallet.balanceGHS)
+  useEffect(() => {
+    return subscribe(() => {
+      setOwned(getState().home.furnitureIds)
+      setBalance(getState().wallet.balanceGHS)
+    })
+  }, [])
+  const items = listHomeFurniture()
+  const buy = (id: string) => {
+    const item = findFurnitureById(id)
+    if (!item) return
+    if (buyHomeFurniture(id, item.costGHS)) {
+      setOwned(getState().home.furnitureIds)
+      setBalance(getState().wallet.balanceGHS)
+    }
+  }
+  return (
+    <div style={{ display: 'grid', gap: 8 }}>
+      <div style={{ fontSize: 13, color: '#fcd116', fontWeight: 800 }}>Wallet GHS {balance.toFixed(0)}</div>
+      {items.map((f) => {
+        const has = owned.includes(f.id)
+        const can = !has && balance >= f.costGHS
+        return (
+          <div key={f.id} style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '8px 10px',
+            borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 700, fontSize: 14 }}>{f.title}</div>
+              <div style={{ fontSize: 11, color: '#94a3b8' }}>{f.summary}</div>
+              <div style={{ fontSize: 12, color: '#fcd116', marginTop: 2 }}>GHS {f.costGHS} · {f.rarity}</div>
+            </div>
+            <button type="button" disabled={!can && !has}
+              onClick={() => buy(f.id)}
+              style={{ minWidth: 72, minHeight: 36, borderRadius: 10, border: 'none', fontWeight: 800, cursor: can ? 'pointer' : 'default',
+                background: has ? 'rgba(16,185,129,0.25)' : can ? '#fcd116' : 'rgba(100,116,139,0.3)',
+                color: has ? '#6ee7b7' : can ? '#0a0f1a' : '#94a3b8' }}>
+              {has ? 'Owned' : can ? 'Buy' : 'Need cash'}
+            </button>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function SetTheMood() {
   const { mats, hour, selected, apply, preset, select, setHour, undo, redo, past, future } = useMood()
   const scores = useMemo(() => moodScores(mats, hour), [mats, hour])
   const sentence = useMemo(() => moodSentence(mats, scores), [mats, scores])
+  // Room tools tabs: mood (materials/daylight) | shop (furniture marketplace)
+  const initialTab = (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('room') === 'shop')
+    ? 'shop' : 'mood'
+  const [roomTab, setRoomTab] = useState<'mood' | 'shop'>(initialTab)
   const slotDef = SLOTS.find((s) => s.id === selected)!
   const [tab, setTab] = useState<MatKind>(slotDef.kinds[0])
   const [idle, setIdle] = useState(true)
@@ -363,8 +419,32 @@ export default function SetTheMood() {
           background: 'rgba(0,0,0,0.55)', color: '#fff', fontWeight: 700, fontSize: 13,
         }}
       >
-        ← Back to street
+        Back to street
       </button>
+      {/* Room tools tabs */}
+      <div style={{ display: 'flex', gap: 8, padding: '8px 12px 0', pointerEvents: 'auto' }}>
+        <button type="button" onClick={() => setRoomTab('mood')}
+          style={{ flex: 1, minHeight: 40, borderRadius: 12, border: roomTab==='mood' ? '1px solid #fcd116' : '1px solid rgba(255,255,255,0.15)',
+            background: roomTab==='mood' ? 'rgba(252,209,22,0.18)' : 'rgba(9,13,22,0.7)', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>
+          Mood
+        </button>
+        <button type="button" onClick={() => setRoomTab('shop')}
+          style={{ flex: 1, minHeight: 40, borderRadius: 12, border: roomTab==='shop' ? '1px solid #fcd116' : '1px solid rgba(255,255,255,0.15)',
+            background: roomTab==='shop' ? 'rgba(252,209,22,0.18)' : 'rgba(9,13,22,0.7)', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>
+          Furniture shop
+        </button>
+      </div>
+
+      {roomTab === 'shop' && (
+        <div style={{ pointerEvents: 'auto', margin: 12, maxHeight: '55vh', overflow: 'auto', borderRadius: 16,
+          border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(14,16,24,0.92)', padding: 14, color: '#e2e8f0' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#94a3b8', marginBottom: 10 }}>
+            Marketplace — buy for your room
+          </div>
+          <FurnitureShop />
+        </div>
+      )}
+
       {/* ── top: title, undo/redo, mood meter ── */}
       <div className="pointer-events-none absolute inset-x-0 top-0 p-4 pt-[max(1rem,env(safe-area-inset-top))]">
         <div className="flex items-start justify-between">
@@ -430,10 +510,10 @@ export default function SetTheMood() {
           />
           <div className="mt-1 grid grid-cols-4 gap-1">
             {[
-              ['☀︎', 'Morning', 7.6],
-              ['☼', 'Midday', 12.8],
-              ['◐', 'Evening', 18.5],
-              ['☾', 'Night', 22.2],
+              ['AM', 'Morning', 7.6],
+              ['MD', 'Midday', 12.8],
+              ['PM', 'Evening', 18.5],
+              ['NT', 'Night', 22.2],
             ].map(([ic, label, h]) => {
               const on = Math.abs(hour - (h as number)) < 1.2
               return (
