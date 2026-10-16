@@ -196,7 +196,8 @@ export function BusinessBuilding({ def }: { def: BusinessDef }) {
   const camera = useThree((s) => s.camera);
   const [detail, setDetail] = useState(false);
   const selected = useBiz(() => getBusinessState().selectedBusinessId);
-  const open = detail || selected === def.id;
+  // Cutaway only when selected — keeps earnAndEat draw-call budget (<450).
+  const open = selected === def.id;
   const hour = getAmbientHour();
   const openNow = isBusinessOpen(def, hour);
 
@@ -238,7 +239,13 @@ export function BusinessBuilding({ def }: { def: BusinessDef }) {
     >
       {!open ? <Shell def={def} onTap={onTap} openNow={openNow} /> : (
         <group onClick={onTap}>
-          <Cutaway def={def} richProps={selected === def.id} />
+          <Cutaway
+            def={def}
+            richProps={
+              selected === def.id &&
+              (def.sub === 'barber' || def.sub === 'salon' || def.sub === 'gym')
+            }
+          />
           {/* low facade lip so cutaway reads as sliced model */}
           <mesh position={[0, 0.15, def.site.d / 2 - 0.05]}>
             <boxGeometry args={[def.site.w, 0.3, 0.1]} />
