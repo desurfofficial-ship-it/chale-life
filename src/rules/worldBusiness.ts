@@ -84,6 +84,19 @@ function pushLog(log: readonly string[], line: string): readonly string[] {
 }
 
 /** Tick one business by dtGameMin game-minutes at hour. */
+
+/**
+ * Staff on shift scales service capacity. Zero on-shift staff → capacity 0
+ * (no seating). Full roster → catalogue capacity. Linear in between.
+ */
+export function effectiveCapacity(def: BusinessDef, state: BusinessSimState): number {
+  const total = state.staff.length;
+  if (total === 0) return def.capacity;
+  const on = state.staff.filter((s) => s.onShift).length;
+  if (on <= 0) return 0;
+  return Math.max(1, Math.round((def.capacity * on) / total));
+}
+
 export function tickBusiness(
   def: BusinessDef,
   state: BusinessSimState,
@@ -98,14 +111,15 @@ export function tickBusiness(
   let log = state.log;
   let customers = state.customers.map((c) => ({ ...c, sinceMin: c.sinceMin + dtGameMin }));
 
-  // When closed, force staff off. When open, preserve player onShift choices.
-  let staff = state.staff.map((s) => ({ ...s, onShift: open ? s.onShift : false }));
-  if (open && staff.length > 0 && staff.every((s) => !s.onShift)) {
-    staff = staff.map((s) => ({ ...s, onShift: true }));
-  }
+  // Preserve player onShift roster always. While closed, capacity/arrivals use
+  // an effective off-shift view without wiping the saved roster.
+  const staff = state.staff;
+  const staffForOps = open
+    ? staff
+    : staff.map((s) => ({ ...s, onShift: false }));
 
   if (!open) {
-    // clear floor slowly
+    // clear floor slowly — keep roster for next open
     queue = 0;
     seated = Math.max(0, seated - dtGameMin * 0.5);
     customers = customers
@@ -115,7 +129,11 @@ export function tickBusiness(
   }
 
   // arrivals
-  const rate = customerArrivalRate(def, hour); // per hour
+  const staffRatio =
+    staffForOps.length === 0
+      ? 1
+      : staffForOps.filter((s) => s.onShift).length / staffForOps.length;
+  const rate = customerArrivalRate(def, hour) * staffRatio; // per hour, staff-scaled
   const arrive = (rate * dtGameMin) / 60;
   // poisson-ish: accumulate fractional via hash of time is overkill — use floor+random-free fractional bank
   const add = Math.floor(arrive + (state.queue % 1));
@@ -137,14 +155,15 @@ export function tickBusiness(
   }
 
   // seat from queue
-  const free = Math.max(0, def.capacity - seated);
+  const cap = effectiveCapacity(def, { ...state, staff: staffForOps });
+  const free = Math.max(0, cap - seated);
   const seatN = Math.min(free, queue, Math.max(1, Math.floor(dtGameMin / 2)));
   if (seatN > 0 && queue > 0) {
     let left = seatN;
     customers = customers.map((c) => {
       if (c.phase === 'queue' && left > 0) {
         left--;
-        return { ...c, phase: 'seated' as const, sinceMin: 0, seat: def.capacity - free + (seatN - left) };
+        return { ...c, phase: 'seated' as const, sinceMin: 0, seat: cap - free + (seatN - left) };
       }
       return c;
     });
