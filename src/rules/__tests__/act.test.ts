@@ -3,7 +3,7 @@ import { findFoodById, FOOD_SACHET_WATER_ID, FOOD_WAAKYE_ID } from '../../data/f
 import { findJobById } from '../../data/jobs';
 import { locations } from '../../data/locations';
 import { createStarterWallet, formatGHS } from '../economy';
-import { createStarterNeeds, drainNeeds, WAAKYE_MAX_HUNGER, WATER_MAX_HUNGER } from '../needs';
+import { createStarterNeeds, drainNeeds } from '../needs';
 import { createStarterJobState, idleObjectiveFor, type JobState } from '../jobs';
 import {
   actPromptFor,

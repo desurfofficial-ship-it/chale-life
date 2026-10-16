@@ -13,7 +13,7 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
 import { signGeometry, getSignMaterial } from '@/lib/signAtlas'
-import { resolveFacade, getFacadeMaterials, signTexture, FACADE_UV_INSET, type AtlasRect } from '@/lib/mapTextures'
+import { resolveFacade, getFacadeMaterials, FACADE_UV_INSET, type AtlasRect } from '@/lib/mapTextures'
 import { COLORS } from '@/lib/mapConfig'
 import { HOUSE_YARDS, houseKey, type FenceKind } from '@/lib/houseYards'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'

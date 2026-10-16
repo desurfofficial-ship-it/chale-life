@@ -14,7 +14,7 @@
 import { CompoundHouse, Shop } from '../../scene/Buildings'
 import { ApartmentBlock } from '../../scene/Expansion2'
 import { Kiosk, VendorTable, BannerGate, BeachStall } from '../../scene/Expansion3'
-import { StallRow, MarketHut } from './Markets'
+import { MarketHut } from './Markets'
 import { COLORS } from '@/lib/mapConfig'
 import { isConverted } from '@/lib/businesses'
 import { T15_REPLACED } from '@/lib/osuNimaLayout'

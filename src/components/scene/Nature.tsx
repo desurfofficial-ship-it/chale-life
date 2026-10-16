@@ -59,10 +59,6 @@ export function Tree({ position, scale = 1 }: { position: [number, number, numbe
   )
 }
 
-// ───────────────────────────────────────────────────────── people (silhouette)
-const SKIN_TONES = ['#8a5a3b', '#6e4226', '#a06a42', '#5b3520']
-const CLOTH_COLORS = ['#ce1126', '#fcd116', '#2e7fa8', '#4f9e4f', '#e08a3c', '#d97b8f', '#f4f1ea', '#3aa08f']
-
 /** Static capsule people removed (looked unfinished). CommunityLife has the proper NPCs. */
 export function Person(_props: { position: [number, number, number]; rotation?: number }) {
   return null

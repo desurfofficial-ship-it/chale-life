@@ -187,7 +187,6 @@ function mergeFacadeCell(
   groups: Map<string, FacadeGroup>,
   cell: CellBatch,
 ) {
-  const mat4 = new THREE.Matrix4()
   for (const [tag, grp] of groups) {
     let geo: THREE.BufferGeometry | null = null
     try {

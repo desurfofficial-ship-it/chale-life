@@ -5,7 +5,7 @@
  * LOD: full ≤12, mid ≤6, overview ≤3. No physics. raycast disabled.
  */
 import { useFrame } from '@react-three/fiber';
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { lastDetailLod } from '../../engine/CameraRig';
 import type { DetailLod } from '../../engine/zoomFit';

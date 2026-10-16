@@ -3,8 +3,7 @@
 // ─── District: Osu / Oxford Street — Accra Mall, shopping strip, ────────────
 // ─── National Theatre, Osu Castle and the castle-approach neighborhood ──────
 import { AccraMall } from '../../scene/Landmarks'
-import { NationalTheatre, OsuCastle, ApartmentBlock } from '../../scene/Expansion2'
-import { BannerGate } from '../../scene/Expansion3'
+import { NationalTheatre, OsuCastle } from '../../scene/Expansion2'
 import { Shop, CompoundHouse } from '../../scene/Buildings'
 import { InstancedLamps, InstancedPeople, InstancedTrees, type PropItem } from '../InstancedNature'
 import { COLORS } from '@/lib/mapConfig'

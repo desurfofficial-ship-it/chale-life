@@ -37,8 +37,6 @@ const HUSTLE_ID = 'HUSTLE_AUNTY_BA_STARTER';
 const WAAKYE_LOCATION_ID = 'LOC-001';
 /** The job spot waypoint (proximity.ts, G-008d) — hire + steps 1/3. */
 const JOB_SPOT_ID = 'LOC-001-JOB';
-/** The bench waypoint (proximity.ts) — step 2. */
-const BENCH_ID = 'LOC-001-BENCH';
 /** The Starter Compound (src/data/locations.ts) — spawn point, G-006 sleep. */
 const SLEEP_LOCATION_ID = 'LOC-002';
 

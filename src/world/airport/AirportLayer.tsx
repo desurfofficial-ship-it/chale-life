@@ -12,16 +12,6 @@ import { phaseAt, bridgeExtended, planeOnStand } from './turnaround';
 import { getAmbientGameTime, registerAmbient } from '../../engine/ambient';
 import { signTexture } from '@/lib/mapTextures';
 
-const _m = new THREE.Matrix4();
-const _p = new THREE.Vector3();
-const _q = new THREE.Quaternion();
-const _s = new THREE.Vector3(1, 1, 1);
-const _e = new THREE.Euler();
-const _c = new THREE.Color();
-
-const LIVERIES = ['#f6f4ee', '#e8f0ff', '#fff5e6', '#f0fff4'] as const;
-const TAIL_GREEN = '#006b3f';
-
 function Terminal() {
   const { x, z, w, d, h } = AIRPORT.terminal;
   const sign = useMemo(() => signTexture('KOTOKA INTL', '#0a3d4a', '#ffd98f'), []);

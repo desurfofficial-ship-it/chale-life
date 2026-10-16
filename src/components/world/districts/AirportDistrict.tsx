@@ -2,12 +2,11 @@
 
 // ─── District: Kotoka Airport (A-001) + Airport City towers ────────────────
 import { AirportLayer } from '@/world/airport/AirportLayer'
-import { GlassTower, Building } from '../../scene/Buildings'
+import { GlassTower } from '../../scene/Buildings'
 import { ApartmentBlock } from '../../scene/Expansion2'
 import { ParkingDeck } from '../../scene/Expansion3'
 import { GhanaFlag } from '../../scene/Nature'
 import { InstancedLamps, InstancedPalms, InstancedPeople, type PropItem } from '../InstancedNature'
-import { COLORS } from '@/lib/mapConfig'
 
 const APC_LAMPS: PropItem[] = [
   { p: [74, -91.7] }, { p: [88, -91.7] }, { p: [102, -91.7] }, { p: [116, -91.7] },

@@ -7,7 +7,7 @@
 // State persists in localStorage ('chale-room-v1').
 import { Suspense, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import * as THREE from 'three'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls, ContactShadows } from '@react-three/drei'
 import { create } from 'zustand'
 import { listHomeFurniture, findFurnitureById } from '../data/furniture'
@@ -19,16 +19,11 @@ import {
   type ZoneId,
 } from '../data/roomZones'
 import { findHousingTierById } from '../data/housing'
-import { GyanRoom, ROOM } from './GyanRoom'
+import { GyanRoom } from './GyanRoom'
 import {
-  MOODS, SLOTS, SWATCH, SWATCHES, moodScores, moodSentence, swatchURL,
+  MOODS, SLOTS, SWATCH, SWATCHES, moodScores, moodSentence,
   type MatKind, type MoodId, type RoomMats, type Slot,
 } from './materials'
-import { PlayerCharacter } from '../components/world/PlayerCharacter'
-
-// ?nochar=1 hides the player (the headless SwiftShader proof renderer on ARM
-// crashes its GPU process on skinned meshes; real phones are unaffected)
-const SHOW_PLAYER = typeof window === 'undefined' || !new URLSearchParams(window.location.search).get('nochar')
 
 // ── store ────────────────────────────────────────────────────────────────────
 interface MoodState {
@@ -188,82 +183,6 @@ function DaylightRig() {
     </>
   )
 }
-
-// exposes the r3f camera/scene to the DOM drag-and-drop layer
-const r3f: { camera: THREE.Camera | null; scene: THREE.Scene | null; el: HTMLElement | null } = { camera: null, scene: null, el: null }
-function Bridge() {
-  const { camera, scene, gl } = useThree()
-  useEffect(() => {
-    r3f.camera = camera
-    r3f.scene = scene
-    r3f.el = gl.domElement
-    ;(window as unknown as Record<string, unknown>).__MOOD = { gl, scene, camera }
-  }, [camera, scene, gl])
-  return null
-}
-function slotAt(clientX: number, clientY: number): Slot | null {
-  if (!r3f.camera || !r3f.scene || !r3f.el) return null
-  const r = r3f.el.getBoundingClientRect()
-  const ndc = new THREE.Vector2(((clientX - r.left) / r.width) * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1)
-  const rc = new THREE.Raycaster()
-  rc.setFromCamera(ndc, r3f.camera)
-  for (const hit of rc.intersectObjects(r3f.scene.children, true)) {
-    let o: THREE.Object3D | null = hit.object
-    while (o) {
-      if (o.userData?.slot) return o.userData.slot as Slot
-      o = o.parent
-    }
-  }
-  return null
-}
-
-// distance that fits the whole diorama (≈ 5.4 m radius) across a portrait
-// screen's narrow horizontal field of view
-const LOOK_Y = -1.6 // look below the room so it sits above the bottom sheet
-function fitDistance(cam: THREE.PerspectiveCamera) {
-  const vHalf = (cam.fov * Math.PI) / 360
-  const hHalf = Math.atan(Math.tan(vHalf) * cam.aspect)
-  return Math.min(48, Math.max(16, 6.1 / Math.tan(Math.min(vHalf, hHalf))))
-}
-
-// a slow idle drift so the diorama feels alive (stops while the user orbits)
-function IdleDrift({ active }: { active: boolean }) {
-  const { camera } = useThree()
-  const t = useRef(0)
-  useFrame((_, dt) => {
-    if (!active) return
-    t.current += dt
-    const a = 0.62 + Math.sin(t.current * 0.18) * 0.07
-    const R = fitDistance(camera as THREE.PerspectiveCamera)
-    camera.position.set(Math.sin(a) * R * 0.78, R * 0.62, Math.cos(a) * R * 0.78)
-    camera.lookAt(0, LOOK_Y, 0)
-  })
-  return null
-}
-
-function Plinth() {
-  return (
-    <group>
-      <mesh position={[0, -0.45, 0]} receiveShadow castShadow>
-        <boxGeometry args={[ROOM.w + 0.9, 0.9, ROOM.d + 0.9]} />
-        <meshStandardMaterial color="#14121a" roughness={0.8} />
-      </mesh>
-      <mesh position={[0, -0.002, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[ROOM.w + 0.9, ROOM.d + 0.9]} />
-        <meshStandardMaterial color="#1d1a24" roughness={0.9} />
-      </mesh>
-      {/* gold rim line, Ghana-flag stripe on the front face */}
-      <mesh position={[0, -0.12, (ROOM.d + 0.9) / 2 + 0.002]}>
-        <planeGeometry args={[ROOM.w + 0.9, 0.025]} />
-        <meshStandardMaterial color="#fcd116" emissive="#fcd116" emissiveIntensity={0.6} />
-      </mesh>
-    </group>
-  )
-}
-
-
-
-
 
 /** Furniture marketplace — House Control style tiles. */
 function FurnitureShop() {

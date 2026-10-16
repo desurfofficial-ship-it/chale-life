@@ -25,7 +25,6 @@ function load(): Saved {
 }
 
 let minutes = 9 * 60;
-let lastTickMs = Date.now();
 let weather: WeatherKind = 'clear';
 
 function init() {
@@ -35,7 +34,6 @@ function init() {
   const elapsedRealMin = Math.max(0, (Date.now() - s.savedAtMs) / 60_000);
   const catchUp = Math.min(8 * 60, elapsedRealMin * 10);
   minutes = (s.minutes + catchUp) % (24 * 60);
-  lastTickMs = Date.now();
   // URL overrides
   const q = new URLSearchParams(window.location.search);
   const h = q.get('hour');
@@ -97,7 +95,6 @@ export function getWorldTime(): WorldTimeSnapshot {
 /** Test hook: restore the pristine 09:00 clear clock, bucket included. */
 export function __resetAmbientClockForTests(): void {
   minutes = 9 * 60;
-  lastTickMs = Date.now();
   lastBucket = Math.floor(minutes / BUCKET_MIN);
   weather = 'clear';
   worldTime = { hour: (lastBucket * BUCKET_MIN) / 60, weather };
@@ -107,7 +104,6 @@ export function __resetAmbientClockForTests(): void {
 export function tickAmbientClock(realDtSec: number): void {
   // 1 real min = 10 game min → 10/60 game-min per real-sec
   minutes = (minutes + realDtSec * (10 / 60)) % (24 * 60);
-  lastTickMs = Date.now();
   checkBucket();
 }
 

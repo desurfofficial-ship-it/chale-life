@@ -16,7 +16,7 @@
 // walkable without moving anything here.
 import { useLayoutEffect, useMemo, useRef, useEffect } from 'react'
 import * as THREE from 'three'
-import { Hospital, Mall, Factory, OfficeBlock, PropertyListing, FarmHut, Hills, Sign, Box } from '../../scene/Businesses'
+import { Hospital, Mall, Factory, PropertyListing, FarmHut, Hills, Sign, Box } from '../../scene/Businesses'
 import type { PropItem } from '../InstancedNature'
 import { InstancedTrees, InstancedPalms } from '../InstancedNature'
 

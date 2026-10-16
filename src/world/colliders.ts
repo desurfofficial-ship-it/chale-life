@@ -81,7 +81,7 @@ function gyanHouseWallColliders(): ColliderBox[] {
 
 /** True if a captured box is the solid Gyan-house shell (blocks the whole room). */
 function isGyanHouseSolid(b: ColliderBox): boolean {
-  const { x, z, w, d } = GYAN_HOUSE_WORLD;
+  const { x, z } = GYAN_HOUSE_WORLD;
   const cx = (b.minX + b.maxX) / 2;
   const cz = (b.minZ + b.maxZ) / 2;
   const bw = b.maxX - b.minX;

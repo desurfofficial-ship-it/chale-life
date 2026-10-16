@@ -79,10 +79,6 @@ export function createBusinessSim(def: BusinessDef): BusinessSimState {
   };
 }
 
-function pushLog(log: readonly string[], line: string): readonly string[] {
-  return [...log.slice(-20), line];
-}
-
 /** Tick one business by dtGameMin game-minutes at hour. */
 export function tickBusiness(
   def: BusinessDef,
@@ -114,9 +110,7 @@ export function tickBusiness(
   // arrivals
   const rate = customerArrivalRate(def, hour); // per hour
   const arrive = (rate * dtGameMin) / 60;
-  // poisson-ish: accumulate fractional via hash of time is overkill — use floor+random-free fractional bank
-  const add = Math.floor(arrive + (state.queue % 1));
-  // use deterministic fractional from revenue cents
+  // deterministic fractional from revenue cents (floor + frac, no Math.random)
   const frac = (revenue * 10 + seated * 3 + queue) % 1;
   const nNew = Math.floor(arrive + frac);
   if (nNew > 0) {

@@ -1,7 +1,7 @@
 /**
  * B-001 — Business simulation store. Tick via registerAmbient (shared ambient step).
  */
-import { BUSINESSES, findBusiness, type BusinessDef, type MenuItem } from '../data/worldBusinesses';
+import { BUSINESSES, findBusiness, type MenuItem } from '../data/worldBusinesses';
 import {
   createBusinessSim,
   tickBusiness,
