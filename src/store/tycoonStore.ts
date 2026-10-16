@@ -69,6 +69,8 @@ export interface TycoonState {
   tycoonMode: boolean;
   selectedPlotId: string | null;
   activeTab: TycoonTab;
+  /** When set, HUD furniture-edit mode is active for this business. */
+  furnitureEditBusinessId: string | null;
 }
 
 /** localStorage key — dotted form avoids gitleaks generic-api-key false positive */
@@ -89,6 +91,7 @@ let state: TycoonState = {
   tycoonMode: false,
   selectedPlotId: null,
   activeTab: 'property',
+  furnitureEditBusinessId: null,
 };
 
 function notify(): void {
@@ -179,6 +182,7 @@ export function __resetTycoonForTests(): void {
     tycoonMode: false,
     selectedPlotId: null,
     activeTab: 'property',
+    furnitureEditBusinessId: null,
   };
   notify();
 }
@@ -219,6 +223,13 @@ export function setTycoonMode(on: boolean): void {
 export function setSelectedPlotId(id: string | null): void {
   if (state.selectedPlotId === id) return;
   state.selectedPlotId = id;
+  notify();
+}
+
+
+export function setFurnitureEditBusinessId(id: string | null): void {
+  if (state.furnitureEditBusinessId === id) return;
+  state = { ...state, furnitureEditBusinessId: id };
   notify();
 }
 
