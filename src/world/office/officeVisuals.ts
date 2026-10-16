@@ -88,3 +88,88 @@ export function hashIndex(s: string, n: number): number {
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
   return Math.abs(h) % n;
 }
+
+const tagCache = new Map<string, THREE.CanvasTexture>();
+/** Canvas size of the floating office tag (aspect used for sprite scale). */
+export const OFFICE_TAG_ASPECT = 512 / 152;
+
+/**
+ * O-002 — Floating map tag for an office: dark pill with a coloured
+ * "OFFICE" badge (brand colour) + the office name, and a pointer notch
+ * under it so it reads as a pin above the building. No emoji.
+ */
+export function officeTagTexture(name: string, accent: string, badge = 'OFFICE'): THREE.CanvasTexture {
+  const key = `${name}|${accent}|${badge}`;
+  const hit = tagCache.get(key);
+  if (hit) return hit;
+  const W = 512;
+  const H = 152;
+  const c = document.createElement('canvas');
+  c.width = W;
+  c.height = H;
+  const g = c.getContext('2d')!;
+  g.clearRect(0, 0, W, H);
+  const bodyH = 112;
+  const r = 30;
+  const x0 = 6;
+  const y0 = 6;
+  const x1 = W - 6;
+  const y1 = y0 + bodyH;
+  // body
+  g.fillStyle = 'rgba(22,24,36,0.94)';
+  g.beginPath();
+  g.moveTo(x0 + r, y0);
+  g.arcTo(x1, y0, x1, y1, r);
+  g.arcTo(x1, y1, x0, y1, r);
+  g.arcTo(x0, y1, x0, y0, r);
+  g.arcTo(x0, y0, x1, y0, r);
+  g.closePath();
+  g.fill();
+  // pointer notch
+  g.beginPath();
+  g.moveTo(W / 2 - 18, y1 - 1);
+  g.lineTo(W / 2 + 18, y1 - 1);
+  g.lineTo(W / 2, H - 4);
+  g.closePath();
+  g.fill();
+  // accent ring
+  g.strokeStyle = accent;
+  g.lineWidth = 5;
+  g.beginPath();
+  g.moveTo(x0 + r, y0 + 2);
+  g.arcTo(x1 - 2, y0 + 2, x1 - 2, y1 - 2, r);
+  g.arcTo(x1 - 2, y1 - 2, x0 + 2, y1 - 2, r);
+  g.arcTo(x0 + 2, y1 - 2, x0 + 2, y0 + 2, r);
+  g.arcTo(x0 + 2, y0 + 2, x1 - 2, y0 + 2, r);
+  g.closePath();
+  g.stroke();
+  // badge
+  g.font = '800 24px Inter, Arial, sans-serif';
+  const bw = Math.max(110, g.measureText(badge).width + 28);
+  g.fillStyle = accent;
+  g.beginPath();
+  const bx = 22;
+  const by = 22;
+  const bh = 34;
+  g.moveTo(bx + 10, by);
+  g.arcTo(bx + bw, by, bx + bw, by + bh, 10);
+  g.arcTo(bx + bw, by + bh, bx, by + bh, 10);
+  g.arcTo(bx, by + bh, bx, by, 10);
+  g.arcTo(bx, by, bx + bw, by, 10);
+  g.closePath();
+  g.fill();
+  g.fillStyle = '#ffffff';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.fillText(badge, bx + bw / 2, by + bh / 2 + 1);
+  // name
+  g.font = '700 34px Inter, Arial, sans-serif';
+  g.textAlign = 'left';
+  g.fillStyle = '#ffffff';
+  g.fillText(name, 24, 84, W - 48);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 2;
+  tagCache.set(key, t);
+  return t;
+}
