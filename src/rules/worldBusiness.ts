@@ -196,7 +196,12 @@ export function canBuyItem(
   hour: number,
 ): { ok: true } | { ok: false; reason: string } {
   if (!isBusinessOpen(def, hour)) return { ok: false, reason: 'Closed' };
-  if (walletGHS < item.priceGHS) return { ok: false, reason: 'Need cash' };
+  if (!Number.isFinite(item.priceGHS) || item.priceGHS < 0) {
+    return { ok: false, reason: 'Invalid item price' };
+  }
+  if (!Number.isFinite(walletGHS) || walletGHS < item.priceGHS) {
+    return { ok: false, reason: 'Need cash' };
+  }
   if (def.kind === 'shop' && (state.stock[item.id] ?? 0) <= 0) return { ok: false, reason: 'Out of stock' };
   return { ok: true };
 }
