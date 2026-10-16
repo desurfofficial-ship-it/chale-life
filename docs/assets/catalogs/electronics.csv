@@ -1,0 +1,501 @@
+id,name,archetype,tris,kb_meshopt,w_m,d_m,h_m,file
+television-00,Television #01,television,276,6.2,0.57,0.47,1.39,television/television-00.glb
+television-01,Television #02,television,132,4.0,1.02,0.24,0.68,television/television-01.glb
+television-02,Television #03,television,100,3.6,0.88,0.22,0.58,television/television-02.glb
+television-03,Television #04,television,122,4.0,1.24,0.14,0.82,television/television-03.glb
+television-04,Television #05,television,230,5.6,0.73,0.65,0.96,television/television-04.glb
+television-05,Television #06,television,120,3.9,0.95,0.24,0.65,television/television-05.glb
+television-06,Television #07,television,112,3.7,1.3,0.22,0.79,television/television-06.glb
+television-07,Television #08,television,122,3.9,1.32,0.13,0.84,television/television-07.glb
+television-08,Television #09,television,224,5.3,0.7,0.65,1.13,television/television-08.glb
+television-09,Television #10,television,132,4.0,1.12,0.24,0.74,television/television-09.glb
+television-10,Television #11,television,100,3.6,1.03,0.22,0.67,television/television-10.glb
+television-11,Television #12,television,66,3.0,1.08,0.13,0.64,television/television-11.glb
+television-12,Television #13,television,224,4.9,0.56,0.47,0.85,television/television-12.glb
+television-13,Television #14,television,120,3.8,0.85,0.24,0.61,television/television-13.glb
+television-14,Television #15,television,124,3.9,0.92,0.22,0.61,television/television-14.glb
+television-15,Television #16,television,66,3.0,0.99,0.14,0.6,television/television-15.glb
+television-16,Television #17,television,224,5.4,0.61,0.52,0.87,television/television-16.glb
+television-17,Television #18,television,132,4.0,1.43,0.24,0.92,television/television-17.glb
+television-18,Television #19,television,100,3.6,1.01,0.22,0.64,television/television-18.glb
+television-19,Television #20,television,90,3.3,1.41,0.14,0.8,television/television-19.glb
+television-20,Television #21,television,138,4.3,0.58,0.53,0.45,television/television-20.glb
+television-21,Television #22,television,120,3.9,0.93,0.24,0.68,television/television-21.glb
+television-22,Television #23,television,112,3.8,0.93,0.22,0.62,television/television-22.glb
+television-23,Television #24,television,122,4.0,0.81,0.13,0.55,television/television-23.glb
+television-24,Television #25,television,210,5.4,0.68,0.65,0.91,television/television-24.glb
+television-25,Television #26,television,108,3.7,1.23,0.24,0.8,television/television-25.glb
+television-26,Television #27,television,112,3.8,0.87,0.22,0.57,television/television-26.glb
+television-27,Television #28,television,66,3.0,0.88,0.14,0.49,television/television-27.glb
+television-28,Television #29,television,276,6.1,0.54,0.43,1.27,television/television-28.glb
+television-29,Television #30,television,120,3.9,0.99,0.24,0.66,television/television-29.glb
+television-30,Television #31,television,112,3.8,0.89,0.22,0.58,television/television-30.glb
+television-31,Television #32,television,122,3.9,0.82,0.13,0.57,television/television-31.glb
+television-32,Television #33,television,244,5.7,0.57,0.53,0.95,television/television-32.glb
+television-33,Television #34,television,120,3.9,0.9,0.24,0.66,television/television-33.glb
+television-34,Television #35,television,100,3.6,1.17,0.22,0.77,television/television-34.glb
+television-35,Television #36,television,66,3.0,1.1,0.14,0.65,television/television-35.glb
+television-36,Television #37,television,138,4.3,0.62,0.56,0.52,television/television-36.glb
+television-37,Television #38,television,108,3.7,1.23,0.24,0.83,television/television-37.glb
+television-38,Television #39,television,100,3.6,1.23,0.22,0.78,television/television-38.glb
+television-39,Television #40,television,90,3.3,1.32,0.14,0.78,television/television-39.glb
+television-40,Television #41,television,230,5.5,0.63,0.55,0.89,television/television-40.glb
+television-41,Television #42,television,132,4.0,1.02,0.24,0.72,television/television-41.glb
+television-42,Television #43,television,124,4.0,0.94,0.22,0.62,television/television-42.glb
+television-43,Television #44,television,110,3.8,1.0,0.13,0.67,television/television-43.glb
+television-44,Television #45,television,190,5.1,0.62,0.52,0.94,television/television-44.glb
+television-45,Television #46,television,108,3.7,1.26,0.24,0.83,television/television-45.glb
+television-46,Television #47,television,112,3.7,1.18,0.22,0.74,television/television-46.glb
+television-47,Television #48,television,66,3.0,1.24,0.12,0.7,television/television-47.glb
+television-48,Television #49,television,296,6.5,0.63,0.56,1.35,television/television-48.glb
+television-49,Television #50,television,120,3.8,1.01,0.24,0.67,television/television-49.glb
+radio-00,Radio #01,radio,202,5.1,0.58,0.14,0.27,radio/radio-00.glb
+radio-01,Radio #02,radio,102,3.6,0.41,0.09,0.48,radio/radio-01.glb
+radio-02,Radio #03,radio,160,4.5,0.31,0.19,0.33,radio/radio-02.glb
+radio-03,Radio #04,radio,118,3.9,0.18,0.15,0.15,radio/radio-03.glb
+radio-04,Radio #05,radio,146,4.3,0.52,0.14,0.33,radio/radio-04.glb
+radio-05,Radio #06,radio,114,3.8,0.34,0.1,0.44,radio/radio-05.glb
+radio-06,Radio #07,radio,160,4.5,0.33,0.24,0.32,radio/radio-06.glb
+radio-07,Radio #08,radio,118,3.9,0.16,0.13,0.11,radio/radio-07.glb
+radio-08,Radio #09,radio,146,4.3,0.55,0.15,0.3,radio/radio-08.glb
+radio-09,Radio #10,radio,102,3.6,0.39,0.09,0.38,radio/radio-09.glb
+radio-10,Radio #11,radio,160,4.5,0.37,0.19,0.36,radio/radio-10.glb
+radio-11,Radio #12,radio,130,4.1,0.22,0.12,0.14,radio/radio-11.glb
+radio-12,Radio #13,radio,146,4.3,0.58,0.14,0.35,radio/radio-12.glb
+radio-13,Radio #14,radio,102,3.6,0.41,0.11,0.51,radio/radio-13.glb
+radio-14,Radio #15,radio,160,4.4,0.34,0.24,0.33,radio/radio-14.glb
+radio-15,Radio #16,radio,106,3.7,0.17,0.13,0.12,radio/radio-15.glb
+radio-16,Radio #17,radio,146,4.3,0.56,0.15,0.3,radio/radio-16.glb
+radio-17,Radio #18,radio,114,3.8,0.31,0.1,0.41,radio/radio-17.glb
+radio-18,Radio #19,radio,160,4.5,0.43,0.22,0.42,radio/radio-18.glb
+radio-19,Radio #20,radio,118,3.9,0.24,0.15,0.14,radio/radio-19.glb
+radio-20,Radio #21,radio,146,4.3,0.55,0.14,0.28,radio/radio-20.glb
+radio-21,Radio #22,radio,114,3.8,0.37,0.1,0.47,radio/radio-21.glb
+radio-22,Radio #23,radio,160,4.5,0.36,0.19,0.36,radio/radio-22.glb
+radio-23,Radio #24,radio,130,4.1,0.2,0.14,0.13,radio/radio-23.glb
+radio-24,Radio #25,radio,146,4.3,0.53,0.13,0.34,radio/radio-24.glb
+radio-25,Radio #26,radio,114,3.8,0.44,0.12,0.45,radio/radio-25.glb
+radio-26,Radio #27,radio,160,4.5,0.33,0.21,0.32,radio/radio-26.glb
+radio-27,Radio #28,radio,118,3.9,0.21,0.15,0.15,radio/radio-27.glb
+radio-28,Radio #29,radio,146,4.3,0.58,0.16,0.31,radio/radio-28.glb
+radio-29,Radio #30,radio,102,3.7,0.39,0.09,0.49,radio/radio-29.glb
+radio-30,Radio #31,radio,160,4.5,0.42,0.2,0.41,radio/radio-30.glb
+radio-31,Radio #32,radio,118,3.9,0.23,0.12,0.1,radio/radio-31.glb
+radio-32,Radio #33,radio,146,4.3,0.49,0.14,0.33,radio/radio-32.glb
+radio-33,Radio #34,radio,102,3.7,0.41,0.09,0.51,radio/radio-33.glb
+radio-34,Radio #35,radio,160,4.5,0.34,0.19,0.34,radio/radio-34.glb
+radio-35,Radio #36,radio,118,3.9,0.19,0.13,0.11,radio/radio-35.glb
+radio-36,Radio #37,radio,146,4.3,0.48,0.15,0.31,radio/radio-36.glb
+radio-37,Radio #38,radio,102,3.6,0.31,0.11,0.5,radio/radio-37.glb
+radio-38,Radio #39,radio,160,4.4,0.4,0.21,0.39,radio/radio-38.glb
+radio-39,Radio #40,radio,118,3.9,0.19,0.15,0.11,radio/radio-39.glb
+radio-40,Radio #41,radio,146,4.3,0.58,0.13,0.32,radio/radio-40.glb
+radio-41,Radio #42,radio,102,3.7,0.43,0.11,0.5,radio/radio-41.glb
+radio-42,Radio #43,radio,160,4.4,0.44,0.21,0.43,radio/radio-42.glb
+radio-43,Radio #44,radio,118,3.9,0.18,0.16,0.1,radio/radio-43.glb
+radio-44,Radio #45,radio,146,4.3,0.57,0.13,0.34,radio/radio-44.glb
+radio-45,Radio #46,radio,102,3.6,0.42,0.1,0.5,radio/radio-45.glb
+radio-46,Radio #47,radio,160,4.5,0.43,0.22,0.42,radio/radio-46.glb
+radio-47,Radio #48,radio,118,3.9,0.17,0.13,0.15,radio/radio-47.glb
+radio-48,Radio #49,radio,202,5.1,0.6,0.14,0.32,radio/radio-48.glb
+radio-49,Radio #50,radio,114,3.8,0.37,0.09,0.35,radio/radio-49.glb
+speaker-box-00,Speaker Box #01,speaker-box,308,6.6,0.27,0.34,1.09,speaker-box/speaker-box-00.glb
+speaker-box-01,Speaker Box #02,speaker-box,180,5.0,0.89,0.78,1.78,speaker-box/speaker-box-01.glb
+speaker-box-02,Speaker Box #03,speaker-box,234,5.8,0.73,0.61,1.03,speaker-box/speaker-box-02.glb
+speaker-box-03,Speaker Box #04,speaker-box,282,6.5,0.91,0.28,0.32,speaker-box/speaker-box-03.glb
+speaker-box-04,Speaker Box #05,speaker-box,308,6.5,0.31,0.37,1.03,speaker-box/speaker-box-04.glb
+speaker-box-05,Speaker Box #06,speaker-box,192,5.2,0.89,0.78,1.97,speaker-box/speaker-box-05.glb
+speaker-box-06,Speaker Box #07,speaker-box,234,5.9,0.61,0.53,0.88,speaker-box/speaker-box-06.glb
+speaker-box-07,Speaker Box #08,speaker-box,282,6.6,0.83,0.28,0.35,speaker-box/speaker-box-07.glb
+speaker-box-08,Speaker Box #09,speaker-box,308,6.6,0.29,0.35,1.01,speaker-box/speaker-box-08.glb
+speaker-box-09,Speaker Box #10,speaker-box,192,5.1,0.89,0.78,2.0,speaker-box/speaker-box-09.glb
+speaker-box-10,Speaker Box #11,speaker-box,210,5.4,0.6,0.54,0.95,speaker-box/speaker-box-10.glb
+speaker-box-11,Speaker Box #12,speaker-box,282,6.7,0.83,0.27,0.31,speaker-box/speaker-box-11.glb
+speaker-box-12,Speaker Box #13,speaker-box,252,5.7,0.27,0.35,1.06,speaker-box/speaker-box-12.glb
+speaker-box-13,Speaker Box #14,speaker-box,180,4.9,0.89,0.78,1.97,speaker-box/speaker-box-13.glb
+speaker-box-14,Speaker Box #15,speaker-box,210,5.4,0.64,0.54,0.97,speaker-box/speaker-box-14.glb
+speaker-box-15,Speaker Box #16,speaker-box,282,6.6,0.57,0.25,0.36,speaker-box/speaker-box-15.glb
+speaker-box-16,Speaker Box #17,speaker-box,252,5.8,0.26,0.3,1.11,speaker-box/speaker-box-16.glb
+speaker-box-17,Speaker Box #18,speaker-box,192,5.1,0.89,0.78,2.02,speaker-box/speaker-box-17.glb
+speaker-box-18,Speaker Box #19,speaker-box,290,6.7,0.61,0.62,0.98,speaker-box/speaker-box-18.glb
+speaker-box-19,Speaker Box #20,speaker-box,282,6.6,0.72,0.29,0.3,speaker-box/speaker-box-19.glb
+speaker-box-20,Speaker Box #21,speaker-box,308,6.6,0.29,0.4,0.96,speaker-box/speaker-box-20.glb
+speaker-box-21,Speaker Box #22,speaker-box,192,5.1,0.89,0.78,2.1,speaker-box/speaker-box-21.glb
+speaker-box-22,Speaker Box #23,speaker-box,122,3.9,0.66,0.55,0.6,speaker-box/speaker-box-22.glb
+speaker-box-23,Speaker Box #24,speaker-box,282,6.6,0.72,0.26,0.32,speaker-box/speaker-box-23.glb
+speaker-box-24,Speaker Box #25,speaker-box,252,5.7,0.27,0.33,0.85,speaker-box/speaker-box-24.glb
+speaker-box-25,Speaker Box #26,speaker-box,180,5.0,0.89,0.78,1.72,speaker-box/speaker-box-25.glb
+speaker-box-26,Speaker Box #27,speaker-box,154,4.4,0.59,0.64,0.57,speaker-box/speaker-box-26.glb
+speaker-box-27,Speaker Box #28,speaker-box,282,6.5,0.99,0.28,0.38,speaker-box/speaker-box-27.glb
+speaker-box-28,Speaker Box #29,speaker-box,308,6.6,0.32,0.36,0.99,speaker-box/speaker-box-28.glb
+speaker-box-29,Speaker Box #30,speaker-box,192,5.1,0.89,0.78,2.0,speaker-box/speaker-box-29.glb
+speaker-box-30,Speaker Box #31,speaker-box,234,5.9,0.74,0.58,0.98,speaker-box/speaker-box-30.glb
+speaker-box-31,Speaker Box #32,speaker-box,282,6.6,0.8,0.31,0.37,speaker-box/speaker-box-31.glb
+speaker-box-32,Speaker Box #33,speaker-box,308,6.6,0.27,0.38,0.95,speaker-box/speaker-box-32.glb
+speaker-box-33,Speaker Box #34,speaker-box,192,5.1,0.89,0.78,1.85,speaker-box/speaker-box-33.glb
+speaker-box-34,Speaker Box #35,speaker-box,210,5.5,0.53,0.63,0.97,speaker-box/speaker-box-34.glb
+speaker-box-35,Speaker Box #36,speaker-box,282,6.6,0.72,0.27,0.35,speaker-box/speaker-box-35.glb
+speaker-box-36,Speaker Box #37,speaker-box,252,5.8,0.28,0.38,0.84,speaker-box/speaker-box-36.glb
+speaker-box-37,Speaker Box #38,speaker-box,180,4.9,0.89,0.78,1.82,speaker-box/speaker-box-37.glb
+speaker-box-38,Speaker Box #39,speaker-box,290,6.6,0.67,0.5,1.02,speaker-box/speaker-box-38.glb
+speaker-box-39,Speaker Box #40,speaker-box,282,6.6,0.82,0.29,0.34,speaker-box/speaker-box-39.glb
+speaker-box-40,Speaker Box #41,speaker-box,252,5.8,0.22,0.4,0.86,speaker-box/speaker-box-40.glb
+speaker-box-41,Speaker Box #42,speaker-box,192,5.2,0.89,0.78,1.96,speaker-box/speaker-box-41.glb
+speaker-box-42,Speaker Box #43,speaker-box,290,6.7,0.72,0.57,0.81,speaker-box/speaker-box-42.glb
+speaker-box-43,Speaker Box #44,speaker-box,282,6.6,0.78,0.3,0.33,speaker-box/speaker-box-43.glb
+speaker-box-44,Speaker Box #45,speaker-box,252,5.7,0.23,0.36,0.86,speaker-box/speaker-box-44.glb
+speaker-box-45,Speaker Box #46,speaker-box,180,5.0,0.89,0.78,1.82,speaker-box/speaker-box-45.glb
+speaker-box-46,Speaker Box #47,speaker-box,290,6.7,0.58,0.54,0.9,speaker-box/speaker-box-46.glb
+speaker-box-47,Speaker Box #48,speaker-box,282,6.6,0.71,0.27,0.3,speaker-box/speaker-box-47.glb
+speaker-box-48,Speaker Box #49,speaker-box,196,5.0,0.27,0.3,1.03,speaker-box/speaker-box-48.glb
+speaker-box-49,Speaker Box #50,speaker-box,192,5.1,0.89,0.78,1.87,speaker-box/speaker-box-49.glb
+laptop-00,Laptop #01,laptop,132,4.1,0.42,0.26,0.25,laptop/laptop-00.glb
+laptop-01,Laptop #02,laptop,140,4.3,0.43,0.23,0.05,laptop/laptop-01.glb
+laptop-02,Laptop #03,laptop,132,4.2,0.45,0.45,0.15,laptop/laptop-02.glb
+laptop-03,Laptop #04,laptop,174,4.9,0.54,0.33,0.28,laptop/laptop-03.glb
+laptop-04,Laptop #05,laptop,132,4.1,0.47,0.28,0.27,laptop/laptop-04.glb
+laptop-05,Laptop #06,laptop,98,3.7,0.32,0.22,0.05,laptop/laptop-05.glb
+laptop-06,Laptop #07,laptop,90,3.4,0.33,0.43,0.17,laptop/laptop-06.glb
+laptop-07,Laptop #08,laptop,132,4.2,0.45,0.34,0.29,laptop/laptop-07.glb
+laptop-08,Laptop #09,laptop,90,3.4,0.35,0.34,0.26,laptop/laptop-08.glb
+laptop-09,Laptop #10,laptop,140,4.4,0.47,0.25,0.06,laptop/laptop-09.glb
+laptop-10,Laptop #11,laptop,90,3.5,0.34,0.45,0.15,laptop/laptop-10.glb
+laptop-11,Laptop #12,laptop,174,4.9,0.53,0.27,0.26,laptop/laptop-11.glb
+laptop-12,Laptop #13,laptop,132,4.2,0.45,0.34,0.25,laptop/laptop-12.glb
+laptop-13,Laptop #14,laptop,140,4.4,0.42,0.21,0.05,laptop/laptop-13.glb
+laptop-14,Laptop #15,laptop,90,3.4,0.39,0.49,0.17,laptop/laptop-14.glb
+laptop-15,Laptop #16,laptop,132,4.2,0.43,0.31,0.26,laptop/laptop-15.glb
+laptop-16,Laptop #17,laptop,90,3.4,0.32,0.29,0.26,laptop/laptop-16.glb
+laptop-17,Laptop #18,laptop,140,4.3,0.5,0.26,0.04,laptop/laptop-17.glb
+laptop-18,Laptop #19,laptop,90,3.4,0.35,0.48,0.14,laptop/laptop-18.glb
+laptop-19,Laptop #20,laptop,174,4.9,0.53,0.26,0.27,laptop/laptop-19.glb
+laptop-20,Laptop #21,laptop,132,4.2,0.48,0.32,0.29,laptop/laptop-20.glb
+laptop-21,Laptop #22,laptop,140,4.3,0.5,0.26,0.04,laptop/laptop-21.glb
+laptop-22,Laptop #23,laptop,132,4.2,0.49,0.49,0.18,laptop/laptop-22.glb
+laptop-23,Laptop #24,laptop,132,4.2,0.45,0.33,0.27,laptop/laptop-23.glb
+laptop-24,Laptop #25,laptop,90,3.4,0.39,0.38,0.29,laptop/laptop-24.glb
+laptop-25,Laptop #26,laptop,140,4.4,0.44,0.23,0.05,laptop/laptop-25.glb
+laptop-26,Laptop #27,laptop,90,3.4,0.38,0.49,0.2,laptop/laptop-26.glb
+laptop-27,Laptop #28,laptop,132,4.2,0.42,0.31,0.25,laptop/laptop-27.glb
+laptop-28,Laptop #29,laptop,132,4.2,0.41,0.25,0.23,laptop/laptop-28.glb
+laptop-29,Laptop #30,laptop,140,4.3,0.43,0.22,0.04,laptop/laptop-29.glb
+laptop-30,Laptop #31,laptop,90,3.4,0.38,0.47,0.18,laptop/laptop-30.glb
+laptop-31,Laptop #32,laptop,132,4.2,0.4,0.26,0.24,laptop/laptop-31.glb
+laptop-32,Laptop #33,laptop,90,3.4,0.38,0.36,0.29,laptop/laptop-32.glb
+laptop-33,Laptop #34,laptop,98,3.6,0.33,0.21,0.04,laptop/laptop-33.glb
+laptop-34,Laptop #35,laptop,90,3.5,0.34,0.43,0.13,laptop/laptop-34.glb
+laptop-35,Laptop #36,laptop,132,4.2,0.49,0.3,0.31,laptop/laptop-35.glb
+laptop-36,Laptop #37,laptop,90,3.4,0.36,0.33,0.27,laptop/laptop-36.glb
+laptop-37,Laptop #38,laptop,140,4.4,0.47,0.25,0.05,laptop/laptop-37.glb
+laptop-38,Laptop #39,laptop,90,3.4,0.33,0.42,0.13,laptop/laptop-38.glb
+laptop-39,Laptop #40,laptop,132,4.2,0.47,0.36,0.27,laptop/laptop-39.glb
+laptop-40,Laptop #41,laptop,132,4.1,0.43,0.25,0.25,laptop/laptop-40.glb
+laptop-41,Laptop #42,laptop,98,3.6,0.36,0.25,0.04,laptop/laptop-41.glb
+laptop-42,Laptop #43,laptop,90,3.4,0.33,0.44,0.18,laptop/laptop-42.glb
+laptop-43,Laptop #44,laptop,132,4.2,0.44,0.34,0.28,laptop/laptop-43.glb
+laptop-44,Laptop #45,laptop,132,4.2,0.43,0.29,0.25,laptop/laptop-44.glb
+laptop-45,Laptop #46,laptop,140,4.3,0.43,0.22,0.04,laptop/laptop-45.glb
+laptop-46,Laptop #47,laptop,90,3.4,0.39,0.53,0.17,laptop/laptop-46.glb
+laptop-47,Laptop #48,laptop,174,4.9,0.57,0.36,0.28,laptop/laptop-47.glb
+laptop-48,Laptop #49,laptop,90,3.4,0.4,0.32,0.31,laptop/laptop-48.glb
+laptop-49,Laptop #50,laptop,98,3.6,0.32,0.21,0.06,laptop/laptop-49.glb
+desktop-pc-00,Desktop PC #01,desktop-pc,234,5.8,0.94,0.56,0.53,desktop-pc/desktop-pc-00.glb
+desktop-pc-01,Desktop PC #02,desktop-pc,176,4.9,0.5,0.65,0.51,desktop-pc/desktop-pc-01.glb
+desktop-pc-02,Desktop PC #03,desktop-pc,132,4.2,0.63,0.4,0.5,desktop-pc/desktop-pc-02.glb
+desktop-pc-03,Desktop PC #04,desktop-pc,228,5.6,1.28,0.52,0.53,desktop-pc/desktop-pc-03.glb
+desktop-pc-04,Desktop PC #05,desktop-pc,234,5.8,0.75,0.53,0.42,desktop-pc/desktop-pc-04.glb
+desktop-pc-05,Desktop PC #06,desktop-pc,176,4.9,0.48,0.65,0.5,desktop-pc/desktop-pc-05.glb
+desktop-pc-06,Desktop PC #07,desktop-pc,132,4.2,0.68,0.4,0.53,desktop-pc/desktop-pc-06.glb
+desktop-pc-07,Desktop PC #08,desktop-pc,228,5.8,1.35,0.53,0.48,desktop-pc/desktop-pc-07.glb
+desktop-pc-08,Desktop PC #09,desktop-pc,234,5.8,0.84,0.53,0.46,desktop-pc/desktop-pc-08.glb
+desktop-pc-09,Desktop PC #10,desktop-pc,176,4.9,0.46,0.65,0.46,desktop-pc/desktop-pc-09.glb
+desktop-pc-10,Desktop PC #11,desktop-pc,132,4.2,0.6,0.4,0.49,desktop-pc/desktop-pc-10.glb
+desktop-pc-11,Desktop PC #12,desktop-pc,228,5.8,1.34,0.52,0.55,desktop-pc/desktop-pc-11.glb
+desktop-pc-12,Desktop PC #13,desktop-pc,234,5.8,0.95,0.53,0.46,desktop-pc/desktop-pc-12.glb
+desktop-pc-13,Desktop PC #14,desktop-pc,176,4.9,0.44,0.65,0.46,desktop-pc/desktop-pc-13.glb
+desktop-pc-14,Desktop PC #15,desktop-pc,132,4.2,0.71,0.4,0.56,desktop-pc/desktop-pc-14.glb
+desktop-pc-15,Desktop PC #16,desktop-pc,228,5.8,1.23,0.54,0.47,desktop-pc/desktop-pc-15.glb
+desktop-pc-16,Desktop PC #17,desktop-pc,234,5.8,0.84,0.56,0.5,desktop-pc/desktop-pc-16.glb
+desktop-pc-17,Desktop PC #18,desktop-pc,176,4.9,0.45,0.65,0.49,desktop-pc/desktop-pc-17.glb
+desktop-pc-18,Desktop PC #19,desktop-pc,132,4.3,0.66,0.4,0.52,desktop-pc/desktop-pc-18.glb
+desktop-pc-19,Desktop PC #20,desktop-pc,228,5.8,1.25,0.53,0.55,desktop-pc/desktop-pc-19.glb
+desktop-pc-20,Desktop PC #21,desktop-pc,234,5.8,0.89,0.54,0.48,desktop-pc/desktop-pc-20.glb
+desktop-pc-21,Desktop PC #22,desktop-pc,176,4.9,0.49,0.66,0.53,desktop-pc/desktop-pc-21.glb
+desktop-pc-22,Desktop PC #23,desktop-pc,132,4.2,0.53,0.4,0.44,desktop-pc/desktop-pc-22.glb
+desktop-pc-23,Desktop PC #24,desktop-pc,228,5.8,1.2,0.53,0.54,desktop-pc/desktop-pc-23.glb
+desktop-pc-24,Desktop PC #25,desktop-pc,234,5.8,0.84,0.54,0.45,desktop-pc/desktop-pc-24.glb
+desktop-pc-25,Desktop PC #26,desktop-pc,176,4.9,0.44,0.65,0.48,desktop-pc/desktop-pc-25.glb
+desktop-pc-26,Desktop PC #27,desktop-pc,132,4.3,0.63,0.4,0.5,desktop-pc/desktop-pc-26.glb
+desktop-pc-27,Desktop PC #28,desktop-pc,228,5.9,1.15,0.53,0.49,desktop-pc/desktop-pc-27.glb
+desktop-pc-28,Desktop PC #29,desktop-pc,234,5.9,0.76,0.52,0.45,desktop-pc/desktop-pc-28.glb
+desktop-pc-29,Desktop PC #30,desktop-pc,176,4.9,0.5,0.65,0.48,desktop-pc/desktop-pc-29.glb
+desktop-pc-30,Desktop PC #31,desktop-pc,132,4.2,0.63,0.4,0.5,desktop-pc/desktop-pc-30.glb
+desktop-pc-31,Desktop PC #32,desktop-pc,228,5.8,1.15,0.55,0.55,desktop-pc/desktop-pc-31.glb
+desktop-pc-32,Desktop PC #33,desktop-pc,234,5.8,0.75,0.52,0.49,desktop-pc/desktop-pc-32.glb
+desktop-pc-33,Desktop PC #34,desktop-pc,176,4.9,0.48,0.65,0.53,desktop-pc/desktop-pc-33.glb
+desktop-pc-34,Desktop PC #35,desktop-pc,132,4.2,0.69,0.4,0.54,desktop-pc/desktop-pc-34.glb
+desktop-pc-35,Desktop PC #36,desktop-pc,228,5.6,1.29,0.53,0.51,desktop-pc/desktop-pc-35.glb
+desktop-pc-36,Desktop PC #37,desktop-pc,234,5.8,0.91,0.53,0.45,desktop-pc/desktop-pc-36.glb
+desktop-pc-37,Desktop PC #38,desktop-pc,176,4.9,0.48,0.65,0.5,desktop-pc/desktop-pc-37.glb
+desktop-pc-38,Desktop PC #39,desktop-pc,132,4.2,0.54,0.4,0.45,desktop-pc/desktop-pc-38.glb
+desktop-pc-39,Desktop PC #40,desktop-pc,228,5.8,1.2,0.53,0.49,desktop-pc/desktop-pc-39.glb
+desktop-pc-40,Desktop PC #41,desktop-pc,234,5.8,0.89,0.53,0.49,desktop-pc/desktop-pc-40.glb
+desktop-pc-41,Desktop PC #42,desktop-pc,176,4.9,0.47,0.65,0.48,desktop-pc/desktop-pc-41.glb
+desktop-pc-42,Desktop PC #43,desktop-pc,132,4.2,0.61,0.4,0.49,desktop-pc/desktop-pc-42.glb
+desktop-pc-43,Desktop PC #44,desktop-pc,228,5.8,1.15,0.56,0.45,desktop-pc/desktop-pc-43.glb
+desktop-pc-44,Desktop PC #45,desktop-pc,234,5.8,0.89,0.53,0.48,desktop-pc/desktop-pc-44.glb
+desktop-pc-45,Desktop PC #46,desktop-pc,176,4.9,0.49,0.65,0.5,desktop-pc/desktop-pc-45.glb
+desktop-pc-46,Desktop PC #47,desktop-pc,132,4.2,0.62,0.4,0.5,desktop-pc/desktop-pc-46.glb
+desktop-pc-47,Desktop PC #48,desktop-pc,228,5.8,1.37,0.54,0.57,desktop-pc/desktop-pc-47.glb
+desktop-pc-48,Desktop PC #49,desktop-pc,234,5.8,0.9,0.56,0.5,desktop-pc/desktop-pc-48.glb
+desktop-pc-49,Desktop PC #50,desktop-pc,176,4.9,0.45,0.65,0.49,desktop-pc/desktop-pc-49.glb
+phone-00,Phone #01,phone,54,2.9,0.08,0.15,0.04,phone/phone-00.glb
+phone-01,Phone #02,phone,90,3.5,0.09,0.11,0.19,phone/phone-01.glb
+phone-02,Phone #03,phone,90,3.4,0.06,0.12,0.04,phone/phone-02.glb
+phone-03,Phone #04,phone,194,5.5,0.29,0.25,0.12,phone/phone-03.glb
+phone-04,Phone #05,phone,84,3.3,0.07,0.22,0.04,phone/phone-04.glb
+phone-05,Phone #06,phone,90,3.5,0.09,0.12,0.17,phone/phone-05.glb
+phone-06,Phone #07,phone,102,3.6,0.06,0.12,0.05,phone/phone-06.glb
+phone-07,Phone #08,phone,178,5.3,0.23,0.25,0.14,phone/phone-07.glb
+phone-08,Phone #09,phone,54,2.9,0.07,0.14,0.04,phone/phone-08.glb
+phone-09,Phone #10,phone,90,3.5,0.09,0.13,0.18,phone/phone-09.glb
+phone-10,Phone #11,phone,102,3.5,0.05,0.11,0.05,phone/phone-10.glb
+phone-11,Phone #12,phone,190,5.4,0.21,0.29,0.12,phone/phone-11.glb
+phone-12,Phone #13,phone,54,2.9,0.08,0.17,0.04,phone/phone-12.glb
+phone-13,Phone #14,phone,90,3.5,0.09,0.13,0.18,phone/phone-13.glb
+phone-14,Phone #15,phone,114,3.6,0.05,0.13,0.05,phone/phone-14.glb
+phone-15,Phone #16,phone,194,5.5,0.28,0.27,0.12,phone/phone-15.glb
+phone-16,Phone #17,phone,64,3.0,0.08,0.21,0.04,phone/phone-16.glb
+phone-17,Phone #18,phone,90,3.5,0.09,0.13,0.18,phone/phone-17.glb
+phone-18,Phone #19,phone,102,3.6,0.05,0.11,0.05,phone/phone-18.glb
+phone-19,Phone #20,phone,178,5.3,0.19,0.25,0.14,phone/phone-19.glb
+phone-20,Phone #21,phone,84,3.4,0.08,0.21,0.04,phone/phone-20.glb
+phone-21,Phone #22,phone,90,3.5,0.09,0.12,0.19,phone/phone-21.glb
+phone-22,Phone #23,phone,90,3.4,0.05,0.12,0.04,phone/phone-22.glb
+phone-23,Phone #24,phone,190,5.3,0.21,0.27,0.14,phone/phone-23.glb
+phone-24,Phone #25,phone,74,3.2,0.08,0.17,0.04,phone/phone-24.glb
+phone-25,Phone #26,phone,90,3.5,0.09,0.12,0.18,phone/phone-25.glb
+phone-26,Phone #27,phone,90,3.4,0.06,0.12,0.04,phone/phone-26.glb
+phone-27,Phone #28,phone,178,5.2,0.2,0.27,0.14,phone/phone-27.glb
+phone-28,Phone #29,phone,64,3.0,0.08,0.23,0.04,phone/phone-28.glb
+phone-29,Phone #30,phone,90,3.5,0.09,0.12,0.18,phone/phone-29.glb
+phone-30,Phone #31,phone,102,3.6,0.05,0.12,0.05,phone/phone-30.glb
+phone-31,Phone #32,phone,194,5.5,0.27,0.25,0.12,phone/phone-31.glb
+phone-32,Phone #33,phone,84,3.3,0.08,0.22,0.04,phone/phone-32.glb
+phone-33,Phone #34,phone,90,3.5,0.09,0.12,0.18,phone/phone-33.glb
+phone-34,Phone #35,phone,114,3.8,0.05,0.11,0.05,phone/phone-34.glb
+phone-35,Phone #36,phone,194,5.6,0.25,0.26,0.12,phone/phone-35.glb
+phone-36,Phone #37,phone,74,3.2,0.08,0.17,0.04,phone/phone-36.glb
+phone-37,Phone #38,phone,90,3.5,0.09,0.13,0.17,phone/phone-37.glb
+phone-38,Phone #39,phone,102,3.4,0.06,0.12,0.04,phone/phone-38.glb
+phone-39,Phone #40,phone,190,5.5,0.19,0.28,0.13,phone/phone-39.glb
+phone-40,Phone #41,phone,74,3.2,0.08,0.16,0.04,phone/phone-40.glb
+phone-41,Phone #42,phone,90,3.5,0.09,0.12,0.19,phone/phone-41.glb
+phone-42,Phone #43,phone,102,3.6,0.05,0.12,0.04,phone/phone-42.glb
+phone-43,Phone #44,phone,178,5.2,0.18,0.25,0.12,phone/phone-43.glb
+phone-44,Phone #45,phone,74,3.2,0.08,0.14,0.04,phone/phone-44.glb
+phone-45,Phone #46,phone,90,3.5,0.09,0.13,0.18,phone/phone-45.glb
+phone-46,Phone #47,phone,102,3.6,0.05,0.11,0.05,phone/phone-46.glb
+phone-47,Phone #48,phone,194,5.5,0.24,0.25,0.14,phone/phone-47.glb
+phone-48,Phone #49,phone,74,3.2,0.07,0.16,0.04,phone/phone-48.glb
+phone-49,Phone #50,phone,90,3.5,0.09,0.13,0.17,phone/phone-49.glb
+ceiling-fan-00,Ceiling Fan #01,ceiling-fan,278,6.8,1.28,1.34,0.55,ceiling-fan/ceiling-fan-00.glb
+ceiling-fan-01,Ceiling Fan #02,ceiling-fan,230,5.6,1.15,1.36,0.75,ceiling-fan/ceiling-fan-01.glb
+ceiling-fan-02,Ceiling Fan #03,ceiling-fan,218,5.6,1.22,1.26,0.43,ceiling-fan/ceiling-fan-02.glb
+ceiling-fan-03,Ceiling Fan #04,ceiling-fan,270,6.4,1.31,1.31,0.63,ceiling-fan/ceiling-fan-03.glb
+ceiling-fan-04,Ceiling Fan #05,ceiling-fan,206,5.4,1.19,1.37,0.76,ceiling-fan/ceiling-fan-04.glb
+ceiling-fan-05,Ceiling Fan #06,ceiling-fan,230,5.6,1.19,1.36,0.83,ceiling-fan/ceiling-fan-05.glb
+ceiling-fan-06,Ceiling Fan #07,ceiling-fan,194,5.1,1.45,1.44,0.56,ceiling-fan/ceiling-fan-06.glb
+ceiling-fan-07,Ceiling Fan #08,ceiling-fan,270,6.4,1.24,1.24,0.86,ceiling-fan/ceiling-fan-07.glb
+ceiling-fan-08,Ceiling Fan #09,ceiling-fan,278,6.7,1.27,1.33,0.73,ceiling-fan/ceiling-fan-08.glb
+ceiling-fan-09,Ceiling Fan #10,ceiling-fan,230,5.7,1.02,1.18,0.78,ceiling-fan/ceiling-fan-09.glb
+ceiling-fan-10,Ceiling Fan #11,ceiling-fan,218,5.6,1.11,1.16,0.82,ceiling-fan/ceiling-fan-10.glb
+ceiling-fan-11,Ceiling Fan #12,ceiling-fan,270,6.4,1.18,1.18,0.81,ceiling-fan/ceiling-fan-11.glb
+ceiling-fan-12,Ceiling Fan #13,ceiling-fan,278,6.7,1.36,1.41,0.41,ceiling-fan/ceiling-fan-12.glb
+ceiling-fan-13,Ceiling Fan #14,ceiling-fan,230,5.7,1.03,1.2,0.49,ceiling-fan/ceiling-fan-13.glb
+ceiling-fan-14,Ceiling Fan #15,ceiling-fan,242,6.1,1.29,1.18,0.57,ceiling-fan/ceiling-fan-14.glb
+ceiling-fan-15,Ceiling Fan #16,ceiling-fan,270,6.4,1.24,1.24,0.81,ceiling-fan/ceiling-fan-15.glb
+ceiling-fan-16,Ceiling Fan #17,ceiling-fan,278,6.8,1.14,1.2,0.63,ceiling-fan/ceiling-fan-16.glb
+ceiling-fan-17,Ceiling Fan #18,ceiling-fan,230,5.7,1.02,1.14,0.81,ceiling-fan/ceiling-fan-17.glb
+ceiling-fan-18,Ceiling Fan #19,ceiling-fan,194,5.1,1.26,1.25,0.55,ceiling-fan/ceiling-fan-18.glb
+ceiling-fan-19,Ceiling Fan #20,ceiling-fan,306,7.2,1.22,1.29,0.79,ceiling-fan/ceiling-fan-19.glb
+ceiling-fan-20,Ceiling Fan #21,ceiling-fan,206,5.5,1.06,1.19,0.45,ceiling-fan/ceiling-fan-20.glb
+ceiling-fan-21,Ceiling Fan #22,ceiling-fan,230,5.7,0.99,1.1,0.55,ceiling-fan/ceiling-fan-21.glb
+ceiling-fan-22,Ceiling Fan #23,ceiling-fan,194,5.2,1.21,1.22,0.63,ceiling-fan/ceiling-fan-22.glb
+ceiling-fan-23,Ceiling Fan #24,ceiling-fan,306,7.1,1.38,1.45,0.71,ceiling-fan/ceiling-fan-23.glb
+ceiling-fan-24,Ceiling Fan #25,ceiling-fan,206,5.5,0.95,1.08,0.78,ceiling-fan/ceiling-fan-24.glb
+ceiling-fan-25,Ceiling Fan #26,ceiling-fan,274,6.2,1.53,1.55,0.82,ceiling-fan/ceiling-fan-25.glb
+ceiling-fan-26,Ceiling Fan #27,ceiling-fan,194,5.1,1.47,1.46,0.78,ceiling-fan/ceiling-fan-26.glb
+ceiling-fan-27,Ceiling Fan #28,ceiling-fan,306,7.2,1.22,1.26,0.56,ceiling-fan/ceiling-fan-27.glb
+ceiling-fan-28,Ceiling Fan #29,ceiling-fan,278,6.7,1.29,1.38,0.79,ceiling-fan/ceiling-fan-28.glb
+ceiling-fan-29,Ceiling Fan #30,ceiling-fan,230,5.6,1.04,1.18,0.73,ceiling-fan/ceiling-fan-29.glb
+ceiling-fan-30,Ceiling Fan #31,ceiling-fan,194,5.1,1.25,1.25,0.52,ceiling-fan/ceiling-fan-30.glb
+ceiling-fan-31,Ceiling Fan #32,ceiling-fan,234,5.8,1.11,1.31,0.96,ceiling-fan/ceiling-fan-31.glb
+ceiling-fan-32,Ceiling Fan #33,ceiling-fan,206,5.5,1.0,1.11,0.65,ceiling-fan/ceiling-fan-32.glb
+ceiling-fan-33,Ceiling Fan #34,ceiling-fan,274,6.2,1.42,1.44,0.41,ceiling-fan/ceiling-fan-33.glb
+ceiling-fan-34,Ceiling Fan #35,ceiling-fan,194,5.1,1.29,1.29,0.79,ceiling-fan/ceiling-fan-34.glb
+ceiling-fan-35,Ceiling Fan #36,ceiling-fan,306,7.3,1.17,1.21,0.55,ceiling-fan/ceiling-fan-35.glb
+ceiling-fan-36,Ceiling Fan #37,ceiling-fan,242,6.1,1.45,1.45,0.61,ceiling-fan/ceiling-fan-36.glb
+ceiling-fan-37,Ceiling Fan #38,ceiling-fan,230,5.6,1.18,1.32,0.65,ceiling-fan/ceiling-fan-37.glb
+ceiling-fan-38,Ceiling Fan #39,ceiling-fan,218,5.7,1.09,1.15,0.42,ceiling-fan/ceiling-fan-38.glb
+ceiling-fan-39,Ceiling Fan #40,ceiling-fan,270,6.4,1.46,1.46,0.86,ceiling-fan/ceiling-fan-39.glb
+ceiling-fan-40,Ceiling Fan #41,ceiling-fan,242,5.9,1.5,1.5,0.6,ceiling-fan/ceiling-fan-40.glb
+ceiling-fan-41,Ceiling Fan #42,ceiling-fan,230,5.7,1.0,1.11,0.77,ceiling-fan/ceiling-fan-41.glb
+ceiling-fan-42,Ceiling Fan #43,ceiling-fan,218,5.6,1.26,1.32,0.6,ceiling-fan/ceiling-fan-42.glb
+ceiling-fan-43,Ceiling Fan #44,ceiling-fan,270,6.4,1.15,1.14,0.65,ceiling-fan/ceiling-fan-43.glb
+ceiling-fan-44,Ceiling Fan #45,ceiling-fan,206,5.4,1.18,1.33,0.64,ceiling-fan/ceiling-fan-44.glb
+ceiling-fan-45,Ceiling Fan #46,ceiling-fan,274,6.3,1.2,1.22,0.46,ceiling-fan/ceiling-fan-45.glb
+ceiling-fan-46,Ceiling Fan #47,ceiling-fan,218,5.6,1.36,1.43,0.52,ceiling-fan/ceiling-fan-46.glb
+ceiling-fan-47,Ceiling Fan #48,ceiling-fan,306,7.1,1.38,1.44,0.77,ceiling-fan/ceiling-fan-47.glb
+ceiling-fan-48,Ceiling Fan #49,ceiling-fan,278,6.8,1.12,1.17,0.76,ceiling-fan/ceiling-fan-48.glb
+ceiling-fan-49,Ceiling Fan #50,ceiling-fan,274,6.3,1.45,1.46,0.82,ceiling-fan/ceiling-fan-49.glb
+standing-fan-00,Standing Fan #01,standing-fan,310,7.2,0.49,0.44,1.15,standing-fan/standing-fan-00.glb
+standing-fan-01,Standing Fan #02,standing-fan,328,7.5,0.39,0.19,0.53,standing-fan/standing-fan-01.glb
+standing-fan-02,Standing Fan #03,standing-fan,180,4.5,0.44,0.23,0.56,standing-fan/standing-fan-02.glb
+standing-fan-03,Standing Fan #04,standing-fan,90,3.5,0.37,0.37,1.02,standing-fan/standing-fan-03.glb
+standing-fan-04,Standing Fan #05,standing-fan,286,6.7,0.5,0.49,1.26,standing-fan/standing-fan-04.glb
+standing-fan-05,Standing Fan #06,standing-fan,328,7.6,0.37,0.19,0.52,standing-fan/standing-fan-05.glb
+standing-fan-06,Standing Fan #07,standing-fan,192,4.7,0.41,0.23,0.53,standing-fan/standing-fan-06.glb
+standing-fan-07,Standing Fan #08,standing-fan,90,3.5,0.36,0.36,1.16,standing-fan/standing-fan-07.glb
+standing-fan-08,Standing Fan #09,standing-fan,296,6.8,0.55,0.55,1.16,standing-fan/standing-fan-08.glb
+standing-fan-09,Standing Fan #10,standing-fan,352,8.0,0.35,0.19,0.49,standing-fan/standing-fan-09.glb
+standing-fan-10,Standing Fan #11,standing-fan,180,4.5,0.44,0.25,0.56,standing-fan/standing-fan-10.glb
+standing-fan-11,Standing Fan #12,standing-fan,90,3.5,0.34,0.34,1.16,standing-fan/standing-fan-11.glb
+standing-fan-12,Standing Fan #13,standing-fan,310,7.1,0.55,0.5,1.25,standing-fan/standing-fan-12.glb
+standing-fan-13,Standing Fan #14,standing-fan,328,7.6,0.34,0.19,0.47,standing-fan/standing-fan-13.glb
+standing-fan-14,Standing Fan #15,standing-fan,180,4.5,0.45,0.25,0.57,standing-fan/standing-fan-14.glb
+standing-fan-15,Standing Fan #16,standing-fan,90,3.5,0.34,0.34,1.12,standing-fan/standing-fan-15.glb
+standing-fan-16,Standing Fan #17,standing-fan,286,6.7,0.5,0.49,1.47,standing-fan/standing-fan-16.glb
+standing-fan-17,Standing Fan #18,standing-fan,316,7.4,0.33,0.19,0.48,standing-fan/standing-fan-17.glb
+standing-fan-18,Standing Fan #19,standing-fan,180,4.5,0.47,0.23,0.59,standing-fan/standing-fan-18.glb
+standing-fan-19,Standing Fan #20,standing-fan,90,3.5,0.35,0.35,1.16,standing-fan/standing-fan-19.glb
+standing-fan-20,Standing Fan #21,standing-fan,284,6.6,0.55,0.55,1.44,standing-fan/standing-fan-20.glb
+standing-fan-21,Standing Fan #22,standing-fan,316,7.3,0.33,0.19,0.47,standing-fan/standing-fan-21.glb
+standing-fan-22,Standing Fan #23,standing-fan,192,4.7,0.46,0.24,0.58,standing-fan/standing-fan-22.glb
+standing-fan-23,Standing Fan #24,standing-fan,90,3.5,0.32,0.32,1.11,standing-fan/standing-fan-23.glb
+standing-fan-24,Standing Fan #25,standing-fan,286,6.8,0.49,0.49,1.2,standing-fan/standing-fan-24.glb
+standing-fan-25,Standing Fan #26,standing-fan,304,7.1,0.32,0.19,0.49,standing-fan/standing-fan-25.glb
+standing-fan-26,Standing Fan #27,standing-fan,168,4.4,0.38,0.23,0.5,standing-fan/standing-fan-26.glb
+standing-fan-27,Standing Fan #28,standing-fan,90,3.5,0.34,0.34,0.93,standing-fan/standing-fan-27.glb
+standing-fan-28,Standing Fan #29,standing-fan,296,6.8,0.55,0.55,1.41,standing-fan/standing-fan-28.glb
+standing-fan-29,Standing Fan #30,standing-fan,328,7.6,0.32,0.19,0.49,standing-fan/standing-fan-29.glb
+standing-fan-30,Standing Fan #31,standing-fan,192,4.8,0.49,0.24,0.61,standing-fan/standing-fan-30.glb
+standing-fan-31,Standing Fan #32,standing-fan,90,3.5,0.34,0.34,0.92,standing-fan/standing-fan-31.glb
+standing-fan-32,Standing Fan #33,standing-fan,286,6.7,0.55,0.43,1.16,standing-fan/standing-fan-32.glb
+standing-fan-33,Standing Fan #34,standing-fan,352,8.0,0.33,0.19,0.5,standing-fan/standing-fan-33.glb
+standing-fan-34,Standing Fan #35,standing-fan,180,4.5,0.43,0.25,0.55,standing-fan/standing-fan-34.glb
+standing-fan-35,Standing Fan #36,standing-fan,90,3.5,0.36,0.36,1.09,standing-fan/standing-fan-35.glb
+standing-fan-36,Standing Fan #37,standing-fan,298,6.8,0.48,0.42,1.28,standing-fan/standing-fan-36.glb
+standing-fan-37,Standing Fan #38,standing-fan,340,7.8,0.33,0.19,0.45,standing-fan/standing-fan-37.glb
+standing-fan-38,Standing Fan #39,standing-fan,180,4.6,0.44,0.25,0.56,standing-fan/standing-fan-38.glb
+standing-fan-39,Standing Fan #40,standing-fan,90,3.5,0.38,0.38,0.91,standing-fan/standing-fan-39.glb
+standing-fan-40,Standing Fan #41,standing-fan,284,6.6,0.55,0.55,1.42,standing-fan/standing-fan-40.glb
+standing-fan-41,Standing Fan #42,standing-fan,340,7.8,0.39,0.19,0.5,standing-fan/standing-fan-41.glb
+standing-fan-42,Standing Fan #43,standing-fan,180,4.5,0.42,0.23,0.54,standing-fan/standing-fan-42.glb
+standing-fan-43,Standing Fan #44,standing-fan,90,3.5,0.35,0.35,0.87,standing-fan/standing-fan-43.glb
+standing-fan-44,Standing Fan #45,standing-fan,286,6.7,0.44,0.43,1.14,standing-fan/standing-fan-44.glb
+standing-fan-45,Standing Fan #46,standing-fan,328,7.5,0.38,0.19,0.48,standing-fan/standing-fan-45.glb
+standing-fan-46,Standing Fan #47,standing-fan,204,5.0,0.48,0.23,0.6,standing-fan/standing-fan-46.glb
+standing-fan-47,Standing Fan #48,standing-fan,90,3.5,0.36,0.36,1.09,standing-fan/standing-fan-47.glb
+standing-fan-48,Standing Fan #49,standing-fan,284,6.6,0.55,0.55,1.45,standing-fan/standing-fan-48.glb
+standing-fan-49,Standing Fan #50,standing-fan,340,7.7,0.32,0.19,0.47,standing-fan/standing-fan-49.glb
+air-conditioner-00,Air Conditioner #01,air-conditioner,138,4.3,0.76,0.22,0.28,air-conditioner/air-conditioner-00.glb
+air-conditioner-01,Air Conditioner #02,air-conditioner,220,5.4,0.86,0.43,0.66,air-conditioner/air-conditioner-01.glb
+air-conditioner-02,Air Conditioner #03,air-conditioner,206,4.9,0.7,0.67,0.52,air-conditioner/air-conditioner-02.glb
+air-conditioner-03,Air Conditioner #04,air-conditioner,150,4.1,0.5,0.37,1.68,air-conditioner/air-conditioner-03.glb
+air-conditioner-04,Air Conditioner #05,air-conditioner,122,4.0,0.96,0.24,0.34,air-conditioner/air-conditioner-04.glb
+air-conditioner-05,Air Conditioner #06,air-conditioner,220,5.4,0.7,0.45,0.57,air-conditioner/air-conditioner-05.glb
+air-conditioner-06,Air Conditioner #07,air-conditioner,170,4.2,0.77,0.65,0.49,air-conditioner/air-conditioner-06.glb
+air-conditioner-07,Air Conditioner #08,air-conditioner,150,4.1,0.48,0.35,1.74,air-conditioner/air-conditioner-07.glb
+air-conditioner-08,Air Conditioner #09,air-conditioner,138,4.3,0.77,0.23,0.3,air-conditioner/air-conditioner-08.glb
+air-conditioner-09,Air Conditioner #10,air-conditioner,220,5.3,0.77,0.48,0.63,air-conditioner/air-conditioner-09.glb
+air-conditioner-10,Air Conditioner #11,air-conditioner,170,4.3,0.71,0.62,0.51,air-conditioner/air-conditioner-10.glb
+air-conditioner-11,Air Conditioner #12,air-conditioner,126,3.7,0.5,0.4,1.71,air-conditioner/air-conditioner-11.glb
+air-conditioner-12,Air Conditioner #13,air-conditioner,122,4.1,0.82,0.21,0.33,air-conditioner/air-conditioner-12.glb
+air-conditioner-13,Air Conditioner #14,air-conditioner,208,5.2,0.81,0.47,0.56,air-conditioner/air-conditioner-13.glb
+air-conditioner-14,Air Conditioner #15,air-conditioner,170,4.3,0.81,0.7,0.54,air-conditioner/air-conditioner-14.glb
+air-conditioner-15,Air Conditioner #16,air-conditioner,114,3.7,0.55,0.34,1.66,air-conditioner/air-conditioner-15.glb
+air-conditioner-16,Air Conditioner #17,air-conditioner,138,4.3,0.76,0.21,0.33,air-conditioner/air-conditioner-16.glb
+air-conditioner-17,Air Conditioner #18,air-conditioner,208,5.1,0.75,0.49,0.61,air-conditioner/air-conditioner-17.glb
+air-conditioner-18,Air Conditioner #19,air-conditioner,170,4.3,0.74,0.67,0.55,air-conditioner/air-conditioner-18.glb
+air-conditioner-19,Air Conditioner #20,air-conditioner,114,3.7,0.46,0.35,1.62,air-conditioner/air-conditioner-19.glb
+air-conditioner-20,Air Conditioner #21,air-conditioner,122,4.1,0.89,0.21,0.3,air-conditioner/air-conditioner-20.glb
+air-conditioner-21,Air Conditioner #22,air-conditioner,220,5.4,0.73,0.49,0.62,air-conditioner/air-conditioner-21.glb
+air-conditioner-22,Air Conditioner #23,air-conditioner,170,4.3,0.73,0.61,0.51,air-conditioner/air-conditioner-22.glb
+air-conditioner-23,Air Conditioner #24,air-conditioner,114,3.7,0.46,0.4,1.82,air-conditioner/air-conditioner-23.glb
+air-conditioner-24,Air Conditioner #25,air-conditioner,122,4.1,0.95,0.21,0.3,air-conditioner/air-conditioner-24.glb
+air-conditioner-25,Air Conditioner #26,air-conditioner,208,5.2,0.88,0.48,0.61,air-conditioner/air-conditioner-25.glb
+air-conditioner-26,Air Conditioner #27,air-conditioner,146,4.0,0.81,0.72,0.54,air-conditioner/air-conditioner-26.glb
+air-conditioner-27,Air Conditioner #28,air-conditioner,138,4.0,0.46,0.38,1.82,air-conditioner/air-conditioner-27.glb
+air-conditioner-28,Air Conditioner #29,air-conditioner,138,4.3,0.97,0.24,0.31,air-conditioner/air-conditioner-28.glb
+air-conditioner-29,Air Conditioner #30,air-conditioner,196,5.1,0.84,0.47,0.68,air-conditioner/air-conditioner-29.glb
+air-conditioner-30,Air Conditioner #31,air-conditioner,182,4.5,0.78,0.61,0.47,air-conditioner/air-conditioner-30.glb
+air-conditioner-31,Air Conditioner #32,air-conditioner,126,3.8,0.49,0.41,1.68,air-conditioner/air-conditioner-31.glb
+air-conditioner-32,Air Conditioner #33,air-conditioner,138,4.3,0.89,0.22,0.31,air-conditioner/air-conditioner-32.glb
+air-conditioner-33,Air Conditioner #34,air-conditioner,208,5.2,0.88,0.48,0.67,air-conditioner/air-conditioner-33.glb
+air-conditioner-34,Air Conditioner #35,air-conditioner,194,4.6,0.77,0.69,0.52,air-conditioner/air-conditioner-34.glb
+air-conditioner-35,Air Conditioner #36,air-conditioner,138,3.9,0.48,0.38,1.74,air-conditioner/air-conditioner-35.glb
+air-conditioner-36,Air Conditioner #37,air-conditioner,138,4.3,0.94,0.21,0.34,air-conditioner/air-conditioner-36.glb
+air-conditioner-37,Air Conditioner #38,air-conditioner,220,5.4,0.81,0.44,0.64,air-conditioner/air-conditioner-37.glb
+air-conditioner-38,Air Conditioner #39,air-conditioner,182,4.4,0.75,0.62,0.53,air-conditioner/air-conditioner-38.glb
+air-conditioner-39,Air Conditioner #40,air-conditioner,150,4.1,0.5,0.35,1.74,air-conditioner/air-conditioner-39.glb
+air-conditioner-40,Air Conditioner #41,air-conditioner,138,4.3,0.93,0.21,0.31,air-conditioner/air-conditioner-40.glb
+air-conditioner-41,Air Conditioner #42,air-conditioner,196,5.1,0.72,0.48,0.59,air-conditioner/air-conditioner-41.glb
+air-conditioner-42,Air Conditioner #43,air-conditioner,182,4.5,0.8,0.59,0.53,air-conditioner/air-conditioner-42.glb
+air-conditioner-43,Air Conditioner #44,air-conditioner,114,3.7,0.48,0.39,1.66,air-conditioner/air-conditioner-43.glb
+air-conditioner-44,Air Conditioner #45,air-conditioner,122,4.1,0.85,0.24,0.32,air-conditioner/air-conditioner-44.glb
+air-conditioner-45,Air Conditioner #46,air-conditioner,220,5.4,0.79,0.49,0.66,air-conditioner/air-conditioner-45.glb
+air-conditioner-46,Air Conditioner #47,air-conditioner,182,4.5,0.73,0.65,0.5,air-conditioner/air-conditioner-46.glb
+air-conditioner-47,Air Conditioner #48,air-conditioner,126,3.8,0.53,0.36,1.78,air-conditioner/air-conditioner-47.glb
+air-conditioner-48,Air Conditioner #49,air-conditioner,122,4.1,0.77,0.23,0.31,air-conditioner/air-conditioner-48.glb
+air-conditioner-49,Air Conditioner #50,air-conditioner,196,5.1,0.86,0.45,0.59,air-conditioner/air-conditioner-49.glb
+decoder-box-00,Decoder Box #01,decoder-box,188,4.7,0.23,0.23,0.06,decoder-box/decoder-box-00.glb
+decoder-box-01,Decoder Box #02,decoder-box,134,4.2,0.23,0.22,0.2,decoder-box/decoder-box-01.glb
+decoder-box-02,Decoder Box #03,decoder-box,120,4.0,0.35,0.17,0.05,decoder-box/decoder-box-02.glb
+decoder-box-03,Decoder Box #04,decoder-box,122,4.0,0.4,0.2,0.1,decoder-box/decoder-box-03.glb
+decoder-box-04,Decoder Box #05,decoder-box,148,4.3,0.18,0.16,0.05,decoder-box/decoder-box-04.glb
+decoder-box-05,Decoder Box #06,decoder-box,154,4.6,0.22,0.17,0.18,decoder-box/decoder-box-05.glb
+decoder-box-06,Decoder Box #07,decoder-box,120,4.0,0.4,0.25,0.05,decoder-box/decoder-box-06.glb
+decoder-box-07,Decoder Box #08,decoder-box,122,4.0,0.3,0.22,0.12,decoder-box/decoder-box-07.glb
+decoder-box-08,Decoder Box #09,decoder-box,168,4.5,0.23,0.17,0.06,decoder-box/decoder-box-08.glb
+decoder-box-09,Decoder Box #10,decoder-box,138,4.3,0.28,0.2,0.2,decoder-box/decoder-box-09.glb
+decoder-box-10,Decoder Box #11,decoder-box,108,3.8,0.39,0.18,0.04,decoder-box/decoder-box-10.glb
+decoder-box-11,Decoder Box #12,decoder-box,122,4.0,0.39,0.24,0.1,decoder-box/decoder-box-11.glb
+decoder-box-12,Decoder Box #13,decoder-box,148,4.2,0.25,0.2,0.06,decoder-box/decoder-box-12.glb
+decoder-box-13,Decoder Box #14,decoder-box,154,4.7,0.22,0.22,0.18,decoder-box/decoder-box-13.glb
+decoder-box-14,Decoder Box #15,decoder-box,108,3.9,0.38,0.23,0.04,decoder-box/decoder-box-14.glb
+decoder-box-15,Decoder Box #16,decoder-box,122,4.0,0.4,0.23,0.11,decoder-box/decoder-box-15.glb
+decoder-box-16,Decoder Box #17,decoder-box,148,4.2,0.19,0.23,0.05,decoder-box/decoder-box-16.glb
+decoder-box-17,Decoder Box #18,decoder-box,122,4.0,0.26,0.21,0.19,decoder-box/decoder-box-17.glb
+decoder-box-18,Decoder Box #19,decoder-box,120,4.0,0.35,0.23,0.05,decoder-box/decoder-box-18.glb
+decoder-box-19,Decoder Box #20,decoder-box,122,4.0,0.29,0.22,0.13,decoder-box/decoder-box-19.glb
+decoder-box-20,Decoder Box #21,decoder-box,168,4.4,0.3,0.17,0.06,decoder-box/decoder-box-20.glb
+decoder-box-21,Decoder Box #22,decoder-box,142,4.5,0.24,0.16,0.19,decoder-box/decoder-box-21.glb
+decoder-box-22,Decoder Box #23,decoder-box,120,4.0,0.39,0.23,0.05,decoder-box/decoder-box-22.glb
+decoder-box-23,Decoder Box #24,decoder-box,122,4.0,0.25,0.16,0.11,decoder-box/decoder-box-23.glb
+decoder-box-24,Decoder Box #25,decoder-box,128,3.9,0.27,0.2,0.07,decoder-box/decoder-box-24.glb
+decoder-box-25,Decoder Box #26,decoder-box,134,4.2,0.23,0.16,0.19,decoder-box/decoder-box-25.glb
+decoder-box-26,Decoder Box #27,decoder-box,120,4.0,0.36,0.2,0.06,decoder-box/decoder-box-26.glb
+decoder-box-27,Decoder Box #28,decoder-box,122,4.0,0.42,0.27,0.11,decoder-box/decoder-box-27.glb
+decoder-box-28,Decoder Box #29,decoder-box,188,4.7,0.3,0.24,0.05,decoder-box/decoder-box-28.glb
+decoder-box-29,Decoder Box #30,decoder-box,110,3.9,0.19,0.17,0.18,decoder-box/decoder-box-29.glb
+decoder-box-30,Decoder Box #31,decoder-box,108,3.9,0.26,0.21,0.04,decoder-box/decoder-box-30.glb
+decoder-box-31,Decoder Box #32,decoder-box,122,4.0,0.31,0.28,0.11,decoder-box/decoder-box-31.glb
+decoder-box-32,Decoder Box #33,decoder-box,168,4.4,0.3,0.23,0.07,decoder-box/decoder-box-32.glb
+decoder-box-33,Decoder Box #34,decoder-box,166,4.7,0.2,0.16,0.2,decoder-box/decoder-box-33.glb
+decoder-box-34,Decoder Box #35,decoder-box,108,3.8,0.38,0.19,0.04,decoder-box/decoder-box-34.glb
+decoder-box-35,Decoder Box #36,decoder-box,122,4.0,0.35,0.24,0.12,decoder-box/decoder-box-35.glb
+decoder-box-36,Decoder Box #37,decoder-box,168,4.4,0.25,0.23,0.05,decoder-box/decoder-box-36.glb
+decoder-box-37,Decoder Box #38,decoder-box,126,4.2,0.23,0.17,0.19,decoder-box/decoder-box-37.glb
+decoder-box-38,Decoder Box #39,decoder-box,108,3.7,0.39,0.23,0.06,decoder-box/decoder-box-38.glb
+decoder-box-39,Decoder Box #40,decoder-box,122,3.9,0.26,0.19,0.12,decoder-box/decoder-box-39.glb
+decoder-box-40,Decoder Box #41,decoder-box,148,4.2,0.23,0.24,0.05,decoder-box/decoder-box-40.glb
+decoder-box-41,Decoder Box #42,decoder-box,134,4.2,0.3,0.16,0.2,decoder-box/decoder-box-41.glb
+decoder-box-42,Decoder Box #43,decoder-box,108,3.8,0.39,0.24,0.05,decoder-box/decoder-box-42.glb
+decoder-box-43,Decoder Box #44,decoder-box,122,4.0,0.27,0.27,0.13,decoder-box/decoder-box-43.glb
+decoder-box-44,Decoder Box #45,decoder-box,128,3.9,0.27,0.21,0.05,decoder-box/decoder-box-44.glb
+decoder-box-45,Decoder Box #46,decoder-box,154,4.5,0.26,0.23,0.18,decoder-box/decoder-box-45.glb
+decoder-box-46,Decoder Box #47,decoder-box,108,3.9,0.33,0.24,0.05,decoder-box/decoder-box-46.glb
+decoder-box-47,Decoder Box #48,decoder-box,122,4.0,0.41,0.18,0.13,decoder-box/decoder-box-47.glb
+decoder-box-48,Decoder Box #49,decoder-box,168,4.5,0.21,0.16,0.06,decoder-box/decoder-box-48.glb
+decoder-box-49,Decoder Box #50,decoder-box,134,4.2,0.28,0.17,0.18,decoder-box/decoder-box-49.glb
