@@ -3,8 +3,8 @@
  * B-001 — Bottom sheet for a world-run shop/restaurant (mirrors OfficePanel).
  */
 import { useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
-import { findBusiness, type BusinessKind } from '../../data/businesses';
-import { isBusinessOpen, busyLabel } from '../../rules/business';
+import { findBusiness, type BusinessKind } from '../../data/worldBusinesses';
+import { isBusinessOpen, busyLabel } from '../../rules/worldBusiness';
 import {
   getBusinessState,
   selectBusiness,
