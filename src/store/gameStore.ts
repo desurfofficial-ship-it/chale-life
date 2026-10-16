@@ -564,6 +564,32 @@ export function setWalletBalanceGHS(balanceGHS: number): void {
   notify();
 }
 
+/**
+ * Buy a home furniture item (marketplace). Debits wallet and appends id to
+ * home.furnitureIds. Returns false if already owned or insufficient funds.
+ */
+export function buyHomeFurniture(id: string, costGHS: number): boolean {
+  if (state.home.furnitureIds.includes(id)) return false;
+  if (state.wallet.balanceGHS < costGHS) return false;
+  state.wallet.balanceGHS = Math.round((state.wallet.balanceGHS - costGHS) * 100) / 100;
+  state.home = {
+    ...state.home,
+    furnitureIds: [...state.home.furnitureIds, id],
+  };
+  notify();
+  return true;
+}
+
+/** Own a furniture id without charging (debug / e2e). */
+export function grantHomeFurniture(id: string): void {
+  if (state.home.furnitureIds.includes(id)) return;
+  state.home = {
+    ...state.home,
+    furnitureIds: [...state.home.furnitureIds, id],
+  };
+  notify();
+}
+
 if (
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('e2e') === '1'
