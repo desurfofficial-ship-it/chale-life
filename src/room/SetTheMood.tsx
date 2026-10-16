@@ -248,8 +248,6 @@ function Plinth() {
 
 
 
-import { listHomeFurniture, findFurnitureById } from '../data/furniture'
-import { getState, subscribe, buyHomeFurniture } from '../store/gameStore'
 
 /** Furniture marketplace list — reads catalog, buys into home.furnitureIds. */
 function FurnitureShop() {
@@ -305,7 +303,7 @@ export default function SetTheMood() {
   // Room tools tabs: mood (materials/daylight) | shop (furniture marketplace)
   const initialTab = (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('room') === 'shop')
     ? 'shop' : 'mood'
-  const [tab, setTab] = useState<'mood' | 'shop'>(initialTab as 'mood' | 'shop')
+  const [roomTab, setRoomTab] = useState<'mood' | 'shop'>(initialTab)
   const slotDef = SLOTS.find((s) => s.id === selected)!
   const [tab, setTab] = useState<MatKind>(slotDef.kinds[0])
   const [idle, setIdle] = useState(true)
@@ -425,19 +423,19 @@ export default function SetTheMood() {
       </button>
       {/* Room tools tabs */}
       <div style={{ display: 'flex', gap: 8, padding: '8px 12px 0', pointerEvents: 'auto' }}>
-        <button type="button" onClick={() => setTab('mood')}
-          style={{ flex: 1, minHeight: 40, borderRadius: 12, border: tab==='mood' ? '1px solid #fcd116' : '1px solid rgba(255,255,255,0.15)',
-            background: tab==='mood' ? 'rgba(252,209,22,0.18)' : 'rgba(9,13,22,0.7)', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>
+        <button type="button" onClick={() => setRoomTab('mood')}
+          style={{ flex: 1, minHeight: 40, borderRadius: 12, border: roomTab==='mood' ? '1px solid #fcd116' : '1px solid rgba(255,255,255,0.15)',
+            background: roomTab==='mood' ? 'rgba(252,209,22,0.18)' : 'rgba(9,13,22,0.7)', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>
           Mood
         </button>
-        <button type="button" onClick={() => setTab('shop')}
-          style={{ flex: 1, minHeight: 40, borderRadius: 12, border: tab==='shop' ? '1px solid #fcd116' : '1px solid rgba(255,255,255,0.15)',
-            background: tab==='shop' ? 'rgba(252,209,22,0.18)' : 'rgba(9,13,22,0.7)', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>
+        <button type="button" onClick={() => setRoomTab('shop')}
+          style={{ flex: 1, minHeight: 40, borderRadius: 12, border: roomTab==='shop' ? '1px solid #fcd116' : '1px solid rgba(255,255,255,0.15)',
+            background: roomTab==='shop' ? 'rgba(252,209,22,0.18)' : 'rgba(9,13,22,0.7)', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>
           Furniture shop
         </button>
       </div>
 
-      {tab === 'shop' && (
+      {roomTab === 'shop' && (
         <div style={{ pointerEvents: 'auto', margin: 12, maxHeight: '55vh', overflow: 'auto', borderRadius: 16,
           border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(14,16,24,0.92)', padding: 14, color: '#e2e8f0' }}>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#94a3b8', marginBottom: 10 }}>
