@@ -166,6 +166,7 @@ export function BusinessPanel() {
         ) : null}
 
         {sim ? (
+          <>
           <div style={{ marginTop: 10, fontSize: 11, color: '#888' }}>
             Day revenue (owner) GHS {sim.dayRevenueGHS.toFixed(0)} · Staff on shift{' '}
             {sim.staff.filter((s) => s.onShift).length}/{sim.staff.length}
@@ -207,6 +208,7 @@ export function BusinessPanel() {
               </button>
             ))}
           </div>
+          </>
         ) : null}
       </div>
     </div>
