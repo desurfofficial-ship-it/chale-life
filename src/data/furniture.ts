@@ -33,6 +33,8 @@ export interface FurnitureCatalogItem {
   readonly summary: string;
   /** When true, used in tycoon business kits (not home placement). */
   readonly businessKit?: boolean;
+  /** Optional meshopt GLB under public/models/furniture/ (1 unit = 1 m, +Y up). */
+  readonly modelPath?: string;
 }
 
 export const FURNITURE_CATALOG: ReadonlyArray<FurnitureCatalogItem> = [
@@ -239,6 +241,109 @@ export const FURNITURE_CATALOG: ReadonlyArray<FurnitureCatalogItem> = [
     effects: { comfort: 15, dumsorImmunity: true },
     dimensions: { widthMeters: 0.8, depthMeters: 0.6 },
     summary: 'Dumsor immunity. The whole compound hears you have power.',
+  },
+
+  // ── Low-poly batch 01 (CC0, meshopt) — public/models/furniture/*.glb ───────
+  {
+    id: 'sofa_lp',
+    title: 'Low-poly 2-Seater Sofa',
+    costGHS: 340,
+    rarity: 'standard',
+    effects: { comfort: 9, funRestore: 8, energyDecayMult: 0.92 },
+    dimensions: { widthMeters: 2.0, depthMeters: 0.9 },
+    summary: 'Clean low-poly sofa — same comfort as the basic 2-seater, real mesh.',
+    modelPath: 'models/furniture/sofa.glb',
+  },
+  {
+    id: 'office_chair_lp',
+    title: 'Office Chair',
+    costGHS: 180,
+    rarity: 'standard',
+    effects: { comfort: 5 },
+    dimensions: { widthMeters: 0.62, depthMeters: 0.65 },
+    summary: 'Swivel office chair — home desk or office floor.',
+    modelPath: 'models/furniture/office-chair.glb',
+  },
+  {
+    id: 'office_desk_lp',
+    title: 'Office Desk',
+    costGHS: 420,
+    rarity: 'standard',
+    effects: { comfort: 6 },
+    dimensions: { widthMeters: 1.4, depthMeters: 0.72 },
+    summary: 'Simple desk with legs — laptop and letters live here.',
+    modelPath: 'models/furniture/office-desk.glb',
+  },
+  {
+    id: 'coffee_table_lp',
+    title: 'Coffee Table',
+    costGHS: 150,
+    rarity: 'basic',
+    effects: { comfort: 4 },
+    dimensions: { widthMeters: 1.0, depthMeters: 0.56 },
+    summary: 'Low table for the sitting area.',
+    modelPath: 'models/furniture/coffee-table.glb',
+  },
+  {
+    id: 'bookshelf_lp',
+    title: 'Bookshelf',
+    costGHS: 280,
+    rarity: 'standard',
+    effects: { comfort: 6 },
+    dimensions: { widthMeters: 0.86, depthMeters: 0.32 },
+    summary: 'Tall open shelves — books, boxes, and a little pride.',
+    modelPath: 'models/furniture/bookshelf.glb',
+  },
+  {
+    id: 'floor_lamp_lp',
+    title: 'Floor Lamp',
+    costGHS: 95,
+    rarity: 'basic',
+    effects: { comfort: 3 },
+    dimensions: { widthMeters: 0.42, depthMeters: 0.42 },
+    summary: 'Standing lamp — warm light for the room corner.',
+    modelPath: 'models/furniture/floor-lamp.glb',
+  },
+  {
+    id: 'potted_plant_lp',
+    title: 'Potted Plant',
+    costGHS: 45,
+    rarity: 'basic',
+    effects: { comfort: 3 },
+    dimensions: { widthMeters: 0.69, depthMeters: 0.57 },
+    summary: 'A little green — same spirit as the terracotta planters.',
+    modelPath: 'models/furniture/potted-plant.glb',
+  },
+  {
+    id: 'filing_cabinet_lp',
+    title: 'Filing Cabinet',
+    costGHS: 220,
+    rarity: 'standard',
+    effects: { comfort: 4 },
+    dimensions: { widthMeters: 0.46, depthMeters: 0.65 },
+    summary: 'Metal drawers for papers and receipts.',
+    modelPath: 'models/furniture/filing-cabinet.glb',
+  },
+  {
+    id: 'water_cooler_lp',
+    title: 'Water Cooler',
+    costGHS: 160,
+    rarity: 'standard',
+    effects: { comfort: 3, hygieneRestore: 10 },
+    dimensions: { widthMeters: 0.32, depthMeters: 0.43 },
+    summary: 'Office water dispenser — sachet alternative at home too.',
+    modelPath: 'models/furniture/water-cooler.glb',
+  },
+  {
+    id: 'reception_counter_lp',
+    title: 'Reception Counter',
+    costGHS: 380,
+    rarity: 'standard',
+    effects: { comfort: 0 },
+    dimensions: { widthMeters: 2.06, depthMeters: 0.86 },
+    summary: 'Long counter for lobby or small shop front.',
+    businessKit: true,
+    modelPath: 'models/furniture/reception-counter.glb',
   },
 
   // ── Business kit (G-009 / T-001) — tycoon interiors, not home ─────────────
