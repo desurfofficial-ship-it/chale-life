@@ -103,7 +103,17 @@ function Cutaway({ def, richProps }: { def: BusinessDef; richProps: boolean }) {
       {/* floor */}
       <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[w - 0.2, d - 0.2]} />
-        <meshStandardMaterial color={def.kind === 'restaurant' ? '#f6edd8' : '#e8eef7'} />
+        <meshStandardMaterial
+          color={
+            def.kind === 'restaurant'
+              ? '#f6edd8'
+              : def.sub === 'barber' || def.sub === 'salon'
+                ? '#f3e9df'
+                : def.sub === 'gym'
+                  ? '#e4ebe6'
+                  : '#e8eef7'
+          }
+        />
       </mesh>
       {/* back + side walls (roofless) */}
       <mesh position={[0, 0.9, -d / 2 + 0.08]}>
