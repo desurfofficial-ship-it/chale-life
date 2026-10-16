@@ -4,6 +4,7 @@
  */
 import { variantIndex } from '../../data/worldBusinesses';
 import type { BusinessDef } from '../../data/worldBusinesses';
+import { publicUrl } from '../gltfSupport';
 
 export type PropSpec = {
   readonly path: string;
@@ -15,7 +16,7 @@ export type PropSpec = {
 };
 
 const p = (category: string, archetype: string) =>
-  `/models/furniture/${category}/${archetype}/${archetype}-00.glb`;
+  publicUrl(`models/furniture/${category}/${archetype}/${archetype}-00.glb`);
 
 /** Props laid out inside a business cutaway (local space, origin = centre). */
 export function propsFor(def: BusinessDef): readonly PropSpec[] {
