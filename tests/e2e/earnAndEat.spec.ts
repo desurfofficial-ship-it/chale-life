@@ -435,11 +435,14 @@ test('robot playtest: earn-and-eat loop — ₵20 → payout → waakye, then Ac
   await expect(page.getByText(formatGHS(23), { exact: true })).toBeVisible();
 
   // ── 7. Perf budget + a clean console ─────────────────────────────
-  // ACCRA MAP budget (re-derived): the batched street view measures 379
-  // draws (the v6 viewer reports ~163 at overview + instanced nature);
-  // the guard's job is to catch the UNBATCHED regression (measured 3992
-  // when SceneBatcher was skipped), not to pin the old starter map's 60.
-  expect(await drawCalls(page)).toBeLessThan(450);
+  // ACCRA MAP budget (re-derived): the batched street view measured 379
+  // draws with the old whole-city merge (zero culling), 3992 unbatched.
+  // P2-1 batches per 128 m cell with frustum culling ON: street level only
+  // draws nearby cells (strict win), while wide top-down views trade a few
+  // extra cell draws for district-level culling — measured 451 in this
+  // playtest. The guard still catches the UNBATCHED regression class
+  // (3992) with ~8× headroom; it does not pin the old starter map's 60.
+  expect(await drawCalls(page)).toBeLessThan(500);
   expect(failedAssets, 'every shipped asset must resolve').toEqual([]);
   expect(pageErrors, 'the playtest must run without page errors').toEqual([]);
 });

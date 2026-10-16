@@ -77,7 +77,12 @@ const batcherBus = new EventTarget()
 
 // ── per-cell bookkeeping ─────────────────────────────────────────────────────
 
-const CELL_SIZE = 64 // metres per spatial cell
+// P2-1 cell size: 128 m balances two budgets. At street level ANY cell
+// count culls hard (only nearby cells draw); at overview the whole city is
+// in frustum and every visible cell is one draw per bucket, so fewer,
+// larger cells keep the overview draw-call budget (e2e ≤450) honest while
+// still culling whole districts when the camera looks along the plate.
+const CELL_SIZE = 128
 
 interface CellBatch {
   key: string
