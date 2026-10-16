@@ -1,13 +1,13 @@
 /**
  * B-001 — Business simulation store. Tick via registerAmbient (shared ambient step).
  */
-import { BUSINESSES, findBusiness, type BusinessDef, type MenuItem } from '../data/businesses';
+import { BUSINESSES, findBusiness, type BusinessDef, type MenuItem } from '../data/worldBusinesses';
 import {
   createBusinessSim,
   tickBusiness,
   canBuyItem,
   type BusinessSimState,
-} from '../rules/business';
+} from '../rules/worldBusiness';
 import { getAmbientHour } from './ambientClock';
 
 const SIM_INTERVAL_S = 0.25;
