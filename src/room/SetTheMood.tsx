@@ -5,7 +5,7 @@
 // a swatch straight onto the room. Pull the sun across the sky with the
 // daylight slider. Mood meter (Cozy / Bright / Moody) reacts to every change.
 // State persists in localStorage ('chale-room-v1').
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import * as THREE from 'three'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { OrbitControls, ContactShadows } from '@react-three/drei'
@@ -249,7 +249,8 @@ function Plinth() {
 
 
 
-/** Furniture marketplace list — reads catalog, buys into home.furnitureIds. */
+
+/** Furniture marketplace — House Control style tiles. */
 function FurnitureShop() {
   const [owned, setOwned] = useState<readonly string[]>(() => getState().home.furnitureIds)
   const [balance, setBalance] = useState(() => getState().wallet.balanceGHS)
@@ -270,332 +271,374 @@ function FurnitureShop() {
   }
   return (
     <div style={{ display: 'grid', gap: 8 }}>
-      <div style={{ fontSize: 13, color: '#fcd116', fontWeight: 800 }}>Wallet GHS {balance.toFixed(0)}</div>
-      {items.map((f) => {
-        const has = owned.includes(f.id)
-        const can = !has && balance >= f.costGHS
-        return (
-          <div key={f.id} style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '8px 10px',
-            borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontWeight: 700, fontSize: 14 }}>{f.title}</div>
-              <div style={{ fontSize: 11, color: '#94a3b8' }}>{f.summary}</div>
-              <div style={{ fontSize: 12, color: '#fcd116', marginTop: 2 }}>GHS {f.costGHS} · {f.rarity}</div>
-            </div>
-            <button type="button" disabled={!can && !has}
+      <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+        Wallet GHS {balance.toFixed(0)}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+        {items.map((f) => {
+          const has = owned.includes(f.id)
+          const can = !has && balance >= f.costGHS
+          return (
+            <button
+              key={f.id}
+              type="button"
               onClick={() => buy(f.id)}
-              style={{ minWidth: 72, minHeight: 36, borderRadius: 10, border: 'none', fontWeight: 800, cursor: can ? 'pointer' : 'default',
-                background: has ? 'rgba(16,185,129,0.25)' : can ? '#fcd116' : 'rgba(100,116,139,0.3)',
-                color: has ? '#6ee7b7' : can ? '#0a0f1a' : '#94a3b8' }}>
-              {has ? 'Owned' : can ? 'Buy' : 'Need cash'}
+              disabled={!can && !has}
+              style={{
+                textAlign: 'left',
+                padding: '12px 12px',
+                borderRadius: 14,
+                border: has ? '1px solid rgba(16,185,129,0.45)' : '1px solid rgba(255,255,255,0.1)',
+                background: has ? 'rgba(16,185,129,0.12)' : 'rgba(255,255,255,0.05)',
+                color: '#e8eef7',
+                cursor: can || has ? 'pointer' : 'default',
+                opacity: can || has ? 1 : 0.55,
+              }}
+            >
+              <div style={{ fontWeight: 800, fontSize: 13, lineHeight: 1.2 }}>{f.title}</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>GHS {f.costGHS}</div>
+              <div style={{ fontSize: 11, fontWeight: 700, marginTop: 6, color: has ? '#6ee7b7' : can ? '#fcd116' : 'rgba(255,255,255,0.35)' }}>
+                {has ? 'Owned' : can ? 'Buy' : 'Need cash'}
+              </div>
             </button>
-          </div>
-        )
-      })}
+          )
+        })}
+      </div>
     </div>
   )
 }
 
+/**
+ * Room editor — House Control–inspired layout:
+ *   3D dollhouse on top, dark glass panel below with scene chips + tiles.
+ * Tap a surface in 3D to select it; scene chips set the whole mood at once.
+ */
 export default function SetTheMood() {
   const { mats, hour, selected, apply, preset, select, setHour, undo, redo, past, future } = useMood()
   const scores = useMemo(() => moodScores(mats, hour), [mats, hour])
   const sentence = useMemo(() => moodSentence(mats, scores), [mats, scores])
-  // Room tools tabs: mood (materials/daylight) | shop (furniture marketplace)
-  const initialTab = (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('room') === 'shop')
-    ? 'shop' : 'mood'
-  const [roomTab, setRoomTab] = useState<'mood' | 'shop'>(initialTab)
-  const slotDef = SLOTS.find((s) => s.id === selected)!
-  const [tab, setTab] = useState<MatKind>(slotDef.kinds[0])
-  const [idle, setIdle] = useState(true)
-  const [toast, setToast] = useState<string | null>(null)
-  const [drag, setDrag] = useState<{ id: string; x: number; y: number; moved: boolean; over: Slot | null } | null>(null)
   const lamps = daylight(hour).lamps
 
+  // Panel tab: surfaces (paint) | lights (daylight) | shop (furniture)
+  const [panel, setPanel] = useState<'surfaces' | 'lights' | 'shop'>(() => {
+    if (typeof window === 'undefined') return 'surfaces'
+    return new URLSearchParams(window.location.search).get('room') === 'shop' ? 'shop' : 'surfaces'
+  })
+  const slotDef = SLOTS.find((s) => s.id === selected)!
+  const [matKind, setMatKind] = useState<MatKind>(slotDef.kinds[0])
   useEffect(() => {
-    if (!slotDef.kinds.includes(tab)) setTab(slotDef.kinds[0])
-  }, [selected]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (!slotDef.kinds.includes(matKind)) setMatKind(slotDef.kinds[0])
+  }, [selected, slotDef, matKind])
 
-  const flash = (msg: string) => {
-    setToast(msg)
-    window.clearTimeout((flash as unknown as { t?: number }).t)
-    ;(flash as unknown as { t?: number }).t = window.setTimeout(() => setToast(null), 1600)
-  }
-  const tryApply = (slot: Slot, id: string) => {
-    const def = SLOTS.find((s) => s.id === slot)!
-    const sw = SWATCH[id]
-    if (!def.kinds.includes(sw.kind)) {
-      flash(`${sw.name} can't go on the ${def.label.toLowerCase()}`)
-      return
+  const goStreet = () => {
+    try {
+      sessionStorage.removeItem('chale.moodOk')
+    } catch {
+      /* */
     }
-    apply(slot, id)
-    flash(`${def.label} · ${sw.name}`)
+    const u = new URL(window.location.href)
+    u.searchParams.delete('mood')
+    u.searchParams.delete('room')
+    u.searchParams.delete('from')
+    window.location.href = u.pathname + (u.search ? u.search : '') + u.hash
   }
 
-  // drag-and-drop from the tray onto the room
-  useEffect(() => {
-    if (!drag) return
-    const move = (e: PointerEvent) => {
-      const moved = drag.moved || Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 8
-      setDrag({ ...drag, x: e.clientX, y: e.clientY, moved, over: moved ? slotAt(e.clientX, e.clientY) : null })
-    }
-    const up = (e: PointerEvent) => {
-      if (drag.moved) {
-        const s = slotAt(e.clientX, e.clientY)
-        if (s) tryApply(s, drag.id)
-      } else {
-        tryApply(selected, drag.id)
-      }
-      setDrag(null)
-    }
-    window.addEventListener('pointermove', move)
-    window.addEventListener('pointerup', up)
-    return () => {
-      window.removeEventListener('pointermove', move)
-      window.removeEventListener('pointerup', up)
-    }
-  }) // eslint-disable-line react-hooks/exhaustive-deps
+  const kinds: MatKind[] = ['wood', 'stone', 'fabric', 'paint']
+  const sceneChips: { id: MoodId; label: string }[] = [
+    { id: 'bright', label: 'Bright' },
+    { id: 'cozy', label: 'Cozy' },
+    { id: 'moody', label: 'Night' },
+  ]
 
-  const hh = Math.floor(hour)
-  const mm = Math.floor((hour - hh) * 60)
-  const clock = `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`
-  const tabs: MatKind[] = ['wood', 'stone', 'fabric', 'paint']
-  const glass = 'rounded-2xl border border-white/10 bg-[#0e1018]/75 backdrop-blur-md'
+  const chipBase: CSSProperties = {
+    minHeight: 40,
+    padding: '0 14px',
+    borderRadius: 12,
+    border: '1px solid rgba(255,255,255,0.12)',
+    background: 'rgba(255,255,255,0.06)',
+    color: 'rgba(255,255,255,0.85)',
+    fontWeight: 700,
+    fontSize: 13,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  }
 
   return (
-    <div className="relative h-[100dvh] w-screen select-none overflow-hidden bg-[#0b0d14] text-white" style={{ touchAction: 'none', WebkitTouchCallout: 'none' }}>
-      <Canvas
-        shadows
-        dpr={[1, 2]}
-        camera={{ position: [18, 20, 23], fov: 38, near: 0.5, far: 300 }}
-        gl={{ antialias: true }}
-        onCreated={({ gl }) => {
-          gl.toneMapping = THREE.ACESFilmicToneMapping
-          gl.toneMappingExposure = 1.05
-        }}
-        onPointerMissed={() => undefined}
-      >
-        <Bridge />
-        <DaylightRig />
-        <group position={[0, 0, 0.6]}>
-          <GyanRoom mode="dollhouse" mats={mats} selected={selected} onPick={(s) => select(s)} lampsOn={lamps} />
-          {/* the GLB suspends while loading: without its own boundary the
-              suspension reached the page and remounted the whole Canvas
-              (WebGL context lost → blank screen) */}
-          {SHOW_PLAYER && (
-            <Suspense fallback={null}>
-              <PlayerCharacter position={[-0.3, 0, 0.4]} rotationY={0.5} />
-            </Suspense>
-          )}
-          <Plinth />
-        </group>
-        <ContactShadows position={[0, -0.9, 0.6]} opacity={0.5} scale={14} blur={2.6} far={2} />
-        <OrbitControls
-          enablePan={false}
-          minDistance={10}
-          maxDistance={50}
-          minPolarAngle={0.5}
-          maxPolarAngle={1.15}
-          target={[0, LOOK_Y, 0]}
-          onStart={() => setIdle(false)}
-        />
-        <IdleDrift active={idle} />
-      </Canvas>
-
-      {/* back to play — mood is an in-room editor only */}
-      <button
-        type="button"
-        onClick={() => {
-          try {
-            sessionStorage.removeItem('chale.moodOk')
-          } catch { /* */ }
-          const u = new URL(window.location.href)
-          u.searchParams.delete('mood')
-          u.searchParams.delete('from')
-          window.location.href = u.pathname + (u.search || '') + u.hash
-        }}
-        style={{
-          position: 'absolute', top: 12, left: 12, zIndex: 40,
-          padding: '8px 12px', borderRadius: 10, border: 'none',
-          background: 'rgba(0,0,0,0.55)', color: '#fff', fontWeight: 700, fontSize: 13,
-        }}
-      >
-        Back to street
-      </button>
-      {/* Room tools tabs */}
-      <div style={{ display: 'flex', gap: 8, padding: '8px 12px 0', pointerEvents: 'auto' }}>
-        <button type="button" onClick={() => setRoomTab('mood')}
-          style={{ flex: 1, minHeight: 40, borderRadius: 12, border: roomTab==='mood' ? '1px solid #fcd116' : '1px solid rgba(255,255,255,0.15)',
-            background: roomTab==='mood' ? 'rgba(252,209,22,0.18)' : 'rgba(9,13,22,0.7)', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>
-          Mood
-        </button>
-        <button type="button" onClick={() => setRoomTab('shop')}
-          style={{ flex: 1, minHeight: 40, borderRadius: 12, border: roomTab==='shop' ? '1px solid #fcd116' : '1px solid rgba(255,255,255,0.15)',
-            background: roomTab==='shop' ? 'rgba(252,209,22,0.18)' : 'rgba(9,13,22,0.7)', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>
-          Furniture shop
-        </button>
+    <div
+      className="relative h-[100dvh] w-screen select-none overflow-hidden bg-[#0a0c12] text-white"
+      style={{ touchAction: 'none', WebkitTouchCallout: 'none', fontFamily: 'system-ui, -apple-system, sans-serif' }}
+    >
+      {/* ── 3D dollhouse (upper half) ── */}
+      <div style={{ position: 'absolute', inset: 0, bottom: '42%' }}>
+        <Canvas
+          dpr={[1, 1.5]}
+          gl={{ antialias: true, alpha: false }}
+          camera={{ position: [4.2, 3.6, 4.8], fov: 42, near: 0.1, far: 40 }}
+          onPointerMissed={() => { /* keep last selection */ }}
+        >
+          <color attach="background" args={['#0a0c12']} />
+          <ambientLight intensity={0.35 + lamps * 0.15} />
+          <directionalLight position={[4, 8, 2]} intensity={0.55 + lamps * 0.35} color="#fff1d6" />
+          <Suspense fallback={null}>
+            <GyanRoom mode="dollhouse" mats={mats} selected={selected} onPick={select} lampsOn={lamps} />
+            <ContactShadows position={[0, 0.01, 0]} opacity={0.45} scale={12} blur={2.4} far={4} />
+          </Suspense>
+          <OrbitControls
+            enablePan={false}
+            minPolarAngle={0.35}
+            maxPolarAngle={1.35}
+            minDistance={4}
+            maxDistance={11}
+            target={[0, 1.1, 0]}
+          />
+          <DaylightRig />
+        </Canvas>
       </div>
 
-      {roomTab === 'shop' && (
-        <div style={{ pointerEvents: 'auto', margin: 12, maxHeight: '55vh', overflow: 'auto', borderRadius: 16,
-          border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(14,16,24,0.92)', padding: 14, color: '#e2e8f0' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#94a3b8', marginBottom: 10 }}>
-            Marketplace — buy for your room
-          </div>
-          <FurnitureShop />
+      {/* Top chrome */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 20,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: 'max(10px, env(safe-area-inset-top)) 12px 8px',
+          pointerEvents: 'none',
+        }}
+      >
+        <button
+          type="button"
+          onClick={goStreet}
+          style={{
+            ...chipBase,
+            pointerEvents: 'auto',
+            background: 'rgba(14,16,24,0.82)',
+            backdropFilter: 'blur(10px)',
+          }}
+        >
+          Back
+        </button>
+        <div
+          style={{
+            pointerEvents: 'none',
+            background: 'rgba(14,16,24,0.82)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: 12,
+            padding: '8px 14px',
+            border: '1px solid rgba(255,255,255,0.1)',
+            fontWeight: 800,
+            fontSize: 14,
+          }}
+        >
+          Room
         </div>
-      )}
+        <div style={{ display: 'flex', gap: 6, pointerEvents: 'auto' }}>
+          <button type="button" onClick={undo} disabled={!past.length} style={{ ...chipBase, opacity: past.length ? 1 : 0.35, background: 'rgba(14,16,24,0.82)' }}>
+            Undo
+          </button>
+          <button type="button" onClick={redo} disabled={!future.length} style={{ ...chipBase, opacity: future.length ? 1 : 0.35, background: 'rgba(14,16,24,0.82)' }}>
+            Redo
+          </button>
+        </div>
+      </div>
 
-      {/* ── top: title, undo/redo, mood meter ── */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 p-4 pt-[max(1rem,env(safe-area-inset-top))]">
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="text-[13px] font-black uppercase leading-none tracking-wide text-white/90">Set the</div>
-            <div className="text-[30px] font-black uppercase leading-[0.95] text-[#5fd4ff]">Mood</div>
-          </div>
-          <div className="pointer-events-auto flex gap-2">
-            <button onClick={undo} disabled={!past.length} className={`${glass} h-9 w-9 text-base disabled:opacity-30`} aria-label="Undo">↶</button>
-            <button onClick={redo} disabled={!future.length} className={`${glass} h-9 w-9 text-base disabled:opacity-30`} aria-label="Redo">↷</button>
-          </div>
+      {/* ── Bottom glass panel (House Control style) ── */}
+      <div
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 30,
+          maxHeight: '58%',
+          overflowY: 'auto',
+          borderTopLeftRadius: 22,
+          borderTopRightRadius: 22,
+          background: 'rgba(12,14,22,0.94)',
+          borderTop: '1px solid rgba(255,255,255,0.1)',
+          boxShadow: '0 -12px 40px rgba(0,0,0,0.45)',
+          padding: '14px 14px calc(14px + env(safe-area-inset-bottom))',
+          pointerEvents: 'auto',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        {/* Scene chips — one tap sets the whole mood */}
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', marginBottom: 8 }}>
+          Scenes
         </div>
-        <div className="pointer-events-auto mt-3 grid grid-cols-3 gap-2">
-          {MOODS.map((m) => {
-            const v = scores[m.id]
-            const top = Math.max(scores.cozy, scores.bright, scores.moody) === v
+        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginBottom: 14 }}>
+          {sceneChips.map((c) => {
+            const on = scores[c.id] >= Math.max(scores.cozy, scores.bright, scores.moody) - 0.02 && scores[c.id] > 0.4
             return (
-              <button key={m.id} onClick={() => preset(m.id)} className={`${glass} p-2 text-left transition ${top ? 'border-[#5fd4ff]/70 bg-white/10' : ''}`}>
-                <div className="flex h-2.5 overflow-hidden rounded-full">
-                  {(['floor', 'walls', 'accentWall', 'accents'] as Slot[]).map((s) => (
-                    <span key={s} className="flex-1" style={{ background: SWATCH[m.mats[s]].color }} />
-                  ))}
-                </div>
-                <div className="mt-1.5 flex items-baseline justify-between">
-                  <span className="text-[13px] font-bold">{m.label}</span>
-                  <span className="font-mono text-[11px] text-[#5fd4ff]">{v}%</span>
-                </div>
-                <div className="font-mono text-[9px] text-white/50">{m.sub}</div>
-                <div className="mt-1 h-1 rounded-full bg-white/10">
-                  <div className="h-1 rounded-full bg-[#5fd4ff] transition-all" style={{ width: `${v}%` }} />
-                </div>
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => preset(c.id)}
+                style={{
+                  ...chipBase,
+                  background: on ? 'rgba(252,209,22,0.2)' : 'rgba(255,255,255,0.06)',
+                  border: on ? '1px solid #fcd116' : '1px solid rgba(255,255,255,0.12)',
+                  color: on ? '#fcd116' : 'rgba(255,255,255,0.85)',
+                }}
+              >
+                {c.label}
               </button>
             )
           })}
         </div>
-        <p className="mt-2 text-[11.5px] leading-snug text-white/80">{sentence}</p>
-      </div>
 
-      {/* ── toast ── */}
-      {toast && (
-        <div className="pointer-events-none absolute left-1/2 top-[44%] -translate-x-1/2 rounded-full bg-black/70 px-3 py-1.5 font-mono text-[11px] text-white backdrop-blur">
-          {toast}
-        </div>
-      )}
-
-      {/* ── bottom sheet ── */}
-      <div className="absolute inset-x-0 bottom-0 space-y-2 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-        {/* daylight */}
-        <div className={`${glass} px-3 py-2`}>
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/60">Daylight</span>
-            <span className="font-mono text-[13px] font-bold">{clock}</span>
-          </div>
-          <input
-            type="range"
-            min={5}
-            max={23.9}
-            step={0.05}
-            value={hour}
-            onChange={(e) => setHour(parseFloat(e.target.value))}
-            className="mood-range mt-1.5 w-full"
-            aria-label="Time of day"
-          />
-          <div className="mt-1 grid grid-cols-4 gap-1">
-            {[
-              ['AM', 'Morning', 7.6],
-              ['MD', 'Midday', 12.8],
-              ['PM', 'Evening', 18.5],
-              ['NT', 'Night', 22.2],
-            ].map(([ic, label, h]) => {
-              const on = Math.abs(hour - (h as number)) < 1.2
-              return (
-                <button key={label as string} onClick={() => setHour(h as number)} className={`rounded-lg py-1 text-[10px] ${on ? 'bg-white/15 text-white' : 'text-white/55'}`}>
-                  <span className="mr-1">{ic}</span>
-                  {label}
-                </button>
-              )
-            })}
-          </div>
+        {/* Panel tabs */}
+        <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+          {([
+            ['surfaces', 'Surfaces'],
+            ['lights', 'Lights'],
+            ['shop', 'Shop'],
+          ] as const).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setPanel(id)}
+              style={{
+                flex: 1,
+                minHeight: 40,
+                borderRadius: 12,
+                border: panel === id ? '1px solid #fcd116' : '1px solid rgba(255,255,255,0.1)',
+                background: panel === id ? 'rgba(252,209,22,0.16)' : 'rgba(255,255,255,0.04)',
+                color: panel === id ? '#fcd116' : 'rgba(255,255,255,0.8)',
+                fontWeight: 800,
+                fontSize: 13,
+                cursor: 'pointer',
+              }}
+            >
+              {label}
+            </button>
+          ))}
         </div>
 
-        {/* surfaces + swatches */}
-        <div className={`${glass} p-2.5`}>
-          <div className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1.5 [scrollbar-width:none]">
-            {SLOTS.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => select(s.id)}
-                className={`flex shrink-0 items-center gap-1.5 rounded-full py-1 pl-1 pr-2.5 text-[11px] ${selected === s.id ? 'bg-[#5fd4ff] font-bold text-[#0b0d14]' : 'bg-white/8 text-white/75'}`}
-              >
-                <span className="h-4 w-4 rounded-full border border-black/20 bg-cover" style={{ backgroundImage: `url(${swatchURL(mats[s.id])})` }} />
-                {s.label}
-              </button>
-            ))}
-          </div>
-          <div className="mb-2 flex gap-1">
-            {tabs.map((t) => {
-              const allowed = slotDef.kinds.includes(t)
-              return (
+        {/* Mood sentence */}
+        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', marginBottom: 12, lineHeight: 1.35 }}>
+          {sentence}
+        </div>
+
+        {panel === 'surfaces' && (
+          <div>
+            {/* Slot picker */}
+            <div style={{ display: 'flex', gap: 6, overflowX: 'auto', marginBottom: 10, paddingBottom: 2 }}>
+              {SLOTS.map((s) => {
+                const on = selected === s.id
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => select(s.id)}
+                    style={{
+                      ...chipBase,
+                      background: on ? 'rgba(95,212,255,0.18)' : 'rgba(255,255,255,0.05)',
+                      border: on ? '1px solid #5fd4ff' : '1px solid rgba(255,255,255,0.1)',
+                      color: on ? '#5fd4ff' : 'rgba(255,255,255,0.8)',
+                    }}
+                  >
+                    {s.label}
+                  </button>
+                )
+              })}
+            </div>
+            {/* Mat kind + swatches */}
+            <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+              {kinds.filter((k) => slotDef.kinds.includes(k)).map((k) => (
                 <button
-                  key={t}
-                  onClick={() => setTab(t)}
-                  className={`rounded-full px-3 py-1 text-[11px] capitalize ${tab === t ? 'bg-white text-[#0b0d14] font-bold' : allowed ? 'text-white/80' : 'text-white/30'}`}
-                >
-                  {t}
-                </button>
-              )
-            })}
-          </div>
-          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 [scrollbar-width:none]">
-            {SWATCHES.filter((s) => s.kind === tab).map((s) => {
-              const on = mats[selected] === s.id
-              return (
-                <div
-                  key={s.id}
-                  onPointerDown={(e) => {
-                    e.preventDefault()
-                    setDrag({ id: s.id, x: e.clientX, y: e.clientY, moved: false, over: null })
+                  key={k}
+                  type="button"
+                  onClick={() => setMatKind(k)}
+                  style={{
+                    ...chipBase,
+                    textTransform: 'capitalize',
+                    background: matKind === k ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.04)',
+                    border: matKind === k ? '1px solid rgba(255,255,255,0.35)' : '1px solid rgba(255,255,255,0.08)',
                   }}
-                  className="w-[62px] shrink-0 cursor-grab text-center"
                 >
-                  <div
-                    className={`mx-auto h-[52px] w-[52px] rounded-xl bg-cover shadow-lg ${on ? 'ring-2 ring-[#5fd4ff] ring-offset-2 ring-offset-[#0e1018]' : ''}`}
-                    style={{ backgroundImage: `url(${swatchURL(s.id)})` }}
+                  {k}
+                </button>
+              ))}
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+              {SWATCHES.filter((s) => s.kind === matKind).map((s) => {
+                const on = mats[selected] === s.id
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => apply(selected, s.id)}
+                    title={s.name}
+                    style={{
+                      aspectRatio: '1',
+                      borderRadius: 12,
+                      border: on ? '2px solid #fcd116' : '1px solid rgba(255,255,255,0.12)',
+                      background: s.color,
+                      cursor: 'pointer',
+                      boxShadow: on ? '0 0 0 2px rgba(252,209,22,0.35)' : undefined,
+                    }}
                   />
-                  <div className={`mt-1 truncate text-[10px] ${on ? 'text-[#5fd4ff]' : 'text-white/70'}`}>{on ? '• ' : ''}{s.name}</div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
-          <div className="mt-1.5 text-center font-mono text-[9.5px] text-white/45">tap a surface, then a swatch, or drag a swatch onto the room</div>
-        </div>
+        )}
+
+        {panel === 'lights' && (
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.5)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              Daylight
+            </div>
+            <input
+              type="range"
+              min={5}
+              max={23}
+              step={0.1}
+              value={hour}
+              onChange={(e) => setHour(Number(e.target.value))}
+              style={{ width: '100%', accentColor: '#fcd116' }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, gap: 6 }}>
+              {(
+                [
+                  ['AM', 7.6],
+                  ['Mid', 12.8],
+                  ['Eve', 18.4],
+                  ['Night', 22.2],
+                ] as const
+              ).map(([label, h]) => {
+                const on = Math.abs(hour - h) < 1.2
+                return (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => setHour(h)}
+                    style={{
+                      ...chipBase,
+                      flex: 1,
+                      background: on ? 'rgba(252,209,22,0.18)' : 'rgba(255,255,255,0.05)',
+                      border: on ? '1px solid #fcd116' : '1px solid rgba(255,255,255,0.1)',
+                      color: on ? '#fcd116' : 'rgba(255,255,255,0.8)',
+                    }}
+                  >
+                    {label}
+                  </button>
+                )
+              })}
+            </div>
+            <div style={{ marginTop: 14, fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>
+              Lamps {Math.round(lamps * 100)}% · Hour {hour.toFixed(1)}
+            </div>
+          </div>
+        )}
+
+        {panel === 'shop' && <FurnitureShop />}
       </div>
-
-      {/* ── drag ghost ── */}
-      {drag?.moved && (
-        <div className="pointer-events-none fixed z-50" style={{ left: drag.x - 30, top: drag.y - 70 }}>
-          <div className="h-[60px] w-[60px] rounded-xl border-2 border-white bg-cover shadow-2xl" style={{ backgroundImage: `url(${swatchURL(drag.id)})` }} />
-          <div className="mt-1 whitespace-nowrap rounded-full bg-black/75 px-2 py-0.5 text-center font-mono text-[10px]">
-            {drag.over ? `drop on ${SLOTS.find((s) => s.id === drag.over)!.label.toLowerCase()}` : SWATCH[drag.id].name}
-          </div>
-        </div>
-      )}
-
-      <style>{`
-        .mood-range{-webkit-appearance:none;appearance:none;height:6px;border-radius:9px;
-          background:linear-gradient(90deg,#f3c99a,#d9e9f5 40%,#f08a4b 72%,#141a36)}
-        .mood-range::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;
-          background:#fff;border:3px solid #5fd4ff;box-shadow:0 2px 8px rgba(0,0,0,.5)}
-        .mood-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid #5fd4ff}
-      `}</style>
     </div>
   )
 }
