@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findBusiness, BUSINESSES } from '../../data/worldBusinesses';
+import { findBusiness, BUSINESSES } from '../../../data/worldBusinesses';
 import { propsFor } from '../businessFurniture';
 
 describe('businessFurniture propsFor', () => {
