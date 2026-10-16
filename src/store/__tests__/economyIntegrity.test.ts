@@ -92,3 +92,21 @@ describe('P0 store integrity: teleport', () => {
     expect(getState().player.position.z).toBe(10);
   });
 });
+
+
+describe('P1 worldBounds covers Offices Go destinations', () => {
+  it('NorthReach bank z≈-152 is inside worldBounds after plate extension', () => {
+    // Gold Coast Bank site.z = -152 (src/data/offices.ts)
+    const bankZ = -152;
+    expect(bankZ).toBeGreaterThanOrEqual(worldBounds.minZ);
+    expect(bankZ).toBeLessThanOrEqual(worldBounds.maxZ);
+  });
+
+  it('teleport to NorthReach office door is not clamped away', () => {
+    requestTeleport(163, -152);
+    const req = consumeTeleport();
+    expect(req).not.toBeNull();
+    expect(req!.z).toBe(-152);
+    expect(req!.x).toBe(163);
+  });
+});
