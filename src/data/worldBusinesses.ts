@@ -27,11 +27,23 @@ export type ShopSub =
   | 'supermarket'
   | 'boutique'
   | 'electronics'
-  | 'pharmacy';
+  | 'pharmacy'
+  | 'barber'
+  | 'salon'
+  | 'gym';
 
 export type BusinessSub = RestaurantSub | ShopSub;
 
-export type StaffRole = 'cook' | 'waiter' | 'cashier' | 'stocker' | 'pharmacist' | 'bartender';
+export type StaffRole =
+  | 'cook'
+  | 'waiter'
+  | 'cashier'
+  | 'stocker'
+  | 'pharmacist'
+  | 'bartender'
+  | 'barber'
+  | 'stylist'
+  | 'trainer';
 
 export interface MenuItem {
   readonly id: string;
@@ -528,6 +540,56 @@ export const BUSINESSES: readonly BusinessDef[] = [
       },
     ],
   },
+  // ── service vertical slice (barber near spawn) ─────────────────────
+  {
+    id: 'BIZ_KWAME_BARBER',
+    name: "Kwame's Barber",
+    kind: 'shop',
+    sub: 'barber',
+    ownership: 'world',
+    ownerName: 'Kwame Mensah',
+    site: {
+      x: -132,
+      z: 18,
+      w: 6,
+      d: 5,
+      yaw: 0,
+      replaces: 'Service cutaway near Daavi (barber vertical slice)',
+      district: 'dansoman',
+    },
+    facade: {
+      wall: '#f5f0e6',
+      roof: '#3d3d3d',
+      sign: "KWAME'S BARBER",
+      signBg: '#1a1a1a',
+      awning: '#c8102e',
+    },
+    openHour: 8,
+    closeHour: 20,
+    staffRoles: [
+      { role: 'barber', count: 2, names: ['Kwame', 'Kojo'] },
+      { role: 'cashier', count: 1, names: ['Ama'] },
+    ],
+    menu: [
+      { id: 'fade', name: 'Fade cut', priceGHS: 25, category: 'goods' },
+      { id: 'trim', name: 'Beard trim', priceGHS: 12, category: 'goods' },
+      { id: 'kids', name: 'Kids cut', priceGHS: 15, category: 'goods' },
+      { id: 'shampoo', name: 'Wash & style', priceGHS: 30, category: 'goods' },
+    ],
+    capacity: 4,
+    customersPerHour: 3.5,
+    jobs: [
+      {
+        id: 'BJOB_BARBER_CUT',
+        businessId: 'BIZ_KWAME_BARBER',
+        role: 'barber',
+        title: 'Barber shift',
+        payGHS: 35,
+        shiftMinutes: 120,
+      },
+    ],
+  },
+
 ];
 
 export function findBusiness(id: string): BusinessDef | undefined {

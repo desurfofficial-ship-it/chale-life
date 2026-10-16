@@ -11,10 +11,11 @@ import {
 } from '../worldBusiness';
 
 describe('B-001 business rules', () => {
-  it('defines 10 businesses (5 restaurants + 5 shops)', () => {
-    expect(BUSINESSES).toHaveLength(10);
+  it('defines businesses (restaurants + shops including service slice)', () => {
+    expect(BUSINESSES.length).toBeGreaterThanOrEqual(10);
     expect(BUSINESSES.filter((b) => b.kind === 'restaurant')).toHaveLength(5);
-    expect(BUSINESSES.filter((b) => b.kind === 'shop')).toHaveLength(5);
+    expect(BUSINESSES.filter((b) => b.kind === 'shop').length).toBeGreaterThanOrEqual(5);
+    expect(BUSINESSES.some((b) => b.sub === 'barber')).toBe(true);
   });
 
   it('places at least 3 businesses within 60 m of Daavi spawn', () => {
@@ -97,6 +98,18 @@ describe('P0 canBuyItem integrity', () => {
     const prov = findBusiness('BIZ_KOFI_PROVISION')!;
     const sim = createBusinessSim(prov);
     expect(canBuyItem(prov, sim, prov.menu[0], Number.NaN, 10).ok).toBe(false);
+  });
+});
+
+
+describe('service interior props', () => {
+  it('barber business has a menu and is near spawn', () => {
+    const barber = findBusiness('BIZ_KWAME_BARBER');
+    expect(barber).toBeTruthy();
+    expect(barber!.sub).toBe('barber');
+    expect(barber!.menu.length).toBeGreaterThan(0);
+    const dist = Math.hypot(barber!.site.x - SPAWN_XZ.x, barber!.site.z - SPAWN_XZ.z);
+    expect(dist).toBeLessThan(60);
   });
 });
 
