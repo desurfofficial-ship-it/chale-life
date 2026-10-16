@@ -1,0 +1,501 @@
+id,name,archetype,tris,kb_meshopt,w_m,d_m,h_m,file
+yam-pile-00,Yam Pile #01,yam-pile,180,7.2,0.49,0.46,0.29,yam-pile/yam-pile-00.glb
+yam-pile-01,Yam Pile #02,yam-pile,143,5.5,0.74,0.36,0.55,yam-pile/yam-pile-01.glb
+yam-pile-02,Yam Pile #03,yam-pile,392,12.9,0.49,0.72,0.67,yam-pile/yam-pile-02.glb
+yam-pile-03,Yam Pile #04,yam-pile,130,5.1,0.45,0.45,0.23,yam-pile/yam-pile-03.glb
+yam-pile-04,Yam Pile #05,yam-pile,222,7.8,0.64,0.39,0.27,yam-pile/yam-pile-04.glb
+yam-pile-05,Yam Pile #06,yam-pile,143,5.5,0.67,0.34,0.21,yam-pile/yam-pile-05.glb
+yam-pile-06,Yam Pile #07,yam-pile,80,4.3,0.45,0.46,0.48,yam-pile/yam-pile-06.glb
+yam-pile-07,Yam Pile #08,yam-pile,280,8.9,0.79,0.6,0.77,yam-pile/yam-pile-07.glb
+yam-pile-08,Yam Pile #09,yam-pile,158,5.1,0.77,0.6,0.24,yam-pile/yam-pile-08.glb
+yam-pile-09,Yam Pile #10,yam-pile,143,5.5,0.55,0.36,0.19,yam-pile/yam-pile-09.glb
+yam-pile-10,Yam Pile #11,yam-pile,183,6.7,0.59,0.55,0.25,yam-pile/yam-pile-10.glb
+yam-pile-11,Yam Pile #12,yam-pile,160,6.6,0.5,0.47,0.64,yam-pile/yam-pile-11.glb
+yam-pile-12,Yam Pile #13,yam-pile,272,9.4,0.58,0.76,0.67,yam-pile/yam-pile-12.glb
+yam-pile-13,Yam Pile #14,yam-pile,198,6.4,0.63,0.46,0.37,yam-pile/yam-pile-13.glb
+yam-pile-14,Yam Pile #15,yam-pile,143,5.5,0.66,0.46,0.25,yam-pile/yam-pile-14.glb
+yam-pile-15,Yam Pile #16,yam-pile,243,8.4,0.88,0.53,0.45,yam-pile/yam-pile-15.glb
+yam-pile-16,Yam Pile #17,yam-pile,140,6.1,0.35,0.38,0.36,yam-pile/yam-pile-16.glb
+yam-pile-17,Yam Pile #18,yam-pile,140,4.8,0.88,0.57,0.5,yam-pile/yam-pile-17.glb
+yam-pile-18,Yam Pile #19,yam-pile,130,5.1,0.64,0.65,0.26,yam-pile/yam-pile-18.glb
+yam-pile-19,Yam Pile #20,yam-pile,199,7.8,0.48,0.43,0.3,yam-pile/yam-pile-19.glb
+yam-pile-20,Yam Pile #21,yam-pile,280,10.2,0.41,0.75,0.53,yam-pile/yam-pile-20.glb
+yam-pile-21,Yam Pile #22,yam-pile,163,6.1,0.67,0.76,0.45,yam-pile/yam-pile-21.glb
+yam-pile-22,Yam Pile #23,yam-pile,180,6.0,0.95,0.6,0.42,yam-pile/yam-pile-22.glb
+yam-pile-23,Yam Pile #24,yam-pile,190,6.9,0.66,0.66,0.41,yam-pile/yam-pile-23.glb
+yam-pile-24,Yam Pile #25,yam-pile,100,4.9,0.44,0.44,0.26,yam-pile/yam-pile-24.glb
+yam-pile-25,Yam Pile #26,yam-pile,120,5.5,0.58,0.48,0.41,yam-pile/yam-pile-25.glb
+yam-pile-26,Yam Pile #27,yam-pile,140,6.1,0.36,0.36,0.54,yam-pile/yam-pile-26.glb
+yam-pile-27,Yam Pile #28,yam-pile,392,12.9,0.61,0.95,0.85,yam-pile/yam-pile-27.glb
+yam-pile-28,Yam Pile #29,yam-pile,198,6.4,0.93,0.74,0.31,yam-pile/yam-pile-28.glb
+yam-pile-29,Yam Pile #30,yam-pile,360,12.5,0.37,0.7,0.41,yam-pile/yam-pile-29.glb
+yam-pile-30,Yam Pile #31,yam-pile,280,10.2,0.56,0.72,0.48,yam-pile/yam-pile-30.glb
+yam-pile-31,Yam Pile #32,yam-pile,180,7.2,0.63,0.54,0.53,yam-pile/yam-pile-31.glb
+yam-pile-32,Yam Pile #33,yam-pile,220,7.2,0.92,0.65,0.51,yam-pile/yam-pile-32.glb
+yam-pile-33,Yam Pile #34,yam-pile,190,6.8,0.63,0.63,0.35,yam-pile/yam-pile-33.glb
+yam-pile-34,Yam Pile #35,yam-pile,100,4.9,0.45,0.39,0.24,yam-pile/yam-pile-34.glb
+yam-pile-35,Yam Pile #36,yam-pile,140,6.1,0.4,0.49,0.21,yam-pile/yam-pile-35.glb
+yam-pile-36,Yam Pile #37,yam-pile,123,4.9,0.57,0.3,0.43,yam-pile/yam-pile-36.glb
+yam-pile-37,Yam Pile #38,yam-pile,92,4.1,0.53,0.61,0.46,yam-pile/yam-pile-37.glb
+yam-pile-38,Yam Pile #39,yam-pile,198,6.4,0.78,0.6,0.3,yam-pile/yam-pile-38.glb
+yam-pile-39,Yam Pile #40,yam-pile,143,5.5,0.61,0.44,0.24,yam-pile/yam-pile-39.glb
+yam-pile-40,Yam Pile #41,yam-pile,163,6.1,0.68,0.45,0.38,yam-pile/yam-pile-40.glb
+yam-pile-41,Yam Pile #42,yam-pile,183,6.7,0.63,0.58,0.38,yam-pile/yam-pile-41.glb
+yam-pile-42,Yam Pile #43,yam-pile,440,13.6,0.59,0.8,0.79,yam-pile/yam-pile-42.glb
+yam-pile-43,Yam Pile #44,yam-pile,110,4.5,0.76,0.76,0.24,yam-pile/yam-pile-43.glb
+yam-pile-44,Yam Pile #45,yam-pile,403,13.1,0.73,0.73,0.4,yam-pile/yam-pile-44.glb
+yam-pile-45,Yam Pile #46,yam-pile,360,12.5,0.62,0.84,0.48,yam-pile/yam-pile-45.glb
+yam-pile-46,Yam Pile #47,yam-pile,160,6.6,0.74,0.59,0.44,yam-pile/yam-pile-46.glb
+yam-pile-47,Yam Pile #48,yam-pile,152,5.9,0.44,0.47,0.57,yam-pile/yam-pile-47.glb
+yam-pile-48,Yam Pile #49,yam-pile,238,7.5,0.9,0.73,0.32,yam-pile/yam-pile-48.glb
+yam-pile-49,Yam Pile #50,yam-pile,143,5.5,0.66,0.44,0.25,yam-pile/yam-pile-49.glb
+plantain-bunch-00,Plantain Bunch #01,plantain-bunch,204,5.8,0.34,0.45,0.17,plantain-bunch/plantain-bunch-00.glb
+plantain-bunch-01,Plantain Bunch #02,plantain-bunch,408,9.4,0.45,0.39,0.24,plantain-bunch/plantain-bunch-01.glb
+plantain-bunch-02,Plantain Bunch #03,plantain-bunch,360,8.4,0.62,0.31,1.37,plantain-bunch/plantain-bunch-02.glb
+plantain-bunch-03,Plantain Bunch #04,plantain-bunch,278,6.5,0.69,0.55,0.2,plantain-bunch/plantain-bunch-03.glb
+plantain-bunch-04,Plantain Bunch #05,plantain-bunch,300,7.2,0.61,0.64,0.17,plantain-bunch/plantain-bunch-04.glb
+plantain-bunch-05,Plantain Bunch #06,plantain-bunch,264,6.6,0.3,0.58,0.17,plantain-bunch/plantain-bunch-05.glb
+plantain-bunch-06,Plantain Bunch #07,plantain-bunch,372,8.9,0.43,0.44,0.29,plantain-bunch/plantain-bunch-06.glb
+plantain-bunch-07,Plantain Bunch #08,plantain-bunch,360,8.4,0.63,0.25,1.27,plantain-bunch/plantain-bunch-07.glb
+plantain-bunch-08,Plantain Bunch #09,plantain-bunch,422,9.2,0.65,0.53,0.2,plantain-bunch/plantain-bunch-08.glb
+plantain-bunch-09,Plantain Bunch #10,plantain-bunch,228,6.0,0.35,0.41,0.18,plantain-bunch/plantain-bunch-09.glb
+plantain-bunch-10,Plantain Bunch #11,plantain-bunch,336,7.8,0.49,0.62,0.15,plantain-bunch/plantain-bunch-10.glb
+plantain-bunch-11,Plantain Bunch #12,plantain-bunch,444,10.3,0.39,0.39,0.24,plantain-bunch/plantain-bunch-11.glb
+plantain-bunch-12,Plantain Bunch #13,plantain-bunch,444,10.0,0.6,0.27,1.11,plantain-bunch/plantain-bunch-12.glb
+plantain-bunch-13,Plantain Bunch #14,plantain-bunch,254,6.5,0.78,0.78,0.21,plantain-bunch/plantain-bunch-13.glb
+plantain-bunch-14,Plantain Bunch #15,plantain-bunch,204,5.8,0.34,0.39,0.19,plantain-bunch/plantain-bunch-14.glb
+plantain-bunch-15,Plantain Bunch #16,plantain-bunch,336,7.8,0.59,0.74,0.17,plantain-bunch/plantain-bunch-15.glb
+plantain-bunch-16,Plantain Bunch #17,plantain-bunch,396,9.4,0.41,0.47,0.27,plantain-bunch/plantain-bunch-16.glb
+plantain-bunch-17,Plantain Bunch #18,plantain-bunch,312,7.6,0.66,0.29,1.31,plantain-bunch/plantain-bunch-17.glb
+plantain-bunch-18,Plantain Bunch #19,plantain-bunch,422,9.3,0.66,0.57,0.22,plantain-bunch/plantain-bunch-18.glb
+plantain-bunch-19,Plantain Bunch #20,plantain-bunch,192,5.3,0.37,0.45,0.22,plantain-bunch/plantain-bunch-19.glb
+plantain-bunch-20,Plantain Bunch #21,plantain-bunch,252,6.6,0.49,0.65,0.16,plantain-bunch/plantain-bunch-20.glb
+plantain-bunch-21,Plantain Bunch #22,plantain-bunch,396,9.2,0.32,0.4,0.21,plantain-bunch/plantain-bunch-21.glb
+plantain-bunch-22,Plantain Bunch #23,plantain-bunch,444,10.1,0.61,0.3,1.3,plantain-bunch/plantain-bunch-22.glb
+plantain-bunch-23,Plantain Bunch #24,plantain-bunch,422,9.2,0.8,0.64,0.2,plantain-bunch/plantain-bunch-23.glb
+plantain-bunch-24,Plantain Bunch #25,plantain-bunch,192,5.3,0.27,0.3,0.13,plantain-bunch/plantain-bunch-24.glb
+plantain-bunch-25,Plantain Bunch #26,plantain-bunch,228,5.8,0.39,0.83,0.18,plantain-bunch/plantain-bunch-25.glb
+plantain-bunch-26,Plantain Bunch #27,plantain-bunch,372,8.9,0.41,0.57,0.27,plantain-bunch/plantain-bunch-26.glb
+plantain-bunch-27,Plantain Bunch #28,plantain-bunch,444,10.1,0.66,0.37,1.22,plantain-bunch/plantain-bunch-27.glb
+plantain-bunch-28,Plantain Bunch #29,plantain-bunch,254,6.5,0.65,0.65,0.25,plantain-bunch/plantain-bunch-28.glb
+plantain-bunch-29,Plantain Bunch #30,plantain-bunch,204,5.8,0.3,0.39,0.17,plantain-bunch/plantain-bunch-29.glb
+plantain-bunch-30,Plantain Bunch #31,plantain-bunch,300,7.1,0.41,0.58,0.15,plantain-bunch/plantain-bunch-30.glb
+plantain-bunch-31,Plantain Bunch #32,plantain-bunch,408,9.2,0.44,0.46,0.21,plantain-bunch/plantain-bunch-31.glb
+plantain-bunch-32,Plantain Bunch #33,plantain-bunch,360,8.3,0.61,0.26,1.17,plantain-bunch/plantain-bunch-32.glb
+plantain-bunch-33,Plantain Bunch #34,plantain-bunch,434,10.0,0.7,0.7,0.22,plantain-bunch/plantain-bunch-33.glb
+plantain-bunch-34,Plantain Bunch #35,plantain-bunch,180,5.4,0.34,0.41,0.17,plantain-bunch/plantain-bunch-34.glb
+plantain-bunch-35,Plantain Bunch #36,plantain-bunch,180,5.4,0.33,0.39,0.18,plantain-bunch/plantain-bunch-35.glb
+plantain-bunch-36,Plantain Bunch #37,plantain-bunch,384,8.7,0.47,0.52,0.26,plantain-bunch/plantain-bunch-36.glb
+plantain-bunch-37,Plantain Bunch #38,plantain-bunch,312,7.6,0.63,0.28,1.19,plantain-bunch/plantain-bunch-37.glb
+plantain-bunch-38,Plantain Bunch #39,plantain-bunch,458,9.7,0.71,0.49,0.19,plantain-bunch/plantain-bunch-38.glb
+plantain-bunch-39,Plantain Bunch #40,plantain-bunch,288,7.2,0.41,0.48,0.15,plantain-bunch/plantain-bunch-39.glb
+plantain-bunch-40,Plantain Bunch #41,plantain-bunch,240,6.5,0.32,0.58,0.17,plantain-bunch/plantain-bunch-40.glb
+plantain-bunch-41,Plantain Bunch #42,plantain-bunch,420,9.4,0.38,0.49,0.24,plantain-bunch/plantain-bunch-41.glb
+plantain-bunch-42,Plantain Bunch #43,plantain-bunch,360,8.4,0.63,0.28,1.33,plantain-bunch/plantain-bunch-42.glb
+plantain-bunch-43,Plantain Bunch #44,plantain-bunch,278,6.7,0.66,0.66,0.23,plantain-bunch/plantain-bunch-43.glb
+plantain-bunch-44,Plantain Bunch #45,plantain-bunch,192,5.4,0.31,0.38,0.18,plantain-bunch/plantain-bunch-44.glb
+plantain-bunch-45,Plantain Bunch #46,plantain-bunch,300,7.2,0.43,0.6,0.18,plantain-bunch/plantain-bunch-45.glb
+plantain-bunch-46,Plantain Bunch #47,plantain-bunch,372,8.9,0.33,0.49,0.23,plantain-bunch/plantain-bunch-46.glb
+plantain-bunch-47,Plantain Bunch #48,plantain-bunch,444,9.9,0.63,0.28,1.35,plantain-bunch/plantain-bunch-47.glb
+plantain-bunch-48,Plantain Bunch #49,plantain-bunch,242,5.8,0.77,0.49,0.17,plantain-bunch/plantain-bunch-48.glb
+plantain-bunch-49,Plantain Bunch #50,plantain-bunch,180,5.4,0.36,0.55,0.19,plantain-bunch/plantain-bunch-49.glb
+pineapple-00,Pineapple #01,pineapple,134,4.4,0.21,0.23,0.37,pineapple/pineapple-00.glb
+pineapple-01,Pineapple #02,pineapple,172,5.1,0.27,0.12,0.32,pineapple/pineapple-01.glb
+pineapple-02,Pineapple #03,pineapple,134,4.3,0.35,0.15,0.21,pineapple/pineapple-02.glb
+pineapple-03,Pineapple #04,pineapple,132,4.2,0.3,0.3,0.34,pineapple/pineapple-03.glb
+pineapple-04,Pineapple #05,pineapple,134,4.3,0.33,0.13,0.13,pineapple/pineapple-04.glb
+pineapple-05,Pineapple #06,pineapple,116,4.1,0.14,0.15,0.32,pineapple/pineapple-05.glb
+pineapple-06,Pineapple #07,pineapple,172,5.1,0.29,0.14,0.26,pineapple/pineapple-06.glb
+pineapple-07,Pineapple #08,pineapple,116,4.0,0.35,0.15,0.22,pineapple/pineapple-07.glb
+pineapple-08,Pineapple #09,pineapple,142,4.5,0.34,0.34,0.43,pineapple/pineapple-08.glb
+pineapple-09,Pineapple #10,pineapple,115,4.0,0.35,0.12,0.12,pineapple/pineapple-09.glb
+pineapple-10,Pineapple #11,pineapple,140,4.6,0.18,0.15,0.42,pineapple/pineapple-10.glb
+pineapple-11,Pineapple #12,pineapple,172,5.2,0.29,0.14,0.29,pineapple/pineapple-11.glb
+pineapple-12,Pineapple #13,pineapple,116,4.0,0.25,0.13,0.24,pineapple/pineapple-12.glb
+pineapple-13,Pineapple #14,pineapple,154,4.7,0.34,0.34,0.46,pineapple/pineapple-13.glb
+pineapple-14,Pineapple #15,pineapple,132,4.4,0.38,0.14,0.13,pineapple/pineapple-14.glb
+pineapple-15,Pineapple #16,pineapple,92,3.6,0.13,0.14,0.34,pineapple/pineapple-15.glb
+pineapple-16,Pineapple #17,pineapple,172,5.2,0.29,0.18,0.37,pineapple/pineapple-16.glb
+pineapple-17,Pineapple #18,pineapple,134,4.4,0.36,0.16,0.23,pineapple/pineapple-17.glb
+pineapple-18,Pineapple #19,pineapple,168,5.0,0.34,0.34,0.37,pineapple/pineapple-18.glb
+pineapple-19,Pineapple #20,pineapple,127,4.2,0.44,0.17,0.17,pineapple/pineapple-19.glb
+pineapple-20,Pineapple #21,pineapple,104,3.9,0.16,0.16,0.39,pineapple/pineapple-20.glb
+pineapple-21,Pineapple #22,pineapple,160,4.9,0.3,0.14,0.39,pineapple/pineapple-21.glb
+pineapple-22,Pineapple #23,pineapple,158,4.8,0.35,0.16,0.19,pineapple/pineapple-22.glb
+pineapple-23,Pineapple #24,pineapple,130,4.3,0.32,0.32,0.39,pineapple/pineapple-23.glb
+pineapple-24,Pineapple #25,pineapple,127,4.2,0.41,0.14,0.14,pineapple/pineapple-24.glb
+pineapple-25,Pineapple #26,pineapple,134,4.4,0.2,0.16,0.43,pineapple/pineapple-25.glb
+pineapple-26,Pineapple #27,pineapple,184,5.3,0.3,0.16,0.29,pineapple/pineapple-26.glb
+pineapple-27,Pineapple #28,pineapple,116,4.0,0.32,0.19,0.24,pineapple/pineapple-27.glb
+pineapple-28,Pineapple #29,pineapple,154,4.7,0.38,0.38,0.42,pineapple/pineapple-28.glb
+pineapple-29,Pineapple #30,pineapple,108,3.9,0.37,0.16,0.13,pineapple/pineapple-29.glb
+pineapple-30,Pineapple #31,pineapple,98,3.8,0.22,0.17,0.37,pineapple/pineapple-30.glb
+pineapple-31,Pineapple #32,pineapple,160,4.9,0.27,0.15,0.35,pineapple/pineapple-31.glb
+pineapple-32,Pineapple #33,pineapple,128,4.2,0.37,0.19,0.22,pineapple/pineapple-32.glb
+pineapple-33,Pineapple #34,pineapple,118,4.1,0.32,0.32,0.44,pineapple/pineapple-33.glb
+pineapple-34,Pineapple #35,pineapple,108,3.9,0.28,0.14,0.12,pineapple/pineapple-34.glb
+pineapple-35,Pineapple #36,pineapple,122,4.2,0.16,0.16,0.4,pineapple/pineapple-35.glb
+pineapple-36,Pineapple #37,pineapple,172,5.1,0.31,0.15,0.29,pineapple/pineapple-36.glb
+pineapple-37,Pineapple #38,pineapple,134,4.4,0.28,0.15,0.19,pineapple/pineapple-37.glb
+pineapple-38,Pineapple #39,pineapple,149,4.6,0.35,0.35,0.39,pineapple/pineapple-38.glb
+pineapple-39,Pineapple #40,pineapple,96,3.7,0.34,0.17,0.15,pineapple/pineapple-39.glb
+pineapple-40,Pineapple #41,pineapple,128,4.3,0.18,0.2,0.41,pineapple/pineapple-40.glb
+pineapple-41,Pineapple #42,pineapple,172,5.2,0.26,0.14,0.31,pineapple/pineapple-41.glb
+pineapple-42,Pineapple #43,pineapple,164,4.8,0.3,0.15,0.24,pineapple/pineapple-42.glb
+pineapple-43,Pineapple #44,pineapple,161,4.9,0.32,0.32,0.35,pineapple/pineapple-43.glb
+pineapple-44,Pineapple #45,pineapple,122,4.1,0.41,0.2,0.21,pineapple/pineapple-44.glb
+pineapple-45,Pineapple #46,pineapple,128,4.3,0.18,0.2,0.4,pineapple/pineapple-45.glb
+pineapple-46,Pineapple #47,pineapple,172,5.2,0.27,0.14,0.32,pineapple/pineapple-46.glb
+pineapple-47,Pineapple #48,pineapple,146,4.6,0.31,0.16,0.26,pineapple/pineapple-47.glb
+pineapple-48,Pineapple #49,pineapple,168,5.0,0.34,0.34,0.41,pineapple/pineapple-48.glb
+pineapple-49,Pineapple #50,pineapple,139,4.5,0.36,0.12,0.13,pineapple/pineapple-49.glb
+coconut-00,Coconut #01,coconut,96,4.5,0.22,0.21,0.28,coconut/coconut-00.glb
+coconut-01,Coconut #02,coconut,78,3.2,0.23,0.22,0.38,coconut/coconut-01.glb
+coconut-02,Coconut #03,coconut,80,4.3,0.16,0.15,0.15,coconut/coconut-02.glb
+coconut-03,Coconut #04,coconut,60,3.7,0.35,0.37,0.2,coconut/coconut-03.glb
+coconut-04,Coconut #05,coconut,186,4.9,0.55,0.22,0.06,coconut/coconut-04.glb
+coconut-05,Coconut #06,coconut,80,4.3,0.23,0.19,0.24,coconut/coconut-05.glb
+coconut-06,Coconut #07,coconut,78,3.2,0.22,0.21,0.36,coconut/coconut-06.glb
+coconut-07,Coconut #08,coconut,100,4.9,0.38,0.21,0.21,coconut/coconut-07.glb
+coconut-08,Coconut #09,coconut,80,4.3,0.36,0.36,0.34,coconut/coconut-08.glb
+coconut-09,Coconut #10,coconut,62,2.9,0.16,0.16,0.06,coconut/coconut-09.glb
+coconut-10,Coconut #11,coconut,80,4.3,0.22,0.2,0.24,coconut/coconut-10.glb
+coconut-11,Coconut #12,coconut,62,2.9,0.28,0.27,0.24,coconut/coconut-11.glb
+coconut-12,Coconut #13,coconut,97,4.8,0.36,0.23,0.23,coconut/coconut-12.glb
+coconut-13,Coconut #14,coconut,60,3.7,0.39,0.42,0.23,coconut/coconut-13.glb
+coconut-14,Coconut #15,coconut,186,4.9,0.58,0.23,0.07,coconut/coconut-14.glb
+coconut-15,Coconut #16,coconut,96,4.5,0.25,0.24,0.33,coconut/coconut-15.glb
+coconut-16,Coconut #17,coconut,78,3.2,0.24,0.23,0.34,coconut/coconut-16.glb
+coconut-17,Coconut #18,coconut,100,4.9,0.37,0.21,0.21,coconut/coconut-17.glb
+coconut-18,Coconut #19,coconut,80,4.3,0.44,0.43,0.42,coconut/coconut-18.glb
+coconut-19,Coconut #20,coconut,186,4.9,0.56,0.18,0.06,coconut/coconut-19.glb
+coconut-20,Coconut #21,coconut,80,4.3,0.23,0.23,0.26,coconut/coconut-20.glb
+coconut-21,Coconut #22,coconut,62,2.9,0.28,0.27,0.25,coconut/coconut-21.glb
+coconut-22,Coconut #23,coconut,79,4.3,0.18,0.18,0.19,coconut/coconut-22.glb
+coconut-23,Coconut #24,coconut,80,4.3,0.41,0.42,0.4,coconut/coconut-23.glb
+coconut-24,Coconut #25,coconut,186,4.9,0.5,0.18,0.06,coconut/coconut-24.glb
+coconut-25,Coconut #26,coconut,80,4.3,0.25,0.24,0.31,coconut/coconut-25.glb
+coconut-26,Coconut #27,coconut,78,3.2,0.25,0.25,0.37,coconut/coconut-26.glb
+coconut-27,Coconut #28,coconut,79,4.3,0.21,0.2,0.21,coconut/coconut-27.glb
+coconut-28,Coconut #29,coconut,60,3.7,0.4,0.41,0.23,coconut/coconut-28.glb
+coconut-29,Coconut #30,coconut,186,4.9,0.55,0.16,0.06,coconut/coconut-29.glb
+coconut-30,Coconut #31,coconut,80,4.3,0.21,0.21,0.26,coconut/coconut-30.glb
+coconut-31,Coconut #32,coconut,78,3.2,0.22,0.21,0.36,coconut/coconut-31.glb
+coconut-32,Coconut #33,coconut,80,4.3,0.17,0.18,0.19,coconut/coconut-32.glb
+coconut-33,Coconut #34,coconut,80,4.3,0.33,0.34,0.31,coconut/coconut-33.glb
+coconut-34,Coconut #35,coconut,186,4.9,0.49,0.19,0.06,coconut/coconut-34.glb
+coconut-35,Coconut #36,coconut,80,4.3,0.22,0.2,0.25,coconut/coconut-35.glb
+coconut-36,Coconut #37,coconut,62,2.9,0.26,0.26,0.21,coconut/coconut-36.glb
+coconut-37,Coconut #38,coconut,79,4.2,0.15,0.15,0.17,coconut/coconut-37.glb
+coconut-38,Coconut #39,coconut,80,4.3,0.43,0.42,0.39,coconut/coconut-38.glb
+coconut-39,Coconut #40,coconut,124,3.9,0.4,0.19,0.07,coconut/coconut-39.glb
+coconut-40,Coconut #41,coconut,80,4.3,0.23,0.19,0.26,coconut/coconut-40.glb
+coconut-41,Coconut #42,coconut,78,3.2,0.27,0.26,0.36,coconut/coconut-41.glb
+coconut-42,Coconut #43,coconut,100,4.9,0.3,0.17,0.17,coconut/coconut-42.glb
+coconut-43,Coconut #44,coconut,80,4.3,0.35,0.36,0.35,coconut/coconut-43.glb
+coconut-44,Coconut #45,coconut,186,4.9,0.52,0.19,0.06,coconut/coconut-44.glb
+coconut-45,Coconut #46,coconut,80,4.3,0.26,0.25,0.29,coconut/coconut-45.glb
+coconut-46,Coconut #47,coconut,78,3.2,0.28,0.27,0.4,coconut/coconut-46.glb
+coconut-47,Coconut #48,coconut,97,4.8,0.32,0.2,0.19,coconut/coconut-47.glb
+coconut-48,Coconut #49,coconut,60,3.7,0.35,0.34,0.21,coconut/coconut-48.glb
+coconut-49,Coconut #50,coconut,124,3.9,0.36,0.19,0.06,coconut/coconut-49.glb
+watermelon-00,Watermelon #01,watermelon,80,4.3,0.27,0.37,0.25,watermelon/watermelon-00.glb
+watermelon-01,Watermelon #02,watermelon,80,4.3,0.26,0.25,0.23,watermelon/watermelon-01.glb
+watermelon-02,Watermelon #03,watermelon,128,3.9,0.52,0.52,0.15,watermelon/watermelon-02.glb
+watermelon-03,Watermelon #04,watermelon,82,3.3,0.57,0.31,0.2,watermelon/watermelon-03.glb
+watermelon-04,Watermelon #05,watermelon,66,3.3,0.61,0.26,0.23,watermelon/watermelon-04.glb
+watermelon-05,Watermelon #06,watermelon,96,4.5,0.35,0.39,0.31,watermelon/watermelon-05.glb
+watermelon-06,Watermelon #07,watermelon,96,4.5,0.35,0.37,0.35,watermelon/watermelon-06.glb
+watermelon-07,Watermelon #08,watermelon,100,3.5,0.31,0.31,0.13,watermelon/watermelon-07.glb
+watermelon-08,Watermelon #09,watermelon,190,5.0,0.63,0.35,0.21,watermelon/watermelon-08.glb
+watermelon-09,Watermelon #10,watermelon,138,4.5,0.81,0.35,0.3,watermelon/watermelon-09.glb
+watermelon-10,Watermelon #11,watermelon,80,4.3,0.34,0.35,0.25,watermelon/watermelon-10.glb
+watermelon-11,Watermelon #12,watermelon,96,4.5,0.27,0.26,0.26,watermelon/watermelon-11.glb
+watermelon-12,Watermelon #13,watermelon,128,3.9,0.44,0.44,0.13,watermelon/watermelon-12.glb
+watermelon-13,Watermelon #14,watermelon,136,4.2,0.37,0.25,0.17,watermelon/watermelon-13.glb
+watermelon-14,Watermelon #15,watermelon,66,3.2,0.6,0.26,0.24,watermelon/watermelon-14.glb
+watermelon-15,Watermelon #16,watermelon,80,4.3,0.36,0.3,0.26,watermelon/watermelon-15.glb
+watermelon-16,Watermelon #17,watermelon,80,4.3,0.26,0.26,0.23,watermelon/watermelon-16.glb
+watermelon-17,Watermelon #18,watermelon,86,3.3,0.25,0.25,0.12,watermelon/watermelon-17.glb
+watermelon-18,Watermelon #19,watermelon,154,4.5,0.54,0.3,0.2,watermelon/watermelon-18.glb
+watermelon-19,Watermelon #20,watermelon,102,3.8,0.82,0.35,0.31,watermelon/watermelon-19.glb
+watermelon-20,Watermelon #21,watermelon,80,4.3,0.35,0.29,0.25,watermelon/watermelon-20.glb
+watermelon-21,Watermelon #22,watermelon,80,4.3,0.36,0.34,0.31,watermelon/watermelon-21.glb
+watermelon-22,Watermelon #23,watermelon,128,3.9,0.56,0.56,0.16,watermelon/watermelon-22.glb
+watermelon-23,Watermelon #24,watermelon,154,4.4,0.55,0.3,0.19,watermelon/watermelon-23.glb
+watermelon-24,Watermelon #25,watermelon,102,3.8,0.7,0.3,0.28,watermelon/watermelon-24.glb
+watermelon-25,Watermelon #26,watermelon,96,4.5,0.43,0.35,0.31,watermelon/watermelon-25.glb
+watermelon-26,Watermelon #27,watermelon,96,4.5,0.3,0.31,0.3,watermelon/watermelon-26.glb
+watermelon-27,Watermelon #28,watermelon,100,3.4,0.26,0.26,0.12,watermelon/watermelon-27.glb
+watermelon-28,Watermelon #29,watermelon,136,4.3,0.29,0.23,0.14,watermelon/watermelon-28.glb
+watermelon-29,Watermelon #30,watermelon,66,3.3,0.62,0.26,0.24,watermelon/watermelon-29.glb
+watermelon-30,Watermelon #31,watermelon,80,4.3,0.49,0.34,0.3,watermelon/watermelon-30.glb
+watermelon-31,Watermelon #32,watermelon,96,4.5,0.27,0.29,0.28,watermelon/watermelon-31.glb
+watermelon-32,Watermelon #33,watermelon,128,3.9,0.58,0.58,0.16,watermelon/watermelon-32.glb
+watermelon-33,Watermelon #34,watermelon,82,3.3,0.61,0.33,0.2,watermelon/watermelon-33.glb
+watermelon-34,Watermelon #35,watermelon,66,3.2,0.81,0.35,0.32,watermelon/watermelon-34.glb
+watermelon-35,Watermelon #36,watermelon,80,4.3,0.36,0.28,0.23,watermelon/watermelon-35.glb
+watermelon-36,Watermelon #37,watermelon,80,4.3,0.28,0.28,0.27,watermelon/watermelon-36.glb
+watermelon-37,Watermelon #38,watermelon,86,3.3,0.29,0.28,0.13,watermelon/watermelon-37.glb
+watermelon-38,Watermelon #39,watermelon,136,4.2,0.38,0.26,0.18,watermelon/watermelon-38.glb
+watermelon-39,Watermelon #40,watermelon,138,4.4,0.65,0.28,0.25,watermelon/watermelon-39.glb
+watermelon-40,Watermelon #41,watermelon,80,4.3,0.28,0.34,0.23,watermelon/watermelon-40.glb
+watermelon-41,Watermelon #42,watermelon,96,4.5,0.32,0.33,0.32,watermelon/watermelon-41.glb
+watermelon-42,Watermelon #43,watermelon,86,3.3,0.29,0.28,0.13,watermelon/watermelon-42.glb
+watermelon-43,Watermelon #44,watermelon,102,3.6,0.2,0.2,0.15,watermelon/watermelon-43.glb
+watermelon-44,Watermelon #45,watermelon,138,4.4,0.6,0.26,0.24,watermelon/watermelon-44.glb
+watermelon-45,Watermelon #46,watermelon,80,4.3,0.29,0.33,0.24,watermelon/watermelon-45.glb
+watermelon-46,Watermelon #47,watermelon,96,4.5,0.3,0.31,0.31,watermelon/watermelon-46.glb
+watermelon-47,Watermelon #48,watermelon,114,3.7,0.52,0.52,0.15,watermelon/watermelon-47.glb
+watermelon-48,Watermelon #49,watermelon,190,5.1,0.54,0.3,0.19,watermelon/watermelon-48.glb
+watermelon-49,Watermelon #50,watermelon,102,3.8,0.77,0.33,0.28,watermelon/watermelon-49.glb
+fish-tray-00,Fish Tray #01,fish-tray,370,10.2,0.79,0.79,0.13,fish-tray/fish-tray-00.glb
+fish-tray-01,Fish Tray #02,fish-tray,146,4.9,0.28,0.33,0.06,fish-tray/fish-tray-01.glb
+fish-tray-02,Fish Tray #03,fish-tray,106,4.4,0.53,0.46,0.06,fish-tray/fish-tray-02.glb
+fish-tray-03,Fish Tray #04,fish-tray,278,8.4,0.74,0.74,0.1,fish-tray/fish-tray-03.glb
+fish-tray-04,Fish Tray #05,fish-tray,338,9.6,0.69,0.69,0.15,fish-tray/fish-tray-04.glb
+fish-tray-05,Fish Tray #06,fish-tray,242,7.2,0.69,0.69,0.15,fish-tray/fish-tray-05.glb
+fish-tray-06,Fish Tray #07,fish-tray,338,9.4,0.35,0.59,0.08,fish-tray/fish-tray-06.glb
+fish-tray-07,Fish Tray #08,fish-tray,106,4.4,0.32,0.32,0.04,fish-tray/fish-tray-07.glb
+fish-tray-08,Fish Tray #09,fish-tray,374,10.7,0.79,0.79,0.1,fish-tray/fish-tray-08.glb
+fish-tray-09,Fish Tray #10,fish-tray,306,8.8,0.8,0.8,0.14,fish-tray/fish-tray-09.glb
+fish-tray-10,Fish Tray #11,fish-tray,306,8.8,0.72,0.72,0.15,fish-tray/fish-tray-10.glb
+fish-tray-11,Fish Tray #12,fish-tray,210,6.3,0.31,0.53,0.06,fish-tray/fish-tray-11.glb
+fish-tray-12,Fish Tray #13,fish-tray,202,6.6,0.52,0.8,0.05,fish-tray/fish-tray-12.glb
+fish-tray-13,Fish Tray #14,fish-tray,246,7.6,0.78,0.78,0.07,fish-tray/fish-tray-13.glb
+fish-tray-14,Fish Tray #15,fish-tray,370,10.3,0.72,0.72,0.16,fish-tray/fish-tray-14.glb
+fish-tray-15,Fish Tray #16,fish-tray,306,8.8,0.79,0.79,0.14,fish-tray/fish-tray-15.glb
+fish-tray-16,Fish Tray #17,fish-tray,210,6.4,0.36,0.4,0.07,fish-tray/fish-tray-16.glb
+fish-tray-17,Fish Tray #18,fish-tray,170,5.9,0.53,0.7,0.06,fish-tray/fish-tray-17.glb
+fish-tray-18,Fish Tray #19,fish-tray,182,6.1,0.67,0.67,0.07,fish-tray/fish-tray-18.glb
+fish-tray-19,Fish Tray #20,fish-tray,370,10.4,0.7,0.7,0.17,fish-tray/fish-tray-19.glb
+fish-tray-20,Fish Tray #21,fish-tray,338,9.6,0.64,0.64,0.16,fish-tray/fish-tray-20.glb
+fish-tray-21,Fish Tray #22,fish-tray,402,10.9,0.29,0.59,0.07,fish-tray/fish-tray-21.glb
+fish-tray-22,Fish Tray #23,fish-tray,202,6.6,0.35,0.57,0.04,fish-tray/fish-tray-22.glb
+fish-tray-23,Fish Tray #24,fish-tray,246,7.7,0.7,0.7,0.07,fish-tray/fish-tray-23.glb
+fish-tray-24,Fish Tray #25,fish-tray,338,9.5,0.77,0.77,0.16,fish-tray/fish-tray-24.glb
+fish-tray-25,Fish Tray #26,fish-tray,370,10.4,0.64,0.64,0.15,fish-tray/fish-tray-25.glb
+fish-tray-26,Fish Tray #27,fish-tray,242,7.1,0.4,0.77,0.06,fish-tray/fish-tray-26.glb
+fish-tray-27,Fish Tray #28,fish-tray,170,5.9,0.49,0.66,0.05,fish-tray/fish-tray-27.glb
+fish-tray-28,Fish Tray #29,fish-tray,406,11.4,0.66,0.66,0.09,fish-tray/fish-tray-28.glb
+fish-tray-29,Fish Tray #30,fish-tray,242,7.3,0.74,0.74,0.12,fish-tray/fish-tray-29.glb
+fish-tray-30,Fish Tray #31,fish-tray,370,10.3,0.66,0.66,0.17,fish-tray/fish-tray-30.glb
+fish-tray-31,Fish Tray #32,fish-tray,274,7.9,0.35,0.48,0.08,fish-tray/fish-tray-31.glb
+fish-tray-32,Fish Tray #33,fish-tray,138,5.2,0.46,0.52,0.05,fish-tray/fish-tray-32.glb
+fish-tray-33,Fish Tray #34,fish-tray,214,6.8,0.69,0.69,0.08,fish-tray/fish-tray-33.glb
+fish-tray-34,Fish Tray #35,fish-tray,306,8.7,0.8,0.8,0.15,fish-tray/fish-tray-34.glb
+fish-tray-35,Fish Tray #36,fish-tray,242,7.2,0.71,0.71,0.15,fish-tray/fish-tray-35.glb
+fish-tray-36,Fish Tray #37,fish-tray,146,4.9,0.42,0.45,0.06,fish-tray/fish-tray-36.glb
+fish-tray-37,Fish Tray #38,fish-tray,170,5.9,0.49,0.65,0.05,fish-tray/fish-tray-37.glb
+fish-tray-38,Fish Tray #39,fish-tray,342,9.8,0.72,0.72,0.1,fish-tray/fish-tray-38.glb
+fish-tray-39,Fish Tray #40,fish-tray,370,10.4,0.73,0.73,0.18,fish-tray/fish-tray-39.glb
+fish-tray-40,Fish Tray #41,fish-tray,338,9.6,0.73,0.73,0.17,fish-tray/fish-tray-40.glb
+fish-tray-41,Fish Tray #42,fish-tray,210,6.4,0.31,0.36,0.07,fish-tray/fish-tray-41.glb
+fish-tray-42,Fish Tray #43,fish-tray,202,6.6,0.44,0.69,0.04,fish-tray/fish-tray-42.glb
+fish-tray-43,Fish Tray #44,fish-tray,342,9.8,0.68,0.68,0.09,fish-tray/fish-tray-43.glb
+fish-tray-44,Fish Tray #45,fish-tray,306,8.8,0.78,0.78,0.16,fish-tray/fish-tray-44.glb
+fish-tray-45,Fish Tray #46,fish-tray,242,7.3,0.64,0.64,0.17,fish-tray/fish-tray-45.glb
+fish-tray-46,Fish Tray #47,fish-tray,242,7.1,0.3,0.57,0.06,fish-tray/fish-tray-46.glb
+fish-tray-47,Fish Tray #48,fish-tray,106,4.4,0.35,0.33,0.04,fish-tray/fish-tray-47.glb
+fish-tray-48,Fish Tray #49,fish-tray,342,9.9,0.63,0.63,0.1,fish-tray/fish-tray-48.glb
+fish-tray-49,Fish Tray #50,fish-tray,242,7.3,0.76,0.76,0.11,fish-tray/fish-tray-49.glb
+bread-loaf-stack-00,Bread Loaf Stack #01,bread-loaf-stack,218,5.4,0.35,0.77,0.49,bread-loaf-stack/bread-loaf-stack-00.glb
+bread-loaf-stack-01,Bread Loaf Stack #02,bread-loaf-stack,220,5.2,0.35,0.27,0.93,bread-loaf-stack/bread-loaf-stack-01.glb
+bread-loaf-stack-02,Bread Loaf Stack #03,bread-loaf-stack,210,7.4,0.65,0.65,0.17,bread-loaf-stack/bread-loaf-stack-02.glb
+bread-loaf-stack-03,Bread Loaf Stack #04,bread-loaf-stack,90,3.3,0.62,0.45,0.41,bread-loaf-stack/bread-loaf-stack-03.glb
+bread-loaf-stack-04,Bread Loaf Stack #05,bread-loaf-stack,204,5.1,0.33,0.3,0.81,bread-loaf-stack/bread-loaf-stack-04.glb
+bread-loaf-stack-05,Bread Loaf Stack #06,bread-loaf-stack,54,2.9,0.24,0.34,0.2,bread-loaf-stack/bread-loaf-stack-05.glb
+bread-loaf-stack-06,Bread Loaf Stack #07,bread-loaf-stack,184,4.5,0.32,0.34,0.77,bread-loaf-stack/bread-loaf-stack-06.glb
+bread-loaf-stack-07,Bread Loaf Stack #08,bread-loaf-stack,170,6.2,0.55,0.55,0.13,bread-loaf-stack/bread-loaf-stack-07.glb
+bread-loaf-stack-08,Bread Loaf Stack #09,bread-loaf-stack,170,4.5,0.55,0.45,0.4,bread-loaf-stack/bread-loaf-stack-08.glb
+bread-loaf-stack-09,Bread Loaf Stack #10,bread-loaf-stack,192,4.9,0.42,0.3,0.59,bread-loaf-stack/bread-loaf-stack-09.glb
+bread-loaf-stack-10,Bread Loaf Stack #11,bread-loaf-stack,66,3.1,0.25,0.39,0.33,bread-loaf-stack/bread-loaf-stack-10.glb
+bread-loaf-stack-11,Bread Loaf Stack #12,bread-loaf-stack,220,5.2,0.37,0.3,0.85,bread-loaf-stack/bread-loaf-stack-11.glb
+bread-loaf-stack-12,Bread Loaf Stack #13,bread-loaf-stack,170,6.2,0.53,0.53,0.13,bread-loaf-stack/bread-loaf-stack-12.glb
+bread-loaf-stack-13,Bread Loaf Stack #14,bread-loaf-stack,170,4.5,0.56,0.45,0.41,bread-loaf-stack/bread-loaf-stack-13.glb
+bread-loaf-stack-14,Bread Loaf Stack #15,bread-loaf-stack,252,5.8,0.46,0.31,0.61,bread-loaf-stack/bread-loaf-stack-14.glb
+bread-loaf-stack-15,Bread Loaf Stack #16,bread-loaf-stack,86,3.1,0.35,0.35,0.2,bread-loaf-stack/bread-loaf-stack-15.glb
+bread-loaf-stack-16,Bread Loaf Stack #17,bread-loaf-stack,208,5.1,0.52,0.35,0.85,bread-loaf-stack/bread-loaf-stack-16.glb
+bread-loaf-stack-17,Bread Loaf Stack #18,bread-loaf-stack,170,6.2,0.65,0.65,0.13,bread-loaf-stack/bread-loaf-stack-17.glb
+bread-loaf-stack-18,Bread Loaf Stack #19,bread-loaf-stack,160,4.3,0.56,0.29,0.12,bread-loaf-stack/bread-loaf-stack-18.glb
+bread-loaf-stack-19,Bread Loaf Stack #20,bread-loaf-stack,276,6.3,0.45,0.3,0.79,bread-loaf-stack/bread-loaf-stack-19.glb
+bread-loaf-stack-20,Bread Loaf Stack #21,bread-loaf-stack,32,2.4,0.27,0.24,0.21,bread-loaf-stack/bread-loaf-stack-20.glb
+bread-loaf-stack-21,Bread Loaf Stack #22,bread-loaf-stack,184,4.6,0.43,0.3,0.89,bread-loaf-stack/bread-loaf-stack-21.glb
+bread-loaf-stack-22,Bread Loaf Stack #23,bread-loaf-stack,170,6.2,0.55,0.55,0.13,bread-loaf-stack/bread-loaf-stack-22.glb
+bread-loaf-stack-23,Bread Loaf Stack #24,bread-loaf-stack,110,3.7,0.58,0.45,0.39,bread-loaf-stack/bread-loaf-stack-23.glb
+bread-loaf-stack-24,Bread Loaf Stack #25,bread-loaf-stack,192,4.9,0.44,0.35,0.51,bread-loaf-stack/bread-loaf-stack-24.glb
+bread-loaf-stack-25,Bread Loaf Stack #26,bread-loaf-stack,66,3.1,0.29,0.37,0.29,bread-loaf-stack/bread-loaf-stack-25.glb
+bread-loaf-stack-26,Bread Loaf Stack #27,bread-loaf-stack,160,4.2,0.31,0.28,0.86,bread-loaf-stack/bread-loaf-stack-26.glb
+bread-loaf-stack-27,Bread Loaf Stack #28,bread-loaf-stack,170,6.2,0.67,0.67,0.14,bread-loaf-stack/bread-loaf-stack-27.glb
+bread-loaf-stack-28,Bread Loaf Stack #29,bread-loaf-stack,170,4.5,0.47,0.45,0.4,bread-loaf-stack/bread-loaf-stack-28.glb
+bread-loaf-stack-29,Bread Loaf Stack #30,bread-loaf-stack,204,5.1,0.35,0.28,0.69,bread-loaf-stack/bread-loaf-stack-29.glb
+bread-loaf-stack-30,Bread Loaf Stack #31,bread-loaf-stack,86,3.1,0.28,0.39,0.27,bread-loaf-stack/bread-loaf-stack-30.glb
+bread-loaf-stack-31,Bread Loaf Stack #32,bread-loaf-stack,220,5.1,0.34,0.35,1.04,bread-loaf-stack/bread-loaf-stack-31.glb
+bread-loaf-stack-32,Bread Loaf Stack #33,bread-loaf-stack,230,8.0,0.56,0.56,0.18,bread-loaf-stack/bread-loaf-stack-32.glb
+bread-loaf-stack-33,Bread Loaf Stack #34,bread-loaf-stack,170,4.5,0.62,0.45,0.39,bread-loaf-stack/bread-loaf-stack-33.glb
+bread-loaf-stack-34,Bread Loaf Stack #35,bread-loaf-stack,204,5.1,0.32,0.33,0.75,bread-loaf-stack/bread-loaf-stack-34.glb
+bread-loaf-stack-35,Bread Loaf Stack #36,bread-loaf-stack,112,3.7,0.24,0.6,0.48,bread-loaf-stack/bread-loaf-stack-35.glb
+bread-loaf-stack-36,Bread Loaf Stack #37,bread-loaf-stack,172,4.4,0.38,0.33,0.87,bread-loaf-stack/bread-loaf-stack-36.glb
+bread-loaf-stack-37,Bread Loaf Stack #38,bread-loaf-stack,210,7.4,0.61,0.61,0.17,bread-loaf-stack/bread-loaf-stack-37.glb
+bread-loaf-stack-38,Bread Loaf Stack #39,bread-loaf-stack,110,3.6,0.49,0.45,0.42,bread-loaf-stack/bread-loaf-stack-38.glb
+bread-loaf-stack-39,Bread Loaf Stack #40,bread-loaf-stack,252,5.8,0.53,0.29,0.65,bread-loaf-stack/bread-loaf-stack-39.glb
+bread-loaf-stack-40,Bread Loaf Stack #41,bread-loaf-stack,158,4.4,0.3,0.54,0.34,bread-loaf-stack/bread-loaf-stack-40.glb
+bread-loaf-stack-41,Bread Loaf Stack #42,bread-loaf-stack,256,5.8,0.44,0.28,0.82,bread-loaf-stack/bread-loaf-stack-41.glb
+bread-loaf-stack-42,Bread Loaf Stack #43,bread-loaf-stack,250,8.6,0.69,0.69,0.17,bread-loaf-stack/bread-loaf-stack-42.glb
+bread-loaf-stack-43,Bread Loaf Stack #44,bread-loaf-stack,100,3.4,0.48,0.28,0.16,bread-loaf-stack/bread-loaf-stack-43.glb
+bread-loaf-stack-44,Bread Loaf Stack #45,bread-loaf-stack,156,4.3,0.33,0.28,0.53,bread-loaf-stack/bread-loaf-stack-44.glb
+bread-loaf-stack-45,Bread Loaf Stack #46,bread-loaf-stack,218,5.3,0.26,0.78,0.51,bread-loaf-stack/bread-loaf-stack-45.glb
+bread-loaf-stack-46,Bread Loaf Stack #47,bread-loaf-stack,184,4.6,0.34,0.33,0.84,bread-loaf-stack/bread-loaf-stack-46.glb
+bread-loaf-stack-47,Bread Loaf Stack #48,bread-loaf-stack,170,6.2,0.7,0.7,0.12,bread-loaf-stack/bread-loaf-stack-47.glb
+bread-loaf-stack-48,Bread Loaf Stack #49,bread-loaf-stack,90,3.3,0.52,0.45,0.41,bread-loaf-stack/bread-loaf-stack-48.glb
+bread-loaf-stack-49,Bread Loaf Stack #50,bread-loaf-stack,192,4.9,0.5,0.3,0.54,bread-loaf-stack/bread-loaf-stack-49.glb
+fruit-bowl-00,Fruit Bowl #01,fruit-bowl,170,6.3,0.4,0.4,0.2,fruit-bowl/fruit-bowl-00.glb
+fruit-bowl-01,Fruit Bowl #02,fruit-bowl,202,7.6,0.51,0.51,0.13,fruit-bowl/fruit-bowl-01.glb
+fruit-bowl-02,Fruit Bowl #03,fruit-bowl,191,6.5,0.32,0.31,0.26,fruit-bowl/fruit-bowl-02.glb
+fruit-bowl-03,Fruit Bowl #04,fruit-bowl,170,6.2,0.41,0.41,0.19,fruit-bowl/fruit-bowl-03.glb
+fruit-bowl-04,Fruit Bowl #05,fruit-bowl,170,6.2,0.41,0.37,0.22,fruit-bowl/fruit-bowl-04.glb
+fruit-bowl-05,Fruit Bowl #06,fruit-bowl,218,7.2,0.38,0.38,0.29,fruit-bowl/fruit-bowl-05.glb
+fruit-bowl-06,Fruit Bowl #07,fruit-bowl,142,5.8,0.41,0.41,0.1,fruit-bowl/fruit-bowl-06.glb
+fruit-bowl-07,Fruit Bowl #08,fruit-bowl,163,6.2,0.39,0.38,0.22,fruit-bowl/fruit-bowl-07.glb
+fruit-bowl-08,Fruit Bowl #09,fruit-bowl,210,7.5,0.43,0.43,0.18,fruit-bowl/fruit-bowl-08.glb
+fruit-bowl-09,Fruit Bowl #10,fruit-bowl,130,5.1,0.33,0.33,0.18,fruit-bowl/fruit-bowl-09.glb
+fruit-bowl-10,Fruit Bowl #11,fruit-bowl,258,8.4,0.41,0.41,0.26,fruit-bowl/fruit-bowl-10.glb
+fruit-bowl-11,Fruit Bowl #12,fruit-bowl,190,6.7,0.4,0.4,0.18,fruit-bowl/fruit-bowl-11.glb
+fruit-bowl-12,Fruit Bowl #13,fruit-bowl,143,5.6,0.39,0.38,0.17,fruit-bowl/fruit-bowl-12.glb
+fruit-bowl-13,Fruit Bowl #14,fruit-bowl,218,7.2,0.4,0.4,0.22,fruit-bowl/fruit-bowl-13.glb
+fruit-bowl-14,Fruit Bowl #15,fruit-bowl,198,6.6,0.38,0.38,0.25,fruit-bowl/fruit-bowl-14.glb
+fruit-bowl-15,Fruit Bowl #16,fruit-bowl,218,7.2,0.44,0.45,0.26,fruit-bowl/fruit-bowl-15.glb
+fruit-bowl-16,Fruit Bowl #17,fruit-bowl,150,5.6,0.38,0.38,0.18,fruit-bowl/fruit-bowl-16.glb
+fruit-bowl-17,Fruit Bowl #18,fruit-bowl,191,6.5,0.33,0.32,0.25,fruit-bowl/fruit-bowl-17.glb
+fruit-bowl-18,Fruit Bowl #19,fruit-bowl,130,5.1,0.34,0.36,0.22,fruit-bowl/fruit-bowl-18.glb
+fruit-bowl-19,Fruit Bowl #20,fruit-bowl,238,7.8,0.43,0.43,0.27,fruit-bowl/fruit-bowl-19.glb
+fruit-bowl-20,Fruit Bowl #21,fruit-bowl,170,6.2,0.42,0.4,0.22,fruit-bowl/fruit-bowl-20.glb
+fruit-bowl-21,Fruit Bowl #22,fruit-bowl,190,6.8,0.42,0.42,0.18,fruit-bowl/fruit-bowl-21.glb
+fruit-bowl-22,Fruit Bowl #23,fruit-bowl,211,7.1,0.36,0.38,0.26,fruit-bowl/fruit-bowl-22.glb
+fruit-bowl-23,Fruit Bowl #24,fruit-bowl,218,7.2,0.34,0.34,0.22,fruit-bowl/fruit-bowl-23.glb
+fruit-bowl-24,Fruit Bowl #25,fruit-bowl,198,6.6,0.32,0.32,0.28,fruit-bowl/fruit-bowl-24.glb
+fruit-bowl-25,Fruit Bowl #26,fruit-bowl,178,6.0,0.38,0.38,0.28,fruit-bowl/fruit-bowl-25.glb
+fruit-bowl-26,Fruit Bowl #27,fruit-bowl,150,5.6,0.34,0.34,0.18,fruit-bowl/fruit-bowl-26.glb
+fruit-bowl-27,Fruit Bowl #28,fruit-bowl,143,5.6,0.48,0.46,0.23,fruit-bowl/fruit-bowl-27.glb
+fruit-bowl-28,Fruit Bowl #29,fruit-bowl,238,7.8,0.4,0.4,0.24,fruit-bowl/fruit-bowl-28.glb
+fruit-bowl-29,Fruit Bowl #30,fruit-bowl,170,6.2,0.37,0.37,0.25,fruit-bowl/fruit-bowl-29.glb
+fruit-bowl-30,Fruit Bowl #31,fruit-bowl,230,8.1,0.47,0.47,0.2,fruit-bowl/fruit-bowl-30.glb
+fruit-bowl-31,Fruit Bowl #32,fruit-bowl,162,6.5,0.4,0.4,0.17,fruit-bowl/fruit-bowl-31.glb
+fruit-bowl-32,Fruit Bowl #33,fruit-bowl,183,6.8,0.45,0.43,0.24,fruit-bowl/fruit-bowl-32.glb
+fruit-bowl-33,Fruit Bowl #34,fruit-bowl,218,7.1,0.4,0.43,0.23,fruit-bowl/fruit-bowl-33.glb
+fruit-bowl-34,Fruit Bowl #35,fruit-bowl,170,6.2,0.46,0.46,0.21,fruit-bowl/fruit-bowl-34.glb
+fruit-bowl-35,Fruit Bowl #36,fruit-bowl,178,6.0,0.36,0.36,0.28,fruit-bowl/fruit-bowl-35.glb
+fruit-bowl-36,Fruit Bowl #37,fruit-bowl,170,6.2,0.37,0.37,0.18,fruit-bowl/fruit-bowl-36.glb
+fruit-bowl-37,Fruit Bowl #38,fruit-bowl,143,5.6,0.37,0.36,0.23,fruit-bowl/fruit-bowl-37.glb
+fruit-bowl-38,Fruit Bowl #39,fruit-bowl,190,6.9,0.41,0.41,0.18,fruit-bowl/fruit-bowl-38.glb
+fruit-bowl-39,Fruit Bowl #40,fruit-bowl,198,6.6,0.32,0.32,0.28,fruit-bowl/fruit-bowl-39.glb
+fruit-bowl-40,Fruit Bowl #41,fruit-bowl,258,8.4,0.45,0.45,0.27,fruit-bowl/fruit-bowl-40.glb
+fruit-bowl-41,Fruit Bowl #42,fruit-bowl,142,5.8,0.44,0.44,0.16,fruit-bowl/fruit-bowl-41.glb
+fruit-bowl-42,Fruit Bowl #43,fruit-bowl,143,5.6,0.35,0.34,0.18,fruit-bowl/fruit-bowl-42.glb
+fruit-bowl-43,Fruit Bowl #44,fruit-bowl,198,6.6,0.36,0.36,0.23,fruit-bowl/fruit-bowl-43.glb
+fruit-bowl-44,Fruit Bowl #45,fruit-bowl,178,6.0,0.44,0.44,0.28,fruit-bowl/fruit-bowl-44.glb
+fruit-bowl-45,Fruit Bowl #46,fruit-bowl,278,8.9,0.47,0.47,0.26,fruit-bowl/fruit-bowl-45.glb
+fruit-bowl-46,Fruit Bowl #47,fruit-bowl,210,7.4,0.48,0.48,0.19,fruit-bowl/fruit-bowl-46.glb
+fruit-bowl-47,Fruit Bowl #48,fruit-bowl,171,5.9,0.45,0.44,0.27,fruit-bowl/fruit-bowl-47.glb
+fruit-bowl-48,Fruit Bowl #49,fruit-bowl,178,6.0,0.49,0.5,0.23,fruit-bowl/fruit-bowl-48.glb
+fruit-bowl-49,Fruit Bowl #50,fruit-bowl,170,6.2,0.38,0.38,0.2,fruit-bowl/fruit-bowl-49.glb
+kenkey-pack-00,Kenkey Pack #01,kenkey-pack,370,10.5,0.75,0.75,0.21,kenkey-pack/kenkey-pack-00.glb
+kenkey-pack-01,Kenkey Pack #02,kenkey-pack,242,7.3,0.33,0.38,0.13,kenkey-pack/kenkey-pack-01.glb
+kenkey-pack-02,Kenkey Pack #03,kenkey-pack,298,8.9,0.68,0.51,0.29,kenkey-pack/kenkey-pack-02.glb
+kenkey-pack-03,Kenkey Pack #04,kenkey-pack,213,5.9,0.83,0.42,0.69,kenkey-pack/kenkey-pack-03.glb
+kenkey-pack-04,Kenkey Pack #05,kenkey-pack,306,9.0,0.74,0.74,0.22,kenkey-pack/kenkey-pack-04.glb
+kenkey-pack-05,Kenkey Pack #06,kenkey-pack,306,9.0,0.78,0.78,0.19,kenkey-pack/kenkey-pack-05.glb
+kenkey-pack-06,Kenkey Pack #07,kenkey-pack,477,12.4,0.98,0.43,0.11,kenkey-pack/kenkey-pack-06.glb
+kenkey-pack-07,Kenkey Pack #08,kenkey-pack,149,5.1,0.71,0.39,0.19,kenkey-pack/kenkey-pack-07.glb
+kenkey-pack-08,Kenkey Pack #09,kenkey-pack,213,5.9,0.84,0.4,0.71,kenkey-pack/kenkey-pack-08.glb
+kenkey-pack-09,Kenkey Pack #10,kenkey-pack,370,10.5,0.77,0.77,0.24,kenkey-pack/kenkey-pack-09.glb
+kenkey-pack-10,Kenkey Pack #11,kenkey-pack,210,6.8,0.62,0.62,0.16,kenkey-pack/kenkey-pack-10.glb
+kenkey-pack-11,Kenkey Pack #12,kenkey-pack,242,7.3,0.32,0.36,0.13,kenkey-pack/kenkey-pack-11.glb
+kenkey-pack-12,Kenkey Pack #13,kenkey-pack,106,4.4,0.57,0.43,0.2,kenkey-pack/kenkey-pack-12.glb
+kenkey-pack-13,Kenkey Pack #14,kenkey-pack,170,5.3,0.45,0.39,0.64,kenkey-pack/kenkey-pack-13.glb
+kenkey-pack-14,Kenkey Pack #15,kenkey-pack,210,6.6,0.61,0.61,0.13,kenkey-pack/kenkey-pack-14.glb
+kenkey-pack-15,Kenkey Pack #16,kenkey-pack,242,7.5,0.61,0.61,0.18,kenkey-pack/kenkey-pack-15.glb
+kenkey-pack-16,Kenkey Pack #17,kenkey-pack,178,5.7,0.44,0.29,0.1,kenkey-pack/kenkey-pack-16.glb
+kenkey-pack-17,Kenkey Pack #18,kenkey-pack,245,7.3,0.8,0.44,0.25,kenkey-pack/kenkey-pack-17.glb
+kenkey-pack-18,Kenkey Pack #19,kenkey-pack,181,5.1,0.79,0.37,0.64,kenkey-pack/kenkey-pack-18.glb
+kenkey-pack-19,Kenkey Pack #20,kenkey-pack,221,6.5,0.85,0.62,0.15,kenkey-pack/kenkey-pack-19.glb
+kenkey-pack-20,Kenkey Pack #21,kenkey-pack,210,6.6,0.72,0.72,0.18,kenkey-pack/kenkey-pack-20.glb
+kenkey-pack-21,Kenkey Pack #22,kenkey-pack,306,8.8,0.55,0.27,0.13,kenkey-pack/kenkey-pack-21.glb
+kenkey-pack-22,Kenkey Pack #23,kenkey-pack,298,9.0,0.62,0.47,0.26,kenkey-pack/kenkey-pack-22.glb
+kenkey-pack-23,Kenkey Pack #24,kenkey-pack,181,5.1,0.72,0.4,0.71,kenkey-pack/kenkey-pack-23.glb
+kenkey-pack-24,Kenkey Pack #25,kenkey-pack,210,6.7,0.64,0.64,0.16,kenkey-pack/kenkey-pack-24.glb
+kenkey-pack-25,Kenkey Pack #26,kenkey-pack,242,7.4,0.68,0.68,0.17,kenkey-pack/kenkey-pack-25.glb
+kenkey-pack-26,Kenkey Pack #27,kenkey-pack,285,7.9,0.74,0.3,0.14,kenkey-pack/kenkey-pack-26.glb
+kenkey-pack-27,Kenkey Pack #28,kenkey-pack,202,6.8,0.53,0.4,0.26,kenkey-pack/kenkey-pack-27.glb
+kenkey-pack-28,Kenkey Pack #29,kenkey-pack,170,5.3,0.6,0.36,0.65,kenkey-pack/kenkey-pack-28.glb
+kenkey-pack-29,Kenkey Pack #30,kenkey-pack,253,7.3,0.74,0.59,0.2,kenkey-pack/kenkey-pack-29.glb
+kenkey-pack-30,Kenkey Pack #31,kenkey-pack,285,8.0,0.94,0.73,0.19,kenkey-pack/kenkey-pack-30.glb
+kenkey-pack-31,Kenkey Pack #32,kenkey-pack,242,7.2,0.58,0.28,0.09,kenkey-pack/kenkey-pack-31.glb
+kenkey-pack-32,Kenkey Pack #33,kenkey-pack,298,8.9,0.68,0.51,0.29,kenkey-pack/kenkey-pack-32.glb
+kenkey-pack-33,Kenkey Pack #34,kenkey-pack,213,5.9,0.75,0.42,0.68,kenkey-pack/kenkey-pack-33.glb
+kenkey-pack-34,Kenkey Pack #35,kenkey-pack,381,10.4,0.8,0.64,0.27,kenkey-pack/kenkey-pack-34.glb
+kenkey-pack-35,Kenkey Pack #36,kenkey-pack,210,6.7,0.7,0.7,0.2,kenkey-pack/kenkey-pack-35.glb
+kenkey-pack-36,Kenkey Pack #37,kenkey-pack,338,9.6,0.67,0.43,0.11,kenkey-pack/kenkey-pack-36.glb
+kenkey-pack-37,Kenkey Pack #38,kenkey-pack,106,4.4,0.62,0.46,0.22,kenkey-pack/kenkey-pack-37.glb
+kenkey-pack-38,Kenkey Pack #39,kenkey-pack,181,5.1,0.72,0.37,0.71,kenkey-pack/kenkey-pack-38.glb
+kenkey-pack-39,Kenkey Pack #40,kenkey-pack,349,9.6,0.89,0.66,0.29,kenkey-pack/kenkey-pack-39.glb
+kenkey-pack-40,Kenkey Pack #41,kenkey-pack,210,6.6,0.66,0.66,0.14,kenkey-pack/kenkey-pack-40.glb
+kenkey-pack-41,Kenkey Pack #42,kenkey-pack,285,7.9,0.82,0.45,0.11,kenkey-pack/kenkey-pack-41.glb
+kenkey-pack-42,Kenkey Pack #43,kenkey-pack,149,5.1,0.7,0.38,0.18,kenkey-pack/kenkey-pack-42.glb
+kenkey-pack-43,Kenkey Pack #44,kenkey-pack,138,4.4,0.57,0.38,0.71,kenkey-pack/kenkey-pack-43.glb
+kenkey-pack-44,Kenkey Pack #45,kenkey-pack,210,6.7,0.67,0.67,0.16,kenkey-pack/kenkey-pack-44.glb
+kenkey-pack-45,Kenkey Pack #46,kenkey-pack,253,7.3,0.89,0.63,0.17,kenkey-pack/kenkey-pack-45.glb
+kenkey-pack-46,Kenkey Pack #47,kenkey-pack,338,9.6,0.54,0.44,0.15,kenkey-pack/kenkey-pack-46.glb
+kenkey-pack-47,Kenkey Pack #48,kenkey-pack,149,5.0,0.88,0.49,0.23,kenkey-pack/kenkey-pack-47.glb
+kenkey-pack-48,Kenkey Pack #49,kenkey-pack,170,5.3,0.52,0.36,0.64,kenkey-pack/kenkey-pack-48.glb
+kenkey-pack-49,Kenkey Pack #50,kenkey-pack,338,9.9,0.61,0.61,0.24,kenkey-pack/kenkey-pack-49.glb
+drink-bottle-crate-00,Drink Bottle Crate #01,drink-bottle-crate,354,7.3,0.31,0.38,0.33,drink-bottle-crate/drink-bottle-crate-00.glb
+drink-bottle-crate-01,Drink Bottle Crate #02,drink-bottle-crate,338,7.2,0.26,0.26,0.34,drink-bottle-crate/drink-bottle-crate-01.glb
+drink-bottle-crate-02,Drink Bottle Crate #03,drink-bottle-crate,140,3.9,0.14,0.2,0.52,drink-bottle-crate/drink-bottle-crate-02.glb
+drink-bottle-crate-03,Drink Bottle Crate #04,drink-bottle-crate,230,5.0,0.24,0.24,0.14,drink-bottle-crate/drink-bottle-crate-03.glb
+drink-bottle-crate-04,Drink Bottle Crate #05,drink-bottle-crate,282,5.4,0.26,0.26,0.8,drink-bottle-crate/drink-bottle-crate-04.glb
+drink-bottle-crate-05,Drink Bottle Crate #06,drink-bottle-crate,242,5.5,0.26,0.41,0.31,drink-bottle-crate/drink-bottle-crate-05.glb
+drink-bottle-crate-06,Drink Bottle Crate #07,drink-bottle-crate,274,6.1,0.18,0.34,0.3,drink-bottle-crate/drink-bottle-crate-06.glb
+drink-bottle-crate-07,Drink Bottle Crate #08,drink-bottle-crate,214,5.2,0.23,0.3,0.23,drink-bottle-crate/drink-bottle-crate-07.glb
+drink-bottle-crate-08,Drink Bottle Crate #09,drink-bottle-crate,358,6.2,0.24,0.24,0.26,drink-bottle-crate/drink-bottle-crate-08.glb
+drink-bottle-crate-09,Drink Bottle Crate #10,drink-bottle-crate,266,5.1,0.18,0.32,0.86,drink-bottle-crate/drink-bottle-crate-09.glb
+drink-bottle-crate-10,Drink Bottle Crate #11,drink-bottle-crate,354,7.1,0.32,0.39,0.3,drink-bottle-crate/drink-bottle-crate-10.glb
+drink-bottle-crate-11,Drink Bottle Crate #12,drink-bottle-crate,370,7.7,0.26,0.34,0.32,drink-bottle-crate/drink-bottle-crate-11.glb
+drink-bottle-crate-12,Drink Bottle Crate #13,drink-bottle-crate,406,8.1,0.28,0.41,0.25,drink-bottle-crate/drink-bottle-crate-12.glb
+drink-bottle-crate-13,Drink Bottle Crate #14,drink-bottle-crate,210,4.9,0.17,0.31,0.14,drink-bottle-crate/drink-bottle-crate-13.glb
+drink-bottle-crate-14,Drink Bottle Crate #15,drink-bottle-crate,182,4.1,0.26,0.26,0.57,drink-bottle-crate/drink-bottle-crate-14.glb
+drink-bottle-crate-15,Drink Bottle Crate #16,drink-bottle-crate,258,5.8,0.26,0.41,0.28,drink-bottle-crate/drink-bottle-crate-15.glb
+drink-bottle-crate-16,Drink Bottle Crate #17,drink-bottle-crate,274,6.1,0.26,0.26,0.34,drink-bottle-crate/drink-bottle-crate-16.glb
+drink-bottle-crate-17,Drink Bottle Crate #18,drink-bottle-crate,214,5.2,0.22,0.3,0.23,drink-bottle-crate/drink-bottle-crate-17.glb
+drink-bottle-crate-18,Drink Bottle Crate #19,drink-bottle-crate,358,6.2,0.24,0.24,0.26,drink-bottle-crate/drink-bottle-crate-18.glb
+drink-bottle-crate-19,Drink Bottle Crate #20,drink-bottle-crate,250,4.9,0.18,0.33,0.78,drink-bottle-crate/drink-bottle-crate-19.glb
+drink-bottle-crate-20,Drink Bottle Crate #21,drink-bottle-crate,290,6.3,0.27,0.43,0.34,drink-bottle-crate/drink-bottle-crate-20.glb
+drink-bottle-crate-21,Drink Bottle Crate #22,drink-bottle-crate,306,6.7,0.26,0.26,0.36,drink-bottle-crate/drink-bottle-crate-21.glb
+drink-bottle-crate-22,Drink Bottle Crate #23,drink-bottle-crate,140,4.0,0.14,0.21,0.48,drink-bottle-crate/drink-bottle-crate-22.glb
+drink-bottle-crate-23,Drink Bottle Crate #24,drink-bottle-crate,246,5.3,0.24,0.24,0.26,drink-bottle-crate/drink-bottle-crate-23.glb
+drink-bottle-crate-24,Drink Bottle Crate #25,drink-bottle-crate,298,5.6,0.26,0.26,0.87,drink-bottle-crate/drink-bottle-crate-24.glb
+drink-bottle-crate-25,Drink Bottle Crate #26,drink-bottle-crate,210,5.1,0.25,0.32,0.32,drink-bottle-crate/drink-bottle-crate-25.glb
+drink-bottle-crate-26,Drink Bottle Crate #27,drink-bottle-crate,338,7.2,0.24,0.24,0.32,drink-bottle-crate/drink-bottle-crate-26.glb
+drink-bottle-crate-27,Drink Bottle Crate #28,drink-bottle-crate,236,5.5,0.2,0.27,0.42,drink-bottle-crate/drink-bottle-crate-27.glb
+drink-bottle-crate-28,Drink Bottle Crate #29,drink-bottle-crate,210,4.7,0.24,0.24,0.14,drink-bottle-crate/drink-bottle-crate-28.glb
+drink-bottle-crate-29,Drink Bottle Crate #30,drink-bottle-crate,262,5.5,0.27,0.35,0.58,drink-bottle-crate/drink-bottle-crate-29.glb
+drink-bottle-crate-30,Drink Bottle Crate #31,drink-bottle-crate,274,6.1,0.25,0.4,0.3,drink-bottle-crate/drink-bottle-crate-30.glb
+drink-bottle-crate-31,Drink Bottle Crate #32,drink-bottle-crate,370,7.7,0.26,0.34,0.35,drink-bottle-crate/drink-bottle-crate-31.glb
+drink-bottle-crate-32,Drink Bottle Crate #33,drink-bottle-crate,118,3.7,0.15,0.23,0.26,drink-bottle-crate/drink-bottle-crate-32.glb
+drink-bottle-crate-33,Drink Bottle Crate #34,drink-bottle-crate,350,6.9,0.31,0.31,0.14,drink-bottle-crate/drink-bottle-crate-33.glb
+drink-bottle-crate-34,Drink Bottle Crate #35,drink-bottle-crate,246,5.3,0.27,0.27,0.59,drink-bottle-crate/drink-bottle-crate-34.glb
+drink-bottle-crate-35,Drink Bottle Crate #36,drink-bottle-crate,194,4.8,0.26,0.34,0.36,drink-bottle-crate/drink-bottle-crate-35.glb
+drink-bottle-crate-36,Drink Bottle Crate #37,drink-bottle-crate,306,6.7,0.25,0.25,0.3,drink-bottle-crate/drink-bottle-crate-36.glb
+drink-bottle-crate-37,Drink Bottle Crate #38,drink-bottle-crate,118,3.7,0.14,0.21,0.23,drink-bottle-crate/drink-bottle-crate-37.glb
+drink-bottle-crate-38,Drink Bottle Crate #39,drink-bottle-crate,290,6.1,0.24,0.31,0.14,drink-bottle-crate/drink-bottle-crate-38.glb
+drink-bottle-crate-39,Drink Bottle Crate #40,drink-bottle-crate,330,6.2,0.27,0.35,0.86,drink-bottle-crate/drink-bottle-crate-39.glb
+drink-bottle-crate-40,Drink Bottle Crate #41,drink-bottle-crate,338,7.0,0.31,0.38,0.33,drink-bottle-crate/drink-bottle-crate-40.glb
+drink-bottle-crate-41,Drink Bottle Crate #42,drink-bottle-crate,338,7.2,0.25,0.25,0.34,drink-bottle-crate/drink-bottle-crate-41.glb
+drink-bottle-crate-42,Drink Bottle Crate #43,drink-bottle-crate,236,5.4,0.2,0.27,0.49,drink-bottle-crate/drink-bottle-crate-42.glb
+drink-bottle-crate-43,Drink Bottle Crate #44,drink-bottle-crate,350,6.9,0.31,0.31,0.14,drink-bottle-crate/drink-bottle-crate-43.glb
+drink-bottle-crate-44,Drink Bottle Crate #45,drink-bottle-crate,330,6.0,0.24,0.31,0.86,drink-bottle-crate/drink-bottle-crate-44.glb
+drink-bottle-crate-45,Drink Bottle Crate #46,drink-bottle-crate,242,5.5,0.26,0.34,0.3,drink-bottle-crate/drink-bottle-crate-45.glb
+drink-bottle-crate-46,Drink Bottle Crate #47,drink-bottle-crate,306,6.7,0.18,0.34,0.33,drink-bottle-crate/drink-bottle-crate-46.glb
+drink-bottle-crate-47,Drink Bottle Crate #48,drink-bottle-crate,406,8.1,0.3,0.44,0.22,drink-bottle-crate/drink-bottle-crate-47.glb
+drink-bottle-crate-48,Drink Bottle Crate #49,drink-bottle-crate,350,6.9,0.31,0.31,0.14,drink-bottle-crate/drink-bottle-crate-48.glb
+drink-bottle-crate-49,Drink Bottle Crate #50,drink-bottle-crate,294,6.0,0.26,0.34,0.58,drink-bottle-crate/drink-bottle-crate-49.glb
