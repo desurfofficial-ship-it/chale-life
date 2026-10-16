@@ -11,7 +11,7 @@
  * live there; keep them in sync).
  */
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { JOYSTICK_DEAD_ZONE, setJoystickVector } from './inputManager';
 
 const BASE_SIZE = 108; // px — must match .joystick width/height in styles.css
@@ -63,6 +63,26 @@ export function Joystick() {
     setKnob({ x: 0, y: 0 });
     setJoystickVector(0, 0, false);
   };
+
+  // P1: clear stick when the page is hidden or pointer capture is lost
+  // (iOS Safari tab switch / OS gesture) — window blur alone is not enough.
+  useEffect(() => {
+    const onVis = (): void => {
+      if (document.visibilityState === 'hidden') release();
+    };
+    const onLost = (e: Event): void => {
+      const pe = e as PointerEvent;
+      if (pointerId.current !== null && pe.pointerId === pointerId.current) release();
+    };
+    document.addEventListener('visibilitychange', onVis);
+    const el = baseRef.current;
+    el?.addEventListener('lostpointercapture', onLost);
+    return () => {
+      document.removeEventListener('visibilitychange', onVis);
+      el?.removeEventListener('lostpointercapture', onLost);
+      release();
+    };
+  }, []);
 
   return (
     <div
