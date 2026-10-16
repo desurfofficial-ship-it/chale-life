@@ -110,7 +110,7 @@ export interface TycoonHudProps {
    * Open a business on an owned plot. Returns true when the business actually
    * opened (wallet covered the startup cost), false when the store rejected
    * it (insufficient cash, plot not owned, already has a business). The
-   * PlotSheet uses this to decide whether to advance to the "Venue open ✓"
+   * PlotSheet uses this to decide whether to advance to the "Venue open OK"
    * screen — same FIX rationale as onBuyPlot above.
    */
   readonly onOpenBusiness: (plot: PlotRef, typeId: string, budget: BudgetTier) => boolean;
@@ -121,8 +121,8 @@ export interface TycoonHudProps {
 function Stars({ n }: { n: number }) {
   return (
     <span aria-label={`${n} stars`} style={{ letterSpacing: 1, color: MUSTARD }}>
-      {'★'.repeat(n)}
-      <span style={{ color: '#ccc' }}>{'★'.repeat(3 - n)}</span>
+      {'*'.repeat(n)}
+      <span style={{ color: '#ccc' }}>{'*'.repeat(3 - n)}</span>
     </span>
   );
 }
@@ -459,7 +459,7 @@ function SetupSheet({
   return (
     <div data-testid="setup-sheet">
       <button type="button" onClick={onBack} style={{ ...chipBase, marginBottom: 10 }}>
-        ← Back
+         Back
       </button>
       <h2 style={{ margin: '0 0 4px', fontSize: 18 }}>{type.name}</h2>
       <p style={{ margin: 0, fontSize: 13, color: MUTED }}>Set startup budget</p>
@@ -520,7 +520,7 @@ function PlotSheet({
   /**
    * FIX: returns boolean — true when the business actually opened (wallet
    * covered the startup cost). Same rationale as `onBuy`: the old `() => void`
-   * contract let the sheet advance to the "Venue open ✓" screen even when the
+   * contract let the sheet advance to the "Venue open OK" screen even when the
    * store rejected the open, so the player thought they had a business while
    * nothing was persisted.
    */
@@ -667,7 +667,7 @@ function PlotSheet({
             setStep(1);
           }}
           onConfirm={(budget) => {
-            // FIX: gate the "Venue open ✓" screen on the store's commit.
+            // FIX: gate the "Venue open OK" screen on the store's commit.
             // requestOpenBusiness returns false if the wallet can't cover the
             // startup cost; without this check the sheet would show the green
             // success check while no business was actually persisted.
@@ -686,7 +686,7 @@ function PlotSheet({
 
       {step === 3 && (
         <div style={{ textAlign: 'center', padding: '20px 0' }}>
-          <div style={{ fontSize: 28, color: FOREST }}>✓</div>
+          <div style={{ fontSize: 28, color: FOREST }}>OK</div>
           <p style={{ fontWeight: 700 }}>Venue open</p>
           <button type="button" style={btnPrimary} onClick={onClose}>
             Done
