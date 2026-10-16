@@ -43,6 +43,7 @@ import { NewLands } from '@/components/world/districts/NewLands'
 import { CommunityQuarter } from '@/components/world/districts/CommunityQuarter'
 import { TycoonLayer, type TycoonWorldProps } from '@/world/tycoon'
 import { OfficesLayer } from '@/world/office/OfficesLayer'
+import { BusinessesLayer } from '@/world/business/BusinessesLayer'
 import { StreetLifeLayer } from '@/world/streetLife'
 
 // ───────────────────────────────────────────────── map-edge skirts ──────────
@@ -215,6 +216,7 @@ export function AccraWorld({
 
       {/* O-001: world-run offices (cutaway + NPC staff + lifts) */}
       <OfficesLayer />
+      <BusinessesLayer />
       {tycoon ? <TycoonLayer {...tycoon} /> : null}
       <StreetLifeLayer hour={hour} />
 
