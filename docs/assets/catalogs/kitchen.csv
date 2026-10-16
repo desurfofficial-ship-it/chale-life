@@ -1,0 +1,501 @@
+id,name,archetype,tris,kb_meshopt,w_m,d_m,h_m,file
+dining-table-00,Dining Table #01,dining-table,128,3.8,1.17,0.81,1.01,dining-table/dining-table-00.glb
+dining-table-01,Dining Table #02,dining-table,98,3.5,0.93,0.93,0.77,dining-table/dining-table-01.glb
+dining-table-02,Dining Table #03,dining-table,144,4.0,1.6,0.73,0.99,dining-table/dining-table-02.glb
+dining-table-03,Dining Table #04,dining-table,148,4.1,1.19,0.98,0.81,dining-table/dining-table-03.glb
+dining-table-04,Dining Table #05,dining-table,280,6.0,1.38,0.97,0.79,dining-table/dining-table-04.glb
+dining-table-05,Dining Table #06,dining-table,100,3.5,1.2,1.2,1.0,dining-table/dining-table-05.glb
+dining-table-06,Dining Table #07,dining-table,180,4.6,1.98,0.94,0.8,dining-table/dining-table-06.glb
+dining-table-07,Dining Table #08,dining-table,96,3.4,1.09,0.93,0.74,dining-table/dining-table-07.glb
+dining-table-08,Dining Table #09,dining-table,128,3.8,1.55,0.72,0.99,dining-table/dining-table-08.glb
+dining-table-09,Dining Table #10,dining-table,136,3.9,1.27,1.27,0.79,dining-table/dining-table-09.glb
+dining-table-10,Dining Table #11,dining-table,208,4.9,1.94,0.96,0.76,dining-table/dining-table-10.glb
+dining-table-11,Dining Table #12,dining-table,128,3.8,1.9,0.73,1.02,dining-table/dining-table-11.glb
+dining-table-12,Dining Table #13,dining-table,128,3.8,1.63,0.89,1.0,dining-table/dining-table-12.glb
+dining-table-13,Dining Table #14,dining-table,192,4.8,1.3,1.3,0.79,dining-table/dining-table-13.glb
+dining-table-14,Dining Table #15,dining-table,208,4.9,1.29,0.84,0.81,dining-table/dining-table-14.glb
+dining-table-15,Dining Table #16,dining-table,92,3.5,1.01,0.86,0.78,dining-table/dining-table-15.glb
+dining-table-16,Dining Table #17,dining-table,164,4.3,1.63,0.98,0.77,dining-table/dining-table-16.glb
+dining-table-17,Dining Table #18,dining-table,196,4.9,0.99,0.99,0.77,dining-table/dining-table-17.glb
+dining-table-18,Dining Table #19,dining-table,208,5.0,1.06,0.8,0.76,dining-table/dining-table-18.glb
+dining-table-19,Dining Table #20,dining-table,148,4.2,1.35,1.03,0.8,dining-table/dining-table-19.glb
+dining-table-20,Dining Table #21,dining-table,220,5.1,1.36,0.98,0.78,dining-table/dining-table-20.glb
+dining-table-21,Dining Table #22,dining-table,98,3.5,1.09,1.09,0.78,dining-table/dining-table-21.glb
+dining-table-22,Dining Table #23,dining-table,236,5.4,1.03,0.9,0.79,dining-table/dining-table-22.glb
+dining-table-23,Dining Table #24,dining-table,160,4.5,1.08,0.87,0.98,dining-table/dining-table-23.glb
+dining-table-24,Dining Table #25,dining-table,128,3.9,1.14,0.76,0.98,dining-table/dining-table-24.glb
+dining-table-25,Dining Table #26,dining-table,152,4.2,0.95,0.95,0.8,dining-table/dining-table-25.glb
+dining-table-26,Dining Table #27,dining-table,144,4.1,1.56,0.78,0.99,dining-table/dining-table-26.glb
+dining-table-27,Dining Table #28,dining-table,160,4.5,1.89,0.81,0.82,dining-table/dining-table-27.glb
+dining-table-28,Dining Table #29,dining-table,252,5.5,1.9,0.72,0.8,dining-table/dining-table-28.glb
+dining-table-29,Dining Table #30,dining-table,96,3.5,0.98,0.98,0.77,dining-table/dining-table-29.glb
+dining-table-30,Dining Table #31,dining-table,236,5.4,1.99,0.7,0.79,dining-table/dining-table-30.glb
+dining-table-31,Dining Table #32,dining-table,156,4.3,1.14,1.02,0.76,dining-table/dining-table-31.glb
+dining-table-32,Dining Table #33,dining-table,204,5.0,1.47,0.83,0.76,dining-table/dining-table-32.glb
+dining-table-33,Dining Table #34,dining-table,100,3.5,1.07,1.07,0.99,dining-table/dining-table-33.glb
+dining-table-34,Dining Table #35,dining-table,180,4.6,1.63,0.85,0.81,dining-table/dining-table-34.glb
+dining-table-35,Dining Table #36,dining-table,176,4.5,1.93,0.86,0.8,dining-table/dining-table-35.glb
+dining-table-36,Dining Table #37,dining-table,152,4.2,1.49,0.73,0.99,dining-table/dining-table-36.glb
+dining-table-37,Dining Table #38,dining-table,140,4.1,1.06,1.06,0.8,dining-table/dining-table-37.glb
+dining-table-38,Dining Table #39,dining-table,208,5.0,1.89,0.85,0.77,dining-table/dining-table-38.glb
+dining-table-39,Dining Table #40,dining-table,244,5.4,1.59,0.82,0.77,dining-table/dining-table-39.glb
+dining-table-40,Dining Table #41,dining-table,172,4.5,1.72,0.83,0.77,dining-table/dining-table-40.glb
+dining-table-41,Dining Table #42,dining-table,124,3.8,1.18,1.18,0.76,dining-table/dining-table-41.glb
+dining-table-42,Dining Table #43,dining-table,124,3.8,1.21,0.97,0.75,dining-table/dining-table-42.glb
+dining-table-43,Dining Table #44,dining-table,148,4.3,1.4,0.85,0.84,dining-table/dining-table-43.glb
+dining-table-44,Dining Table #45,dining-table,164,4.4,1.57,0.94,0.85,dining-table/dining-table-44.glb
+dining-table-45,Dining Table #46,dining-table,138,4.1,1.12,1.12,0.85,dining-table/dining-table-45.glb
+dining-table-46,Dining Table #47,dining-table,208,5.0,1.43,0.76,0.79,dining-table/dining-table-46.glb
+dining-table-47,Dining Table #48,dining-table,124,3.8,1.35,1.03,0.8,dining-table/dining-table-47.glb
+dining-table-48,Dining Table #49,dining-table,224,5.2,1.27,0.89,0.76,dining-table/dining-table-48.glb
+dining-table-49,Dining Table #50,dining-table,108,3.6,0.91,0.91,0.8,dining-table/dining-table-49.glb
+dining-chair-00,Dining Chair #01,dining-chair,228,5.6,0.48,0.5,0.91,dining-chair/dining-chair-00.glb
+dining-chair-01,Dining Chair #02,dining-chair,296,6.9,0.49,0.56,0.84,dining-chair/dining-chair-01.glb
+dining-chair-02,Dining Chair #03,dining-chair,200,5.2,0.46,0.46,0.94,dining-chair/dining-chair-02.glb
+dining-chair-03,Dining Chair #04,dining-chair,152,4.5,0.46,0.46,0.97,dining-chair/dining-chair-03.glb
+dining-chair-04,Dining Chair #05,dining-chair,192,5.1,0.47,0.46,0.99,dining-chair/dining-chair-04.glb
+dining-chair-05,Dining Chair #06,dining-chair,148,4.6,0.48,0.51,0.87,dining-chair/dining-chair-05.glb
+dining-chair-06,Dining Chair #07,dining-chair,176,4.8,0.47,0.49,0.97,dining-chair/dining-chair-06.glb
+dining-chair-07,Dining Chair #08,dining-chair,176,4.8,0.47,0.48,0.9,dining-chair/dining-chair-07.glb
+dining-chair-08,Dining Chair #09,dining-chair,192,5.0,0.43,0.51,0.95,dining-chair/dining-chair-08.glb
+dining-chair-09,Dining Chair #10,dining-chair,260,6.4,0.5,0.51,0.93,dining-chair/dining-chair-09.glb
+dining-chair-10,Dining Chair #11,dining-chair,176,4.8,0.47,0.51,0.94,dining-chair/dining-chair-10.glb
+dining-chair-11,Dining Chair #12,dining-chair,188,5.0,0.5,0.51,0.98,dining-chair/dining-chair-11.glb
+dining-chair-12,Dining Chair #13,dining-chair,168,4.7,0.44,0.46,0.97,dining-chair/dining-chair-12.glb
+dining-chair-13,Dining Chair #14,dining-chair,260,6.5,0.54,0.51,0.84,dining-chair/dining-chair-13.glb
+dining-chair-14,Dining Chair #15,dining-chair,176,4.8,0.43,0.49,0.93,dining-chair/dining-chair-14.glb
+dining-chair-15,Dining Chair #16,dining-chair,188,5.0,0.43,0.52,1.0,dining-chair/dining-chair-15.glb
+dining-chair-16,Dining Chair #17,dining-chair,180,4.8,0.44,0.53,1.0,dining-chair/dining-chair-16.glb
+dining-chair-17,Dining Chair #18,dining-chair,284,6.8,0.54,0.49,0.93,dining-chair/dining-chair-17.glb
+dining-chair-18,Dining Chair #19,dining-chair,176,4.8,0.46,0.55,0.92,dining-chair/dining-chair-18.glb
+dining-chair-19,Dining Chair #20,dining-chair,152,4.5,0.48,0.46,0.92,dining-chair/dining-chair-19.glb
+dining-chair-20,Dining Chair #21,dining-chair,204,5.1,0.5,0.5,0.97,dining-chair/dining-chair-20.glb
+dining-chair-21,Dining Chair #22,dining-chair,260,6.5,0.5,0.53,0.88,dining-chair/dining-chair-21.glb
+dining-chair-22,Dining Chair #23,dining-chair,200,5.2,0.48,0.54,0.85,dining-chair/dining-chair-22.glb
+dining-chair-23,Dining Chair #24,dining-chair,152,4.5,0.46,0.52,0.93,dining-chair/dining-chair-23.glb
+dining-chair-24,Dining Chair #25,dining-chair,132,4.1,0.45,0.45,0.87,dining-chair/dining-chair-24.glb
+dining-chair-25,Dining Chair #26,dining-chair,184,5.1,0.52,0.55,0.86,dining-chair/dining-chair-25.glb
+dining-chair-26,Dining Chair #27,dining-chair,188,5.0,0.44,0.52,0.9,dining-chair/dining-chair-26.glb
+dining-chair-27,Dining Chair #28,dining-chair,176,4.8,0.43,0.48,0.89,dining-chair/dining-chair-27.glb
+dining-chair-28,Dining Chair #29,dining-chair,132,4.1,0.49,0.51,0.93,dining-chair/dining-chair-28.glb
+dining-chair-29,Dining Chair #30,dining-chair,260,6.5,0.56,0.53,0.84,dining-chair/dining-chair-29.glb
+dining-chair-30,Dining Chair #31,dining-chair,176,4.8,0.46,0.52,0.84,dining-chair/dining-chair-30.glb
+dining-chair-31,Dining Chair #32,dining-chair,176,4.7,0.42,0.5,0.91,dining-chair/dining-chair-31.glb
+dining-chair-32,Dining Chair #33,dining-chair,204,5.1,0.48,0.55,0.91,dining-chair/dining-chair-32.glb
+dining-chair-33,Dining Chair #34,dining-chair,284,6.8,0.56,0.49,0.84,dining-chair/dining-chair-33.glb
+dining-chair-34,Dining Chair #35,dining-chair,176,4.8,0.48,0.51,0.92,dining-chair/dining-chair-34.glb
+dining-chair-35,Dining Chair #36,dining-chair,176,4.9,0.43,0.46,0.9,dining-chair/dining-chair-35.glb
+dining-chair-36,Dining Chair #37,dining-chair,168,4.7,0.45,0.45,0.96,dining-chair/dining-chair-36.glb
+dining-chair-37,Dining Chair #38,dining-chair,196,5.4,0.52,0.56,0.83,dining-chair/dining-chair-37.glb
+dining-chair-38,Dining Chair #39,dining-chair,200,5.2,0.47,0.48,0.92,dining-chair/dining-chair-38.glb
+dining-chair-39,Dining Chair #40,dining-chair,188,5.0,0.44,0.52,0.91,dining-chair/dining-chair-39.glb
+dining-chair-40,Dining Chair #41,dining-chair,156,4.4,0.49,0.55,0.99,dining-chair/dining-chair-40.glb
+dining-chair-41,Dining Chair #42,dining-chair,260,6.5,0.52,0.49,0.91,dining-chair/dining-chair-41.glb
+dining-chair-42,Dining Chair #43,dining-chair,200,5.2,0.44,0.51,0.9,dining-chair/dining-chair-42.glb
+dining-chair-43,Dining Chair #44,dining-chair,188,5.0,0.46,0.55,0.92,dining-chair/dining-chair-43.glb
+dining-chair-44,Dining Chair #45,dining-chair,192,5.0,0.47,0.49,0.97,dining-chair/dining-chair-44.glb
+dining-chair-45,Dining Chair #46,dining-chair,260,6.5,0.55,0.55,0.91,dining-chair/dining-chair-45.glb
+dining-chair-46,Dining Chair #47,dining-chair,164,4.7,0.48,0.46,0.92,dining-chair/dining-chair-46.glb
+dining-chair-47,Dining Chair #48,dining-chair,176,4.8,0.45,0.49,1.0,dining-chair/dining-chair-47.glb
+dining-chair-48,Dining Chair #49,dining-chair,180,4.8,0.43,0.53,0.97,dining-chair/dining-chair-48.glb
+dining-chair-49,Dining Chair #50,dining-chair,296,6.9,0.5,0.52,0.84,dining-chair/dining-chair-49.glb
+kitchen-counter-00,Kitchen Counter #01,kitchen-counter,226,5.2,1.16,0.61,1.27,kitchen-counter/kitchen-counter-00.glb
+kitchen-counter-01,Kitchen Counter #02,kitchen-counter,230,5.2,1.63,0.58,1.16,kitchen-counter/kitchen-counter-01.glb
+kitchen-counter-02,Kitchen Counter #03,kitchen-counter,182,4.5,1.95,0.66,0.96,kitchen-counter/kitchen-counter-02.glb
+kitchen-counter-03,Kitchen Counter #04,kitchen-counter,208,5.2,1.11,0.62,1.11,kitchen-counter/kitchen-counter-03.glb
+kitchen-counter-04,Kitchen Counter #05,kitchen-counter,202,4.9,1.68,0.62,1.06,kitchen-counter/kitchen-counter-04.glb
+kitchen-counter-05,Kitchen Counter #06,kitchen-counter,282,6.0,2.2,0.59,1.13,kitchen-counter/kitchen-counter-05.glb
+kitchen-counter-06,Kitchen Counter #07,kitchen-counter,182,4.5,2.04,0.65,1.28,kitchen-counter/kitchen-counter-06.glb
+kitchen-counter-07,Kitchen Counter #08,kitchen-counter,176,4.6,1.36,0.64,0.88,kitchen-counter/kitchen-counter-07.glb
+kitchen-counter-08,Kitchen Counter #09,kitchen-counter,174,4.3,2.13,0.64,0.93,kitchen-counter/kitchen-counter-08.glb
+kitchen-counter-09,Kitchen Counter #10,kitchen-counter,426,8.0,2.0,0.64,1.26,kitchen-counter/kitchen-counter-09.glb
+kitchen-counter-10,Kitchen Counter #11,kitchen-counter,198,4.9,1.22,0.65,1.18,kitchen-counter/kitchen-counter-10.glb
+kitchen-counter-11,Kitchen Counter #12,kitchen-counter,164,4.3,1.27,0.58,1.16,kitchen-counter/kitchen-counter-11.glb
+kitchen-counter-12,Kitchen Counter #13,kitchen-counter,298,6.0,2.37,0.65,1.14,kitchen-counter/kitchen-counter-12.glb
+kitchen-counter-13,Kitchen Counter #14,kitchen-counter,326,6.5,1.86,0.63,1.18,kitchen-counter/kitchen-counter-13.glb
+kitchen-counter-14,Kitchen Counter #15,kitchen-counter,222,5.2,1.34,0.65,1.16,kitchen-counter/kitchen-counter-14.glb
+kitchen-counter-15,Kitchen Counter #16,kitchen-counter,148,4.2,1.8,0.61,0.99,kitchen-counter/kitchen-counter-15.glb
+kitchen-counter-16,Kitchen Counter #17,kitchen-counter,242,5.3,1.59,0.6,0.96,kitchen-counter/kitchen-counter-16.glb
+kitchen-counter-17,Kitchen Counter #18,kitchen-counter,446,8.3,1.79,0.59,1.29,kitchen-counter/kitchen-counter-17.glb
+kitchen-counter-18,Kitchen Counter #19,kitchen-counter,190,4.6,1.48,0.56,0.95,kitchen-counter/kitchen-counter-18.glb
+kitchen-counter-19,Kitchen Counter #20,kitchen-counter,160,4.2,1.55,0.64,0.99,kitchen-counter/kitchen-counter-19.glb
+kitchen-counter-20,Kitchen Counter #21,kitchen-counter,238,5.4,2.41,0.65,1.11,kitchen-counter/kitchen-counter-20.glb
+kitchen-counter-21,Kitchen Counter #22,kitchen-counter,314,6.5,1.59,0.64,1.17,kitchen-counter/kitchen-counter-21.glb
+kitchen-counter-22,Kitchen Counter #23,kitchen-counter,190,4.6,2.0,0.61,0.98,kitchen-counter/kitchen-counter-22.glb
+kitchen-counter-23,Kitchen Counter #24,kitchen-counter,208,5.2,1.4,0.56,1.09,kitchen-counter/kitchen-counter-23.glb
+kitchen-counter-24,Kitchen Counter #25,kitchen-counter,214,5.1,1.04,0.57,1.1,kitchen-counter/kitchen-counter-24.glb
+kitchen-counter-25,Kitchen Counter #26,kitchen-counter,434,8.0,1.66,0.59,1.14,kitchen-counter/kitchen-counter-25.glb
+kitchen-counter-26,Kitchen Counter #27,kitchen-counter,198,4.8,2.21,0.66,1.1,kitchen-counter/kitchen-counter-26.glb
+kitchen-counter-27,Kitchen Counter #28,kitchen-counter,188,4.6,2.24,0.63,0.96,kitchen-counter/kitchen-counter-27.glb
+kitchen-counter-28,Kitchen Counter #29,kitchen-counter,370,7.2,2.22,0.58,1.19,kitchen-counter/kitchen-counter-28.glb
+kitchen-counter-29,Kitchen Counter #30,kitchen-counter,322,6.5,2.39,0.59,1.12,kitchen-counter/kitchen-counter-29.glb
+kitchen-counter-30,Kitchen Counter #31,kitchen-counter,290,6.1,2.31,0.65,1.07,kitchen-counter/kitchen-counter-30.glb
+kitchen-counter-31,Kitchen Counter #32,kitchen-counter,168,4.5,1.52,0.59,1.07,kitchen-counter/kitchen-counter-31.glb
+kitchen-counter-32,Kitchen Counter #33,kitchen-counter,222,5.0,1.59,0.62,1.27,kitchen-counter/kitchen-counter-32.glb
+kitchen-counter-33,Kitchen Counter #34,kitchen-counter,282,6.0,1.69,0.61,1.29,kitchen-counter/kitchen-counter-33.glb
+kitchen-counter-34,Kitchen Counter #35,kitchen-counter,170,4.5,1.14,0.61,1.28,kitchen-counter/kitchen-counter-34.glb
+kitchen-counter-35,Kitchen Counter #36,kitchen-counter,120,3.6,2.23,0.57,1.02,kitchen-counter/kitchen-counter-35.glb
+kitchen-counter-36,Kitchen Counter #37,kitchen-counter,306,6.2,2.38,0.63,0.92,kitchen-counter/kitchen-counter-36.glb
+kitchen-counter-37,Kitchen Counter #38,kitchen-counter,202,4.8,1.31,0.64,1.18,kitchen-counter/kitchen-counter-37.glb
+kitchen-counter-38,Kitchen Counter #39,kitchen-counter,222,5.1,1.24,0.59,1.12,kitchen-counter/kitchen-counter-38.glb
+kitchen-counter-39,Kitchen Counter #40,kitchen-counter,168,4.4,1.15,0.63,1.09,kitchen-counter/kitchen-counter-39.glb
+kitchen-counter-40,Kitchen Counter #41,kitchen-counter,290,6.0,2.0,0.57,0.96,kitchen-counter/kitchen-counter-40.glb
+kitchen-counter-41,Kitchen Counter #42,kitchen-counter,266,5.8,1.19,0.58,1.18,kitchen-counter/kitchen-counter-41.glb
+kitchen-counter-42,Kitchen Counter #43,kitchen-counter,198,4.9,1.15,0.65,1.09,kitchen-counter/kitchen-counter-42.glb
+kitchen-counter-43,Kitchen Counter #44,kitchen-counter,192,4.8,1.65,0.57,1.26,kitchen-counter/kitchen-counter-43.glb
+kitchen-counter-44,Kitchen Counter #45,kitchen-counter,310,6.2,1.59,0.63,1.16,kitchen-counter/kitchen-counter-44.glb
+kitchen-counter-45,Kitchen Counter #46,kitchen-counter,230,5.2,1.15,0.62,1.16,kitchen-counter/kitchen-counter-45.glb
+kitchen-counter-46,Kitchen Counter #47,kitchen-counter,170,4.4,2.03,0.6,1.18,kitchen-counter/kitchen-counter-46.glb
+kitchen-counter-47,Kitchen Counter #48,kitchen-counter,192,4.8,1.66,0.62,1.09,kitchen-counter/kitchen-counter-47.glb
+kitchen-counter-48,Kitchen Counter #49,kitchen-counter,138,3.9,1.44,0.65,0.91,kitchen-counter/kitchen-counter-48.glb
+kitchen-counter-49,Kitchen Counter #50,kitchen-counter,270,6.0,1.43,0.63,1.14,kitchen-counter/kitchen-counter-49.glb
+gas-cooker-00,Gas Cooker #01,gas-cooker,458,8.9,0.5,0.64,0.93,gas-cooker/gas-cooker-00.glb
+gas-cooker-01,Gas Cooker #02,gas-cooker,410,8.1,1.08,0.49,0.88,gas-cooker/gas-cooker-01.glb
+gas-cooker-02,Gas Cooker #03,gas-cooker,278,6.2,0.28,0.28,0.72,gas-cooker/gas-cooker-02.glb
+gas-cooker-03,Gas Cooker #04,gas-cooker,570,10.4,1.22,0.63,0.84,gas-cooker/gas-cooker-03.glb
+gas-cooker-04,Gas Cooker #05,gas-cooker,610,10.9,0.63,0.62,1.17,gas-cooker/gas-cooker-04.glb
+gas-cooker-05,Gas Cooker #06,gas-cooker,398,8.0,1.04,0.54,0.81,gas-cooker/gas-cooker-05.glb
+gas-cooker-06,Gas Cooker #07,gas-cooker,250,5.9,0.33,0.33,0.7,gas-cooker/gas-cooker-06.glb
+gas-cooker-07,Gas Cooker #08,gas-cooker,570,10.4,1.1,0.49,0.91,gas-cooker/gas-cooker-07.glb
+gas-cooker-08,Gas Cooker #09,gas-cooker,590,10.7,0.67,0.64,1.07,gas-cooker/gas-cooker-08.glb
+gas-cooker-09,Gas Cooker #10,gas-cooker,490,9.2,1.27,0.52,1.03,gas-cooker/gas-cooker-09.glb
+gas-cooker-10,Gas Cooker #11,gas-cooker,338,7.0,0.4,0.34,0.92,gas-cooker/gas-cooker-10.glb
+gas-cooker-11,Gas Cooker #12,gas-cooker,570,10.5,1.03,0.56,0.87,gas-cooker/gas-cooker-11.glb
+gas-cooker-12,Gas Cooker #13,gas-cooker,542,10.2,0.84,0.6,0.97,gas-cooker/gas-cooker-12.glb
+gas-cooker-13,Gas Cooker #14,gas-cooker,398,7.9,1.18,0.56,0.88,gas-cooker/gas-cooker-13.glb
+gas-cooker-14,Gas Cooker #15,gas-cooker,318,6.9,0.37,0.32,0.76,gas-cooker/gas-cooker-14.glb
+gas-cooker-15,Gas Cooker #16,gas-cooker,490,9.4,0.86,0.45,0.85,gas-cooker/gas-cooker-15.glb
+gas-cooker-16,Gas Cooker #17,gas-cooker,470,8.8,0.56,0.66,1.4,gas-cooker/gas-cooker-16.glb
+gas-cooker-17,Gas Cooker #18,gas-cooker,490,9.3,1.24,0.57,0.99,gas-cooker/gas-cooker-17.glb
+gas-cooker-18,Gas Cooker #19,gas-cooker,358,7.5,0.35,0.34,0.85,gas-cooker/gas-cooker-18.glb
+gas-cooker-19,Gas Cooker #20,gas-cooker,490,9.3,1.12,0.46,0.66,gas-cooker/gas-cooker-19.glb
+gas-cooker-20,Gas Cooker #21,gas-cooker,470,8.8,0.62,0.64,1.36,gas-cooker/gas-cooker-20.glb
+gas-cooker-21,Gas Cooker #22,gas-cooker,498,9.4,1.13,0.61,1.03,gas-cooker/gas-cooker-21.glb
+gas-cooker-22,Gas Cooker #23,gas-cooker,358,7.4,0.42,0.34,0.9,gas-cooker/gas-cooker-22.glb
+gas-cooker-23,Gas Cooker #24,gas-cooker,490,9.5,0.88,0.63,0.74,gas-cooker/gas-cooker-23.glb
+gas-cooker-24,Gas Cooker #25,gas-cooker,498,9.4,0.65,0.61,0.96,gas-cooker/gas-cooker-24.glb
+gas-cooker-25,Gas Cooker #26,gas-cooker,490,9.3,1.16,0.6,1.02,gas-cooker/gas-cooker-25.glb
+gas-cooker-26,Gas Cooker #27,gas-cooker,318,6.8,0.34,0.32,0.92,gas-cooker/gas-cooker-26.glb
+gas-cooker-27,Gas Cooker #28,gas-cooker,590,10.8,1.09,0.55,0.99,gas-cooker/gas-cooker-27.glb
+gas-cooker-28,Gas Cooker #29,gas-cooker,498,9.4,0.77,0.66,0.94,gas-cooker/gas-cooker-28.glb
+gas-cooker-29,Gas Cooker #30,gas-cooker,410,8.1,1.18,0.52,0.86,gas-cooker/gas-cooker-29.glb
+gas-cooker-30,Gas Cooker #31,gas-cooker,258,6.0,0.28,0.28,0.66,gas-cooker/gas-cooker-30.glb
+gas-cooker-31,Gas Cooker #32,gas-cooker,590,11.0,0.9,0.46,0.97,gas-cooker/gas-cooker-31.glb
+gas-cooker-32,Gas Cooker #33,gas-cooker,590,10.6,0.66,0.63,1.39,gas-cooker/gas-cooker-32.glb
+gas-cooker-33,Gas Cooker #34,gas-cooker,490,9.3,1.19,0.54,0.94,gas-cooker/gas-cooker-33.glb
+gas-cooker-34,Gas Cooker #35,gas-cooker,270,6.2,0.3,0.3,0.66,gas-cooker/gas-cooker-34.glb
+gas-cooker-35,Gas Cooker #36,gas-cooker,490,9.4,0.98,0.53,0.84,gas-cooker/gas-cooker-35.glb
+gas-cooker-36,Gas Cooker #37,gas-cooker,510,9.3,0.88,0.65,1.34,gas-cooker/gas-cooker-36.glb
+gas-cooker-37,Gas Cooker #38,gas-cooker,398,7.9,1.23,0.6,0.93,gas-cooker/gas-cooker-37.glb
+gas-cooker-38,Gas Cooker #39,gas-cooker,378,7.7,0.42,0.35,0.96,gas-cooker/gas-cooker-38.glb
+gas-cooker-39,Gas Cooker #40,gas-cooker,550,10.4,0.84,0.5,0.82,gas-cooker/gas-cooker-39.glb
+gas-cooker-40,Gas Cooker #41,gas-cooker,470,8.8,0.56,0.63,1.34,gas-cooker/gas-cooker-40.glb
+gas-cooker-41,Gas Cooker #42,gas-cooker,390,7.9,0.99,0.49,0.93,gas-cooker/gas-cooker-41.glb
+gas-cooker-42,Gas Cooker #43,gas-cooker,358,7.5,0.36,0.33,0.97,gas-cooker/gas-cooker-42.glb
+gas-cooker-43,Gas Cooker #44,gas-cooker,570,10.5,1.03,0.57,0.95,gas-cooker/gas-cooker-43.glb
+gas-cooker-44,Gas Cooker #45,gas-cooker,610,10.8,0.63,0.63,1.34,gas-cooker/gas-cooker-44.glb
+gas-cooker-45,Gas Cooker #46,gas-cooker,490,9.2,1.33,0.48,0.98,gas-cooker/gas-cooker-45.glb
+gas-cooker-46,Gas Cooker #47,gas-cooker,358,7.5,0.38,0.3,0.88,gas-cooker/gas-cooker-46.glb
+gas-cooker-47,Gas Cooker #48,gas-cooker,570,10.6,1.0,0.52,0.89,gas-cooker/gas-cooker-47.glb
+gas-cooker-48,Gas Cooker #49,gas-cooker,470,8.8,0.82,0.63,1.32,gas-cooker/gas-cooker-48.glb
+gas-cooker-49,Gas Cooker #50,gas-cooker,490,9.3,1.12,0.58,1.06,gas-cooker/gas-cooker-49.glb
+fridge-00,Fridge #01,fridge,110,3.7,0.53,0.63,1.2,fridge/fridge-00.glb
+fridge-01,Fridge #02,fridge,206,5.2,0.58,0.73,1.73,fridge/fridge-01.glb
+fridge-02,Fridge #03,fridge,122,4.0,1.0,0.69,0.87,fridge/fridge-02.glb
+fridge-03,Fridge #04,fridge,176,4.7,0.45,0.59,0.85,fridge/fridge-03.glb
+fridge-04,Fridge #05,fridge,230,5.3,0.93,0.78,2.04,fridge/fridge-04.glb
+fridge-05,Fridge #06,fridge,142,4.2,0.55,0.68,1.36,fridge/fridge-05.glb
+fridge-06,Fridge #07,fridge,244,5.7,0.69,0.72,1.73,fridge/fridge-06.glb
+fridge-07,Fridge #08,fridge,202,5.0,1.28,0.72,0.96,fridge/fridge-07.glb
+fridge-08,Fridge #09,fridge,252,5.9,0.48,0.6,1.01,fridge/fridge-08.glb
+fridge-09,Fridge #10,fridge,206,5.2,0.87,0.8,1.78,fridge/fridge-09.glb
+fridge-10,Fridge #11,fridge,200,5.0,0.5,0.6,1.19,fridge/fridge-10.glb
+fridge-11,Fridge #12,fridge,284,6.4,0.69,0.68,1.61,fridge/fridge-11.glb
+fridge-12,Fridge #13,fridge,146,4.3,0.83,0.71,1.04,fridge/fridge-12.glb
+fridge-13,Fridge #14,fridge,134,4.1,0.53,0.6,0.87,fridge/fridge-13.glb
+fridge-14,Fridge #15,fridge,254,5.8,0.91,0.78,1.94,fridge/fridge-14.glb
+fridge-15,Fridge #16,fridge,258,5.9,0.55,0.68,1.77,fridge/fridge-15.glb
+fridge-16,Fridge #17,fridge,218,5.4,0.6,0.68,1.54,fridge/fridge-16.glb
+fridge-17,Fridge #18,fridge,162,4.6,0.98,0.66,0.91,fridge/fridge-17.glb
+fridge-18,Fridge #19,fridge,230,5.6,0.5,0.62,0.94,fridge/fridge-18.glb
+fridge-19,Fridge #20,fridge,292,6.4,0.89,0.73,1.88,fridge/fridge-19.glb
+fridge-20,Fridge #21,fridge,268,6.1,0.52,0.65,1.33,fridge/fridge-20.glb
+fridge-21,Fridge #22,fridge,166,4.6,0.56,0.73,1.45,fridge/fridge-21.glb
+fridge-22,Fridge #23,fridge,134,4.1,1.0,0.61,0.96,fridge/fridge-22.glb
+fridge-23,Fridge #24,fridge,110,3.8,0.55,0.54,0.88,fridge/fridge-23.glb
+fridge-24,Fridge #25,fridge,244,5.7,0.88,0.78,1.74,fridge/fridge-24.glb
+fridge-25,Fridge #26,fridge,176,4.7,0.6,0.62,1.24,fridge/fridge-25.glb
+fridge-26,Fridge #27,fridge,332,6.9,0.55,0.66,1.67,fridge/fridge-26.glb
+fridge-27,Fridge #28,fridge,122,4.0,0.88,0.64,0.84,fridge/fridge-27.glb
+fridge-28,Fridge #29,fridge,110,3.8,0.51,0.59,0.81,fridge/fridge-28.glb
+fridge-29,Fridge #30,fridge,252,5.8,0.89,0.75,1.9,fridge/fridge-29.glb
+fridge-30,Fridge #31,fridge,276,6.2,0.54,0.65,1.6,fridge/fridge-30.glb
+fridge-31,Fridge #32,fridge,166,4.6,0.61,0.71,1.67,fridge/fridge-31.glb
+fridge-32,Fridge #33,fridge,122,4.0,0.89,0.61,0.82,fridge/fridge-32.glb
+fridge-33,Fridge #34,fridge,150,4.4,0.46,0.6,0.87,fridge/fridge-33.glb
+fridge-34,Fridge #35,fridge,234,5.6,0.9,0.72,1.99,fridge/fridge-34.glb
+fridge-35,Fridge #36,fridge,146,4.2,0.53,0.62,1.33,fridge/fridge-35.glb
+fridge-36,Fridge #37,fridge,232,5.6,0.57,0.65,1.66,fridge/fridge-36.glb
+fridge-37,Fridge #38,fridge,202,5.1,1.29,0.63,0.93,fridge/fridge-37.glb
+fridge-38,Fridge #39,fridge,238,5.7,0.54,0.62,0.96,fridge/fridge-38.glb
+fridge-39,Fridge #40,fridge,348,7.3,0.88,0.73,1.87,fridge/fridge-39.glb
+fridge-40,Fridge #41,fridge,176,4.7,0.57,0.61,1.4,fridge/fridge-40.glb
+fridge-41,Fridge #42,fridge,304,6.7,0.62,0.7,1.85,fridge/fridge-41.glb
+fridge-42,Fridge #43,fridge,134,4.1,1.29,0.66,1.03,fridge/fridge-42.glb
+fridge-43,Fridge #44,fridge,198,5.0,0.47,0.56,1.12,fridge/fridge-43.glb
+fridge-44,Fridge #45,fridge,198,5.1,0.95,0.72,1.96,fridge/fridge-44.glb
+fridge-45,Fridge #46,fridge,176,4.7,0.53,0.68,1.45,fridge/fridge-45.glb
+fridge-46,Fridge #47,fridge,166,4.5,0.57,0.73,1.71,fridge/fridge-46.glb
+fridge-47,Fridge #48,fridge,214,5.4,1.03,0.72,1.09,fridge/fridge-47.glb
+fridge-48,Fridge #49,fridge,212,5.2,0.52,0.57,0.88,fridge/fridge-48.glb
+fridge-49,Fridge #50,fridge,190,4.9,0.88,0.78,1.73,fridge/fridge-49.glb
+cooking-pot-00,Cooking Pot #01,cooking-pot,86,3.3,0.31,0.25,0.17,cooking-pot/cooking-pot-00.glb
+cooking-pot-01,Cooking Pot #02,cooking-pot,62,2.9,0.58,0.29,0.18,cooking-pot/cooking-pot-01.glb
+cooking-pot-02,Cooking Pot #03,cooking-pot,110,3.7,0.5,0.37,0.35,cooking-pot/cooking-pot-02.glb
+cooking-pot-03,Cooking Pot #04,cooking-pot,62,2.9,0.43,0.23,0.1,cooking-pot/cooking-pot-03.glb
+cooking-pot-04,Cooking Pot #05,cooking-pot,130,4.0,0.41,0.37,0.24,cooking-pot/cooking-pot-04.glb
+cooking-pot-05,Cooking Pot #06,cooking-pot,118,3.8,0.36,0.25,0.19,cooking-pot/cooking-pot-05.glb
+cooking-pot-06,Cooking Pot #07,cooking-pot,74,3.2,0.6,0.31,0.29,cooking-pot/cooking-pot-06.glb
+cooking-pot-07,Cooking Pot #08,cooking-pot,110,3.7,0.63,0.5,0.37,cooking-pot/cooking-pot-07.glb
+cooking-pot-08,Cooking Pot #09,cooking-pot,74,3.1,0.59,0.3,0.09,cooking-pot/cooking-pot-08.glb
+cooking-pot-09,Cooking Pot #10,cooking-pot,106,3.6,0.31,0.31,0.17,cooking-pot/cooking-pot-09.glb
+cooking-pot-10,Cooking Pot #11,cooking-pot,74,3.2,0.51,0.23,0.15,cooking-pot/cooking-pot-10.glb
+cooking-pot-11,Cooking Pot #12,cooking-pot,110,3.7,0.57,0.43,0.41,cooking-pot/cooking-pot-11.glb
+cooking-pot-12,Cooking Pot #13,cooking-pot,110,3.7,0.44,0.31,0.34,cooking-pot/cooking-pot-12.glb
+cooking-pot-13,Cooking Pot #14,cooking-pot,62,2.9,0.44,0.23,0.08,cooking-pot/cooking-pot-13.glb
+cooking-pot-14,Cooking Pot #15,cooking-pot,130,4.0,0.39,0.35,0.2,cooking-pot/cooking-pot-14.glb
+cooking-pot-15,Cooking Pot #16,cooking-pot,118,3.8,0.37,0.25,0.16,cooking-pot/cooking-pot-15.glb
+cooking-pot-16,Cooking Pot #17,cooking-pot,82,3.3,0.66,0.37,0.35,cooking-pot/cooking-pot-16.glb
+cooking-pot-17,Cooking Pot #18,cooking-pot,98,3.5,0.52,0.39,0.1,cooking-pot/cooking-pot-17.glb
+cooking-pot-18,Cooking Pot #19,cooking-pot,74,3.1,0.58,0.32,0.09,cooking-pot/cooking-pot-18.glb
+cooking-pot-19,Cooking Pot #20,cooking-pot,130,4.0,0.46,0.42,0.26,cooking-pot/cooking-pot-19.glb
+cooking-pot-20,Cooking Pot #21,cooking-pot,94,3.4,0.3,0.24,0.17,cooking-pot/cooking-pot-20.glb
+cooking-pot-21,Cooking Pot #22,cooking-pot,94,3.4,0.51,0.46,0.35,cooking-pot/cooking-pot-21.glb
+cooking-pot-22,Cooking Pot #23,cooking-pot,98,3.5,0.41,0.28,0.08,cooking-pot/cooking-pot-22.glb
+cooking-pot-23,Cooking Pot #24,cooking-pot,62,2.9,0.51,0.31,0.09,cooking-pot/cooking-pot-23.glb
+cooking-pot-24,Cooking Pot #25,cooking-pot,178,4.7,0.43,0.39,0.33,cooking-pot/cooking-pot-24.glb
+cooking-pot-25,Cooking Pot #26,cooking-pot,74,3.2,0.48,0.19,0.13,cooking-pot/cooking-pot-25.glb
+cooking-pot-26,Cooking Pot #27,cooking-pot,110,3.7,0.41,0.29,0.24,cooking-pot/cooking-pot-26.glb
+cooking-pot-27,Cooking Pot #28,cooking-pot,110,3.7,0.44,0.31,0.33,cooking-pot/cooking-pot-27.glb
+cooking-pot-28,Cooking Pot #29,cooking-pot,74,3.1,0.5,0.27,0.08,cooking-pot/cooking-pot-28.glb
+cooking-pot-29,Cooking Pot #30,cooking-pot,106,3.6,0.27,0.27,0.17,cooking-pot/cooking-pot-29.glb
+cooking-pot-30,Cooking Pot #31,cooking-pot,74,3.1,0.27,0.19,0.07,cooking-pot/cooking-pot-30.glb
+cooking-pot-31,Cooking Pot #32,cooking-pot,62,2.9,0.67,0.38,0.28,cooking-pot/cooking-pot-31.glb
+cooking-pot-32,Cooking Pot #33,cooking-pot,98,3.5,0.53,0.4,0.11,cooking-pot/cooking-pot-32.glb
+cooking-pot-33,Cooking Pot #34,cooking-pot,62,2.9,0.42,0.26,0.08,cooking-pot/cooking-pot-33.glb
+cooking-pot-34,Cooking Pot #35,cooking-pot,130,4.0,0.3,0.25,0.2,cooking-pot/cooking-pot-34.glb
+cooking-pot-35,Cooking Pot #36,cooking-pot,98,3.5,0.35,0.21,0.11,cooking-pot/cooking-pot-35.glb
+cooking-pot-36,Cooking Pot #37,cooking-pot,86,3.3,0.37,0.31,0.27,cooking-pot/cooking-pot-36.glb
+cooking-pot-37,Cooking Pot #38,cooking-pot,110,3.7,0.59,0.46,0.36,cooking-pot/cooking-pot-37.glb
+cooking-pot-38,Cooking Pot #39,cooking-pot,74,3.2,0.46,0.24,0.09,cooking-pot/cooking-pot-38.glb
+cooking-pot-39,Cooking Pot #40,cooking-pot,130,4.0,0.41,0.36,0.26,cooking-pot/cooking-pot-39.glb
+cooking-pot-40,Cooking Pot #41,cooking-pot,94,3.4,0.27,0.2,0.14,cooking-pot/cooking-pot-40.glb
+cooking-pot-41,Cooking Pot #42,cooking-pot,118,3.8,0.53,0.4,0.32,cooking-pot/cooking-pot-41.glb
+cooking-pot-42,Cooking Pot #43,cooking-pot,98,3.5,0.54,0.41,0.09,cooking-pot/cooking-pot-42.glb
+cooking-pot-43,Cooking Pot #44,cooking-pot,62,2.9,0.44,0.23,0.09,cooking-pot/cooking-pot-43.glb
+cooking-pot-44,Cooking Pot #45,cooking-pot,130,4.0,0.46,0.42,0.29,cooking-pot/cooking-pot-44.glb
+cooking-pot-45,Cooking Pot #46,cooking-pot,94,3.4,0.33,0.28,0.17,cooking-pot/cooking-pot-45.glb
+cooking-pot-46,Cooking Pot #47,cooking-pot,74,3.2,0.7,0.42,0.3,cooking-pot/cooking-pot-46.glb
+cooking-pot-47,Cooking Pot #48,cooking-pot,110,3.7,0.41,0.28,0.32,cooking-pot/cooking-pot-47.glb
+cooking-pot-48,Cooking Pot #49,cooking-pot,74,3.1,0.54,0.26,0.09,cooking-pot/cooking-pot-48.glb
+cooking-pot-49,Cooking Pot #50,cooking-pot,178,4.7,0.37,0.33,0.28,cooking-pot/cooking-pot-49.glb
+mortar-pestle-00,Mortar & Pestle #01,mortar-pestle,118,3.7,0.57,0.47,2.12,mortar-pestle/mortar-pestle-00.glb
+mortar-pestle-01,Mortar & Pestle #02,mortar-pestle,82,3.3,0.54,0.38,0.12,mortar-pestle/mortar-pestle-01.glb
+mortar-pestle-02,Mortar & Pestle #03,mortar-pestle,98,3.5,0.38,0.3,0.66,mortar-pestle/mortar-pestle-02.glb
+mortar-pestle-03,Mortar & Pestle #04,mortar-pestle,166,4.5,0.53,0.44,2.03,mortar-pestle/mortar-pestle-03.glb
+mortar-pestle-04,Mortar & Pestle #05,mortar-pestle,176,4.7,0.78,0.46,2.13,mortar-pestle/mortar-pestle-04.glb
+mortar-pestle-05,Mortar & Pestle #06,mortar-pestle,82,3.3,0.49,0.32,0.17,mortar-pestle/mortar-pestle-05.glb
+mortar-pestle-06,Mortar & Pestle #07,mortar-pestle,98,3.5,0.49,0.32,0.71,mortar-pestle/mortar-pestle-06.glb
+mortar-pestle-07,Mortar & Pestle #08,mortar-pestle,166,4.5,0.43,0.43,1.84,mortar-pestle/mortar-pestle-07.glb
+mortar-pestle-08,Mortar & Pestle #09,mortar-pestle,196,5.0,0.66,0.39,1.4,mortar-pestle/mortar-pestle-08.glb
+mortar-pestle-09,Mortar & Pestle #10,mortar-pestle,118,4.0,0.44,0.26,0.15,mortar-pestle/mortar-pestle-09.glb
+mortar-pestle-10,Mortar & Pestle #11,mortar-pestle,98,3.5,0.44,0.31,0.71,mortar-pestle/mortar-pestle-10.glb
+mortar-pestle-11,Mortar & Pestle #12,mortar-pestle,166,4.5,0.53,0.53,1.97,mortar-pestle/mortar-pestle-11.glb
+mortar-pestle-12,Mortar & Pestle #13,mortar-pestle,118,3.8,0.61,0.35,1.93,mortar-pestle/mortar-pestle-12.glb
+mortar-pestle-13,Mortar & Pestle #14,mortar-pestle,98,3.5,0.32,0.32,0.14,mortar-pestle/mortar-pestle-13.glb
+mortar-pestle-14,Mortar & Pestle #15,mortar-pestle,98,3.5,0.49,0.36,0.67,mortar-pestle/mortar-pestle-14.glb
+mortar-pestle-15,Mortar & Pestle #16,mortar-pestle,188,4.9,0.81,0.46,1.76,mortar-pestle/mortar-pestle-15.glb
+mortar-pestle-16,Mortar & Pestle #17,mortar-pestle,146,4.2,0.53,0.44,2.06,mortar-pestle/mortar-pestle-16.glb
+mortar-pestle-17,Mortar & Pestle #18,mortar-pestle,106,3.8,0.49,0.31,0.16,mortar-pestle/mortar-pestle-17.glb
+mortar-pestle-18,Mortar & Pestle #19,mortar-pestle,98,3.5,0.42,0.32,0.85,mortar-pestle/mortar-pestle-18.glb
+mortar-pestle-19,Mortar & Pestle #20,mortar-pestle,196,5.0,0.83,0.44,2.04,mortar-pestle/mortar-pestle-19.glb
+mortar-pestle-20,Mortar & Pestle #21,mortar-pestle,196,5.0,0.76,0.45,1.62,mortar-pestle/mortar-pestle-20.glb
+mortar-pestle-21,Mortar & Pestle #22,mortar-pestle,146,4.4,0.51,0.34,0.14,mortar-pestle/mortar-pestle-21.glb
+mortar-pestle-22,Mortar & Pestle #23,mortar-pestle,98,3.5,0.5,0.37,0.72,mortar-pestle/mortar-pestle-22.glb
+mortar-pestle-23,Mortar & Pestle #24,mortar-pestle,166,4.6,0.6,0.5,1.84,mortar-pestle/mortar-pestle-23.glb
+mortar-pestle-24,Mortar & Pestle #25,mortar-pestle,146,4.2,0.45,0.45,1.77,mortar-pestle/mortar-pestle-24.glb
+mortar-pestle-25,Mortar & Pestle #26,mortar-pestle,98,3.4,0.44,0.28,0.11,mortar-pestle/mortar-pestle-25.glb
+mortar-pestle-26,Mortar & Pestle #27,mortar-pestle,98,3.5,0.48,0.39,0.77,mortar-pestle/mortar-pestle-26.glb
+mortar-pestle-27,Mortar & Pestle #28,mortar-pestle,188,4.8,0.75,0.45,2.11,mortar-pestle/mortar-pestle-27.glb
+mortar-pestle-28,Mortar & Pestle #29,mortar-pestle,196,5.0,0.72,0.43,1.9,mortar-pestle/mortar-pestle-28.glb
+mortar-pestle-29,Mortar & Pestle #30,mortar-pestle,122,3.9,0.39,0.39,0.15,mortar-pestle/mortar-pestle-29.glb
+mortar-pestle-30,Mortar & Pestle #31,mortar-pestle,98,3.5,0.31,0.29,0.57,mortar-pestle/mortar-pestle-30.glb
+mortar-pestle-31,Mortar & Pestle #32,mortar-pestle,208,5.2,0.79,0.49,1.78,mortar-pestle/mortar-pestle-31.glb
+mortar-pestle-32,Mortar & Pestle #33,mortar-pestle,98,3.5,0.36,0.36,1.64,mortar-pestle/mortar-pestle-32.glb
+mortar-pestle-33,Mortar & Pestle #34,mortar-pestle,82,3.3,0.31,0.31,0.17,mortar-pestle/mortar-pestle-33.glb
+mortar-pestle-34,Mortar & Pestle #35,mortar-pestle,98,3.5,0.51,0.32,0.82,mortar-pestle/mortar-pestle-34.glb
+mortar-pestle-35,Mortar & Pestle #36,mortar-pestle,166,4.5,0.56,0.5,2.11,mortar-pestle/mortar-pestle-35.glb
+mortar-pestle-36,Mortar & Pestle #37,mortar-pestle,168,4.5,0.69,0.41,2.07,mortar-pestle/mortar-pestle-36.glb
+mortar-pestle-37,Mortar & Pestle #38,mortar-pestle,134,4.2,0.27,0.27,0.18,mortar-pestle/mortar-pestle-37.glb
+mortar-pestle-38,Mortar & Pestle #39,mortar-pestle,98,3.5,0.33,0.33,0.61,mortar-pestle/mortar-pestle-38.glb
+mortar-pestle-39,Mortar & Pestle #40,mortar-pestle,188,4.9,0.7,0.41,1.84,mortar-pestle/mortar-pestle-39.glb
+mortar-pestle-40,Mortar & Pestle #41,mortar-pestle,196,5.1,0.83,0.52,1.7,mortar-pestle/mortar-pestle-40.glb
+mortar-pestle-41,Mortar & Pestle #42,mortar-pestle,98,3.4,0.3,0.3,0.16,mortar-pestle/mortar-pestle-41.glb
+mortar-pestle-42,Mortar & Pestle #43,mortar-pestle,98,3.5,0.36,0.28,0.66,mortar-pestle/mortar-pestle-42.glb
+mortar-pestle-43,Mortar & Pestle #44,mortar-pestle,188,4.9,0.69,0.41,1.82,mortar-pestle/mortar-pestle-43.glb
+mortar-pestle-44,Mortar & Pestle #45,mortar-pestle,118,3.8,0.67,0.51,1.86,mortar-pestle/mortar-pestle-44.glb
+mortar-pestle-45,Mortar & Pestle #46,mortar-pestle,146,4.4,0.35,0.35,0.2,mortar-pestle/mortar-pestle-45.glb
+mortar-pestle-46,Mortar & Pestle #47,mortar-pestle,98,3.5,0.34,0.29,0.67,mortar-pestle/mortar-pestle-46.glb
+mortar-pestle-47,Mortar & Pestle #48,mortar-pestle,166,4.5,0.51,0.51,1.86,mortar-pestle/mortar-pestle-47.glb
+mortar-pestle-48,Mortar & Pestle #49,mortar-pestle,168,4.6,0.78,0.48,1.86,mortar-pestle/mortar-pestle-48.glb
+mortar-pestle-49,Mortar & Pestle #50,mortar-pestle,146,4.4,0.39,0.39,0.17,mortar-pestle/mortar-pestle-49.glb
+coal-pot-00,Coal Pot #01,coal-pot,162,4.6,0.41,0.41,0.32,coal-pot/coal-pot-00.glb
+coal-pot-01,Coal Pot #02,coal-pot,242,5.8,0.46,0.38,0.47,coal-pot/coal-pot-01.glb
+coal-pot-02,Coal Pot #03,coal-pot,154,4.6,0.35,0.35,0.39,coal-pot/coal-pot-02.glb
+coal-pot-03,Coal Pot #04,coal-pot,314,7.1,0.57,0.49,0.53,coal-pot/coal-pot-03.glb
+coal-pot-04,Coal Pot #05,coal-pot,162,4.6,0.37,0.37,0.31,coal-pot/coal-pot-04.glb
+coal-pot-05,Coal Pot #06,coal-pot,266,6.4,0.46,0.37,0.42,coal-pot/coal-pot-05.glb
+coal-pot-06,Coal Pot #07,coal-pot,214,5.5,0.3,0.3,0.39,coal-pot/coal-pot-06.glb
+coal-pot-07,Coal Pot #08,coal-pot,312,7.0,0.71,0.43,0.6,coal-pot/coal-pot-07.glb
+coal-pot-08,Coal Pot #09,coal-pot,196,5.3,0.56,0.36,0.34,coal-pot/coal-pot-08.glb
+coal-pot-09,Coal Pot #10,coal-pot,290,6.7,0.46,0.39,0.46,coal-pot/coal-pot-09.glb
+coal-pot-10,Coal Pot #11,coal-pot,128,4.1,0.63,0.4,0.37,coal-pot/coal-pot-10.glb
+coal-pot-11,Coal Pot #12,coal-pot,250,5.9,0.39,0.39,0.4,coal-pot/coal-pot-11.glb
+coal-pot-12,Coal Pot #13,coal-pot,174,4.9,0.37,0.37,0.34,coal-pot/coal-pot-12.glb
+coal-pot-13,Coal Pot #14,coal-pot,272,6.4,0.7,0.43,0.54,coal-pot/coal-pot-13.glb
+coal-pot-14,Coal Pot #15,coal-pot,164,4.8,0.62,0.39,0.36,coal-pot/coal-pot-14.glb
+coal-pot-15,Coal Pot #16,coal-pot,226,5.7,0.44,0.44,0.34,coal-pot/coal-pot-15.glb
+coal-pot-16,Coal Pot #17,coal-pot,234,5.7,0.31,0.31,0.37,coal-pot/coal-pot-16.glb
+coal-pot-17,Coal Pot #18,coal-pot,264,6.2,0.71,0.41,0.52,coal-pot/coal-pot-17.glb
+coal-pot-18,Coal Pot #19,coal-pot,118,3.9,0.38,0.38,0.35,coal-pot/coal-pot-18.glb
+coal-pot-19,Coal Pot #20,coal-pot,282,6.5,0.62,0.53,0.44,coal-pot/coal-pot-19.glb
+coal-pot-20,Coal Pot #21,coal-pot,258,6.2,0.31,0.31,0.37,coal-pot/coal-pot-20.glb
+coal-pot-21,Coal Pot #22,coal-pot,266,6.3,0.51,0.42,0.47,coal-pot/coal-pot-21.glb
+coal-pot-22,Coal Pot #23,coal-pot,164,4.7,0.53,0.35,0.37,coal-pot/coal-pot-22.glb
+coal-pot-23,Coal Pot #24,coal-pot,260,6.4,0.77,0.51,0.33,coal-pot/coal-pot-23.glb
+coal-pot-24,Coal Pot #25,coal-pot,222,5.6,0.4,0.4,0.38,coal-pot/coal-pot-24.glb
+coal-pot-25,Coal Pot #26,coal-pot,310,7.1,0.5,0.42,0.53,coal-pot/coal-pot-25.glb
+coal-pot-26,Coal Pot #27,coal-pot,166,4.6,0.35,0.35,0.4,coal-pot/coal-pot-26.glb
+coal-pot-27,Coal Pot #28,coal-pot,308,7.0,0.67,0.41,0.41,coal-pot/coal-pot-27.glb
+coal-pot-28,Coal Pot #29,coal-pot,246,6.1,0.3,0.3,0.36,coal-pot/coal-pot-28.glb
+coal-pot-29,Coal Pot #30,coal-pot,288,6.7,0.65,0.38,0.53,coal-pot/coal-pot-29.glb
+coal-pot-30,Coal Pot #31,coal-pot,118,4.0,0.36,0.36,0.33,coal-pot/coal-pot-30.glb
+coal-pot-31,Coal Pot #32,coal-pot,262,6.2,0.39,0.39,0.41,coal-pot/coal-pot-31.glb
+coal-pot-32,Coal Pot #33,coal-pot,198,5.3,0.33,0.33,0.35,coal-pot/coal-pot-32.glb
+coal-pot-33,Coal Pot #34,coal-pot,320,7.3,0.68,0.41,0.53,coal-pot/coal-pot-33.glb
+coal-pot-34,Coal Pot #35,coal-pot,130,4.2,0.3,0.3,0.31,coal-pot/coal-pot-34.glb
+coal-pot-35,Coal Pot #36,coal-pot,336,7.5,0.74,0.47,0.55,coal-pot/coal-pot-35.glb
+coal-pot-36,Coal Pot #37,coal-pot,222,5.8,0.37,0.37,0.34,coal-pot/coal-pot-36.glb
+coal-pot-37,Coal Pot #38,coal-pot,320,7.3,0.72,0.44,0.54,coal-pot/coal-pot-37.glb
+coal-pot-38,Coal Pot #39,coal-pot,154,4.5,0.28,0.28,0.4,coal-pot/coal-pot-38.glb
+coal-pot-39,Coal Pot #40,coal-pot,178,4.9,0.45,0.45,0.37,coal-pot/coal-pot-39.glb
+coal-pot-40,Coal Pot #41,coal-pot,198,5.2,0.3,0.3,0.34,coal-pot/coal-pot-40.glb
+coal-pot-41,Coal Pot #42,coal-pot,290,6.7,0.46,0.4,0.42,coal-pot/coal-pot-41.glb
+coal-pot-42,Coal Pot #43,coal-pot,164,4.8,0.56,0.36,0.37,coal-pot/coal-pot-42.glb
+coal-pot-43,Coal Pot #44,coal-pot,248,6.1,0.68,0.42,0.35,coal-pot/coal-pot-43.glb
+coal-pot-44,Coal Pot #45,coal-pot,150,4.5,0.32,0.32,0.29,coal-pot/coal-pot-44.glb
+coal-pot-45,Coal Pot #46,coal-pot,242,5.8,0.39,0.31,0.5,coal-pot/coal-pot-45.glb
+coal-pot-46,Coal Pot #47,coal-pot,130,4.2,0.33,0.33,0.33,coal-pot/coal-pot-46.glb
+coal-pot-47,Coal Pot #48,coal-pot,202,5.3,0.47,0.47,0.33,coal-pot/coal-pot-47.glb
+coal-pot-48,Coal Pot #49,coal-pot,246,6.0,0.33,0.33,0.39,coal-pot/coal-pot-48.glb
+coal-pot-49,Coal Pot #50,coal-pot,262,6.2,0.5,0.42,0.48,coal-pot/coal-pot-49.glb
+plate-rack-00,Plate Rack #01,plate-rack,238,5.6,0.5,0.44,0.29,plate-rack/plate-rack-00.glb
+plate-rack-01,Plate Rack #02,plate-rack,212,5.0,0.53,0.35,0.75,plate-rack/plate-rack-01.glb
+plate-rack-02,Plate Rack #03,plate-rack,400,7.5,0.83,0.36,1.1,plate-rack/plate-rack-02.glb
+plate-rack-03,Plate Rack #04,plate-rack,344,7.0,0.66,0.45,0.53,plate-rack/plate-rack-03.glb
+plate-rack-04,Plate Rack #05,plate-rack,258,5.8,0.5,0.39,0.26,plate-rack/plate-rack-04.glb
+plate-rack-05,Plate Rack #06,plate-rack,624,11.0,0.63,0.39,1.38,plate-rack/plate-rack-05.glb
+plate-rack-06,Plate Rack #07,plate-rack,492,8.5,0.76,0.41,1.54,plate-rack/plate-rack-06.glb
+plate-rack-07,Plate Rack #08,plate-rack,316,6.6,0.63,0.41,0.66,plate-rack/plate-rack-07.glb
+plate-rack-08,Plate Rack #09,plate-rack,198,4.7,0.59,0.35,0.26,plate-rack/plate-rack-08.glb
+plate-rack-09,Plate Rack #10,plate-rack,232,5.3,0.69,0.37,0.76,plate-rack/plate-rack-09.glb
+plate-rack-10,Plate Rack #11,plate-rack,332,6.8,0.7,0.44,0.8,plate-rack/plate-rack-10.glb
+plate-rack-11,Plate Rack #12,plate-rack,360,7.3,0.84,0.5,0.63,plate-rack/plate-rack-11.glb
+plate-rack-12,Plate Rack #13,plate-rack,198,5.0,0.59,0.35,0.27,plate-rack/plate-rack-12.glb
+plate-rack-13,Plate Rack #14,plate-rack,344,6.8,0.63,0.32,1.31,plate-rack/plate-rack-13.glb
+plate-rack-14,Plate Rack #15,plate-rack,320,6.6,0.82,0.43,0.86,plate-rack/plate-rack-14.glb
+plate-rack-15,Plate Rack #16,plate-rack,108,3.5,0.79,0.43,0.49,plate-rack/plate-rack-15.glb
+plate-rack-16,Plate Rack #17,plate-rack,298,6.5,0.58,0.39,0.31,plate-rack/plate-rack-16.glb
+plate-rack-17,Plate Rack #18,plate-rack,332,6.9,0.62,0.41,0.85,plate-rack/plate-rack-17.glb
+plate-rack-18,Plate Rack #19,plate-rack,280,6.1,0.62,0.43,0.74,plate-rack/plate-rack-18.glb
+plate-rack-19,Plate Rack #20,plate-rack,204,4.9,0.72,0.47,0.68,plate-rack/plate-rack-19.glb
+plate-rack-20,Plate Rack #21,plate-rack,198,5.0,0.63,0.36,0.28,plate-rack/plate-rack-20.glb
+plate-rack-21,Plate Rack #22,plate-rack,388,7.6,0.62,0.35,1.23,plate-rack/plate-rack-21.glb
+plate-rack-22,Plate Rack #23,plate-rack,460,8.7,0.53,0.41,1.06,plate-rack/plate-rack-22.glb
+plate-rack-23,Plate Rack #24,plate-rack,248,5.6,0.79,0.48,0.67,plate-rack/plate-rack-23.glb
+plate-rack-24,Plate Rack #25,plate-rack,362,7.6,0.52,0.43,0.25,plate-rack/plate-rack-24.glb
+plate-rack-25,Plate Rack #26,plate-rack,524,9.5,0.54,0.32,1.44,plate-rack/plate-rack-25.glb
+plate-rack-26,Plate Rack #27,plate-rack,208,4.9,0.5,0.42,0.77,plate-rack/plate-rack-26.glb
+plate-rack-27,Plate Rack #28,plate-rack,260,5.7,0.62,0.47,0.48,plate-rack/plate-rack-27.glb
+plate-rack-28,Plate Rack #29,plate-rack,278,6.2,0.57,0.38,0.3,plate-rack/plate-rack-28.glb
+plate-rack-29,Plate Rack #30,plate-rack,288,6.0,0.64,0.32,1.16,plate-rack/plate-rack-29.glb
+plate-rack-30,Plate Rack #31,plate-rack,336,6.9,0.81,0.39,0.8,plate-rack/plate-rack-30.glb
+plate-rack-31,Plate Rack #32,plate-rack,416,8.0,0.61,0.47,0.59,plate-rack/plate-rack-31.glb
+plate-rack-32,Plate Rack #33,plate-rack,378,7.8,0.56,0.35,0.3,plate-rack/plate-rack-32.glb
+plate-rack-33,Plate Rack #34,plate-rack,132,3.8,0.55,0.42,0.72,plate-rack/plate-rack-33.glb
+plate-rack-34,Plate Rack #35,plate-rack,356,7.2,0.65,0.43,0.77,plate-rack/plate-rack-34.glb
+plate-rack-35,Plate Rack #36,plate-rack,176,4.5,0.8,0.49,0.52,plate-rack/plate-rack-35.glb
+plate-rack-36,Plate Rack #37,plate-rack,138,4.1,0.49,0.37,0.31,plate-rack/plate-rack-36.glb
+plate-rack-37,Plate Rack #38,plate-rack,464,8.6,0.74,0.35,1.3,plate-rack/plate-rack-37.glb
+plate-rack-38,Plate Rack #39,plate-rack,352,7.0,0.74,0.37,1.27,plate-rack/plate-rack-38.glb
+plate-rack-39,Plate Rack #40,plate-rack,332,6.8,0.81,0.47,0.65,plate-rack/plate-rack-39.glb
+plate-rack-40,Plate Rack #41,plate-rack,318,6.9,0.53,0.43,0.3,plate-rack/plate-rack-40.glb
+plate-rack-41,Plate Rack #42,plate-rack,308,6.4,0.55,0.37,1.2,plate-rack/plate-rack-41.glb
+plate-rack-42,Plate Rack #43,plate-rack,468,8.7,0.8,0.35,1.58,plate-rack/plate-rack-42.glb
+plate-rack-43,Plate Rack #44,plate-rack,388,7.7,0.8,0.45,0.69,plate-rack/plate-rack-43.glb
+plate-rack-44,Plate Rack #45,plate-rack,342,7.3,0.52,0.36,0.26,plate-rack/plate-rack-44.glb
+plate-rack-45,Plate Rack #46,plate-rack,564,10.1,0.64,0.33,1.48,plate-rack/plate-rack-45.glb
+plate-rack-46,Plate Rack #47,plate-rack,416,8.1,0.77,0.44,0.88,plate-rack/plate-rack-46.glb
+plate-rack-47,Plate Rack #48,plate-rack,192,4.7,0.55,0.45,0.48,plate-rack/plate-rack-47.glb
+plate-rack-48,Plate Rack #49,plate-rack,278,6.3,0.45,0.41,0.32,plate-rack/plate-rack-48.glb
+plate-rack-49,Plate Rack #50,plate-rack,444,8.2,0.66,0.37,1.31,plate-rack/plate-rack-49.glb
+kitchen-shelf-00,Kitchen Shelf #01,kitchen-shelf,294,6.0,1.22,0.36,1.72,kitchen-shelf/kitchen-shelf-00.glb
+kitchen-shelf-01,Kitchen Shelf #02,kitchen-shelf,464,8.8,0.66,0.3,1.52,kitchen-shelf/kitchen-shelf-01.glb
+kitchen-shelf-02,Kitchen Shelf #03,kitchen-shelf,224,5.2,1.16,0.57,1.91,kitchen-shelf/kitchen-shelf-02.glb
+kitchen-shelf-03,Kitchen Shelf #04,kitchen-shelf,216,5.0,0.49,0.32,1.7,kitchen-shelf/kitchen-shelf-03.glb
+kitchen-shelf-04,Kitchen Shelf #05,kitchen-shelf,168,4.4,1.23,0.34,0.95,kitchen-shelf/kitchen-shelf-04.glb
+kitchen-shelf-05,Kitchen Shelf #06,kitchen-shelf,252,5.6,0.61,0.35,1.74,kitchen-shelf/kitchen-shelf-05.glb
+kitchen-shelf-06,Kitchen Shelf #07,kitchen-shelf,324,6.6,1.19,0.55,2.03,kitchen-shelf/kitchen-shelf-06.glb
+kitchen-shelf-07,Kitchen Shelf #08,kitchen-shelf,108,3.5,0.56,0.32,1.84,kitchen-shelf/kitchen-shelf-07.glb
+kitchen-shelf-08,Kitchen Shelf #09,kitchen-shelf,318,6.5,1.14,0.29,1.26,kitchen-shelf/kitchen-shelf-08.glb
+kitchen-shelf-09,Kitchen Shelf #10,kitchen-shelf,140,4.0,0.74,0.39,0.92,kitchen-shelf/kitchen-shelf-09.glb
+kitchen-shelf-10,Kitchen Shelf #11,kitchen-shelf,364,7.3,1.02,0.5,1.87,kitchen-shelf/kitchen-shelf-10.glb
+kitchen-shelf-11,Kitchen Shelf #12,kitchen-shelf,320,6.5,0.49,0.33,1.33,kitchen-shelf/kitchen-shelf-11.glb
+kitchen-shelf-12,Kitchen Shelf #13,kitchen-shelf,140,3.9,1.02,0.31,1.41,kitchen-shelf/kitchen-shelf-12.glb
+kitchen-shelf-13,Kitchen Shelf #14,kitchen-shelf,536,9.8,0.72,0.4,1.24,kitchen-shelf/kitchen-shelf-13.glb
+kitchen-shelf-14,Kitchen Shelf #15,kitchen-shelf,264,5.8,1.23,0.51,1.87,kitchen-shelf/kitchen-shelf-14.glb
+kitchen-shelf-15,Kitchen Shelf #16,kitchen-shelf,600,10.6,0.52,0.36,1.79,kitchen-shelf/kitchen-shelf-15.glb
+kitchen-shelf-16,Kitchen Shelf #17,kitchen-shelf,228,5.4,0.9,0.32,1.04,kitchen-shelf/kitchen-shelf-16.glb
+kitchen-shelf-17,Kitchen Shelf #18,kitchen-shelf,336,6.8,0.85,0.43,1.55,kitchen-shelf/kitchen-shelf-17.glb
+kitchen-shelf-18,Kitchen Shelf #19,kitchen-shelf,356,7.3,1.23,0.56,1.64,kitchen-shelf/kitchen-shelf-18.glb
+kitchen-shelf-19,Kitchen Shelf #20,kitchen-shelf,420,8.1,0.47,0.37,1.83,kitchen-shelf/kitchen-shelf-19.glb
+kitchen-shelf-20,Kitchen Shelf #21,kitchen-shelf,840,13.9,1.34,0.38,1.68,kitchen-shelf/kitchen-shelf-20.glb
+kitchen-shelf-21,Kitchen Shelf #22,kitchen-shelf,220,5.1,0.73,0.32,1.34,kitchen-shelf/kitchen-shelf-21.glb
+kitchen-shelf-22,Kitchen Shelf #23,kitchen-shelf,224,5.3,1.22,0.49,1.9,kitchen-shelf/kitchen-shelf-22.glb
+kitchen-shelf-23,Kitchen Shelf #24,kitchen-shelf,512,9.2,0.48,0.31,1.53,kitchen-shelf/kitchen-shelf-23.glb
+kitchen-shelf-24,Kitchen Shelf #25,kitchen-shelf,68,2.9,1.33,0.35,1.21,kitchen-shelf/kitchen-shelf-24.glb
+kitchen-shelf-25,Kitchen Shelf #26,kitchen-shelf,260,5.7,0.68,0.41,1.75,kitchen-shelf/kitchen-shelf-25.glb
+kitchen-shelf-26,Kitchen Shelf #27,kitchen-shelf,236,5.4,0.94,0.45,1.84,kitchen-shelf/kitchen-shelf-26.glb
+kitchen-shelf-27,Kitchen Shelf #28,kitchen-shelf,772,13.2,0.59,0.39,1.88,kitchen-shelf/kitchen-shelf-27.glb
+kitchen-shelf-28,Kitchen Shelf #29,kitchen-shelf,272,5.9,1.03,0.32,1.64,kitchen-shelf/kitchen-shelf-28.glb
+kitchen-shelf-29,Kitchen Shelf #30,kitchen-shelf,520,9.7,0.9,0.33,1.27,kitchen-shelf/kitchen-shelf-29.glb
+kitchen-shelf-30,Kitchen Shelf #31,kitchen-shelf,284,6.1,1.15,0.53,1.76,kitchen-shelf/kitchen-shelf-30.glb
+kitchen-shelf-31,Kitchen Shelf #32,kitchen-shelf,600,10.6,0.54,0.31,1.95,kitchen-shelf/kitchen-shelf-31.glb
+kitchen-shelf-32,Kitchen Shelf #33,kitchen-shelf,630,11.0,1.36,0.36,1.54,kitchen-shelf/kitchen-shelf-32.glb
+kitchen-shelf-33,Kitchen Shelf #34,kitchen-shelf,300,6.3,0.75,0.42,1.12,kitchen-shelf/kitchen-shelf-33.glb
+kitchen-shelf-34,Kitchen Shelf #35,kitchen-shelf,264,5.9,1.33,0.53,1.51,kitchen-shelf/kitchen-shelf-34.glb
+kitchen-shelf-35,Kitchen Shelf #36,kitchen-shelf,632,11.3,0.51,0.36,1.71,kitchen-shelf/kitchen-shelf-35.glb
+kitchen-shelf-36,Kitchen Shelf #37,kitchen-shelf,124,3.7,1.31,0.37,1.17,kitchen-shelf/kitchen-shelf-36.glb
+kitchen-shelf-37,Kitchen Shelf #38,kitchen-shelf,120,3.6,0.61,0.45,0.95,kitchen-shelf/kitchen-shelf-37.glb
+kitchen-shelf-38,Kitchen Shelf #39,kitchen-shelf,232,5.3,1.02,0.52,1.52,kitchen-shelf/kitchen-shelf-38.glb
+kitchen-shelf-39,Kitchen Shelf #40,kitchen-shelf,388,7.6,0.5,0.31,1.69,kitchen-shelf/kitchen-shelf-39.glb
+kitchen-shelf-40,Kitchen Shelf #41,kitchen-shelf,376,7.3,0.9,0.31,1.29,kitchen-shelf/kitchen-shelf-40.glb
+kitchen-shelf-41,Kitchen Shelf #42,kitchen-shelf,396,7.7,0.94,0.41,1.73,kitchen-shelf/kitchen-shelf-41.glb
+kitchen-shelf-42,Kitchen Shelf #43,kitchen-shelf,276,6.0,0.86,0.55,1.92,kitchen-shelf/kitchen-shelf-42.glb
+kitchen-shelf-43,Kitchen Shelf #44,kitchen-shelf,388,7.6,0.41,0.33,1.55,kitchen-shelf/kitchen-shelf-43.glb
+kitchen-shelf-44,Kitchen Shelf #45,kitchen-shelf,382,7.4,1.01,0.32,1.81,kitchen-shelf/kitchen-shelf-44.glb
+kitchen-shelf-45,Kitchen Shelf #46,kitchen-shelf,416,8.1,0.74,0.34,1.33,kitchen-shelf/kitchen-shelf-45.glb
+kitchen-shelf-46,Kitchen Shelf #47,kitchen-shelf,324,6.7,1.34,0.46,2.09,kitchen-shelf/kitchen-shelf-46.glb
+kitchen-shelf-47,Kitchen Shelf #48,kitchen-shelf,488,9.0,0.51,0.32,1.62,kitchen-shelf/kitchen-shelf-47.glb
+kitchen-shelf-48,Kitchen Shelf #49,kitchen-shelf,896,14.5,1.29,0.3,1.97,kitchen-shelf/kitchen-shelf-48.glb
+kitchen-shelf-49,Kitchen Shelf #50,kitchen-shelf,588,10.5,0.91,0.4,1.45,kitchen-shelf/kitchen-shelf-49.glb

@@ -1,0 +1,501 @@
+id,name,archetype,tris,kb_meshopt,w_m,d_m,h_m,file
+park-bench-00,Park Bench #01,park-bench,288,6.5,1.24,0.53,0.84,park-bench/park-bench-00.glb
+park-bench-01,Park Bench #02,park-bench,64,3.0,1.35,0.41,0.42,park-bench/park-bench-01.glb
+park-bench-02,Park Bench #03,park-bench,44,2.6,1.51,0.36,0.46,park-bench/park-bench-02.glb
+park-bench-03,Park Bench #04,park-bench,124,3.5,1.78,0.5,0.89,park-bench/park-bench-03.glb
+park-bench-04,Park Bench #05,park-bench,288,6.1,1.57,0.55,0.86,park-bench/park-bench-04.glb
+park-bench-05,Park Bench #06,park-bench,86,3.3,1.89,0.5,0.46,park-bench/park-bench-05.glb
+park-bench-06,Park Bench #07,park-bench,56,2.8,1.84,0.33,0.46,park-bench/park-bench-06.glb
+park-bench-07,Park Bench #08,park-bench,160,4.1,1.25,0.42,0.87,park-bench/park-bench-07.glb
+park-bench-08,Park Bench #09,park-bench,320,6.8,1.57,0.57,0.85,park-bench/park-bench-08.glb
+park-bench-09,Park Bench #10,park-bench,86,3.3,1.69,0.49,0.49,park-bench/park-bench-09.glb
+park-bench-10,Park Bench #11,park-bench,44,2.6,1.92,0.33,0.44,park-bench/park-bench-10.glb
+park-bench-11,Park Bench #12,park-bench,136,3.7,1.85,0.43,0.89,park-bench/park-bench-11.glb
+park-bench-12,Park Bench #13,park-bench,272,6.3,1.21,0.54,0.84,park-bench/park-bench-12.glb
+park-bench-13,Park Bench #14,park-bench,64,3.0,1.54,0.41,0.43,park-bench/park-bench-13.glb
+park-bench-14,Park Bench #15,park-bench,44,2.6,1.83,0.33,0.43,park-bench/park-bench-14.glb
+park-bench-15,Park Bench #16,park-bench,136,3.7,1.96,0.43,0.9,park-bench/park-bench-15.glb
+park-bench-16,Park Bench #17,park-bench,276,6.2,1.29,0.53,0.85,park-bench/park-bench-16.glb
+park-bench-17,Park Bench #18,park-bench,86,3.3,1.74,0.45,0.46,park-bench/park-bench-17.glb
+park-bench-18,Park Bench #19,park-bench,44,2.6,1.39,0.32,0.43,park-bench/park-bench-18.glb
+park-bench-19,Park Bench #20,park-bench,124,3.5,1.63,0.49,0.89,park-bench/park-bench-19.glb
+park-bench-20,Park Bench #21,park-bench,328,7.0,1.81,0.58,0.85,park-bench/park-bench-20.glb
+park-bench-21,Park Bench #22,park-bench,76,3.0,1.28,0.46,0.47,park-bench/park-bench-21.glb
+park-bench-22,Park Bench #23,park-bench,32,2.4,1.5,0.34,0.46,park-bench/park-bench-22.glb
+park-bench-23,Park Bench #24,park-bench,124,3.6,1.57,0.51,0.88,park-bench/park-bench-23.glb
+park-bench-24,Park Bench #25,park-bench,308,6.8,1.25,0.58,0.87,park-bench/park-bench-24.glb
+park-bench-25,Park Bench #26,park-bench,86,3.3,1.74,0.4,0.45,park-bench/park-bench-25.glb
+park-bench-26,Park Bench #27,park-bench,44,2.6,1.72,0.38,0.47,park-bench/park-bench-26.glb
+park-bench-27,Park Bench #28,park-bench,136,3.7,1.59,0.51,0.91,park-bench/park-bench-27.glb
+park-bench-28,Park Bench #29,park-bench,276,6.3,1.31,0.55,0.87,park-bench/park-bench-28.glb
+park-bench-29,Park Bench #30,park-bench,74,3.1,1.63,0.44,0.42,park-bench/park-bench-29.glb
+park-bench-30,Park Bench #31,park-bench,44,2.6,1.2,0.38,0.45,park-bench/park-bench-30.glb
+park-bench-31,Park Bench #32,park-bench,124,3.6,1.77,0.47,0.91,park-bench/park-bench-31.glb
+park-bench-32,Park Bench #33,park-bench,332,7.1,1.31,0.54,0.86,park-bench/park-bench-32.glb
+park-bench-33,Park Bench #34,park-bench,76,3.2,1.44,0.41,0.48,park-bench/park-bench-33.glb
+park-bench-34,Park Bench #35,park-bench,56,2.8,1.96,0.38,0.45,park-bench/park-bench-34.glb
+park-bench-35,Park Bench #36,park-bench,124,3.6,1.46,0.46,0.91,park-bench/park-bench-35.glb
+park-bench-36,Park Bench #37,park-bench,332,6.9,1.52,0.56,0.87,park-bench/park-bench-36.glb
+park-bench-37,Park Bench #38,park-bench,64,3.0,1.54,0.41,0.43,park-bench/park-bench-37.glb
+park-bench-38,Park Bench #39,park-bench,32,2.4,1.97,0.32,0.45,park-bench/park-bench-38.glb
+park-bench-39,Park Bench #40,park-bench,124,3.5,1.8,0.48,0.91,park-bench/park-bench-39.glb
+park-bench-40,Park Bench #41,park-bench,296,6.6,1.48,0.58,0.83,park-bench/park-bench-40.glb
+park-bench-41,Park Bench #42,park-bench,86,3.3,1.89,0.41,0.46,park-bench/park-bench-41.glb
+park-bench-42,Park Bench #43,park-bench,44,2.6,1.35,0.35,0.46,park-bench/park-bench-42.glb
+park-bench-43,Park Bench #44,park-bench,124,3.6,1.43,0.51,0.89,park-bench/park-bench-43.glb
+park-bench-44,Park Bench #45,park-bench,284,6.4,1.67,0.51,0.83,park-bench/park-bench-44.glb
+park-bench-45,Park Bench #46,park-bench,76,3.2,1.33,0.43,0.46,park-bench/park-bench-45.glb
+park-bench-46,Park Bench #47,park-bench,56,2.8,1.98,0.37,0.43,park-bench/park-bench-46.glb
+park-bench-47,Park Bench #48,park-bench,136,3.7,1.54,0.43,0.9,park-bench/park-bench-47.glb
+park-bench-48,Park Bench #49,park-bench,308,6.8,1.24,0.58,0.86,park-bench/park-bench-48.glb
+park-bench-49,Park Bench #50,park-bench,64,3.0,1.26,0.48,0.46,park-bench/park-bench-49.glb
+trash-bin-00,Trash Bin #01,trash-bin,136,4.1,0.62,0.73,1.08,trash-bin/trash-bin-00.glb
+trash-bin-01,Trash Bin #02,trash-bin,176,4.6,0.46,0.54,1.11,trash-bin/trash-bin-01.glb
+trash-bin-02,Trash Bin #03,trash-bin,106,3.5,0.59,0.59,0.84,trash-bin/trash-bin-02.glb
+trash-bin-03,Trash Bin #04,trash-bin,56,2.8,0.58,0.67,0.86,trash-bin/trash-bin-03.glb
+trash-bin-04,Trash Bin #05,trash-bin,136,4.0,0.62,0.63,1.1,trash-bin/trash-bin-04.glb
+trash-bin-05,Trash Bin #06,trash-bin,176,4.6,0.5,0.57,1.19,trash-bin/trash-bin-05.glb
+trash-bin-06,Trash Bin #07,trash-bin,118,3.6,0.61,0.59,0.87,trash-bin/trash-bin-06.glb
+trash-bin-07,Trash Bin #08,trash-bin,106,3.5,0.74,0.74,0.71,trash-bin/trash-bin-07.glb
+trash-bin-08,Trash Bin #09,trash-bin,104,3.5,0.6,0.82,1.73,trash-bin/trash-bin-08.glb
+trash-bin-09,Trash Bin #10,trash-bin,176,4.6,0.4,0.48,1.14,trash-bin/trash-bin-09.glb
+trash-bin-10,Trash Bin #11,trash-bin,106,3.5,0.59,0.59,0.81,trash-bin/trash-bin-10.glb
+trash-bin-11,Trash Bin #12,trash-bin,56,2.8,0.66,0.76,0.82,trash-bin/trash-bin-11.glb
+trash-bin-12,Trash Bin #13,trash-bin,104,3.5,0.6,0.77,1.65,trash-bin/trash-bin-12.glb
+trash-bin-13,Trash Bin #14,trash-bin,112,3.6,0.42,0.5,0.99,trash-bin/trash-bin-13.glb
+trash-bin-14,Trash Bin #15,trash-bin,106,3.5,0.62,0.62,0.81,trash-bin/trash-bin-14.glb
+trash-bin-15,Trash Bin #16,trash-bin,106,3.5,0.7,0.7,0.84,trash-bin/trash-bin-15.glb
+trash-bin-16,Trash Bin #17,trash-bin,136,4.1,0.56,0.78,1.12,trash-bin/trash-bin-16.glb
+trash-bin-17,Trash Bin #18,trash-bin,176,4.6,0.5,0.57,1.29,trash-bin/trash-bin-17.glb
+trash-bin-18,Trash Bin #19,trash-bin,126,4.1,0.6,0.6,0.98,trash-bin/trash-bin-18.glb
+trash-bin-19,Trash Bin #20,trash-bin,106,3.5,0.77,0.77,0.7,trash-bin/trash-bin-19.glb
+trash-bin-20,Trash Bin #21,trash-bin,136,4.1,0.62,0.79,1.01,trash-bin/trash-bin-20.glb
+trash-bin-21,Trash Bin #22,trash-bin,176,4.7,0.52,0.59,1.14,trash-bin/trash-bin-21.glb
+trash-bin-22,Trash Bin #23,trash-bin,138,4.3,0.62,0.6,0.93,trash-bin/trash-bin-22.glb
+trash-bin-23,Trash Bin #24,trash-bin,76,3.1,0.73,0.84,0.83,trash-bin/trash-bin-23.glb
+trash-bin-24,Trash Bin #25,trash-bin,104,3.5,0.58,0.85,1.65,trash-bin/trash-bin-24.glb
+trash-bin-25,Trash Bin #26,trash-bin,176,4.6,0.48,0.56,1.21,trash-bin/trash-bin-25.glb
+trash-bin-26,Trash Bin #27,trash-bin,126,4.1,0.58,0.58,0.94,trash-bin/trash-bin-26.glb
+trash-bin-27,Trash Bin #28,trash-bin,76,3.1,0.72,0.84,0.81,trash-bin/trash-bin-27.glb
+trash-bin-28,Trash Bin #29,trash-bin,136,4.1,0.54,0.8,0.98,trash-bin/trash-bin-28.glb
+trash-bin-29,Trash Bin #30,trash-bin,112,3.6,0.44,0.52,0.86,trash-bin/trash-bin-29.glb
+trash-bin-30,Trash Bin #31,trash-bin,118,3.7,0.59,0.57,0.88,trash-bin/trash-bin-30.glb
+trash-bin-31,Trash Bin #32,trash-bin,56,2.8,0.66,0.76,0.72,trash-bin/trash-bin-31.glb
+trash-bin-32,Trash Bin #33,trash-bin,136,4.1,0.56,0.7,1.09,trash-bin/trash-bin-32.glb
+trash-bin-33,Trash Bin #34,trash-bin,112,3.6,0.44,0.52,0.98,trash-bin/trash-bin-33.glb
+trash-bin-34,Trash Bin #35,trash-bin,138,4.3,0.62,0.6,0.96,trash-bin/trash-bin-34.glb
+trash-bin-35,Trash Bin #36,trash-bin,76,3.1,0.7,0.81,0.66,trash-bin/trash-bin-35.glb
+trash-bin-36,Trash Bin #37,trash-bin,136,4.1,0.53,0.76,1.04,trash-bin/trash-bin-36.glb
+trash-bin-37,Trash Bin #38,trash-bin,112,3.6,0.51,0.59,1.01,trash-bin/trash-bin-37.glb
+trash-bin-38,Trash Bin #39,trash-bin,138,4.3,0.59,0.57,1.01,trash-bin/trash-bin-38.glb
+trash-bin-39,Trash Bin #40,trash-bin,78,3.1,0.7,0.7,0.68,trash-bin/trash-bin-39.glb
+trash-bin-40,Trash Bin #41,trash-bin,136,4.1,0.53,0.64,1.11,trash-bin/trash-bin-40.glb
+trash-bin-41,Trash Bin #42,trash-bin,176,4.6,0.46,0.54,1.16,trash-bin/trash-bin-41.glb
+trash-bin-42,Trash Bin #43,trash-bin,126,4.1,0.55,0.55,0.98,trash-bin/trash-bin-42.glb
+trash-bin-43,Trash Bin #44,trash-bin,106,3.5,0.64,0.64,0.75,trash-bin/trash-bin-43.glb
+trash-bin-44,Trash Bin #45,trash-bin,136,4.1,0.62,0.7,1.08,trash-bin/trash-bin-44.glb
+trash-bin-45,Trash Bin #46,trash-bin,176,4.6,0.52,0.59,1.08,trash-bin/trash-bin-45.glb
+trash-bin-46,Trash Bin #47,trash-bin,126,4.1,0.62,0.62,0.98,trash-bin/trash-bin-46.glb
+trash-bin-47,Trash Bin #48,trash-bin,56,2.8,0.72,0.84,0.63,trash-bin/trash-bin-47.glb
+trash-bin-48,Trash Bin #49,trash-bin,104,3.4,0.6,0.81,1.64,trash-bin/trash-bin-48.glb
+trash-bin-49,Trash Bin #50,trash-bin,112,3.6,0.43,0.52,1.06,trash-bin/trash-bin-49.glb
+street-lamp-00,Street Lamp #01,street-lamp,132,4.1,1.89,0.33,7.37,street-lamp/street-lamp-00.glb
+street-lamp-01,Street Lamp #02,street-lamp,228,5.6,3.04,0.4,7.94,street-lamp/street-lamp-01.glb
+street-lamp-02,Street Lamp #03,street-lamp,76,3.4,0.33,0.35,3.65,street-lamp/street-lamp-02.glb
+street-lamp-03,Street Lamp #04,street-lamp,148,4.2,1.64,0.62,6.97,street-lamp/street-lamp-03.glb
+street-lamp-04,Street Lamp #05,street-lamp,132,4.1,1.83,0.3,7.48,street-lamp/street-lamp-04.glb
+street-lamp-05,Street Lamp #06,street-lamp,228,5.7,2.66,0.42,6.85,street-lamp/street-lamp-05.glb
+street-lamp-06,Street Lamp #07,street-lamp,156,4.3,0.85,0.48,4.69,street-lamp/street-lamp-06.glb
+street-lamp-07,Street Lamp #08,street-lamp,148,4.2,1.54,0.52,6.99,street-lamp/street-lamp-07.glb
+street-lamp-08,Street Lamp #09,street-lamp,132,4.1,1.52,0.34,6.34,street-lamp/street-lamp-08.glb
+street-lamp-09,Street Lamp #10,street-lamp,228,5.7,2.77,0.33,6.43,street-lamp/street-lamp-09.glb
+street-lamp-10,Street Lamp #11,street-lamp,156,4.2,0.85,0.48,4.43,street-lamp/street-lamp-10.glb
+street-lamp-11,Street Lamp #12,street-lamp,148,4.2,1.47,0.5,5.89,street-lamp/street-lamp-11.glb
+street-lamp-12,Street Lamp #13,street-lamp,132,4.1,1.6,0.35,6.84,street-lamp/street-lamp-12.glb
+street-lamp-13,Street Lamp #14,street-lamp,228,5.5,2.64,0.35,7.8,street-lamp/street-lamp-13.glb
+street-lamp-14,Street Lamp #15,street-lamp,156,4.3,0.85,0.48,4.64,street-lamp/street-lamp-14.glb
+street-lamp-15,Street Lamp #16,street-lamp,148,4.2,1.7,0.61,7.6,street-lamp/street-lamp-15.glb
+street-lamp-16,Street Lamp #17,street-lamp,132,4.1,1.75,0.34,6.54,street-lamp/street-lamp-16.glb
+street-lamp-17,Street Lamp #18,street-lamp,228,5.6,3.54,0.3,7.24,street-lamp/street-lamp-17.glb
+street-lamp-18,Street Lamp #19,street-lamp,156,4.4,0.85,0.48,3.93,street-lamp/street-lamp-18.glb
+street-lamp-19,Street Lamp #20,street-lamp,148,4.2,1.5,0.67,6.99,street-lamp/street-lamp-19.glb
+street-lamp-20,Street Lamp #21,street-lamp,132,4.0,2.05,0.41,6.49,street-lamp/street-lamp-20.glb
+street-lamp-21,Street Lamp #22,street-lamp,228,5.7,3.42,0.36,6.32,street-lamp/street-lamp-21.glb
+street-lamp-22,Street Lamp #23,street-lamp,76,3.4,0.37,0.43,3.54,street-lamp/street-lamp-22.glb
+street-lamp-23,Street Lamp #24,street-lamp,148,4.3,1.75,0.58,5.98,street-lamp/street-lamp-23.glb
+street-lamp-24,Street Lamp #25,street-lamp,132,4.1,2.06,0.41,5.38,street-lamp/street-lamp-24.glb
+street-lamp-25,Street Lamp #26,street-lamp,228,5.7,3.03,0.34,7.59,street-lamp/street-lamp-25.glb
+street-lamp-26,Street Lamp #27,street-lamp,156,4.3,0.85,0.48,4.5,street-lamp/street-lamp-26.glb
+street-lamp-27,Street Lamp #28,street-lamp,136,4.1,1.76,0.56,5.38,street-lamp/street-lamp-27.glb
+street-lamp-28,Street Lamp #29,street-lamp,132,4.1,1.84,0.41,7.1,street-lamp/street-lamp-28.glb
+street-lamp-29,Street Lamp #30,street-lamp,228,5.6,3.96,0.36,7.73,street-lamp/street-lamp-29.glb
+street-lamp-30,Street Lamp #31,street-lamp,156,4.3,0.85,0.48,4.36,street-lamp/street-lamp-30.glb
+street-lamp-31,Street Lamp #32,street-lamp,148,4.2,1.78,0.6,6.92,street-lamp/street-lamp-31.glb
+street-lamp-32,Street Lamp #33,street-lamp,132,4.1,1.46,0.37,8.24,street-lamp/street-lamp-32.glb
+street-lamp-33,Street Lamp #34,street-lamp,228,5.7,4.16,0.4,5.77,street-lamp/street-lamp-33.glb
+street-lamp-34,Street Lamp #35,street-lamp,96,3.4,0.42,0.48,4.3,street-lamp/street-lamp-34.glb
+street-lamp-35,Street Lamp #36,street-lamp,148,4.2,1.49,0.66,6.81,street-lamp/street-lamp-35.glb
+street-lamp-36,Street Lamp #37,street-lamp,132,4.1,2.21,0.36,6.3,street-lamp/street-lamp-36.glb
+street-lamp-37,Street Lamp #38,street-lamp,228,5.6,2.92,0.35,7.63,street-lamp/street-lamp-37.glb
+street-lamp-38,Street Lamp #39,street-lamp,156,4.3,0.85,0.48,4.42,street-lamp/street-lamp-38.glb
+street-lamp-39,Street Lamp #40,street-lamp,136,4.1,1.8,0.62,5.55,street-lamp/street-lamp-39.glb
+street-lamp-40,Street Lamp #41,street-lamp,132,4.0,1.71,0.31,5.94,street-lamp/street-lamp-40.glb
+street-lamp-41,Street Lamp #42,street-lamp,228,5.7,2.81,0.3,6.76,street-lamp/street-lamp-41.glb
+street-lamp-42,Street Lamp #43,street-lamp,76,3.4,0.35,0.39,3.83,street-lamp/street-lamp-42.glb
+street-lamp-43,Street Lamp #44,street-lamp,136,4.0,1.65,0.57,7.85,street-lamp/street-lamp-43.glb
+street-lamp-44,Street Lamp #45,street-lamp,132,4.1,2.23,0.42,8.01,street-lamp/street-lamp-44.glb
+street-lamp-45,Street Lamp #46,street-lamp,228,5.7,4.32,0.32,5.28,street-lamp/street-lamp-45.glb
+street-lamp-46,Street Lamp #47,street-lamp,76,3.4,0.3,0.32,3.58,street-lamp/street-lamp-46.glb
+street-lamp-47,Street Lamp #48,street-lamp,136,4.1,1.72,0.67,6.44,street-lamp/street-lamp-47.glb
+street-lamp-48,Street Lamp #49,street-lamp,132,4.2,1.91,0.42,6.06,street-lamp/street-lamp-48.glb
+street-lamp-49,Street Lamp #50,street-lamp,228,5.6,4.22,0.31,8.03,street-lamp/street-lamp-49.glb
+fire-hydrant-00,Fire Hydrant #01,fire-hydrant,222,5.4,0.45,0.37,1.06,fire-hydrant/fire-hydrant-00.glb
+fire-hydrant-01,Fire Hydrant #02,fire-hydrant,206,5.1,0.55,0.46,0.78,fire-hydrant/fire-hydrant-01.glb
+fire-hydrant-02,Fire Hydrant #03,fire-hydrant,186,4.8,0.67,0.67,0.89,fire-hydrant/fire-hydrant-02.glb
+fire-hydrant-03,Fire Hydrant #04,fire-hydrant,116,3.8,0.6,0.3,1.15,fire-hydrant/fire-hydrant-03.glb
+fire-hydrant-04,Fire Hydrant #05,fire-hydrant,216,5.3,0.53,0.48,0.92,fire-hydrant/fire-hydrant-04.glb
+fire-hydrant-05,Fire Hydrant #06,fire-hydrant,246,5.7,0.52,0.47,0.76,fire-hydrant/fire-hydrant-05.glb
+fire-hydrant-06,Fire Hydrant #07,fire-hydrant,110,3.7,0.65,0.65,1.01,fire-hydrant/fire-hydrant-06.glb
+fire-hydrant-07,Fire Hydrant #08,fire-hydrant,116,3.8,0.7,0.29,1.13,fire-hydrant/fire-hydrant-07.glb
+fire-hydrant-08,Fire Hydrant #09,fire-hydrant,232,5.7,0.45,0.42,1.07,fire-hydrant/fire-hydrant-08.glb
+fire-hydrant-09,Fire Hydrant #10,fire-hydrant,246,5.7,0.56,0.52,0.88,fire-hydrant/fire-hydrant-09.glb
+fire-hydrant-10,Fire Hydrant #11,fire-hydrant,158,4.4,0.87,0.87,1.05,fire-hydrant/fire-hydrant-10.glb
+fire-hydrant-11,Fire Hydrant #12,fire-hydrant,116,3.8,0.55,0.27,1.01,fire-hydrant/fire-hydrant-11.glb
+fire-hydrant-12,Fire Hydrant #13,fire-hydrant,206,5.1,0.51,0.42,0.86,fire-hydrant/fire-hydrant-12.glb
+fire-hydrant-13,Fire Hydrant #14,fire-hydrant,206,5.0,0.55,0.46,0.84,fire-hydrant/fire-hydrant-13.glb
+fire-hydrant-14,Fire Hydrant #15,fire-hydrant,138,4.1,0.88,0.88,0.86,fire-hydrant/fire-hydrant-14.glb
+fire-hydrant-15,Fire Hydrant #16,fire-hydrant,116,3.8,0.66,0.34,1.15,fire-hydrant/fire-hydrant-15.glb
+fire-hydrant-16,Fire Hydrant #17,fire-hydrant,222,5.4,0.42,0.34,0.86,fire-hydrant/fire-hydrant-16.glb
+fire-hydrant-17,Fire Hydrant #18,fire-hydrant,232,5.6,0.63,0.58,0.86,fire-hydrant/fire-hydrant-17.glb
+fire-hydrant-18,Fire Hydrant #19,fire-hydrant,158,4.4,0.61,0.61,0.93,fire-hydrant/fire-hydrant-18.glb
+fire-hydrant-19,Fire Hydrant #20,fire-hydrant,116,3.8,0.54,0.32,0.97,fire-hydrant/fire-hydrant-19.glb
+fire-hydrant-20,Fire Hydrant #21,fire-hydrant,206,5.1,0.45,0.37,0.97,fire-hydrant/fire-hydrant-20.glb
+fire-hydrant-21,Fire Hydrant #22,fire-hydrant,206,5.1,0.52,0.43,0.84,fire-hydrant/fire-hydrant-21.glb
+fire-hydrant-22,Fire Hydrant #23,fire-hydrant,138,4.1,0.68,0.68,0.84,fire-hydrant/fire-hydrant-22.glb
+fire-hydrant-23,Fire Hydrant #24,fire-hydrant,116,3.8,0.55,0.31,1.0,fire-hydrant/fire-hydrant-23.glb
+fire-hydrant-24,Fire Hydrant #25,fire-hydrant,222,5.4,0.51,0.42,1.07,fire-hydrant/fire-hydrant-24.glb
+fire-hydrant-25,Fire Hydrant #26,fire-hydrant,216,5.3,0.55,0.51,0.74,fire-hydrant/fire-hydrant-25.glb
+fire-hydrant-26,Fire Hydrant #27,fire-hydrant,110,3.7,0.89,0.89,0.87,fire-hydrant/fire-hydrant-26.glb
+fire-hydrant-27,Fire Hydrant #28,fire-hydrant,116,3.8,0.57,0.27,1.23,fire-hydrant/fire-hydrant-27.glb
+fire-hydrant-28,Fire Hydrant #29,fire-hydrant,216,5.4,0.43,0.4,0.98,fire-hydrant/fire-hydrant-28.glb
+fire-hydrant-29,Fire Hydrant #30,fire-hydrant,216,5.3,0.62,0.57,0.87,fire-hydrant/fire-hydrant-29.glb
+fire-hydrant-30,Fire Hydrant #31,fire-hydrant,110,3.7,0.7,0.7,1.0,fire-hydrant/fire-hydrant-30.glb
+fire-hydrant-31,Fire Hydrant #32,fire-hydrant,116,3.8,0.56,0.29,1.12,fire-hydrant/fire-hydrant-31.glb
+fire-hydrant-32,Fire Hydrant #33,fire-hydrant,222,5.4,0.5,0.41,1.05,fire-hydrant/fire-hydrant-32.glb
+fire-hydrant-33,Fire Hydrant #34,fire-hydrant,176,4.7,0.52,0.43,0.76,fire-hydrant/fire-hydrant-33.glb
+fire-hydrant-34,Fire Hydrant #35,fire-hydrant,138,4.1,0.84,0.84,0.96,fire-hydrant/fire-hydrant-34.glb
+fire-hydrant-35,Fire Hydrant #36,fire-hydrant,116,3.8,0.51,0.27,0.93,fire-hydrant/fire-hydrant-35.glb
+fire-hydrant-36,Fire Hydrant #37,fire-hydrant,232,5.6,0.43,0.39,0.84,fire-hydrant/fire-hydrant-36.glb
+fire-hydrant-37,Fire Hydrant #38,fire-hydrant,246,5.7,0.65,0.6,0.76,fire-hydrant/fire-hydrant-37.glb
+fire-hydrant-38,Fire Hydrant #39,fire-hydrant,110,3.7,0.83,0.83,0.92,fire-hydrant/fire-hydrant-38.glb
+fire-hydrant-39,Fire Hydrant #40,fire-hydrant,116,3.8,0.57,0.27,1.11,fire-hydrant/fire-hydrant-39.glb
+fire-hydrant-40,Fire Hydrant #41,fire-hydrant,232,5.7,0.43,0.39,0.86,fire-hydrant/fire-hydrant-40.glb
+fire-hydrant-41,Fire Hydrant #42,fire-hydrant,192,5.0,0.57,0.48,0.84,fire-hydrant/fire-hydrant-41.glb
+fire-hydrant-42,Fire Hydrant #43,fire-hydrant,186,4.8,0.85,0.85,0.99,fire-hydrant/fire-hydrant-42.glb
+fire-hydrant-43,Fire Hydrant #44,fire-hydrant,116,3.8,0.69,0.3,1.01,fire-hydrant/fire-hydrant-43.glb
+fire-hydrant-44,Fire Hydrant #45,fire-hydrant,176,4.7,0.43,0.35,0.84,fire-hydrant/fire-hydrant-44.glb
+fire-hydrant-45,Fire Hydrant #46,fire-hydrant,246,5.7,0.59,0.54,0.89,fire-hydrant/fire-hydrant-45.glb
+fire-hydrant-46,Fire Hydrant #47,fire-hydrant,158,4.4,0.87,0.87,0.8,fire-hydrant/fire-hydrant-46.glb
+fire-hydrant-47,Fire Hydrant #48,fire-hydrant,116,3.8,0.61,0.27,1.13,fire-hydrant/fire-hydrant-47.glb
+fire-hydrant-48,Fire Hydrant #49,fire-hydrant,232,5.7,0.51,0.46,0.96,fire-hydrant/fire-hydrant-48.glb
+fire-hydrant-49,Fire Hydrant #50,fire-hydrant,222,5.4,0.53,0.44,0.76,fire-hydrant/fire-hydrant-49.glb
+bus-stop-shelter-00,Bus Stop Shelter #01,bus-stop-shelter,314,6.9,4.43,1.68,2.62,bus-stop-shelter/bus-stop-shelter-00.glb
+bus-stop-shelter-01,Bus Stop Shelter #02,bus-stop-shelter,386,8.0,3.18,1.89,2.98,bus-stop-shelter/bus-stop-shelter-01.glb
+bus-stop-shelter-02,Bus Stop Shelter #03,bus-stop-shelter,134,4.1,3.72,1.8,2.91,bus-stop-shelter/bus-stop-shelter-02.glb
+bus-stop-shelter-03,Bus Stop Shelter #04,bus-stop-shelter,198,4.8,3.87,1.65,2.93,bus-stop-shelter/bus-stop-shelter-03.glb
+bus-stop-shelter-04,Bus Stop Shelter #05,bus-stop-shelter,210,5.3,3.55,1.99,2.74,bus-stop-shelter/bus-stop-shelter-04.glb
+bus-stop-shelter-05,Bus Stop Shelter #06,bus-stop-shelter,330,7.3,3.35,1.72,2.9,bus-stop-shelter/bus-stop-shelter-05.glb
+bus-stop-shelter-06,Bus Stop Shelter #07,bus-stop-shelter,202,5.0,3.21,1.72,2.78,bus-stop-shelter/bus-stop-shelter-06.glb
+bus-stop-shelter-07,Bus Stop Shelter #08,bus-stop-shelter,186,4.8,2.81,1.94,2.95,bus-stop-shelter/bus-stop-shelter-07.glb
+bus-stop-shelter-08,Bus Stop Shelter #09,bus-stop-shelter,294,6.5,3.87,1.63,2.7,bus-stop-shelter/bus-stop-shelter-08.glb
+bus-stop-shelter-09,Bus Stop Shelter #10,bus-stop-shelter,354,7.5,3.1,1.7,2.99,bus-stop-shelter/bus-stop-shelter-09.glb
+bus-stop-shelter-10,Bus Stop Shelter #11,bus-stop-shelter,202,5.0,4.41,1.8,2.86,bus-stop-shelter/bus-stop-shelter-10.glb
+bus-stop-shelter-11,Bus Stop Shelter #12,bus-stop-shelter,186,4.8,2.86,1.87,2.82,bus-stop-shelter/bus-stop-shelter-11.glb
+bus-stop-shelter-12,Bus Stop Shelter #13,bus-stop-shelter,302,6.7,4.01,1.87,2.62,bus-stop-shelter/bus-stop-shelter-12.glb
+bus-stop-shelter-13,Bus Stop Shelter #14,bus-stop-shelter,446,8.9,3.22,1.95,3.24,bus-stop-shelter/bus-stop-shelter-13.glb
+bus-stop-shelter-14,Bus Stop Shelter #15,bus-stop-shelter,202,5.0,3.57,1.83,2.9,bus-stop-shelter/bus-stop-shelter-14.glb
+bus-stop-shelter-15,Bus Stop Shelter #16,bus-stop-shelter,218,5.2,4.7,1.65,2.97,bus-stop-shelter/bus-stop-shelter-15.glb
+bus-stop-shelter-16,Bus Stop Shelter #17,bus-stop-shelter,314,7.0,3.63,1.79,2.62,bus-stop-shelter/bus-stop-shelter-16.glb
+bus-stop-shelter-17,Bus Stop Shelter #18,bus-stop-shelter,398,8.1,4.66,1.98,2.91,bus-stop-shelter/bus-stop-shelter-17.glb
+bus-stop-shelter-18,Bus Stop Shelter #19,bus-stop-shelter,166,4.6,3.27,1.89,2.77,bus-stop-shelter/bus-stop-shelter-18.glb
+bus-stop-shelter-19,Bus Stop Shelter #20,bus-stop-shelter,230,5.4,3.45,1.69,2.81,bus-stop-shelter/bus-stop-shelter-19.glb
+bus-stop-shelter-20,Bus Stop Shelter #21,bus-stop-shelter,294,6.7,3.21,1.76,2.57,bus-stop-shelter/bus-stop-shelter-20.glb
+bus-stop-shelter-21,Bus Stop Shelter #22,bus-stop-shelter,374,7.8,3.95,1.81,3.0,bus-stop-shelter/bus-stop-shelter-21.glb
+bus-stop-shelter-22,Bus Stop Shelter #23,bus-stop-shelter,202,5.0,3.39,1.95,2.62,bus-stop-shelter/bus-stop-shelter-22.glb
+bus-stop-shelter-23,Bus Stop Shelter #24,bus-stop-shelter,230,5.4,3.76,1.79,2.85,bus-stop-shelter/bus-stop-shelter-23.glb
+bus-stop-shelter-24,Bus Stop Shelter #25,bus-stop-shelter,282,6.4,3.71,1.67,2.76,bus-stop-shelter/bus-stop-shelter-24.glb
+bus-stop-shelter-25,Bus Stop Shelter #26,bus-stop-shelter,366,7.7,4.13,1.7,2.89,bus-stop-shelter/bus-stop-shelter-25.glb
+bus-stop-shelter-26,Bus Stop Shelter #27,bus-stop-shelter,170,4.6,3.71,1.79,2.67,bus-stop-shelter/bus-stop-shelter-26.glb
+bus-stop-shelter-27,Bus Stop Shelter #28,bus-stop-shelter,174,4.5,3.79,1.98,3.02,bus-stop-shelter/bus-stop-shelter-27.glb
+bus-stop-shelter-28,Bus Stop Shelter #29,bus-stop-shelter,278,6.1,3.85,1.94,2.82,bus-stop-shelter/bus-stop-shelter-28.glb
+bus-stop-shelter-29,Bus Stop Shelter #30,bus-stop-shelter,362,7.5,4.28,1.77,3.0,bus-stop-shelter/bus-stop-shelter-29.glb
+bus-stop-shelter-30,Bus Stop Shelter #31,bus-stop-shelter,170,4.6,3.03,2.0,2.7,bus-stop-shelter/bus-stop-shelter-30.glb
+bus-stop-shelter-31,Bus Stop Shelter #32,bus-stop-shelter,218,5.2,4.67,1.69,2.74,bus-stop-shelter/bus-stop-shelter-31.glb
+bus-stop-shelter-32,Bus Stop Shelter #33,bus-stop-shelter,326,7.1,3.22,1.73,2.62,bus-stop-shelter/bus-stop-shelter-32.glb
+bus-stop-shelter-33,Bus Stop Shelter #34,bus-stop-shelter,422,8.5,4.11,1.87,2.97,bus-stop-shelter/bus-stop-shelter-33.glb
+bus-stop-shelter-34,Bus Stop Shelter #35,bus-stop-shelter,170,4.5,3.52,1.76,2.72,bus-stop-shelter/bus-stop-shelter-34.glb
+bus-stop-shelter-35,Bus Stop Shelter #36,bus-stop-shelter,218,5.1,4.11,1.87,2.79,bus-stop-shelter/bus-stop-shelter-35.glb
+bus-stop-shelter-36,Bus Stop Shelter #37,bus-stop-shelter,314,6.9,3.28,1.73,2.62,bus-stop-shelter/bus-stop-shelter-36.glb
+bus-stop-shelter-37,Bus Stop Shelter #38,bus-stop-shelter,366,7.6,3.79,1.76,2.79,bus-stop-shelter/bus-stop-shelter-37.glb
+bus-stop-shelter-38,Bus Stop Shelter #39,bus-stop-shelter,202,5.0,4.47,1.99,2.62,bus-stop-shelter/bus-stop-shelter-38.glb
+bus-stop-shelter-39,Bus Stop Shelter #40,bus-stop-shelter,230,5.4,3.19,1.84,2.86,bus-stop-shelter/bus-stop-shelter-39.glb
+bus-stop-shelter-40,Bus Stop Shelter #41,bus-stop-shelter,326,7.0,4.6,1.6,2.62,bus-stop-shelter/bus-stop-shelter-40.glb
+bus-stop-shelter-41,Bus Stop Shelter #42,bus-stop-shelter,354,7.3,3.82,1.87,2.8,bus-stop-shelter/bus-stop-shelter-41.glb
+bus-stop-shelter-42,Bus Stop Shelter #43,bus-stop-shelter,202,5.0,4.19,1.67,2.62,bus-stop-shelter/bus-stop-shelter-42.glb
+bus-stop-shelter-43,Bus Stop Shelter #44,bus-stop-shelter,186,4.7,4.31,1.85,2.87,bus-stop-shelter/bus-stop-shelter-43.glb
+bus-stop-shelter-44,Bus Stop Shelter #45,bus-stop-shelter,294,6.6,3.42,1.68,2.81,bus-stop-shelter/bus-stop-shelter-44.glb
+bus-stop-shelter-45,Bus Stop Shelter #46,bus-stop-shelter,434,8.7,3.32,1.85,2.76,bus-stop-shelter/bus-stop-shelter-45.glb
+bus-stop-shelter-46,Bus Stop Shelter #47,bus-stop-shelter,170,4.6,2.98,1.83,2.58,bus-stop-shelter/bus-stop-shelter-46.glb
+bus-stop-shelter-47,Bus Stop Shelter #48,bus-stop-shelter,150,4.1,3.93,1.86,2.82,bus-stop-shelter/bus-stop-shelter-47.glb
+bus-stop-shelter-48,Bus Stop Shelter #49,bus-stop-shelter,278,6.2,4.7,1.96,2.76,bus-stop-shelter/bus-stop-shelter-48.glb
+bus-stop-shelter-49,Bus Stop Shelter #50,bus-stop-shelter,354,7.4,4.27,1.8,2.98,bus-stop-shelter/bus-stop-shelter-49.glb
+bollard-00,Bollard #01,bollard,36,2.4,0.13,0.15,0.93,bollard/bollard-00.glb
+bollard-01,Bollard #02,bollard,42,2.8,0.36,0.36,0.39,bollard/bollard-01.glb
+bollard-02,Bollard #03,bollard,98,3.8,0.27,0.27,1.08,bollard/bollard-02.glb
+bollard-03,Bollard #04,bollard,60,2.9,0.95,0.11,0.52,bollard/bollard-03.glb
+bollard-04,Bollard #05,bollard,82,3.2,0.3,0.3,0.96,bollard/bollard-04.glb
+bollard-05,Bollard #06,bollard,92,3.3,0.28,0.32,0.89,bollard/bollard-05.glb
+bollard-06,Bollard #07,bollard,42,2.8,0.5,0.5,0.55,bollard/bollard-06.glb
+bollard-07,Bollard #08,bollard,98,3.8,0.26,0.26,0.93,bollard/bollard-07.glb
+bollard-08,Bollard #09,bollard,60,2.9,0.85,0.11,0.47,bollard/bollard-08.glb
+bollard-09,Bollard #10,bollard,82,3.2,0.3,0.3,0.99,bollard/bollard-09.glb
+bollard-10,Bollard #11,bollard,52,2.7,0.28,0.33,0.94,bollard/bollard-10.glb
+bollard-11,Bollard #12,bollard,42,2.8,0.45,0.45,0.5,bollard/bollard-11.glb
+bollard-12,Bollard #13,bollard,98,3.8,0.29,0.29,1.12,bollard/bollard-12.glb
+bollard-13,Bollard #14,bollard,120,3.9,1.68,0.11,0.52,bollard/bollard-13.glb
+bollard-14,Bollard #15,bollard,82,3.2,0.3,0.3,0.97,bollard/bollard-14.glb
+bollard-15,Bollard #16,bollard,78,3.1,0.16,0.16,0.93,bollard/bollard-15.glb
+bollard-16,Bollard #17,bollard,42,2.8,0.44,0.44,0.41,bollard/bollard-16.glb
+bollard-17,Bollard #18,bollard,98,3.8,0.24,0.24,0.98,bollard/bollard-17.glb
+bollard-18,Bollard #19,bollard,120,3.9,1.61,0.11,0.5,bollard/bollard-18.glb
+bollard-19,Bollard #20,bollard,82,3.2,0.3,0.3,0.87,bollard/bollard-19.glb
+bollard-20,Bollard #21,bollard,72,3.1,0.28,0.32,0.97,bollard/bollard-20.glb
+bollard-21,Bollard #22,bollard,42,2.8,0.38,0.38,0.5,bollard/bollard-21.glb
+bollard-22,Bollard #23,bollard,98,3.8,0.28,0.28,1.11,bollard/bollard-22.glb
+bollard-23,Bollard #24,bollard,120,3.9,1.44,0.11,0.45,bollard/bollard-23.glb
+bollard-24,Bollard #25,bollard,82,3.2,0.3,0.3,0.77,bollard/bollard-24.glb
+bollard-25,Bollard #26,bollard,56,2.8,0.15,0.17,1.0,bollard/bollard-25.glb
+bollard-26,Bollard #27,bollard,42,2.8,0.43,0.43,0.49,bollard/bollard-26.glb
+bollard-27,Bollard #28,bollard,98,3.8,0.27,0.27,1.1,bollard/bollard-27.glb
+bollard-28,Bollard #29,bollard,120,3.9,1.68,0.11,0.51,bollard/bollard-28.glb
+bollard-29,Bollard #30,bollard,82,3.2,0.3,0.3,0.82,bollard/bollard-29.glb
+bollard-30,Bollard #31,bollard,56,2.8,0.14,0.16,1.02,bollard/bollard-30.glb
+bollard-31,Bollard #32,bollard,42,2.8,0.3,0.3,0.38,bollard/bollard-31.glb
+bollard-32,Bollard #33,bollard,98,3.8,0.28,0.28,0.93,bollard/bollard-32.glb
+bollard-33,Bollard #34,bollard,60,2.9,0.86,0.11,0.47,bollard/bollard-33.glb
+bollard-34,Bollard #35,bollard,82,3.2,0.3,0.3,0.91,bollard/bollard-34.glb
+bollard-35,Bollard #36,bollard,100,3.4,0.3,0.3,0.81,bollard/bollard-35.glb
+bollard-36,Bollard #37,bollard,42,2.8,0.48,0.48,0.52,bollard/bollard-36.glb
+bollard-37,Bollard #38,bollard,98,3.8,0.24,0.24,0.91,bollard/bollard-37.glb
+bollard-38,Bollard #39,bollard,60,2.9,0.87,0.11,0.48,bollard/bollard-38.glb
+bollard-39,Bollard #40,bollard,82,3.2,0.3,0.3,1.01,bollard/bollard-39.glb
+bollard-40,Bollard #41,bollard,78,3.0,0.19,0.19,1.1,bollard/bollard-40.glb
+bollard-41,Bollard #42,bollard,42,2.8,0.32,0.32,0.41,bollard/bollard-41.glb
+bollard-42,Bollard #43,bollard,98,3.8,0.24,0.24,1.11,bollard/bollard-42.glb
+bollard-43,Bollard #44,bollard,120,3.9,1.46,0.11,0.45,bollard/bollard-43.glb
+bollard-44,Bollard #45,bollard,82,3.2,0.3,0.3,0.9,bollard/bollard-44.glb
+bollard-45,Bollard #46,bollard,106,3.4,0.16,0.16,0.84,bollard/bollard-45.glb
+bollard-46,Bollard #47,bollard,54,3.0,0.4,0.4,0.52,bollard/bollard-46.glb
+bollard-47,Bollard #48,bollard,98,3.8,0.27,0.27,1.09,bollard/bollard-47.glb
+bollard-48,Bollard #49,bollard,120,3.9,1.57,0.11,0.48,bollard/bollard-48.glb
+bollard-49,Bollard #50,bollard,82,3.2,0.3,0.3,1.0,bollard/bollard-49.glb
+traffic-light-00,Traffic Light #01,traffic-light,152,4.3,0.31,0.46,2.9,traffic-light/traffic-light-00.glb
+traffic-light-01,Traffic Light #02,traffic-light,520,9.7,4.25,0.61,5.76,traffic-light/traffic-light-01.glb
+traffic-light-02,Traffic Light #03,traffic-light,264,6.0,0.32,0.74,2.56,traffic-light/traffic-light-02.glb
+traffic-light-03,Traffic Light #04,traffic-light,364,7.2,1.0,0.53,4.1,traffic-light/traffic-light-03.glb
+traffic-light-04,Traffic Light #05,traffic-light,220,5.3,0.5,0.56,3.12,traffic-light/traffic-light-04.glb
+traffic-light-05,Traffic Light #06,traffic-light,520,9.6,4.05,0.61,5.93,traffic-light/traffic-light-05.glb
+traffic-light-06,Traffic Light #07,traffic-light,216,5.3,0.32,0.54,3.0,traffic-light/traffic-light-06.glb
+traffic-light-07,Traffic Light #08,traffic-light,364,7.4,1.0,0.53,3.68,traffic-light/traffic-light-07.glb
+traffic-light-08,Traffic Light #09,traffic-light,200,5.1,0.5,0.56,2.97,traffic-light/traffic-light-08.glb
+traffic-light-09,Traffic Light #10,traffic-light,296,6.4,3.46,0.51,5.89,traffic-light/traffic-light-09.glb
+traffic-light-10,Traffic Light #11,traffic-light,156,4.4,0.32,0.55,3.0,traffic-light/traffic-light-10.glb
+traffic-light-11,Traffic Light #12,traffic-light,292,6.3,1.0,0.43,3.82,traffic-light/traffic-light-11.glb
+traffic-light-12,Traffic Light #13,traffic-light,140,4.1,0.31,0.46,3.43,traffic-light/traffic-light-12.glb
+traffic-light-13,Traffic Light #14,traffic-light,296,6.3,2.7,0.51,6.2,traffic-light/traffic-light-13.glb
+traffic-light-14,Traffic Light #15,traffic-light,216,5.3,0.32,0.54,2.94,traffic-light/traffic-light-14.glb
+traffic-light-15,Traffic Light #16,traffic-light,364,7.4,1.0,0.53,3.47,traffic-light/traffic-light-15.glb
+traffic-light-16,Traffic Light #17,traffic-light,220,5.3,0.5,0.56,3.54,traffic-light/traffic-light-16.glb
+traffic-light-17,Traffic Light #18,traffic-light,412,8.1,4.66,0.51,6.09,traffic-light/traffic-light-17.glb
+traffic-light-18,Traffic Light #19,traffic-light,264,6.1,0.32,0.74,2.74,traffic-light/traffic-light-18.glb
+traffic-light-19,Traffic Light #20,traffic-light,292,6.3,1.0,0.43,3.73,traffic-light/traffic-light-19.glb
+traffic-light-20,Traffic Light #21,traffic-light,188,4.8,0.5,0.56,3.06,traffic-light/traffic-light-20.glb
+traffic-light-21,Traffic Light #22,traffic-light,368,7.5,3.08,0.61,5.59,traffic-light/traffic-light-21.glb
+traffic-light-22,Traffic Light #23,traffic-light,132,4.1,0.32,0.45,2.82,traffic-light/traffic-light-22.glb
+traffic-light-23,Traffic Light #24,traffic-light,292,6.3,1.0,0.43,3.92,traffic-light/traffic-light-23.glb
+traffic-light-24,Traffic Light #25,traffic-light,188,4.9,0.5,0.56,3.53,traffic-light/traffic-light-24.glb
+traffic-light-25,Traffic Light #26,traffic-light,520,9.7,3.27,0.61,5.43,traffic-light/traffic-light-25.glb
+traffic-light-26,Traffic Light #27,traffic-light,264,6.0,0.32,0.74,2.56,traffic-light/traffic-light-26.glb
+traffic-light-27,Traffic Light #28,traffic-light,340,7.1,1.0,0.53,3.45,traffic-light/traffic-light-27.glb
+traffic-light-28,Traffic Light #29,traffic-light,200,5.1,0.5,0.56,3.65,traffic-light/traffic-light-28.glb
+traffic-light-29,Traffic Light #30,traffic-light,368,7.4,4.1,0.61,5.48,traffic-light/traffic-light-29.glb
+traffic-light-30,Traffic Light #31,traffic-light,264,6.0,0.32,0.74,2.56,traffic-light/traffic-light-30.glb
+traffic-light-31,Traffic Light #32,traffic-light,364,7.4,1.0,0.53,4.18,traffic-light/traffic-light-31.glb
+traffic-light-32,Traffic Light #33,traffic-light,200,5.1,0.5,0.56,2.97,traffic-light/traffic-light-32.glb
+traffic-light-33,Traffic Light #34,traffic-light,520,9.7,4.31,0.61,6.05,traffic-light/traffic-light-33.glb
+traffic-light-34,Traffic Light #35,traffic-light,264,6.1,0.32,0.74,2.55,traffic-light/traffic-light-34.glb
+traffic-light-35,Traffic Light #36,traffic-light,364,7.4,1.0,0.53,3.42,traffic-light/traffic-light-35.glb
+traffic-light-36,Traffic Light #37,traffic-light,208,5.1,0.31,0.56,3.46,traffic-light/traffic-light-36.glb
+traffic-light-37,Traffic Light #38,traffic-light,520,9.6,3.96,0.61,6.26,traffic-light/traffic-light-37.glb
+traffic-light-38,Traffic Light #39,traffic-light,132,4.0,0.32,0.45,2.87,traffic-light/traffic-light-38.glb
+traffic-light-39,Traffic Light #40,traffic-light,268,6.0,1.0,0.43,3.18,traffic-light/traffic-light-39.glb
+traffic-light-40,Traffic Light #41,traffic-light,200,5.1,0.5,0.56,3.17,traffic-light/traffic-light-40.glb
+traffic-light-41,Traffic Light #42,traffic-light,520,9.6,2.96,0.61,5.67,traffic-light/traffic-light-41.glb
+traffic-light-42,Traffic Light #43,traffic-light,216,5.4,0.32,0.54,2.6,traffic-light/traffic-light-42.glb
+traffic-light-43,Traffic Light #44,traffic-light,340,7.1,1.0,0.53,3.3,traffic-light/traffic-light-43.glb
+traffic-light-44,Traffic Light #45,traffic-light,188,4.9,0.5,0.56,3.52,traffic-light/traffic-light-44.glb
+traffic-light-45,Traffic Light #46,traffic-light,412,8.1,4.15,0.51,5.85,traffic-light/traffic-light-45.glb
+traffic-light-46,Traffic Light #47,traffic-light,132,4.1,0.32,0.45,2.54,traffic-light/traffic-light-46.glb
+traffic-light-47,Traffic Light #48,traffic-light,340,7.1,1.0,0.53,3.79,traffic-light/traffic-light-47.glb
+traffic-light-48,Traffic Light #49,traffic-light,172,4.4,0.31,0.46,3.55,traffic-light/traffic-light-48.glb
+traffic-light-49,Traffic Light #50,traffic-light,520,9.6,4.43,0.61,5.75,traffic-light/traffic-light-49.glb
+mailbox-00,Mailbox #01,mailbox,130,3.9,0.53,0.53,1.33,mailbox/mailbox-00.glb
+mailbox-01,Mailbox #02,mailbox,94,3.3,0.26,0.47,1.29,mailbox/mailbox-01.glb
+mailbox-02,Mailbox #03,mailbox,96,3.5,0.34,0.35,1.52,mailbox/mailbox-02.glb
+mailbox-03,Mailbox #04,mailbox,210,5.0,1.06,0.48,0.77,mailbox/mailbox-03.glb
+mailbox-04,Mailbox #05,mailbox,100,3.5,0.47,0.54,1.4,mailbox/mailbox-04.glb
+mailbox-05,Mailbox #06,mailbox,94,3.4,0.3,0.54,1.3,mailbox/mailbox-05.glb
+mailbox-06,Mailbox #07,mailbox,96,3.6,0.43,0.32,1.58,mailbox/mailbox-06.glb
+mailbox-07,Mailbox #08,mailbox,234,5.3,0.74,0.41,1.25,mailbox/mailbox-07.glb
+mailbox-08,Mailbox #09,mailbox,100,3.5,0.51,0.59,1.37,mailbox/mailbox-08.glb
+mailbox-09,Mailbox #10,mailbox,118,3.8,0.25,0.5,1.29,mailbox/mailbox-09.glb
+mailbox-10,Mailbox #11,mailbox,96,3.6,0.39,0.38,1.51,mailbox/mailbox-10.glb
+mailbox-11,Mailbox #12,mailbox,234,5.3,0.69,0.44,1.23,mailbox/mailbox-11.glb
+mailbox-12,Mailbox #13,mailbox,100,3.5,0.47,0.55,1.37,mailbox/mailbox-12.glb
+mailbox-13,Mailbox #14,mailbox,118,3.8,0.28,0.55,1.33,mailbox/mailbox-13.glb
+mailbox-14,Mailbox #15,mailbox,96,3.6,0.41,0.33,1.66,mailbox/mailbox-14.glb
+mailbox-15,Mailbox #16,mailbox,282,6.0,0.81,0.48,1.36,mailbox/mailbox-15.glb
+mailbox-16,Mailbox #17,mailbox,100,3.5,0.47,0.54,1.45,mailbox/mailbox-16.glb
+mailbox-17,Mailbox #18,mailbox,118,3.8,0.26,0.53,1.31,mailbox/mailbox-17.glb
+mailbox-18,Mailbox #19,mailbox,96,3.6,0.44,0.34,1.44,mailbox/mailbox-18.glb
+mailbox-19,Mailbox #20,mailbox,174,4.5,0.61,0.48,1.06,mailbox/mailbox-19.glb
+mailbox-20,Mailbox #21,mailbox,100,3.5,0.46,0.53,1.37,mailbox/mailbox-20.glb
+mailbox-21,Mailbox #22,mailbox,94,3.4,0.26,0.52,1.25,mailbox/mailbox-21.glb
+mailbox-22,Mailbox #23,mailbox,96,3.5,0.44,0.35,1.53,mailbox/mailbox-22.glb
+mailbox-23,Mailbox #24,mailbox,282,5.9,1.03,0.42,1.1,mailbox/mailbox-23.glb
+mailbox-24,Mailbox #25,mailbox,130,3.9,0.58,0.58,1.35,mailbox/mailbox-24.glb
+mailbox-25,Mailbox #26,mailbox,118,3.8,0.26,0.5,1.26,mailbox/mailbox-25.glb
+mailbox-26,Mailbox #27,mailbox,96,3.6,0.41,0.36,1.58,mailbox/mailbox-26.glb
+mailbox-27,Mailbox #28,mailbox,282,6.0,0.82,0.41,1.19,mailbox/mailbox-27.glb
+mailbox-28,Mailbox #29,mailbox,130,4.0,0.48,0.48,1.49,mailbox/mailbox-28.glb
+mailbox-29,Mailbox #30,mailbox,118,3.8,0.27,0.53,1.31,mailbox/mailbox-29.glb
+mailbox-30,Mailbox #31,mailbox,96,3.6,0.41,0.35,1.58,mailbox/mailbox-30.glb
+mailbox-31,Mailbox #32,mailbox,138,4.0,0.61,0.48,1.05,mailbox/mailbox-31.glb
+mailbox-32,Mailbox #33,mailbox,130,3.9,0.52,0.52,1.49,mailbox/mailbox-32.glb
+mailbox-33,Mailbox #34,mailbox,94,3.4,0.28,0.52,1.35,mailbox/mailbox-33.glb
+mailbox-34,Mailbox #35,mailbox,96,3.5,0.41,0.38,1.63,mailbox/mailbox-34.glb
+mailbox-35,Mailbox #36,mailbox,282,6.0,0.91,0.47,1.11,mailbox/mailbox-35.glb
+mailbox-36,Mailbox #37,mailbox,130,4.0,0.58,0.58,1.46,mailbox/mailbox-36.glb
+mailbox-37,Mailbox #38,mailbox,118,3.8,0.28,0.55,1.37,mailbox/mailbox-37.glb
+mailbox-38,Mailbox #39,mailbox,96,3.5,0.42,0.36,1.52,mailbox/mailbox-38.glb
+mailbox-39,Mailbox #40,mailbox,282,6.0,1.0,0.41,1.08,mailbox/mailbox-39.glb
+mailbox-40,Mailbox #41,mailbox,100,3.5,0.48,0.55,1.42,mailbox/mailbox-40.glb
+mailbox-41,Mailbox #42,mailbox,118,3.8,0.26,0.47,1.24,mailbox/mailbox-41.glb
+mailbox-42,Mailbox #43,mailbox,96,3.6,0.44,0.36,1.4,mailbox/mailbox-42.glb
+mailbox-43,Mailbox #44,mailbox,138,4.0,0.57,0.41,0.93,mailbox/mailbox-43.glb
+mailbox-44,Mailbox #45,mailbox,130,4.0,0.5,0.5,1.52,mailbox/mailbox-44.glb
+mailbox-45,Mailbox #46,mailbox,118,3.8,0.28,0.48,1.36,mailbox/mailbox-45.glb
+mailbox-46,Mailbox #47,mailbox,96,3.6,0.34,0.37,1.46,mailbox/mailbox-46.glb
+mailbox-47,Mailbox #48,mailbox,174,4.5,0.57,0.43,1.22,mailbox/mailbox-47.glb
+mailbox-48,Mailbox #49,mailbox,130,3.9,0.49,0.49,1.43,mailbox/mailbox-48.glb
+mailbox-49,Mailbox #50,mailbox,118,3.8,0.3,0.51,1.38,mailbox/mailbox-49.glb
+gutter-slab-00,Gutter Slab #01,gutter-slab,192,4.8,2.16,1.06,0.59,gutter-slab/gutter-slab-00.glb
+gutter-slab-01,Gutter Slab #02,gutter-slab,200,4.9,1.7,0.96,0.57,gutter-slab/gutter-slab-01.glb
+gutter-slab-02,Gutter Slab #03,gutter-slab,250,6.4,2.67,1.1,0.61,gutter-slab/gutter-slab-02.glb
+gutter-slab-03,Gutter Slab #04,gutter-slab,298,6.3,2.66,0.87,0.58,gutter-slab/gutter-slab-03.glb
+gutter-slab-04,Gutter Slab #05,gutter-slab,182,4.7,2.2,0.85,0.63,gutter-slab/gutter-slab-04.glb
+gutter-slab-05,Gutter Slab #06,gutter-slab,354,7.0,3.3,0.82,0.43,gutter-slab/gutter-slab-05.glb
+gutter-slab-06,Gutter Slab #07,gutter-slab,250,6.3,3.0,1.06,0.68,gutter-slab/gutter-slab-06.glb
+gutter-slab-07,Gutter Slab #08,gutter-slab,288,6.4,2.12,1.27,0.62,gutter-slab/gutter-slab-07.glb
+gutter-slab-08,Gutter Slab #09,gutter-slab,260,5.9,3.86,0.78,0.48,gutter-slab/gutter-slab-08.glb
+gutter-slab-09,Gutter Slab #10,gutter-slab,308,6.2,3.15,0.97,0.44,gutter-slab/gutter-slab-09.glb
+gutter-slab-10,Gutter Slab #11,gutter-slab,216,5.6,2.57,0.97,0.62,gutter-slab/gutter-slab-10.glb
+gutter-slab-11,Gutter Slab #12,gutter-slab,198,5.0,1.89,0.76,0.61,gutter-slab/gutter-slab-11.glb
+gutter-slab-12,Gutter Slab #13,gutter-slab,138,4.1,1.59,1.07,0.39,gutter-slab/gutter-slab-12.glb
+gutter-slab-13,Gutter Slab #14,gutter-slab,200,4.9,2.0,0.96,0.56,gutter-slab/gutter-slab-13.glb
+gutter-slab-14,Gutter Slab #15,gutter-slab,162,4.9,1.67,0.98,0.47,gutter-slab/gutter-slab-14.glb
+gutter-slab-15,Gutter Slab #16,gutter-slab,254,5.8,3.06,0.96,0.57,gutter-slab/gutter-slab-15.glb
+gutter-slab-16,Gutter Slab #17,gutter-slab,138,4.0,3.13,1.08,0.46,gutter-slab/gutter-slab-16.glb
+gutter-slab-17,Gutter Slab #18,gutter-slab,214,5.1,1.9,0.84,0.61,gutter-slab/gutter-slab-17.glb
+gutter-slab-18,Gutter Slab #19,gutter-slab,206,5.5,3.06,0.91,0.52,gutter-slab/gutter-slab-18.glb
+gutter-slab-19,Gutter Slab #20,gutter-slab,356,7.4,2.91,1.23,0.55,gutter-slab/gutter-slab-19.glb
+gutter-slab-20,Gutter Slab #21,gutter-slab,250,5.9,3.41,0.99,0.69,gutter-slab/gutter-slab-20.glb
+gutter-slab-21,Gutter Slab #22,gutter-slab,296,6.1,2.72,0.92,0.42,gutter-slab/gutter-slab-21.glb
+gutter-slab-22,Gutter Slab #23,gutter-slab,206,5.7,2.25,0.73,0.46,gutter-slab/gutter-slab-22.glb
+gutter-slab-23,Gutter Slab #24,gutter-slab,208,5.1,1.73,0.75,0.39,gutter-slab/gutter-slab-23.glb
+gutter-slab-24,Gutter Slab #25,gutter-slab,138,4.1,1.16,0.98,0.51,gutter-slab/gutter-slab-24.glb
+gutter-slab-25,Gutter Slab #26,gutter-slab,156,4.1,1.4,1.09,0.43,gutter-slab/gutter-slab-25.glb
+gutter-slab-26,Gutter Slab #27,gutter-slab,118,4.0,1.17,0.96,0.53,gutter-slab/gutter-slab-26.glb
+gutter-slab-27,Gutter Slab #28,gutter-slab,242,5.6,2.08,1.07,0.58,gutter-slab/gutter-slab-27.glb
+gutter-slab-28,Gutter Slab #29,gutter-slab,206,5.2,2.74,0.89,0.57,gutter-slab/gutter-slab-28.glb
+gutter-slab-29,Gutter Slab #30,gutter-slab,224,5.2,1.6,0.93,0.47,gutter-slab/gutter-slab-29.glb
+gutter-slab-30,Gutter Slab #31,gutter-slab,172,5.0,2.27,0.79,0.6,gutter-slab/gutter-slab-30.glb
+gutter-slab-31,Gutter Slab #32,gutter-slab,264,5.9,2.79,1.03,0.62,gutter-slab/gutter-slab-31.glb
+gutter-slab-32,Gutter Slab #33,gutter-slab,148,4.2,1.32,0.76,0.53,gutter-slab/gutter-slab-32.glb
+gutter-slab-33,Gutter Slab #34,gutter-slab,170,4.4,1.3,1.03,0.45,gutter-slab/gutter-slab-33.glb
+gutter-slab-34,Gutter Slab #35,gutter-slab,172,5.0,1.69,1.13,0.73,gutter-slab/gutter-slab-34.glb
+gutter-slab-35,Gutter Slab #36,gutter-slab,174,4.5,1.37,1.31,0.7,gutter-slab/gutter-slab-35.glb
+gutter-slab-36,Gutter Slab #37,gutter-slab,226,5.4,2.78,1.05,0.58,gutter-slab/gutter-slab-36.glb
+gutter-slab-37,Gutter Slab #38,gutter-slab,330,6.5,3.4,1.11,0.7,gutter-slab/gutter-slab-37.glb
+gutter-slab-38,Gutter Slab #39,gutter-slab,260,6.5,2.79,1.05,0.73,gutter-slab/gutter-slab-38.glb
+gutter-slab-39,Gutter Slab #40,gutter-slab,254,5.9,2.11,1.06,0.69,gutter-slab/gutter-slab-39.glb
+gutter-slab-40,Gutter Slab #41,gutter-slab,118,3.7,2.85,0.88,0.64,gutter-slab/gutter-slab-40.glb
+gutter-slab-41,Gutter Slab #42,gutter-slab,352,6.9,3.76,0.86,0.69,gutter-slab/gutter-slab-41.glb
+gutter-slab-42,Gutter Slab #43,gutter-slab,260,6.4,2.6,0.79,0.5,gutter-slab/gutter-slab-42.glb
+gutter-slab-43,Gutter Slab #44,gutter-slab,242,5.6,1.6,0.95,0.64,gutter-slab/gutter-slab-43.glb
+gutter-slab-44,Gutter Slab #45,gutter-slab,192,4.8,1.96,1.09,0.46,gutter-slab/gutter-slab-44.glb
+gutter-slab-45,Gutter Slab #46,gutter-slab,310,6.3,3.02,0.81,0.49,gutter-slab/gutter-slab-45.glb
+gutter-slab-46,Gutter Slab #47,gutter-slab,118,4.1,1.17,0.77,0.56,gutter-slab/gutter-slab-46.glb
+gutter-slab-47,Gutter Slab #48,gutter-slab,174,4.5,1.18,1.08,0.68,gutter-slab/gutter-slab-47.glb
+gutter-slab-48,Gutter Slab #49,gutter-slab,162,4.4,2.95,0.94,0.67,gutter-slab/gutter-slab-48.glb
+gutter-slab-49,Gutter Slab #50,gutter-slab,170,4.4,1.11,0.87,0.43,gutter-slab/gutter-slab-49.glb
+road-barrier-00,Road Barrier #01,road-barrier,22,2.2,2.23,0.61,0.89,road-barrier/road-barrier-00.glb
+road-barrier-01,Road Barrier #02,road-barrier,204,5.3,1.93,0.63,1.0,road-barrier/road-barrier-01.glb
+road-barrier-02,Road Barrier #03,road-barrier,150,4.4,3.37,0.3,1.38,road-barrier/road-barrier-02.glb
+road-barrier-03,Road Barrier #04,road-barrier,212,4.8,2.25,0.6,1.05,road-barrier/road-barrier-03.glb
+road-barrier-04,Road Barrier #05,road-barrier,168,4.4,2.33,0.58,0.93,road-barrier/road-barrier-04.glb
+road-barrier-05,Road Barrier #06,road-barrier,22,2.2,2.22,0.62,0.85,road-barrier/road-barrier-05.glb
+road-barrier-06,Road Barrier #07,road-barrier,96,3.5,1.99,0.63,1.05,road-barrier/road-barrier-06.glb
+road-barrier-07,Road Barrier #08,road-barrier,150,4.3,3.29,0.3,1.57,road-barrier/road-barrier-07.glb
+road-barrier-08,Road Barrier #09,road-barrier,188,4.5,2.1,0.6,1.1,road-barrier/road-barrier-08.glb
+road-barrier-09,Road Barrier #10,road-barrier,168,4.4,2.9,0.6,0.92,road-barrier/road-barrier-09.glb
+road-barrier-10,Road Barrier #11,road-barrier,58,2.7,2.04,0.6,0.88,road-barrier/road-barrier-10.glb
+road-barrier-11,Road Barrier #12,road-barrier,108,3.8,1.36,0.75,1.08,road-barrier/road-barrier-11.glb
+road-barrier-12,Road Barrier #13,road-barrier,114,3.8,4.74,0.3,1.88,road-barrier/road-barrier-12.glb
+road-barrier-13,Road Barrier #14,road-barrier,248,5.3,2.17,0.6,1.02,road-barrier/road-barrier-13.glb
+road-barrier-14,Road Barrier #15,road-barrier,168,4.3,2.05,0.59,0.95,road-barrier/road-barrier-14.glb
+road-barrier-15,Road Barrier #16,road-barrier,70,2.9,2.95,0.64,0.84,road-barrier/road-barrier-15.glb
+road-barrier-16,Road Barrier #17,road-barrier,180,5.0,1.27,0.57,1.04,road-barrier/road-barrier-16.glb
+road-barrier-17,Road Barrier #18,road-barrier,150,4.3,4.55,0.3,1.36,road-barrier/road-barrier-17.glb
+road-barrier-18,Road Barrier #19,road-barrier,212,4.8,2.16,0.6,1.11,road-barrier/road-barrier-18.glb
+road-barrier-19,Road Barrier #20,road-barrier,180,4.6,2.34,0.61,1.13,road-barrier/road-barrier-19.glb
+road-barrier-20,Road Barrier #21,road-barrier,22,2.2,2.75,0.63,0.81,road-barrier/road-barrier-20.glb
+road-barrier-21,Road Barrier #22,road-barrier,156,4.5,1.88,0.71,1.06,road-barrier/road-barrier-21.glb
+road-barrier-22,Road Barrier #23,road-barrier,124,3.8,4.14,0.3,1.08,road-barrier/road-barrier-22.glb
+road-barrier-23,Road Barrier #24,road-barrier,176,4.3,2.37,0.6,1.05,road-barrier/road-barrier-23.glb
+road-barrier-24,Road Barrier #25,road-barrier,180,4.5,2.92,0.62,1.15,road-barrier/road-barrier-24.glb
+road-barrier-25,Road Barrier #26,road-barrier,46,2.6,2.14,0.6,0.8,road-barrier/road-barrier-25.glb
+road-barrier-26,Road Barrier #27,road-barrier,156,4.6,1.06,0.78,0.92,road-barrier/road-barrier-26.glb
+road-barrier-27,Road Barrier #28,road-barrier,126,4.0,3.58,0.3,1.37,road-barrier/road-barrier-27.glb
+road-barrier-28,Road Barrier #29,road-barrier,176,4.3,1.96,0.6,1.12,road-barrier/road-barrier-28.glb
+road-barrier-29,Road Barrier #30,road-barrier,168,4.4,2.29,0.59,0.94,road-barrier/road-barrier-29.glb
+road-barrier-30,Road Barrier #31,road-barrier,58,2.7,2.75,0.59,0.86,road-barrier/road-barrier-30.glb
+road-barrier-31,Road Barrier #32,road-barrier,192,5.2,1.21,0.62,1.1,road-barrier/road-barrier-31.glb
+road-barrier-32,Road Barrier #33,road-barrier,126,4.0,4.87,0.3,1.31,road-barrier/road-barrier-32.glb
+road-barrier-33,Road Barrier #34,road-barrier,188,4.5,2.29,0.6,1.14,road-barrier/road-barrier-33.glb
+road-barrier-34,Road Barrier #35,road-barrier,180,4.6,2.95,0.59,1.15,road-barrier/road-barrier-34.glb
+road-barrier-35,Road Barrier #36,road-barrier,70,2.9,2.94,0.6,0.88,road-barrier/road-barrier-35.glb
+road-barrier-36,Road Barrier #37,road-barrier,144,4.4,1.29,0.6,1.06,road-barrier/road-barrier-36.glb
+road-barrier-37,Road Barrier #38,road-barrier,102,3.6,3.27,0.3,1.64,road-barrier/road-barrier-37.glb
+road-barrier-38,Road Barrier #39,road-barrier,224,4.9,2.31,0.6,1.07,road-barrier/road-barrier-38.glb
+road-barrier-39,Road Barrier #40,road-barrier,168,4.4,2.22,0.61,0.92,road-barrier/road-barrier-39.glb
+road-barrier-40,Road Barrier #41,road-barrier,70,2.9,2.81,0.58,0.86,road-barrier/road-barrier-40.glb
+road-barrier-41,Road Barrier #42,road-barrier,120,4.0,1.04,0.65,0.99,road-barrier/road-barrier-41.glb
+road-barrier-42,Road Barrier #43,road-barrier,114,3.8,4.29,0.3,1.73,road-barrier/road-barrier-42.glb
+road-barrier-43,Road Barrier #44,road-barrier,188,4.5,1.89,0.6,1.07,road-barrier/road-barrier-43.glb
+road-barrier-44,Road Barrier #45,road-barrier,180,4.6,2.75,0.62,1.1,road-barrier/road-barrier-44.glb
+road-barrier-45,Road Barrier #46,road-barrier,70,2.9,2.11,0.59,0.87,road-barrier/road-barrier-45.glb
+road-barrier-46,Road Barrier #47,road-barrier,132,4.2,1.24,0.56,1.05,road-barrier/road-barrier-46.glb
+road-barrier-47,Road Barrier #48,road-barrier,114,3.8,4.65,0.3,2.03,road-barrier/road-barrier-47.glb
+road-barrier-48,Road Barrier #49,road-barrier,224,4.9,2.36,0.6,1.03,road-barrier/road-barrier-48.glb
+road-barrier-49,Road Barrier #50,road-barrier,180,4.5,2.19,0.6,1.12,road-barrier/road-barrier-49.glb

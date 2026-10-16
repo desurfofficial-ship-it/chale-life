@@ -1,0 +1,501 @@
+id,name,archetype,tris,kb_meshopt,w_m,d_m,h_m,file
+market-stall-00,Market Stall #01,market-stall,424,10.0,2.7,1.73,2.75,market-stall/market-stall-00.glb
+market-stall-01,Market Stall #02,market-stall,834,19.2,2.48,1.6,2.67,market-stall/market-stall-01.glb
+market-stall-02,Market Stall #03,market-stall,280,7.6,2.37,1.06,2.28,market-stall/market-stall-02.glb
+market-stall-03,Market Stall #04,market-stall,612,14.5,2.75,2.75,2.68,market-stall/market-stall-03.glb
+market-stall-04,Market Stall #05,market-stall,412,10.0,2.54,2.14,2.77,market-stall/market-stall-04.glb
+market-stall-05,Market Stall #06,market-stall,840,18.5,2.42,1.54,2.92,market-stall/market-stall-05.glb
+market-stall-06,Market Stall #07,market-stall,440,10.7,2.63,1.37,2.26,market-stall/market-stall-06.glb
+market-stall-07,Market Stall #08,market-stall,394,9.2,3.47,3.47,3.08,market-stall/market-stall-07.glb
+market-stall-08,Market Stall #09,market-stall,652,14.9,2.55,1.84,2.84,market-stall/market-stall-08.glb
+market-stall-09,Market Stall #10,market-stall,618,13.6,2.58,1.64,2.65,market-stall/market-stall-09.glb
+market-stall-10,Market Stall #11,market-stall,432,11.3,2.07,1.32,2.14,market-stall/market-stall-10.glb
+market-stall-11,Market Stall #12,market-stall,502,11.6,3.28,3.28,2.79,market-stall/market-stall-11.glb
+market-stall-12,Market Stall #13,market-stall,428,10.3,2.36,1.83,2.73,market-stall/market-stall-12.glb
+market-stall-13,Market Stall #14,market-stall,694,15.8,3.1,1.97,2.9,market-stall/market-stall-13.glb
+market-stall-14,Market Stall #15,market-stall,380,9.2,2.47,1.41,2.27,market-stall/market-stall-14.glb
+market-stall-15,Market Stall #16,market-stall,660,15.3,3.29,3.29,2.84,market-stall/market-stall-15.glb
+market-stall-16,Market Stall #17,market-stall,542,12.6,2.42,1.69,2.99,market-stall/market-stall-16.glb
+market-stall-17,Market Stall #18,market-stall,538,11.6,3.06,1.88,2.71,market-stall/market-stall-17.glb
+market-stall-18,Market Stall #19,market-stall,310,7.9,2.8,1.36,2.16,market-stall/market-stall-18.glb
+market-stall-19,Market Stall #20,market-stall,624,14.9,3.42,3.42,2.92,market-stall/market-stall-19.glb
+market-stall-20,Market Stall #21,market-stall,606,14.8,2.42,1.64,2.86,market-stall/market-stall-20.glb
+market-stall-21,Market Stall #22,market-stall,742,17.2,2.42,1.68,2.52,market-stall/market-stall-21.glb
+market-stall-22,Market Stall #23,market-stall,314,8.3,2.45,1.19,2.48,market-stall/market-stall-22.glb
+market-stall-23,Market Stall #24,market-stall,450,10.5,3.16,3.16,2.85,market-stall/market-stall-23.glb
+market-stall-24,Market Stall #25,market-stall,618,15.0,2.7,1.56,2.79,market-stall/market-stall-24.glb
+market-stall-25,Market Stall #26,market-stall,644,13.8,2.43,1.71,2.94,market-stall/market-stall-25.glb
+market-stall-26,Market Stall #27,market-stall,510,12.9,2.77,1.05,2.25,market-stall/market-stall-26.glb
+market-stall-27,Market Stall #28,market-stall,366,8.7,2.48,2.47,2.72,market-stall/market-stall-27.glb
+market-stall-28,Market Stall #29,market-stall,480,11.6,1.92,2.04,2.54,market-stall/market-stall-28.glb
+market-stall-29,Market Stall #30,market-stall,688,15.8,2.61,1.53,2.58,market-stall/market-stall-29.glb
+market-stall-30,Market Stall #31,market-stall,362,9.4,3.06,1.23,2.12,market-stall/market-stall-30.glb
+market-stall-31,Market Stall #32,market-stall,522,12.2,2.72,2.72,2.74,market-stall/market-stall-31.glb
+market-stall-32,Market Stall #33,market-stall,710,17.3,2.4,1.77,2.69,market-stall/market-stall-32.glb
+market-stall-33,Market Stall #34,market-stall,528,11.8,2.42,1.55,2.81,market-stall/market-stall-33.glb
+market-stall-34,Market Stall #35,market-stall,340,8.7,2.22,1.11,2.32,market-stall/market-stall-34.glb
+market-stall-35,Market Stall #36,market-stall,546,13.3,2.51,2.51,2.88,market-stall/market-stall-35.glb
+market-stall-36,Market Stall #37,market-stall,436,10.4,2.74,2.12,2.61,market-stall/market-stall-36.glb
+market-stall-37,Market Stall #38,market-stall,812,17.9,2.69,1.83,2.53,market-stall/market-stall-37.glb
+market-stall-38,Market Stall #39,market-stall,382,9.9,2.73,1.08,2.18,market-stall/market-stall-38.glb
+market-stall-39,Market Stall #40,market-stall,448,11.1,3.06,3.06,3.05,market-stall/market-stall-39.glb
+market-stall-40,Market Stall #41,market-stall,404,9.9,1.92,1.89,2.66,market-stall/market-stall-40.glb
+market-stall-41,Market Stall #42,market-stall,528,11.6,2.47,1.84,2.66,market-stall/market-stall-41.glb
+market-stall-42,Market Stall #43,market-stall,338,8.6,2.46,1.05,2.27,market-stall/market-stall-42.glb
+market-stall-43,Market Stall #44,market-stall,592,13.8,3.83,3.83,3.22,market-stall/market-stall-43.glb
+market-stall-44,Market Stall #45,market-stall,578,13.9,2.9,1.58,2.99,market-stall/market-stall-44.glb
+market-stall-45,Market Stall #46,market-stall,558,12.4,2.46,1.44,2.66,market-stall/market-stall-45.glb
+market-stall-46,Market Stall #47,market-stall,366,9.1,2.64,1.07,2.31,market-stall/market-stall-46.glb
+market-stall-47,Market Stall #48,market-stall,622,14.7,3.24,3.24,2.82,market-stall/market-stall-47.glb
+market-stall-48,Market Stall #49,market-stall,668,16.0,2.35,1.96,2.97,market-stall/market-stall-48.glb
+market-stall-49,Market Stall #50,market-stall,720,16.0,1.91,1.76,2.54,market-stall/market-stall-49.glb
+kiosk-00,Kiosk #01,kiosk,144,4.1,1.89,2.1,2.45,kiosk/kiosk-00.glb
+kiosk-01,Kiosk #02,kiosk,280,6.1,1.87,2.26,2.45,kiosk/kiosk-01.glb
+kiosk-02,Kiosk #03,kiosk,238,5.5,2.55,2.55,2.71,kiosk/kiosk-02.glb
+kiosk-03,Kiosk #04,kiosk,160,4.3,2.35,2.71,3.0,kiosk/kiosk-03.glb
+kiosk-04,Kiosk #05,kiosk,156,4.3,2.33,2.22,2.45,kiosk/kiosk-04.glb
+kiosk-05,Kiosk #06,kiosk,316,6.7,1.91,2.35,2.7,kiosk/kiosk-05.glb
+kiosk-06,Kiosk #07,kiosk,174,4.6,2.23,2.18,2.69,kiosk/kiosk-06.glb
+kiosk-07,Kiosk #08,kiosk,214,5.1,3.19,3.19,3.06,kiosk/kiosk-07.glb
+kiosk-08,Kiosk #09,kiosk,156,4.3,1.77,1.76,2.5,kiosk/kiosk-08.glb
+kiosk-09,Kiosk #10,kiosk,268,6.0,2.17,2.08,2.54,kiosk/kiosk-09.glb
+kiosk-10,Kiosk #11,kiosk,238,5.5,2.17,2.17,2.66,kiosk/kiosk-10.glb
+kiosk-11,Kiosk #12,kiosk,214,5.1,2.94,2.94,2.81,kiosk/kiosk-11.glb
+kiosk-12,Kiosk #13,kiosk,144,4.1,1.99,2.25,2.37,kiosk/kiosk-12.glb
+kiosk-13,Kiosk #14,kiosk,292,6.4,2.19,2.18,2.52,kiosk/kiosk-13.glb
+kiosk-14,Kiosk #15,kiosk,174,4.6,2.25,2.25,2.92,kiosk/kiosk-14.glb
+kiosk-15,Kiosk #16,kiosk,160,4.3,2.81,3.25,2.78,kiosk/kiosk-15.glb
+kiosk-16,Kiosk #17,kiosk,156,4.3,2.02,1.78,2.41,kiosk/kiosk-16.glb
+kiosk-17,Kiosk #18,kiosk,304,6.5,2.37,2.19,2.66,kiosk/kiosk-17.glb
+kiosk-18,Kiosk #19,kiosk,238,5.5,2.44,2.44,2.89,kiosk/kiosk-18.glb
+kiosk-19,Kiosk #20,kiosk,214,5.1,3.0,3.0,2.85,kiosk/kiosk-19.glb
+kiosk-20,Kiosk #21,kiosk,156,4.3,2.14,1.81,2.44,kiosk/kiosk-20.glb
+kiosk-21,Kiosk #22,kiosk,280,6.2,2.04,2.15,2.63,kiosk/kiosk-21.glb
+kiosk-22,Kiosk #23,kiosk,238,5.5,2.15,2.15,2.72,kiosk/kiosk-22.glb
+kiosk-23,Kiosk #24,kiosk,214,5.1,2.96,2.96,2.78,kiosk/kiosk-23.glb
+kiosk-24,Kiosk #25,kiosk,156,4.3,2.42,2.27,2.36,kiosk/kiosk-24.glb
+kiosk-25,Kiosk #26,kiosk,304,6.5,2.35,2.08,2.63,kiosk/kiosk-25.glb
+kiosk-26,Kiosk #27,kiosk,238,5.6,2.28,2.28,2.7,kiosk/kiosk-26.glb
+kiosk-27,Kiosk #28,kiosk,160,4.2,2.19,2.52,2.84,kiosk/kiosk-27.glb
+kiosk-28,Kiosk #29,kiosk,156,4.2,2.37,1.96,2.57,kiosk/kiosk-28.glb
+kiosk-29,Kiosk #30,kiosk,316,6.7,2.15,2.31,2.7,kiosk/kiosk-29.glb
+kiosk-30,Kiosk #31,kiosk,174,4.6,2.53,2.53,2.67,kiosk/kiosk-30.glb
+kiosk-31,Kiosk #32,kiosk,160,4.3,2.61,3.01,2.82,kiosk/kiosk-31.glb
+kiosk-32,Kiosk #33,kiosk,156,4.3,1.97,1.94,2.36,kiosk/kiosk-32.glb
+kiosk-33,Kiosk #34,kiosk,328,6.9,2.16,2.29,2.74,kiosk/kiosk-33.glb
+kiosk-34,Kiosk #35,kiosk,238,5.6,2.57,2.57,2.88,kiosk/kiosk-34.glb
+kiosk-35,Kiosk #36,kiosk,160,4.3,2.24,2.58,2.72,kiosk/kiosk-35.glb
+kiosk-36,Kiosk #37,kiosk,156,4.1,2.03,2.06,2.56,kiosk/kiosk-36.glb
+kiosk-37,Kiosk #38,kiosk,292,6.3,2.05,2.19,2.63,kiosk/kiosk-37.glb
+kiosk-38,Kiosk #39,kiosk,174,4.6,2.14,2.0,2.76,kiosk/kiosk-38.glb
+kiosk-39,Kiosk #40,kiosk,214,5.1,2.75,2.75,2.75,kiosk/kiosk-39.glb
+kiosk-40,Kiosk #41,kiosk,156,4.2,1.81,1.94,2.55,kiosk/kiosk-40.glb
+kiosk-41,Kiosk #42,kiosk,316,6.7,2.38,2.05,2.72,kiosk/kiosk-41.glb
+kiosk-42,Kiosk #43,kiosk,238,5.5,2.23,2.07,2.74,kiosk/kiosk-42.glb
+kiosk-43,Kiosk #44,kiosk,160,4.3,2.24,2.59,2.87,kiosk/kiosk-43.glb
+kiosk-44,Kiosk #45,kiosk,144,4.1,2.3,2.34,2.36,kiosk/kiosk-44.glb
+kiosk-45,Kiosk #46,kiosk,256,5.8,2.2,2.05,2.68,kiosk/kiosk-45.glb
+kiosk-46,Kiosk #47,kiosk,238,5.5,2.28,2.28,2.79,kiosk/kiosk-46.glb
+kiosk-47,Kiosk #48,kiosk,214,5.1,2.54,2.54,2.99,kiosk/kiosk-47.glb
+kiosk-48,Kiosk #49,kiosk,144,4.1,1.91,1.96,2.6,kiosk/kiosk-48.glb
+kiosk-49,Kiosk #50,kiosk,268,6.0,2.38,1.99,2.48,kiosk/kiosk-49.glb
+beach-umbrella-stall-00,Beach Umbrella Stall #01,beach-umbrella-stall,240,6.5,2.92,2.92,2.69,beach-umbrella-stall/beach-umbrella-stall-00.glb
+beach-umbrella-stall-01,Beach Umbrella Stall #02,beach-umbrella-stall,264,6.0,2.07,2.07,2.74,beach-umbrella-stall/beach-umbrella-stall-01.glb
+beach-umbrella-stall-02,Beach Umbrella Stall #03,beach-umbrella-stall,360,7.4,3.19,1.91,2.74,beach-umbrella-stall/beach-umbrella-stall-02.glb
+beach-umbrella-stall-03,Beach Umbrella Stall #04,beach-umbrella-stall,152,4.2,2.26,2.61,2.48,beach-umbrella-stall/beach-umbrella-stall-03.glb
+beach-umbrella-stall-04,Beach Umbrella Stall #05,beach-umbrella-stall,300,8.1,2.82,2.82,2.86,beach-umbrella-stall/beach-umbrella-stall-04.glb
+beach-umbrella-stall-05,Beach Umbrella Stall #06,beach-umbrella-stall,408,8.1,2.28,2.28,2.67,beach-umbrella-stall/beach-umbrella-stall-05.glb
+beach-umbrella-stall-06,Beach Umbrella Stall #07,beach-umbrella-stall,332,7.1,3.11,1.75,2.53,beach-umbrella-stall/beach-umbrella-stall-06.glb
+beach-umbrella-stall-07,Beach Umbrella Stall #08,beach-umbrella-stall,152,4.3,2.14,2.47,2.61,beach-umbrella-stall/beach-umbrella-stall-07.glb
+beach-umbrella-stall-08,Beach Umbrella Stall #09,beach-umbrella-stall,240,6.5,2.04,2.04,2.67,beach-umbrella-stall/beach-umbrella-stall-08.glb
+beach-umbrella-stall-09,Beach Umbrella Stall #10,beach-umbrella-stall,408,8.1,2.3,2.3,2.66,beach-umbrella-stall/beach-umbrella-stall-09.glb
+beach-umbrella-stall-10,Beach Umbrella Stall #11,beach-umbrella-stall,332,7.1,3.25,1.98,2.69,beach-umbrella-stall/beach-umbrella-stall-10.glb
+beach-umbrella-stall-11,Beach Umbrella Stall #12,beach-umbrella-stall,152,4.2,2.38,2.74,2.8,beach-umbrella-stall/beach-umbrella-stall-11.glb
+beach-umbrella-stall-12,Beach Umbrella Stall #13,beach-umbrella-stall,260,7.0,2.95,2.95,2.98,beach-umbrella-stall/beach-umbrella-stall-12.glb
+beach-umbrella-stall-13,Beach Umbrella Stall #14,beach-umbrella-stall,336,6.8,2.47,2.47,2.56,beach-umbrella-stall/beach-umbrella-stall-13.glb
+beach-umbrella-stall-14,Beach Umbrella Stall #15,beach-umbrella-stall,332,7.0,3.59,2.27,2.56,beach-umbrella-stall/beach-umbrella-stall-14.glb
+beach-umbrella-stall-15,Beach Umbrella Stall #16,beach-umbrella-stall,152,4.2,1.92,2.22,2.6,beach-umbrella-stall/beach-umbrella-stall-15.glb
+beach-umbrella-stall-16,Beach Umbrella Stall #17,beach-umbrella-stall,280,7.6,2.49,2.49,2.49,beach-umbrella-stall/beach-umbrella-stall-16.glb
+beach-umbrella-stall-17,Beach Umbrella Stall #18,beach-umbrella-stall,408,8.1,2.82,2.82,2.48,beach-umbrella-stall/beach-umbrella-stall-17.glb
+beach-umbrella-stall-18,Beach Umbrella Stall #19,beach-umbrella-stall,360,7.4,3.33,1.69,2.39,beach-umbrella-stall/beach-umbrella-stall-18.glb
+beach-umbrella-stall-19,Beach Umbrella Stall #20,beach-umbrella-stall,152,4.2,1.95,2.26,2.66,beach-umbrella-stall/beach-umbrella-stall-19.glb
+beach-umbrella-stall-20,Beach Umbrella Stall #21,beach-umbrella-stall,300,8.2,2.04,2.04,2.59,beach-umbrella-stall/beach-umbrella-stall-20.glb
+beach-umbrella-stall-21,Beach Umbrella Stall #22,beach-umbrella-stall,408,8.0,2.51,2.51,2.75,beach-umbrella-stall/beach-umbrella-stall-21.glb
+beach-umbrella-stall-22,Beach Umbrella Stall #23,beach-umbrella-stall,332,7.0,3.6,2.08,2.53,beach-umbrella-stall/beach-umbrella-stall-22.glb
+beach-umbrella-stall-23,Beach Umbrella Stall #24,beach-umbrella-stall,152,4.2,2.72,3.14,2.64,beach-umbrella-stall/beach-umbrella-stall-23.glb
+beach-umbrella-stall-24,Beach Umbrella Stall #25,beach-umbrella-stall,280,7.7,2.58,2.58,2.65,beach-umbrella-stall/beach-umbrella-stall-24.glb
+beach-umbrella-stall-25,Beach Umbrella Stall #26,beach-umbrella-stall,408,8.1,2.32,2.32,2.8,beach-umbrella-stall/beach-umbrella-stall-25.glb
+beach-umbrella-stall-26,Beach Umbrella Stall #27,beach-umbrella-stall,332,7.0,3.78,2.24,2.73,beach-umbrella-stall/beach-umbrella-stall-26.glb
+beach-umbrella-stall-27,Beach Umbrella Stall #28,beach-umbrella-stall,152,4.3,2.2,2.54,2.46,beach-umbrella-stall/beach-umbrella-stall-27.glb
+beach-umbrella-stall-28,Beach Umbrella Stall #29,beach-umbrella-stall,300,8.1,2.19,2.19,2.71,beach-umbrella-stall/beach-umbrella-stall-28.glb
+beach-umbrella-stall-29,Beach Umbrella Stall #30,beach-umbrella-stall,408,8.1,2.89,2.89,2.89,beach-umbrella-stall/beach-umbrella-stall-29.glb
+beach-umbrella-stall-30,Beach Umbrella Stall #31,beach-umbrella-stall,360,7.6,3.01,1.73,2.53,beach-umbrella-stall/beach-umbrella-stall-30.glb
+beach-umbrella-stall-31,Beach Umbrella Stall #32,beach-umbrella-stall,152,4.2,2.18,2.52,2.78,beach-umbrella-stall/beach-umbrella-stall-31.glb
+beach-umbrella-stall-32,Beach Umbrella Stall #33,beach-umbrella-stall,240,6.5,2.89,2.89,2.62,beach-umbrella-stall/beach-umbrella-stall-32.glb
+beach-umbrella-stall-33,Beach Umbrella Stall #34,beach-umbrella-stall,336,7.0,2.73,2.73,2.88,beach-umbrella-stall/beach-umbrella-stall-33.glb
+beach-umbrella-stall-34,Beach Umbrella Stall #35,beach-umbrella-stall,360,7.5,3.27,2.13,2.51,beach-umbrella-stall/beach-umbrella-stall-34.glb
+beach-umbrella-stall-35,Beach Umbrella Stall #36,beach-umbrella-stall,152,4.3,2.45,2.82,2.63,beach-umbrella-stall/beach-umbrella-stall-35.glb
+beach-umbrella-stall-36,Beach Umbrella Stall #37,beach-umbrella-stall,300,8.1,2.81,2.81,2.62,beach-umbrella-stall/beach-umbrella-stall-36.glb
+beach-umbrella-stall-37,Beach Umbrella Stall #38,beach-umbrella-stall,264,5.8,2.09,2.09,2.56,beach-umbrella-stall/beach-umbrella-stall-37.glb
+beach-umbrella-stall-38,Beach Umbrella Stall #39,beach-umbrella-stall,360,7.4,3.19,1.76,2.65,beach-umbrella-stall/beach-umbrella-stall-38.glb
+beach-umbrella-stall-39,Beach Umbrella Stall #40,beach-umbrella-stall,152,4.2,2.48,2.86,2.83,beach-umbrella-stall/beach-umbrella-stall-39.glb
+beach-umbrella-stall-40,Beach Umbrella Stall #41,beach-umbrella-stall,260,7.0,2.13,2.13,2.56,beach-umbrella-stall/beach-umbrella-stall-40.glb
+beach-umbrella-stall-41,Beach Umbrella Stall #42,beach-umbrella-stall,336,7.0,2.04,2.04,2.7,beach-umbrella-stall/beach-umbrella-stall-41.glb
+beach-umbrella-stall-42,Beach Umbrella Stall #43,beach-umbrella-stall,360,7.4,3.97,2.36,2.64,beach-umbrella-stall/beach-umbrella-stall-42.glb
+beach-umbrella-stall-43,Beach Umbrella Stall #44,beach-umbrella-stall,152,4.2,2.7,3.12,2.59,beach-umbrella-stall/beach-umbrella-stall-43.glb
+beach-umbrella-stall-44,Beach Umbrella Stall #45,beach-umbrella-stall,280,7.6,2.9,2.9,2.84,beach-umbrella-stall/beach-umbrella-stall-44.glb
+beach-umbrella-stall-45,Beach Umbrella Stall #46,beach-umbrella-stall,336,7.0,2.3,2.3,2.68,beach-umbrella-stall/beach-umbrella-stall-45.glb
+beach-umbrella-stall-46,Beach Umbrella Stall #47,beach-umbrella-stall,332,7.1,3.31,1.67,2.68,beach-umbrella-stall/beach-umbrella-stall-46.glb
+beach-umbrella-stall-47,Beach Umbrella Stall #48,beach-umbrella-stall,124,3.9,2.34,2.71,2.79,beach-umbrella-stall/beach-umbrella-stall-47.glb
+beach-umbrella-stall-48,Beach Umbrella Stall #49,beach-umbrella-stall,240,6.6,2.14,2.14,2.44,beach-umbrella-stall/beach-umbrella-stall-48.glb
+beach-umbrella-stall-49,Beach Umbrella Stall #50,beach-umbrella-stall,336,6.9,2.14,2.14,2.55,beach-umbrella-stall/beach-umbrella-stall-49.glb
+wooden-crate-00,Wooden Crate #01,wooden-crate,148,4.0,0.5,0.33,0.3,wooden-crate/wooden-crate-00.glb
+wooden-crate-01,Wooden Crate #02,wooden-crate,146,4.4,0.49,0.43,0.34,wooden-crate/wooden-crate-01.glb
+wooden-crate-03,Wooden Crate #04,wooden-crate,264,7.8,0.52,0.31,0.23,wooden-crate/wooden-crate-03.glb
+wooden-crate-04,Wooden Crate #05,wooden-crate,172,4.4,0.48,0.45,0.29,wooden-crate/wooden-crate-04.glb
+wooden-crate-05,Wooden Crate #06,wooden-crate,122,4.0,0.48,0.36,0.32,wooden-crate/wooden-crate-05.glb
+wooden-crate-07,Wooden Crate #08,wooden-crate,264,7.8,0.65,0.34,0.25,wooden-crate/wooden-crate-07.glb
+wooden-crate-08,Wooden Crate #09,wooden-crate,228,6.4,0.49,0.38,0.36,wooden-crate/wooden-crate-08.glb
+wooden-crate-09,Wooden Crate #10,wooden-crate,122,4.0,0.56,0.42,0.39,wooden-crate/wooden-crate-09.glb
+wooden-crate-11,Wooden Crate #12,wooden-crate,244,7.2,0.62,0.34,0.23,wooden-crate/wooden-crate-11.glb
+wooden-crate-12,Wooden Crate #13,wooden-crate,172,4.4,0.46,0.39,0.28,wooden-crate/wooden-crate-12.glb
+wooden-crate-13,Wooden Crate #14,wooden-crate,122,4.0,0.52,0.4,0.38,wooden-crate/wooden-crate-13.glb
+wooden-crate-15,Wooden Crate #16,wooden-crate,224,6.7,0.7,0.38,0.26,wooden-crate/wooden-crate-15.glb
+wooden-crate-16,Wooden Crate #17,wooden-crate,232,6.2,0.51,0.44,0.34,wooden-crate/wooden-crate-16.glb
+wooden-crate-17,Wooden Crate #18,wooden-crate,146,4.3,0.63,0.33,0.38,wooden-crate/wooden-crate-17.glb
+wooden-crate-19,Wooden Crate #20,wooden-crate,264,7.8,0.7,0.33,0.22,wooden-crate/wooden-crate-19.glb
+wooden-crate-20,Wooden Crate #21,wooden-crate,232,6.2,0.42,0.46,0.37,wooden-crate/wooden-crate-20.glb
+wooden-crate-21,Wooden Crate #22,wooden-crate,122,4.0,0.5,0.37,0.3,wooden-crate/wooden-crate-21.glb
+wooden-crate-23,Wooden Crate #24,wooden-crate,264,7.8,0.51,0.32,0.21,wooden-crate/wooden-crate-23.glb
+wooden-crate-24,Wooden Crate #25,wooden-crate,172,4.4,0.48,0.39,0.38,wooden-crate/wooden-crate-24.glb
+wooden-crate-25,Wooden Crate #26,wooden-crate,122,4.0,0.48,0.36,0.43,wooden-crate/wooden-crate-25.glb
+wooden-crate-27,Wooden Crate #28,wooden-crate,264,7.8,0.63,0.37,0.22,wooden-crate/wooden-crate-27.glb
+wooden-crate-28,Wooden Crate #29,wooden-crate,208,5.8,0.54,0.37,0.38,wooden-crate/wooden-crate-28.glb
+wooden-crate-29,Wooden Crate #30,wooden-crate,134,4.2,0.53,0.33,0.36,wooden-crate/wooden-crate-29.glb
+wooden-crate-31,Wooden Crate #32,wooden-crate,204,6.1,0.56,0.36,0.26,wooden-crate/wooden-crate-31.glb
+wooden-crate-32,Wooden Crate #33,wooden-crate,148,4.1,0.54,0.44,0.32,wooden-crate/wooden-crate-32.glb
+wooden-crate-33,Wooden Crate #34,wooden-crate,134,4.2,0.53,0.4,0.41,wooden-crate/wooden-crate-33.glb
+wooden-crate-35,Wooden Crate #36,wooden-crate,244,7.2,0.6,0.36,0.26,wooden-crate/wooden-crate-35.glb
+wooden-crate-36,Wooden Crate #37,wooden-crate,248,7.0,0.49,0.37,0.32,wooden-crate/wooden-crate-36.glb
+wooden-crate-37,Wooden Crate #38,wooden-crate,146,4.3,0.55,0.4,0.33,wooden-crate/wooden-crate-37.glb
+wooden-crate-39,Wooden Crate #40,wooden-crate,224,6.7,0.65,0.42,0.23,wooden-crate/wooden-crate-39.glb
+wooden-crate-40,Wooden Crate #41,wooden-crate,248,7.0,0.45,0.38,0.32,wooden-crate/wooden-crate-40.glb
+wooden-crate-41,Wooden Crate #42,wooden-crate,134,4.2,0.6,0.34,0.32,wooden-crate/wooden-crate-41.glb
+wooden-crate-43,Wooden Crate #44,wooden-crate,224,6.7,0.65,0.41,0.18,wooden-crate/wooden-crate-43.glb
+wooden-crate-44,Wooden Crate #45,wooden-crate,248,7.0,0.42,0.36,0.3,wooden-crate/wooden-crate-44.glb
+wooden-crate-45,Wooden Crate #46,wooden-crate,134,4.2,0.49,0.33,0.33,wooden-crate/wooden-crate-45.glb
+wooden-crate-47,Wooden Crate #48,wooden-crate,224,6.7,0.57,0.44,0.21,wooden-crate/wooden-crate-47.glb
+wooden-crate-48,Wooden Crate #49,wooden-crate,148,4.0,0.55,0.39,0.4,wooden-crate/wooden-crate-48.glb
+wooden-crate-49,Wooden Crate #50,wooden-crate,122,4.0,0.63,0.46,0.42,wooden-crate/wooden-crate-49.glb
+woven-basket-00,Woven Basket #01,woven-basket,242,6.6,0.42,0.42,0.37,woven-basket/woven-basket-00.glb
+woven-basket-01,Woven Basket #02,woven-basket,190,6.8,0.77,0.77,0.23,woven-basket/woven-basket-01.glb
+woven-basket-02,Woven Basket #03,woven-basket,96,3.4,0.47,0.55,0.8,woven-basket/woven-basket-02.glb
+woven-basket-03,Woven Basket #04,woven-basket,158,4.8,0.56,0.35,0.38,woven-basket/woven-basket-03.glb
+woven-basket-04,Woven Basket #05,woven-basket,76,3.1,0.51,0.58,0.34,woven-basket/woven-basket-04.glb
+woven-basket-05,Woven Basket #06,woven-basket,234,6.8,0.55,0.55,0.54,woven-basket/woven-basket-05.glb
+woven-basket-06,Woven Basket #07,woven-basket,130,5.1,0.79,0.79,0.25,woven-basket/woven-basket-06.glb
+woven-basket-07,Woven Basket #08,woven-basket,76,3.1,0.35,0.4,0.53,woven-basket/woven-basket-07.glb
+woven-basket-08,Woven Basket #09,woven-basket,218,6.5,0.58,0.33,0.31,woven-basket/woven-basket-08.glb
+woven-basket-09,Woven Basket #10,woven-basket,162,4.4,0.53,0.53,0.37,woven-basket/woven-basket-09.glb
+woven-basket-10,Woven Basket #11,woven-basket,124,4.0,0.41,0.42,0.42,woven-basket/woven-basket-10.glb
+woven-basket-11,Woven Basket #12,woven-basket,150,5.7,0.71,0.71,0.22,woven-basket/woven-basket-11.glb
+woven-basket-12,Woven Basket #13,woven-basket,96,3.4,0.46,0.54,0.69,woven-basket/woven-basket-12.glb
+woven-basket-13,Woven Basket #14,woven-basket,238,7.1,0.57,0.33,0.41,woven-basket/woven-basket-13.glb
+woven-basket-14,Woven Basket #15,woven-basket,218,5.2,0.56,0.56,0.46,woven-basket/woven-basket-14.glb
+woven-basket-15,Woven Basket #16,woven-basket,184,5.7,0.45,0.46,0.42,woven-basket/woven-basket-15.glb
+woven-basket-16,Woven Basket #17,woven-basket,116,4.9,0.68,0.78,0.23,woven-basket/woven-basket-16.glb
+woven-basket-17,Woven Basket #18,woven-basket,162,4.4,0.52,0.52,0.75,woven-basket/woven-basket-17.glb
+woven-basket-18,Woven Basket #19,woven-basket,238,7.1,0.61,0.34,0.36,woven-basket/woven-basket-18.glb
+woven-basket-19,Woven Basket #20,woven-basket,156,4.4,0.47,0.54,0.45,woven-basket/woven-basket-19.glb
+woven-basket-20,Woven Basket #21,woven-basket,224,6.6,0.52,0.52,0.46,woven-basket/woven-basket-20.glb
+woven-basket-21,Woven Basket #22,woven-basket,50,2.7,0.85,0.85,0.12,woven-basket/woven-basket-21.glb
+woven-basket-22,Woven Basket #23,woven-basket,96,3.4,0.38,0.43,0.56,woven-basket/woven-basket-22.glb
+woven-basket-23,Woven Basket #24,woven-basket,158,4.8,0.56,0.4,0.3,woven-basket/woven-basket-23.glb
+woven-basket-24,Woven Basket #25,woven-basket,116,3.8,0.48,0.55,0.39,woven-basket/woven-basket-24.glb
+woven-basket-25,Woven Basket #26,woven-basket,224,6.4,0.51,0.51,0.53,woven-basket/woven-basket-25.glb
+woven-basket-26,Woven Basket #27,woven-basket,116,4.9,0.57,0.66,0.24,woven-basket/woven-basket-26.glb
+woven-basket-27,Woven Basket #28,woven-basket,134,3.9,0.52,0.52,0.63,woven-basket/woven-basket-27.glb
+woven-basket-28,Woven Basket #29,woven-basket,258,7.7,0.52,0.38,0.35,woven-basket/woven-basket-28.glb
+woven-basket-29,Woven Basket #30,woven-basket,218,5.2,0.51,0.51,0.42,woven-basket/woven-basket-29.glb
+woven-basket-30,Woven Basket #31,woven-basket,270,7.0,0.52,0.52,0.45,woven-basket/woven-basket-30.glb
+woven-basket-31,Woven Basket #32,woven-basket,130,5.1,0.83,0.83,0.2,woven-basket/woven-basket-31.glb
+woven-basket-32,Woven Basket #33,woven-basket,190,4.8,0.46,0.46,0.82,woven-basket/woven-basket-32.glb
+woven-basket-33,Woven Basket #34,woven-basket,158,4.8,0.53,0.31,0.38,woven-basket/woven-basket-33.glb
+woven-basket-34,Woven Basket #35,woven-basket,162,4.4,0.59,0.59,0.41,woven-basket/woven-basket-34.glb
+woven-basket-35,Woven Basket #36,woven-basket,290,7.6,0.5,0.5,0.48,woven-basket/woven-basket-35.glb
+woven-basket-36,Woven Basket #37,woven-basket,190,6.9,0.66,0.66,0.22,woven-basket/woven-basket-36.glb
+woven-basket-37,Woven Basket #38,woven-basket,134,3.9,0.52,0.52,0.74,woven-basket/woven-basket-37.glb
+woven-basket-38,Woven Basket #39,woven-basket,238,7.1,0.65,0.33,0.36,woven-basket/woven-basket-38.glb
+woven-basket-39,Woven Basket #40,woven-basket,106,3.5,0.56,0.56,0.32,woven-basket/woven-basket-39.glb
+woven-basket-40,Woven Basket #41,woven-basket,262,7.2,0.45,0.45,0.39,woven-basket/woven-basket-40.glb
+woven-basket-41,Woven Basket #42,woven-basket,170,6.2,0.75,0.75,0.28,woven-basket/woven-basket-41.glb
+woven-basket-42,Woven Basket #43,woven-basket,190,4.8,0.46,0.46,0.73,woven-basket/woven-basket-42.glb
+woven-basket-43,Woven Basket #44,woven-basket,218,6.5,0.5,0.38,0.37,woven-basket/woven-basket-43.glb
+woven-basket-44,Woven Basket #45,woven-basket,218,5.2,0.43,0.43,0.35,woven-basket/woven-basket-44.glb
+woven-basket-45,Woven Basket #46,woven-basket,182,4.8,0.39,0.39,0.34,woven-basket/woven-basket-45.glb
+woven-basket-46,Woven Basket #47,woven-basket,130,5.1,0.76,0.76,0.18,woven-basket/woven-basket-46.glb
+woven-basket-47,Woven Basket #48,woven-basket,78,3.1,0.42,0.42,0.66,woven-basket/woven-basket-47.glb
+woven-basket-48,Woven Basket #49,woven-basket,238,7.1,0.51,0.32,0.34,woven-basket/woven-basket-48.glb
+woven-basket-49,Woven Basket #50,woven-basket,156,4.4,0.51,0.59,0.49,woven-basket/woven-basket-49.glb
+produce-sack-00,Produce Sack #01,produce-sack,102,4.0,0.49,0.3,0.77,produce-sack/produce-sack-00.glb
+produce-sack-01,Produce Sack #02,produce-sack,106,4.2,0.53,0.34,0.64,produce-sack/produce-sack-01.glb
+produce-sack-02,Produce Sack #03,produce-sack,92,3.9,0.89,0.47,0.32,produce-sack/produce-sack-02.glb
+produce-sack-03,Produce Sack #04,produce-sack,126,4.9,0.87,0.31,0.68,produce-sack/produce-sack-03.glb
+produce-sack-04,Produce Sack #05,produce-sack,114,4.2,0.48,0.31,0.8,produce-sack/produce-sack-04.glb
+produce-sack-05,Produce Sack #06,produce-sack,130,4.5,0.55,0.39,0.7,produce-sack/produce-sack-05.glb
+produce-sack-06,Produce Sack #07,produce-sack,92,3.9,0.78,0.49,0.34,produce-sack/produce-sack-06.glb
+produce-sack-07,Produce Sack #08,produce-sack,126,4.9,0.88,0.32,0.67,produce-sack/produce-sack-07.glb
+produce-sack-08,Produce Sack #09,produce-sack,102,4.0,0.49,0.3,0.83,produce-sack/produce-sack-08.glb
+produce-sack-09,Produce Sack #10,produce-sack,150,4.8,0.47,0.3,0.81,produce-sack/produce-sack-09.glb
+produce-sack-10,Produce Sack #11,produce-sack,82,3.7,0.91,0.46,0.29,produce-sack/produce-sack-10.glb
+produce-sack-11,Produce Sack #12,produce-sack,126,4.9,0.92,0.36,0.76,produce-sack/produce-sack-11.glb
+produce-sack-12,Produce Sack #13,produce-sack,102,4.1,0.48,0.35,0.92,produce-sack/produce-sack-12.glb
+produce-sack-13,Produce Sack #14,produce-sack,126,4.4,0.47,0.3,0.92,produce-sack/produce-sack-13.glb
+produce-sack-14,Produce Sack #15,produce-sack,92,3.9,0.98,0.46,0.28,produce-sack/produce-sack-14.glb
+produce-sack-15,Produce Sack #16,produce-sack,126,4.9,0.92,0.35,0.82,produce-sack/produce-sack-15.glb
+produce-sack-16,Produce Sack #17,produce-sack,102,4.0,0.46,0.27,0.97,produce-sack/produce-sack-16.glb
+produce-sack-17,Produce Sack #18,produce-sack,106,4.2,0.45,0.32,0.7,produce-sack/produce-sack-17.glb
+produce-sack-18,Produce Sack #19,produce-sack,92,3.9,0.8,0.4,0.26,produce-sack/produce-sack-18.glb
+produce-sack-19,Produce Sack #20,produce-sack,126,4.9,0.91,0.32,0.8,produce-sack/produce-sack-19.glb
+produce-sack-20,Produce Sack #21,produce-sack,126,4.4,0.44,0.28,0.77,produce-sack/produce-sack-20.glb
+produce-sack-21,Produce Sack #22,produce-sack,150,4.9,0.52,0.34,0.76,produce-sack/produce-sack-21.glb
+produce-sack-22,Produce Sack #23,produce-sack,92,3.9,0.79,0.5,0.3,produce-sack/produce-sack-22.glb
+produce-sack-23,Produce Sack #24,produce-sack,126,4.9,0.85,0.32,0.84,produce-sack/produce-sack-23.glb
+produce-sack-24,Produce Sack #25,produce-sack,102,4.0,0.44,0.32,0.86,produce-sack/produce-sack-24.glb
+produce-sack-25,Produce Sack #26,produce-sack,130,4.5,0.51,0.34,0.75,produce-sack/produce-sack-25.glb
+produce-sack-26,Produce Sack #27,produce-sack,92,3.9,0.77,0.4,0.28,produce-sack/produce-sack-26.glb
+produce-sack-27,Produce Sack #28,produce-sack,126,4.9,0.82,0.3,0.8,produce-sack/produce-sack-27.glb
+produce-sack-28,Produce Sack #29,produce-sack,102,4.0,0.49,0.29,0.91,produce-sack/produce-sack-28.glb
+produce-sack-29,Produce Sack #30,produce-sack,150,4.8,0.43,0.3,0.95,produce-sack/produce-sack-29.glb
+produce-sack-30,Produce Sack #31,produce-sack,92,3.9,0.77,0.42,0.29,produce-sack/produce-sack-30.glb
+produce-sack-31,Produce Sack #32,produce-sack,126,4.9,0.93,0.32,0.72,produce-sack/produce-sack-31.glb
+produce-sack-32,Produce Sack #33,produce-sack,102,4.0,0.43,0.28,0.95,produce-sack/produce-sack-32.glb
+produce-sack-33,Produce Sack #34,produce-sack,138,4.6,0.48,0.34,0.93,produce-sack/produce-sack-33.glb
+produce-sack-34,Produce Sack #35,produce-sack,82,3.7,0.9,0.48,0.36,produce-sack/produce-sack-34.glb
+produce-sack-35,Produce Sack #36,produce-sack,126,4.9,0.93,0.33,0.83,produce-sack/produce-sack-35.glb
+produce-sack-36,Produce Sack #37,produce-sack,114,4.2,0.41,0.31,0.78,produce-sack/produce-sack-36.glb
+produce-sack-37,Produce Sack #38,produce-sack,106,4.2,0.48,0.34,0.79,produce-sack/produce-sack-37.glb
+produce-sack-38,Produce Sack #39,produce-sack,92,3.9,0.93,0.45,0.3,produce-sack/produce-sack-38.glb
+produce-sack-39,Produce Sack #40,produce-sack,126,4.9,0.95,0.34,0.77,produce-sack/produce-sack-39.glb
+produce-sack-40,Produce Sack #41,produce-sack,114,4.2,0.41,0.26,0.79,produce-sack/produce-sack-40.glb
+produce-sack-41,Produce Sack #42,produce-sack,118,4.3,0.47,0.3,0.72,produce-sack/produce-sack-41.glb
+produce-sack-42,Produce Sack #43,produce-sack,82,3.7,0.93,0.39,0.3,produce-sack/produce-sack-42.glb
+produce-sack-43,Produce Sack #44,produce-sack,126,4.9,0.85,0.3,0.87,produce-sack/produce-sack-43.glb
+produce-sack-44,Produce Sack #45,produce-sack,126,4.4,0.42,0.27,0.73,produce-sack/produce-sack-44.glb
+produce-sack-45,Produce Sack #46,produce-sack,118,4.3,0.45,0.3,0.73,produce-sack/produce-sack-45.glb
+produce-sack-46,Produce Sack #47,produce-sack,82,3.7,0.97,0.43,0.29,produce-sack/produce-sack-46.glb
+produce-sack-47,Produce Sack #48,produce-sack,126,4.9,0.85,0.32,0.82,produce-sack/produce-sack-47.glb
+produce-sack-48,Produce Sack #49,produce-sack,126,4.4,0.41,0.28,0.96,produce-sack/produce-sack-48.glb
+produce-sack-49,Produce Sack #50,produce-sack,150,4.8,0.52,0.31,0.77,produce-sack/produce-sack-49.glb
+weighing-scale-00,Weighing Scale #01,weighing-scale,150,4.5,0.32,0.32,0.36,weighing-scale/weighing-scale-00.glb
+weighing-scale-01,Weighing Scale #02,weighing-scale,194,5.0,0.63,0.22,0.47,weighing-scale/weighing-scale-01.glb
+weighing-scale-02,Weighing Scale #03,weighing-scale,66,3.0,0.49,0.45,0.09,weighing-scale/weighing-scale-02.glb
+weighing-scale-03,Weighing Scale #04,weighing-scale,164,4.5,0.71,0.61,1.19,weighing-scale/weighing-scale-03.glb
+weighing-scale-04,Weighing Scale #05,weighing-scale,150,4.5,0.37,0.37,0.37,weighing-scale/weighing-scale-04.glb
+weighing-scale-05,Weighing Scale #06,weighing-scale,214,5.3,0.66,0.22,0.47,weighing-scale/weighing-scale-05.glb
+weighing-scale-06,Weighing Scale #07,weighing-scale,150,4.5,0.39,0.36,0.76,weighing-scale/weighing-scale-06.glb
+weighing-scale-07,Weighing Scale #08,weighing-scale,164,4.5,0.91,0.79,1.14,weighing-scale/weighing-scale-07.glb
+weighing-scale-08,Weighing Scale #09,weighing-scale,150,4.5,0.32,0.32,0.42,weighing-scale/weighing-scale-08.glb
+weighing-scale-09,Weighing Scale #10,weighing-scale,194,5.0,0.74,0.22,0.41,weighing-scale/weighing-scale-09.glb
+weighing-scale-10,Weighing Scale #11,weighing-scale,66,3.0,0.37,0.45,0.09,weighing-scale/weighing-scale-10.glb
+weighing-scale-11,Weighing Scale #12,weighing-scale,164,4.5,0.89,0.77,0.99,weighing-scale/weighing-scale-11.glb
+weighing-scale-12,Weighing Scale #13,weighing-scale,230,6.9,0.35,0.35,0.51,weighing-scale/weighing-scale-12.glb
+weighing-scale-13,Weighing Scale #14,weighing-scale,174,4.7,0.71,0.22,0.42,weighing-scale/weighing-scale-13.glb
+weighing-scale-14,Weighing Scale #15,weighing-scale,66,3.1,0.38,0.43,0.09,weighing-scale/weighing-scale-14.glb
+weighing-scale-15,Weighing Scale #16,weighing-scale,164,4.5,0.72,0.63,1.18,weighing-scale/weighing-scale-15.glb
+weighing-scale-16,Weighing Scale #17,weighing-scale,230,6.8,0.32,0.32,0.52,weighing-scale/weighing-scale-16.glb
+weighing-scale-17,Weighing Scale #18,weighing-scale,214,5.3,0.75,0.22,0.41,weighing-scale/weighing-scale-17.glb
+weighing-scale-18,Weighing Scale #19,weighing-scale,150,4.5,0.38,0.39,0.49,weighing-scale/weighing-scale-18.glb
+weighing-scale-19,Weighing Scale #20,weighing-scale,164,4.5,0.89,0.77,1.23,weighing-scale/weighing-scale-19.glb
+weighing-scale-20,Weighing Scale #21,weighing-scale,230,6.9,0.31,0.31,0.47,weighing-scale/weighing-scale-20.glb
+weighing-scale-21,Weighing Scale #22,weighing-scale,174,4.7,0.74,0.22,0.42,weighing-scale/weighing-scale-21.glb
+weighing-scale-22,Weighing Scale #23,weighing-scale,94,3.4,0.44,0.4,0.19,weighing-scale/weighing-scale-22.glb
+weighing-scale-23,Weighing Scale #24,weighing-scale,164,4.5,0.67,0.58,1.13,weighing-scale/weighing-scale-23.glb
+weighing-scale-24,Weighing Scale #25,weighing-scale,150,4.5,0.38,0.38,0.37,weighing-scale/weighing-scale-24.glb
+weighing-scale-25,Weighing Scale #26,weighing-scale,214,5.3,0.69,0.22,0.45,weighing-scale/weighing-scale-25.glb
+weighing-scale-26,Weighing Scale #27,weighing-scale,150,4.5,0.43,0.45,0.7,weighing-scale/weighing-scale-26.glb
+weighing-scale-27,Weighing Scale #28,weighing-scale,164,4.5,0.91,0.79,1.02,weighing-scale/weighing-scale-27.glb
+weighing-scale-28,Weighing Scale #29,weighing-scale,190,5.7,0.36,0.36,0.48,weighing-scale/weighing-scale-28.glb
+weighing-scale-29,Weighing Scale #30,weighing-scale,194,5.0,0.68,0.22,0.38,weighing-scale/weighing-scale-29.glb
+weighing-scale-30,Weighing Scale #31,weighing-scale,122,4.1,0.47,0.42,0.7,weighing-scale/weighing-scale-30.glb
+weighing-scale-31,Weighing Scale #32,weighing-scale,164,4.5,0.91,0.79,0.96,weighing-scale/weighing-scale-31.glb
+weighing-scale-32,Weighing Scale #33,weighing-scale,210,6.2,0.34,0.34,0.53,weighing-scale/weighing-scale-32.glb
+weighing-scale-33,Weighing Scale #34,weighing-scale,214,5.3,0.69,0.22,0.43,weighing-scale/weighing-scale-33.glb
+weighing-scale-34,Weighing Scale #35,weighing-scale,122,4.1,0.41,0.42,0.64,weighing-scale/weighing-scale-34.glb
+weighing-scale-35,Weighing Scale #36,weighing-scale,164,4.5,0.81,0.7,1.05,weighing-scale/weighing-scale-35.glb
+weighing-scale-36,Weighing Scale #37,weighing-scale,230,6.9,0.36,0.36,0.48,weighing-scale/weighing-scale-36.glb
+weighing-scale-37,Weighing Scale #38,weighing-scale,174,4.7,0.77,0.22,0.44,weighing-scale/weighing-scale-37.glb
+weighing-scale-38,Weighing Scale #39,weighing-scale,94,3.4,0.43,0.4,0.19,weighing-scale/weighing-scale-38.glb
+weighing-scale-39,Weighing Scale #40,weighing-scale,164,4.5,0.72,0.62,1.21,weighing-scale/weighing-scale-39.glb
+weighing-scale-40,Weighing Scale #41,weighing-scale,150,4.5,0.37,0.37,0.36,weighing-scale/weighing-scale-40.glb
+weighing-scale-41,Weighing Scale #42,weighing-scale,174,4.7,0.72,0.22,0.49,weighing-scale/weighing-scale-41.glb
+weighing-scale-42,Weighing Scale #43,weighing-scale,94,3.4,0.48,0.43,0.19,weighing-scale/weighing-scale-42.glb
+weighing-scale-43,Weighing Scale #44,weighing-scale,164,4.5,0.81,0.7,1.01,weighing-scale/weighing-scale-43.glb
+weighing-scale-44,Weighing Scale #45,weighing-scale,230,6.9,0.34,0.34,0.5,weighing-scale/weighing-scale-44.glb
+weighing-scale-45,Weighing Scale #46,weighing-scale,194,5.0,0.73,0.22,0.42,weighing-scale/weighing-scale-45.glb
+weighing-scale-46,Weighing Scale #47,weighing-scale,150,4.5,0.5,0.38,0.55,weighing-scale/weighing-scale-46.glb
+weighing-scale-47,Weighing Scale #48,weighing-scale,164,4.5,0.69,0.6,1.17,weighing-scale/weighing-scale-47.glb
+weighing-scale-48,Weighing Scale #49,weighing-scale,150,4.4,0.39,0.39,0.36,weighing-scale/weighing-scale-48.glb
+weighing-scale-49,Weighing Scale #50,weighing-scale,214,5.3,0.66,0.22,0.48,weighing-scale/weighing-scale-49.glb
+display-table-00,Display Table #01,display-table,248,7.5,1.21,0.82,1.0,display-table/display-table-00.glb
+display-table-01,Display Table #02,display-table,180,6.6,1.34,0.8,0.68,display-table/display-table-01.glb
+display-table-02,Display Table #03,display-table,108,3.8,1.67,0.85,0.91,display-table/display-table-02.glb
+display-table-03,Display Table #04,display-table,368,9.1,2.78,2.24,2.34,display-table/display-table-03.glb
+display-table-04,Display Table #05,display-table,484,14.7,1.01,0.73,0.98,display-table/display-table-04.glb
+display-table-05,Display Table #06,display-table,220,7.8,1.02,0.59,0.68,display-table/display-table-05.glb
+display-table-06,Display Table #07,display-table,120,3.9,1.55,0.88,0.99,display-table/display-table-06.glb
+display-table-07,Display Table #08,display-table,128,4.4,1.23,0.6,0.61,display-table/display-table-07.glb
+display-table-08,Display Table #09,display-table,364,10.9,1.43,0.68,0.92,display-table/display-table-08.glb
+display-table-09,Display Table #10,display-table,440,13.7,1.1,0.64,1.0,display-table/display-table-09.glb
+display-table-10,Display Table #11,display-table,120,3.9,1.75,0.77,1.04,display-table/display-table-10.glb
+display-table-11,Display Table #12,display-table,268,6.7,2.7,2.16,2.35,display-table/display-table-11.glb
+display-table-12,Display Table #13,display-table,368,11.0,1.06,0.59,1.1,display-table/display-table-12.glb
+display-table-13,Display Table #14,display-table,180,6.7,1.17,0.52,0.64,display-table/display-table-13.glb
+display-table-14,Display Table #15,display-table,108,3.8,1.35,0.8,0.94,display-table/display-table-14.glb
+display-table-15,Display Table #16,display-table,436,10.6,2.71,2.22,2.39,display-table/display-table-15.glb
+display-table-16,Display Table #17,display-table,244,7.6,1.44,0.7,0.96,display-table/display-table-16.glb
+display-table-17,Display Table #18,display-table,180,6.5,1.41,0.79,0.68,display-table/display-table-17.glb
+display-table-18,Display Table #19,display-table,120,3.9,1.38,0.67,0.93,display-table/display-table-18.glb
+display-table-19,Display Table #20,display-table,196,6.0,1.34,0.68,0.7,display-table/display-table-19.glb
+display-table-20,Display Table #21,display-table,404,12.1,1.32,0.56,1.03,display-table/display-table-20.glb
+display-table-21,Display Table #22,display-table,180,6.5,1.61,0.53,0.64,display-table/display-table-21.glb
+display-table-22,Display Table #23,display-table,120,3.9,1.28,0.74,0.93,display-table/display-table-22.glb
+display-table-23,Display Table #24,display-table,308,7.7,2.22,1.88,2.25,display-table/display-table-23.glb
+display-table-24,Display Table #25,display-table,304,9.0,1.69,0.66,0.94,display-table/display-table-24.glb
+display-table-25,Display Table #26,display-table,180,6.6,1.27,0.52,0.58,display-table/display-table-25.glb
+display-table-26,Display Table #27,display-table,144,4.4,1.4,0.67,0.91,display-table/display-table-26.glb
+display-table-27,Display Table #28,display-table,260,6.7,2.77,2.19,2.38,display-table/display-table-27.glb
+display-table-28,Display Table #29,display-table,264,7.9,1.71,0.64,1.0,display-table/display-table-28.glb
+display-table-29,Display Table #30,display-table,140,5.6,1.03,0.55,0.59,display-table/display-table-29.glb
+display-table-30,Display Table #31,display-table,120,4.0,1.03,0.64,1.07,display-table/display-table-30.glb
+display-table-31,Display Table #32,display-table,168,5.5,1.39,0.52,0.6,display-table/display-table-31.glb
+display-table-32,Display Table #33,display-table,344,10.2,1.47,0.59,0.96,display-table/display-table-32.glb
+display-table-33,Display Table #34,display-table,480,14.0,1.58,0.59,0.91,display-table/display-table-33.glb
+display-table-34,Display Table #35,display-table,120,3.9,1.68,0.62,0.96,display-table/display-table-34.glb
+display-table-35,Display Table #36,display-table,416,10.1,2.47,2.02,2.27,display-table/display-table-35.glb
+display-table-36,Display Table #37,display-table,508,14.8,1.15,0.77,1.08,display-table/display-table-36.glb
+display-table-37,Display Table #38,display-table,310,10.1,1.3,0.64,0.7,display-table/display-table-37.glb
+display-table-38,Display Table #39,display-table,144,4.3,1.76,0.65,1.01,display-table/display-table-38.glb
+display-table-39,Display Table #40,display-table,284,8.1,1.14,0.67,0.62,display-table/display-table-39.glb
+display-table-40,Display Table #41,display-table,528,15.3,1.16,0.65,0.98,display-table/display-table-40.glb
+display-table-41,Display Table #42,display-table,400,12.6,1.1,0.59,0.87,display-table/display-table-41.glb
+display-table-42,Display Table #43,display-table,132,4.2,1.23,0.83,0.98,display-table/display-table-42.glb
+display-table-43,Display Table #44,display-table,304,8.5,1.38,0.68,0.62,display-table/display-table-43.glb
+display-table-44,Display Table #45,display-table,264,8.2,1.35,0.67,0.95,display-table/display-table-44.glb
+display-table-45,Display Table #46,display-table,140,5.4,1.39,0.68,0.65,display-table/display-table-45.glb
+display-table-46,Display Table #47,display-table,132,4.2,1.34,0.87,0.97,display-table/display-table-46.glb
+display-table-47,Display Table #48,display-table,168,5.5,1.35,0.8,0.66,display-table/display-table-47.glb
+display-table-48,Display Table #49,display-table,404,11.9,1.49,0.57,0.98,display-table/display-table-48.glb
+display-table-49,Display Table #50,display-table,390,12.4,1.08,0.73,0.86,display-table/display-table-49.glb
+chop-bar-bench-00,Chop-bar Bench #01,chop-bar-bench,116,3.9,1.31,0.36,0.43,chop-bar-bench/chop-bar-bench-00.glb
+chop-bar-bench-01,Chop-bar Bench #02,chop-bar-bench,50,2.7,1.38,0.32,0.45,chop-bar-bench/chop-bar-bench-01.glb
+chop-bar-bench-02,Chop-bar Bench #03,chop-bar-bench,148,4.0,1.8,1.54,0.78,chop-bar-bench/chop-bar-bench-02.glb
+chop-bar-bench-03,Chop-bar Bench #04,chop-bar-bench,88,3.0,2.05,0.35,0.81,chop-bar-bench/chop-bar-bench-03.glb
+chop-bar-bench-04,Chop-bar Bench #05,chop-bar-bench,128,4.0,1.61,0.42,0.43,chop-bar-bench/chop-bar-bench-04.glb
+chop-bar-bench-05,Chop-bar Bench #06,chop-bar-bench,32,2.3,1.81,0.36,0.4,chop-bar-bench/chop-bar-bench-05.glb
+chop-bar-bench-06,Chop-bar Bench #07,chop-bar-bench,216,5.1,1.31,1.58,0.85,chop-bar-bench/chop-bar-bench-06.glb
+chop-bar-bench-07,Chop-bar Bench #08,chop-bar-bench,88,3.0,2.06,0.32,0.82,chop-bar-bench/chop-bar-bench-07.glb
+chop-bar-bench-08,Chop-bar Bench #09,chop-bar-bench,128,4.0,1.75,0.42,0.45,chop-bar-bench/chop-bar-bench-08.glb
+chop-bar-bench-09,Chop-bar Bench #10,chop-bar-bench,32,2.3,1.68,0.34,0.41,chop-bar-bench/chop-bar-bench-09.glb
+chop-bar-bench-10,Chop-bar Bench #11,chop-bar-bench,204,4.8,1.64,1.51,0.81,chop-bar-bench/chop-bar-bench-10.glb
+chop-bar-bench-11,Chop-bar Bench #12,chop-bar-bench,112,3.4,1.83,0.28,0.84,chop-bar-bench/chop-bar-bench-11.glb
+chop-bar-bench-12,Chop-bar Bench #13,chop-bar-bench,116,3.9,1.62,0.41,0.44,chop-bar-bench/chop-bar-bench-12.glb
+chop-bar-bench-13,Chop-bar Bench #14,chop-bar-bench,32,2.3,1.4,0.34,0.45,chop-bar-bench/chop-bar-bench-13.glb
+chop-bar-bench-14,Chop-bar Bench #15,chop-bar-bench,160,4.2,2.08,1.43,0.77,chop-bar-bench/chop-bar-bench-14.glb
+chop-bar-bench-15,Chop-bar Bench #16,chop-bar-bench,124,3.6,1.22,0.34,0.82,chop-bar-bench/chop-bar-bench-15.glb
+chop-bar-bench-16,Chop-bar Bench #17,chop-bar-bench,128,4.1,1.23,0.35,0.45,chop-bar-bench/chop-bar-bench-16.glb
+chop-bar-bench-17,Chop-bar Bench #18,chop-bar-bench,32,2.3,2.12,0.29,0.43,chop-bar-bench/chop-bar-bench-17.glb
+chop-bar-bench-18,Chop-bar Bench #19,chop-bar-bench,188,4.7,1.29,1.43,0.83,chop-bar-bench/chop-bar-bench-18.glb
+chop-bar-bench-19,Chop-bar Bench #20,chop-bar-bench,112,3.4,1.44,0.3,0.8,chop-bar-bench/chop-bar-bench-19.glb
+chop-bar-bench-20,Chop-bar Bench #21,chop-bar-bench,128,4.2,1.89,0.37,0.45,chop-bar-bench/chop-bar-bench-20.glb
+chop-bar-bench-21,Chop-bar Bench #22,chop-bar-bench,32,2.3,1.45,0.33,0.4,chop-bar-bench/chop-bar-bench-21.glb
+chop-bar-bench-22,Chop-bar Bench #23,chop-bar-bench,216,5.0,1.89,1.34,0.83,chop-bar-bench/chop-bar-bench-22.glb
+chop-bar-bench-23,Chop-bar Bench #24,chop-bar-bench,64,2.8,1.68,0.27,0.86,chop-bar-bench/chop-bar-bench-23.glb
+chop-bar-bench-24,Chop-bar Bench #25,chop-bar-bench,128,4.1,1.5,0.4,0.42,chop-bar-bench/chop-bar-bench-24.glb
+chop-bar-bench-25,Chop-bar Bench #26,chop-bar-bench,32,2.3,1.51,0.33,0.42,chop-bar-bench/chop-bar-bench-25.glb
+chop-bar-bench-26,Chop-bar Bench #27,chop-bar-bench,232,5.2,1.62,1.48,0.82,chop-bar-bench/chop-bar-bench-26.glb
+chop-bar-bench-27,Chop-bar Bench #28,chop-bar-bench,76,2.9,1.32,0.34,0.83,chop-bar-bench/chop-bar-bench-27.glb
+chop-bar-bench-28,Chop-bar Bench #29,chop-bar-bench,116,3.8,1.88,0.45,0.42,chop-bar-bench/chop-bar-bench-28.glb
+chop-bar-bench-29,Chop-bar Bench #30,chop-bar-bench,32,2.3,1.56,0.35,0.44,chop-bar-bench/chop-bar-bench-29.glb
+chop-bar-bench-30,Chop-bar Bench #31,chop-bar-bench,148,4.0,2.01,1.36,0.77,chop-bar-bench/chop-bar-bench-30.glb
+chop-bar-bench-31,Chop-bar Bench #32,chop-bar-bench,76,2.9,1.86,0.32,0.86,chop-bar-bench/chop-bar-bench-31.glb
+chop-bar-bench-32,Chop-bar Bench #33,chop-bar-bench,128,4.0,1.81,0.38,0.43,chop-bar-bench/chop-bar-bench-32.glb
+chop-bar-bench-33,Chop-bar Bench #34,chop-bar-bench,50,2.7,1.52,0.32,0.42,chop-bar-bench/chop-bar-bench-33.glb
+chop-bar-bench-34,Chop-bar Bench #35,chop-bar-bench,176,4.4,1.95,1.5,0.83,chop-bar-bench/chop-bar-bench-34.glb
+chop-bar-bench-35,Chop-bar Bench #36,chop-bar-bench,112,3.5,1.3,0.36,0.84,chop-bar-bench/chop-bar-bench-35.glb
+chop-bar-bench-36,Chop-bar Bench #37,chop-bar-bench,128,4.0,1.78,0.36,0.43,chop-bar-bench/chop-bar-bench-36.glb
+chop-bar-bench-37,Chop-bar Bench #38,chop-bar-bench,50,2.6,1.27,0.32,0.45,chop-bar-bench/chop-bar-bench-37.glb
+chop-bar-bench-38,Chop-bar Bench #39,chop-bar-bench,244,5.5,1.52,1.37,0.82,chop-bar-bench/chop-bar-bench-38.glb
+chop-bar-bench-39,Chop-bar Bench #40,chop-bar-bench,76,2.9,1.23,0.29,0.82,chop-bar-bench/chop-bar-bench-39.glb
+chop-bar-bench-40,Chop-bar Bench #41,chop-bar-bench,116,3.9,1.5,0.38,0.45,chop-bar-bench/chop-bar-bench-40.glb
+chop-bar-bench-41,Chop-bar Bench #42,chop-bar-bench,50,2.7,1.44,0.32,0.43,chop-bar-bench/chop-bar-bench-41.glb
+chop-bar-bench-42,Chop-bar Bench #43,chop-bar-bench,244,5.4,1.7,1.39,0.81,chop-bar-bench/chop-bar-bench-42.glb
+chop-bar-bench-43,Chop-bar Bench #44,chop-bar-bench,88,3.1,1.41,0.36,0.86,chop-bar-bench/chop-bar-bench-43.glb
+chop-bar-bench-44,Chop-bar Bench #45,chop-bar-bench,116,3.8,1.78,0.39,0.41,chop-bar-bench/chop-bar-bench-44.glb
+chop-bar-bench-45,Chop-bar Bench #46,chop-bar-bench,50,2.7,1.87,0.34,0.41,chop-bar-bench/chop-bar-bench-45.glb
+chop-bar-bench-46,Chop-bar Bench #47,chop-bar-bench,232,5.2,1.67,1.48,0.81,chop-bar-bench/chop-bar-bench-46.glb
+chop-bar-bench-47,Chop-bar Bench #48,chop-bar-bench,136,3.7,1.97,0.34,0.84,chop-bar-bench/chop-bar-bench-47.glb
+chop-bar-bench-48,Chop-bar Bench #49,chop-bar-bench,116,3.9,1.42,0.41,0.43,chop-bar-bench/chop-bar-bench-48.glb
+chop-bar-bench-49,Chop-bar Bench #50,chop-bar-bench,32,2.3,1.45,0.36,0.43,chop-bar-bench/chop-bar-bench-49.glb
+vendor-tray-00,Vendor Tray #01,vendor-tray,170,6.2,0.6,0.6,0.24,vendor-tray/vendor-tray-00.glb
+vendor-tray-01,Vendor Tray #02,vendor-tray,194,6.3,0.5,0.41,0.21,vendor-tray/vendor-tray-01.glb
+vendor-tray-02,Vendor Tray #03,vendor-tray,146,3.8,0.51,0.37,0.1,vendor-tray/vendor-tray-02.glb
+vendor-tray-03,Vendor Tray #04,vendor-tray,228,6.9,0.66,0.46,0.72,vendor-tray/vendor-tray-03.glb
+vendor-tray-04,Vendor Tray #05,vendor-tray,122,4.0,0.63,0.63,0.19,vendor-tray/vendor-tray-04.glb
+vendor-tray-05,Vendor Tray #06,vendor-tray,134,4.6,0.56,0.34,0.24,vendor-tray/vendor-tray-05.glb
+vendor-tray-06,Vendor Tray #07,vendor-tray,146,3.8,0.6,0.42,0.09,vendor-tray/vendor-tray-06.glb
+vendor-tray-07,Vendor Tray #08,vendor-tray,168,5.2,0.63,0.4,0.81,vendor-tray/vendor-tray-07.glb
+vendor-tray-08,Vendor Tray #09,vendor-tray,150,5.7,0.73,0.73,0.23,vendor-tray/vendor-tray-08.glb
+vendor-tray-09,Vendor Tray #10,vendor-tray,154,5.1,0.57,0.33,0.25,vendor-tray/vendor-tray-09.glb
+vendor-tray-10,Vendor Tray #11,vendor-tray,158,4.0,0.62,0.42,0.07,vendor-tray/vendor-tray-10.glb
+vendor-tray-11,Vendor Tray #12,vendor-tray,208,6.3,0.61,0.41,0.79,vendor-tray/vendor-tray-11.glb
+vendor-tray-12,Vendor Tray #13,vendor-tray,122,4.0,0.67,0.67,0.17,vendor-tray/vendor-tray-12.glb
+vendor-tray-13,Vendor Tray #14,vendor-tray,134,4.6,0.54,0.37,0.25,vendor-tray/vendor-tray-13.glb
+vendor-tray-14,Vendor Tray #15,vendor-tray,146,3.8,0.59,0.39,0.07,vendor-tray/vendor-tray-14.glb
+vendor-tray-15,Vendor Tray #16,vendor-tray,208,6.4,0.58,0.44,0.77,vendor-tray/vendor-tray-15.glb
+vendor-tray-16,Vendor Tray #17,vendor-tray,170,6.2,0.65,0.65,0.22,vendor-tray/vendor-tray-16.glb
+vendor-tray-17,Vendor Tray #18,vendor-tray,154,5.1,0.55,0.34,0.19,vendor-tray/vendor-tray-17.glb
+vendor-tray-18,Vendor Tray #19,vendor-tray,134,3.7,0.63,0.37,0.1,vendor-tray/vendor-tray-18.glb
+vendor-tray-19,Vendor Tray #20,vendor-tray,168,5.2,0.53,0.46,0.72,vendor-tray/vendor-tray-19.glb
+vendor-tray-20,Vendor Tray #21,vendor-tray,134,4.1,0.63,0.63,0.19,vendor-tray/vendor-tray-20.glb
+vendor-tray-21,Vendor Tray #22,vendor-tray,154,5.1,0.54,0.39,0.22,vendor-tray/vendor-tray-21.glb
+vendor-tray-22,Vendor Tray #23,vendor-tray,158,4.0,0.63,0.39,0.08,vendor-tray/vendor-tray-22.glb
+vendor-tray-23,Vendor Tray #24,vendor-tray,188,5.7,0.62,0.45,0.78,vendor-tray/vendor-tray-23.glb
+vendor-tray-24,Vendor Tray #25,vendor-tray,130,5.1,0.75,0.75,0.22,vendor-tray/vendor-tray-24.glb
+vendor-tray-25,Vendor Tray #26,vendor-tray,194,6.3,0.5,0.39,0.19,vendor-tray/vendor-tray-25.glb
+vendor-tray-26,Vendor Tray #27,vendor-tray,194,4.5,0.51,0.39,0.08,vendor-tray/vendor-tray-26.glb
+vendor-tray-27,Vendor Tray #28,vendor-tray,168,5.2,0.64,0.42,0.78,vendor-tray/vendor-tray-27.glb
+vendor-tray-28,Vendor Tray #29,vendor-tray,150,5.7,0.61,0.61,0.23,vendor-tray/vendor-tray-28.glb
+vendor-tray-29,Vendor Tray #30,vendor-tray,154,5.1,0.51,0.38,0.25,vendor-tray/vendor-tray-29.glb
+vendor-tray-30,Vendor Tray #31,vendor-tray,122,3.5,0.6,0.45,0.06,vendor-tray/vendor-tray-30.glb
+vendor-tray-31,Vendor Tray #32,vendor-tray,188,5.7,0.69,0.48,0.79,vendor-tray/vendor-tray-31.glb
+vendor-tray-32,Vendor Tray #33,vendor-tray,110,3.7,0.7,0.7,0.18,vendor-tray/vendor-tray-32.glb
+vendor-tray-33,Vendor Tray #34,vendor-tray,194,6.3,0.55,0.32,0.21,vendor-tray/vendor-tray-33.glb
+vendor-tray-34,Vendor Tray #35,vendor-tray,206,4.7,0.66,0.37,0.08,vendor-tray/vendor-tray-34.glb
+vendor-tray-35,Vendor Tray #36,vendor-tray,228,6.9,0.5,0.43,0.87,vendor-tray/vendor-tray-35.glb
+vendor-tray-36,Vendor Tray #37,vendor-tray,130,5.1,0.61,0.61,0.21,vendor-tray/vendor-tray-36.glb
+vendor-tray-37,Vendor Tray #38,vendor-tray,194,6.3,0.57,0.37,0.26,vendor-tray/vendor-tray-37.glb
+vendor-tray-38,Vendor Tray #39,vendor-tray,134,3.7,0.52,0.43,0.09,vendor-tray/vendor-tray-38.glb
+vendor-tray-39,Vendor Tray #40,vendor-tray,208,6.3,0.6,0.47,0.86,vendor-tray/vendor-tray-39.glb
+vendor-tray-40,Vendor Tray #41,vendor-tray,98,3.6,0.77,0.77,0.16,vendor-tray/vendor-tray-40.glb
+vendor-tray-41,Vendor Tray #42,vendor-tray,174,5.8,0.58,0.38,0.18,vendor-tray/vendor-tray-41.glb
+vendor-tray-42,Vendor Tray #43,vendor-tray,158,4.0,0.55,0.39,0.09,vendor-tray/vendor-tray-42.glb
+vendor-tray-43,Vendor Tray #44,vendor-tray,208,6.3,0.59,0.42,0.92,vendor-tray/vendor-tray-43.glb
+vendor-tray-44,Vendor Tray #45,vendor-tray,150,5.7,0.74,0.74,0.25,vendor-tray/vendor-tray-44.glb
+vendor-tray-45,Vendor Tray #46,vendor-tray,154,5.1,0.52,0.41,0.23,vendor-tray/vendor-tray-45.glb
+vendor-tray-46,Vendor Tray #47,vendor-tray,134,3.7,0.62,0.38,0.1,vendor-tray/vendor-tray-46.glb
+vendor-tray-47,Vendor Tray #48,vendor-tray,168,5.2,0.61,0.42,0.72,vendor-tray/vendor-tray-47.glb
+vendor-tray-48,Vendor Tray #49,vendor-tray,122,4.0,0.67,0.67,0.18,vendor-tray/vendor-tray-48.glb
+vendor-tray-49,Vendor Tray #50,vendor-tray,174,5.8,0.49,0.35,0.23,vendor-tray/vendor-tray-49.glb
+wooden-crate-02,Wooden Crate #03,wooden-crate,316,6.4,0.42,0.42,0.67,wooden-crate/wooden-crate-02.glb
+wooden-crate-06,Wooden Crate #07,wooden-crate,360,7.2,0.51,0.41,0.79,wooden-crate/wooden-crate-06.glb
+wooden-crate-10,Wooden Crate #11,wooden-crate,348,7.1,0.42,0.34,0.6,wooden-crate/wooden-crate-10.glb
+wooden-crate-14,Wooden Crate #15,wooden-crate,348,7.1,0.47,0.41,0.69,wooden-crate/wooden-crate-14.glb
+wooden-crate-18,Wooden Crate #19,wooden-crate,348,7.1,0.53,0.41,0.65,wooden-crate/wooden-crate-18.glb
+wooden-crate-22,Wooden Crate #23,wooden-crate,304,6.3,0.48,0.43,0.76,wooden-crate/wooden-crate-22.glb
+wooden-crate-26,Wooden Crate #27,wooden-crate,304,6.3,0.4,0.36,0.71,wooden-crate/wooden-crate-26.glb
+wooden-crate-30,Wooden Crate #31,wooden-crate,360,7.2,0.46,0.39,0.79,wooden-crate/wooden-crate-30.glb
+wooden-crate-34,Wooden Crate #35,wooden-crate,360,7.2,0.56,0.45,0.56,wooden-crate/wooden-crate-34.glb
+wooden-crate-38,Wooden Crate #39,wooden-crate,304,6.3,0.5,0.32,0.72,wooden-crate/wooden-crate-38.glb
+wooden-crate-42,Wooden Crate #43,wooden-crate,348,7.0,0.42,0.45,0.71,wooden-crate/wooden-crate-42.glb
+wooden-crate-46,Wooden Crate #47,wooden-crate,360,7.2,0.58,0.32,0.66,wooden-crate/wooden-crate-46.glb
