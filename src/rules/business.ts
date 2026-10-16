@@ -516,6 +516,71 @@ export interface QuestProgress {
   readonly earnedToward: number;
 }
 
+
+
+// ── layout edit (player-owned) ───────────────────────────────────────────────
+
+export interface LayoutEditResult {
+  readonly ok: boolean;
+  readonly layout: readonly FurniturePlacement[];
+  readonly reason?: string;
+}
+
+function cellTaken(layout: readonly FurniturePlacement[], tx: number, tz: number, exceptId?: string): boolean {
+  return layout.some((p) => p.tx === tx && p.tz === tz && p.id !== exceptId);
+}
+
+/** True when tile is strictly inside the plot (margin 1 tile from each edge). */
+export function isValidFurnitureTile(
+  plotTiles: { w: number; d: number },
+  tx: number,
+  tz: number,
+): boolean {
+  const w = Math.max(3, Math.floor(plotTiles.w));
+  const d = Math.max(3, Math.floor(plotTiles.d));
+  return tx >= 1 && tz >= 1 && tx <= w - 2 && tz <= d - 2;
+}
+
+export function moveFurniture(
+  layout: readonly FurniturePlacement[],
+  placementId: string,
+  tx: number,
+  tz: number,
+  plotTiles: { w: number; d: number },
+): LayoutEditResult {
+  const item = layout.find((p) => p.id === placementId);
+  if (!item) return { ok: false, layout, reason: 'Unknown placement.' };
+  if (!isValidFurnitureTile(plotTiles, tx, tz)) {
+    return { ok: false, layout, reason: 'Outside the room or through a wall.' };
+  }
+  if (cellTaken(layout, tx, tz, placementId)) {
+    return { ok: false, layout, reason: 'Tile occupied.' };
+  }
+  const next = layout.map((p) => (p.id === placementId ? { ...p, tx, tz } : p));
+  return { ok: true, layout: next };
+}
+
+export function rotateFurniture(
+  layout: readonly FurniturePlacement[],
+  placementId: string,
+  rot: 0 | 90 | 180 | 270,
+): LayoutEditResult {
+  const item = layout.find((p) => p.id === placementId);
+  if (!item) return { ok: false, layout, reason: 'Unknown placement.' };
+  const next = layout.map((p) => (p.id === placementId ? { ...p, rot } : p));
+  return { ok: true, layout: next };
+}
+
+export function removeFurniture(
+  layout: readonly FurniturePlacement[],
+  placementId: string,
+): LayoutEditResult {
+  if (!layout.some((p) => p.id === placementId)) {
+    return { ok: false, layout, reason: 'Unknown placement.' };
+  }
+  return { ok: true, layout: layout.filter((p) => p.id !== placementId) };
+}
+
 export function createChapter1Quest(): QuestProgress {
   return {
     chapter: 1,
