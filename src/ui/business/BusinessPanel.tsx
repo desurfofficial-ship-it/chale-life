@@ -10,6 +10,7 @@ import {
   selectBusiness,
   subscribeBusiness,
   businessJobsFor,
+  requestSetStaffOnShift,
 } from '../../store/businessStore';
 import { getAmbientHour } from '../../store/ambientClock';
 import { getState, subscribe as subscribeGame, buyBusinessItem } from '../../store/gameStore';
@@ -168,6 +169,43 @@ export function BusinessPanel() {
           <div style={{ marginTop: 10, fontSize: 11, color: '#888' }}>
             Day revenue (owner) GHS {sim.dayRevenueGHS.toFixed(0)} · Staff on shift{' '}
             {sim.staff.filter((s) => s.onShift).length}/{sim.staff.length}
+          </div>
+          <div style={{ marginTop: 10 }} data-testid="business-staff-list">
+            <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 6 }}>Staff roster</div>
+            <p style={{ fontSize: 12, color: '#6b7280', margin: '0 0 8px' }}>
+              Hours {def.openHour}:00–{def.closeHour}:00 (world schedule). Toggle staff on shift.
+            </p>
+            {sim.staff.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                data-testid={`staff-toggle-${s.id}`}
+                onClick={() => requestSetStaffOnShift(id, s.id, !s.onShift)}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  width: '100%',
+                  minHeight: 44,
+                  marginBottom: 6,
+                  padding: '8px 10px',
+                  borderRadius: 10,
+                  border: '1px solid rgba(0,0,0,0.1)',
+                  background: s.onShift ? '#e8f5e9' : '#f5f5f5',
+                  color: '#222',
+                  fontSize: 13,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                <span>
+                  <strong>{s.name}</strong> · {s.role}
+                </span>
+                <span style={{ fontWeight: 700, color: s.onShift ? '#0d7a45' : '#6b7280' }}>
+                  {s.onShift ? 'On shift' : 'Off'}
+                </span>
+              </button>
+            ))}
           </div>
         ) : null}
       </div>
