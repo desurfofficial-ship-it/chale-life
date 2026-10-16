@@ -8,7 +8,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useThree, type ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
-import { FLOOR_HEIGHT_M, TINT_HEX, WALL_HEIGHT_M, type OfficeDef } from '../../data/offices';
+import { FLOOR_HEIGHT_M, OFFICES, TINT_HEX, WALL_HEIGHT_M, type OfficeDef } from '../../data/offices';
 import { carHeightM, doorOpen01 } from '../../rules/lift';
 import { CORE_W, findRoom, isOpen, type FloorLayout, type LaidRoom } from '../../rules/office';
 import { registerAmbient, isReducedMotion } from '../../engine/ambient';
@@ -24,13 +24,36 @@ import {
 } from '../../store/officeStore';
 import { markAnimated, unmarkAnimated } from '../../components/world/SceneBatcher';
 import { signTexture } from '../../lib/mapTextures';
-import { furnitureFor, roomSeats, type Part } from './officeFurniture';
-import { SHARED, SHIRTS, SKINS, VISITOR_SHIRTS, hashIndex, pillTexture, tileGridTexture } from './officeVisuals';
+import { furnitureFor, roomSeats, visitorSpots, type Part } from './officeFurniture';
+import { OfficeModels } from './OfficeModels';
+import {
+  OFFICE_TAG_ASPECT,
+  SHARED,
+  SHIRTS,
+  SKINS,
+  VISITOR_SHIRTS,
+  hashIndex,
+  officeTagTexture,
+  pillTexture,
+  tileGridTexture,
+} from './officeVisuals';
 
 /** Zoom at/above which a nearby office opens into its cutaway. */
 export const DETAIL_ZOOM = 20;
 /** View-centre distance (m) within which the cutaway can open. */
 export const DETAIL_RADIUS_M = 45;
+/** On-screen width (CSS px) of the floating office tag: 176 px street-level, 110 px in city overview. */
+export const OFFICE_TAG_PX = 176;
+export function officeTagPx(zoom: number): number {
+  const t = Math.min(1, Math.max(0, (zoom - 4) / 16));
+  return 110 + (OFFICE_TAG_PX - 110) * t;
+}
+
+/** Tags of offices < 30 m apart stack upward instead of overlapping. */
+function tagStackLevel(def: OfficeDef): number {
+  const i = OFFICES.findIndex((o) => o.id === def.id);
+  return OFFICES.slice(0, Math.max(0, i)).filter((o) => Math.hypot(o.site.x - def.site.x, o.site.z - def.site.z) < 30).length;
+}
 const WALK_MPS = 1.4;
 const MAX_VISITORS = 10;
 
@@ -51,11 +74,20 @@ export function OfficeBuilding({ def }: { def: OfficeDef }) {
     return () => unmarkAnimated(r);
   }, []);
 
-  // detail switch — cheap 4 Hz check of camera view-centre + zoom
+  // detail switch — cheap 4 Hz check of camera view-centre + zoom; the
+  // floating tag keeps a constant on-screen size (ortho: px = m × zoom)
+  const tag = useRef<THREE.Sprite>(null);
   useEffect(() => {
     let acc = 0;
+    let lastZoom = -1;
     const dir = new THREE.Vector3();
     return registerAmbient((dt) => {
+      const z = getZoom();
+      if (z !== lastZoom && tag.current) {
+        lastZoom = z;
+        const wM = officeTagPx(z) / Math.max(1e-3, z);
+        tag.current.scale.set(wM, wM / OFFICE_TAG_ASPECT, 1);
+      }
       acc += dt;
       if (acc < 0.25) return;
       acc = 0;
@@ -82,6 +114,7 @@ export function OfficeBuilding({ def }: { def: OfficeDef }) {
       rotation={[0, def.site.yaw, 0]}
       userData={{ bldg: 'office', officeId: def.id }}
     >
+      <OfficeTag def={def} spriteRef={tag} visible={!open} onTap={onShellTap} />
       {!open ? (
         <Shell def={def} onTap={onShellTap} />
       ) : (
@@ -136,10 +169,102 @@ function Shell({ def, onTap }: { def: OfficeDef; onTap: (e: ThreeEvent<MouseEven
       <mesh geometry={SHARED.box} position={[0, h + 0.15, 0]} scale={[w + 0.4, 0.3, d + 0.4]} castShadow>
         <meshStandardMaterial color={def.facade.roof} roughness={0.8} />
       </mesh>
-      <mesh geometry={SHARED.plane} position={[0, 1.05, d / 2 + 0.08]} scale={[Math.min(w - 1, 6), 1.1, 1]}>
-        <meshStandardMaterial map={sign} emissive="#ffffff" emissiveMap={sign} emissiveIntensity={0.5} />
+      <Entrance def={def} lit={lit} />
+      {/* company sign: big, above the entrance canopy */}
+      <mesh geometry={SHARED.plane} position={[0, 3.4, d / 2 + 0.09]} scale={[Math.min(w - 0.6, 7.5), 1.3, 1]}>
+        <meshStandardMaterial map={sign} emissive="#ffffff" emissiveMap={sign} emissiveIntensity={0.55} />
+      </mesh>
+      {/* rooftop sign, readable from across the district */}
+      <mesh geometry={SHARED.plane} position={[0, h + 1.15, d / 2 - 0.4]} scale={[Math.min(w - 1, 8), 1.5, 1]}>
+        <meshStandardMaterial map={sign} emissive="#ffffff" emissiveMap={sign} emissiveIntensity={0.55} />
       </mesh>
     </group>
+  );
+}
+
+/**
+ * O-002 — reads-as-office entrance: glass double door, a brand-coloured
+ * canopy on two posts, a plinth step and a sign rail. One instanced box
+ * batch (per-instance colour) + the emissive door = 2 draw calls.
+ */
+function Entrance({ def, lit }: { def: OfficeDef; lit: number }) {
+  const { d } = def.site;
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const boxes = useMemo(() => {
+    const f = d / 2;
+    const accent = def.facade.signBg;
+    return [
+      { p: [0, 0.06, f + 0.75], s: [3.6, 0.12, 1.5], c: '#d8d2c4' }, // plinth / step
+      { p: [0, 2.68, f + 0.75], s: [3.4, 0.16, 1.6], c: accent }, // canopy slab
+      { p: [0, 2.58, f + 1.52], s: [3.4, 0.08, 0.06], c: '#f4f1ea' }, // canopy fascia
+      { p: [-1.55, 1.3, f + 1.4], s: [0.09, 2.6, 0.09], c: '#d9d9de' }, // post
+      { p: [1.55, 1.3, f + 1.4], s: [0.09, 2.6, 0.09], c: '#d9d9de' }, // post
+      { p: [0, 2.36, f + 0.1], s: [2.2, 0.12, 0.1], c: '#e9e9f0' }, // door head
+      { p: [-1.1, 1.18, f + 0.1], s: [0.12, 2.36, 0.1], c: '#e9e9f0' }, // jamb
+      { p: [1.1, 1.18, f + 0.1], s: [0.12, 2.36, 0.1], c: '#e9e9f0' }, // jamb
+      { p: [0, 1.18, f + 0.13], s: [0.05, 2.3, 0.04], c: '#c9c9cf' }, // door mullion
+    ] as const;
+  }, [d, def.facade.signBg]);
+  useLayoutEffect(() => {
+    const m = ref.current;
+    if (!m) return;
+    const o = new THREE.Object3D();
+    const c = new THREE.Color();
+    boxes.forEach((b, i) => {
+      o.position.set(b.p[0], b.p[1], b.p[2]);
+      o.scale.set(b.s[0], b.s[1], b.s[2]);
+      o.updateMatrix();
+      m.setMatrixAt(i, o.matrix);
+      m.setColorAt(i, c.set(b.c));
+    });
+    m.instanceMatrix.needsUpdate = true;
+    if (m.instanceColor) m.instanceColor.needsUpdate = true;
+  }, [boxes]);
+  return (
+    <>
+      <instancedMesh ref={ref} args={[SHARED.box, undefined, boxes.length]} castShadow>
+        <meshStandardMaterial color="#ffffff" roughness={0.6} />
+      </instancedMesh>
+      {/* glass doors */}
+      <mesh geometry={SHARED.box} position={[0, 1.18, d / 2 + 0.08]} scale={[2.1, 2.3, 0.06]}>
+        <meshStandardMaterial color="#2a3a48" emissive="#ffd98f" emissiveIntensity={lit ? 0.8 : 0.05} metalness={0.5} roughness={0.15} />
+      </mesh>
+    </>
+  );
+}
+
+/** O-002 — floating "OFFICE" pin above the building, constant screen size. */
+function OfficeTag({
+  def,
+  spriteRef,
+  visible,
+  onTap,
+}: {
+  def: OfficeDef;
+  spriteRef: React.RefObject<THREE.Sprite | null>;
+  visible: boolean;
+  onTap: (e: ThreeEvent<MouseEvent>) => void;
+}) {
+  const h = def.floors.length * FLOOR_HEIGHT_M + 0.4;
+  const tex = useMemo(
+    () => officeTagTexture(def.name, def.facade.signBg, def.ownership === 'employer' ? 'OFFICE · HIRING' : 'OFFICE'),
+    [def.name, def.facade.signBg, def.ownership],
+  );
+  const w0 = officeTagPx(getZoom()) / Math.max(1e-3, getZoom());
+  const level = useMemo(() => tagStackLevel(def), [def]);
+  return (
+    <sprite
+      ref={spriteRef}
+      name={`office-tag-${def.id}`}
+      position={[0, h + 3.2, 0]}
+      center={[0.5, -1.12 * level]}
+      scale={[w0, w0 / OFFICE_TAG_ASPECT, 1]}
+      renderOrder={20}
+      visible={visible}
+      onClick={onTap}
+    >
+      <spriteMaterial map={tex} transparent depthTest={false} depthWrite={false} fog={false} toneMapped={false} />
+    </sprite>
   );
 }
 
@@ -181,7 +306,7 @@ function FloorCutaway({
         <meshStandardMaterial color={TINT_HEX.grey} roughness={0.95} />
       </mesh>
       <Walls def={def} layout={layout} />
-      <Furniture layout={layout} />
+      <Furniture layout={layout} officeId={def.id} />
       {layout.rooms.map((r) => (
         <sprite key={`pill-${r.spec.id}`} position={[r.x, WALL_HEIGHT_M + 1.0, r.z - r.d / 2 + 0.6]} scale={[1.9, 0.48, 1]}>
           <spriteMaterial map={pillTexture(r.spec.label)} depthWrite={false} transparent />
@@ -273,14 +398,17 @@ function Walls({ def, layout }: { def: OfficeDef; layout: FloorLayout }) {
   );
 }
 
-function Furniture({ layout }: { layout: FloorLayout }) {
-  const parts = useMemo(() => layout.rooms.flatMap((r) => furnitureFor(r)), [layout]);
+function Furniture({ layout, officeId }: { layout: FloorLayout; officeId: string }) {
+  const rooms = useMemo(() => layout.rooms.map((r) => furnitureFor(r, officeId)), [layout, officeId]);
+  const parts = useMemo(() => rooms.flatMap((f) => f.parts), [rooms]);
+  const models = useMemo(() => rooms.flatMap((f) => f.models), [rooms]);
   const solid = useMemo(() => parts.filter((p) => !p.glow), [parts]);
   const glow = useMemo(() => parts.filter((p) => p.glow), [parts]);
   return (
     <>
       <PartBatch parts={solid} />
       <PartBatch parts={glow} emissive />
+      <OfficeModels models={models} fallback={(boxes) => <PartBatch parts={boxes} />} />
     </>
   );
 }
@@ -458,6 +586,7 @@ function People({ def, layouts, viewFloor }: { def: OfficeDef; layouts: FloorLay
         let tz = w.z;
         let ty = baseY;
         let sitting = false;
+        let seatYaw = Math.PI;
         let visible = false;
         let snap = false;
         if (i < n) {
@@ -479,10 +608,11 @@ function People({ def, layouts, viewFloor }: { def: OfficeDef; layouts: FloorLay
           } else if (s.roomId) {
             const room = findRoom(layouts, s.roomId);
             if (room && room.floor === viewFloor) {
-              const seats = roomSeats(room);
+              const seats = roomSeats(room, def.id);
               const seat = seats[s.seat % seats.length];
               tx = seat.x;
               tz = seat.z;
+              seatYaw = seat.yaw;
               sitting = s.activity === 'working' || s.activity === 'planning' || s.activity === 'meeting';
               visible = true;
             }
@@ -495,11 +625,11 @@ function People({ def, layouts, viewFloor }: { def: OfficeDef; layouts: FloorLay
               layouts[0].rooms.find((r) => r.spec.kind === 'hall') ??
               layouts[0].rooms.find((r) => r.spec.kind === 'counter' || r.spec.kind === 'lobby');
             if (room) {
-              const seats = roomSeats(room);
-              const s = seats[vi % seats.length];
-              tx = s.x + (vi >= seats.length ? 0.3 : 0);
-              tz = s.z + (vi >= seats.length ? 0.4 : 0);
-              sitting = room.spec.kind === 'hall' && vi < seats.length;
+              const spots = visitorSpots(room, def.id);
+              const s = spots[vi % spots.length];
+              tx = s.x + (vi >= spots.length ? 0.3 : 0);
+              tz = s.z + (vi >= spots.length ? 0.4 : 0);
+              sitting = room.spec.kind === 'hall' && vi < spots.length;
               visible = true;
             }
           }
@@ -531,7 +661,7 @@ function People({ def, layouts, viewFloor }: { def: OfficeDef; layouts: FloorLay
           w.yaw = Math.atan2(dx, dz);
           w.phase += dt * 7;
         } else if (sitting) {
-          w.yaw = Math.PI; // face the desk (−z)
+          w.yaw = seatYaw; // face the desk / table the chair points at
         }
         w.y = ty;
         const swing = moving && !reduced ? Math.sin(w.phase) * 0.38 : 0;
