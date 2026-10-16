@@ -4,7 +4,7 @@
  * on the ambient step (no new useFrame).
  */
 import { useEffect } from 'react';
-import { BUSINESSES } from '../../data/businesses';
+import { BUSINESSES } from '../../data/worldBusinesses';
 import { registerAmbient } from '../../engine/ambient';
 import { tickBusinesses } from '../../store/businessStore';
 import { getState } from '../../store/gameStore';
