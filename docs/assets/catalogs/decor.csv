@@ -1,0 +1,501 @@
+id,name,archetype,tris,kb_meshopt,w_m,d_m,h_m,file
+wall-clock-00,Wall Clock #01,wall-clock,148,4.1,0.34,0.07,0.34,wall-clock/wall-clock-00.glb
+wall-clock-01,Wall Clock #02,wall-clock,146,4.2,0.34,0.07,0.34,wall-clock/wall-clock-01.glb
+wall-clock-02,Wall Clock #03,wall-clock,180,4.7,0.53,0.1,1.04,wall-clock/wall-clock-02.glb
+wall-clock-03,Wall Clock #04,wall-clock,220,5.4,0.48,0.06,0.5,wall-clock/wall-clock-03.glb
+wall-clock-04,Wall Clock #05,wall-clock,110,3.5,0.51,0.08,0.63,wall-clock/wall-clock-04.glb
+wall-clock-05,Wall Clock #06,wall-clock,160,4.3,0.41,0.06,0.41,wall-clock/wall-clock-05.glb
+wall-clock-06,Wall Clock #07,wall-clock,256,6.1,0.33,0.17,0.34,wall-clock/wall-clock-06.glb
+wall-clock-07,Wall Clock #08,wall-clock,168,4.5,0.36,0.11,0.76,wall-clock/wall-clock-07.glb
+wall-clock-08,Wall Clock #09,wall-clock,280,6.2,0.62,0.06,0.65,wall-clock/wall-clock-08.glb
+wall-clock-09,Wall Clock #10,wall-clock,170,4.5,0.43,0.09,0.45,wall-clock/wall-clock-09.glb
+wall-clock-10,Wall Clock #11,wall-clock,100,3.4,0.46,0.07,0.46,wall-clock/wall-clock-10.glb
+wall-clock-11,Wall Clock #12,wall-clock,244,5.7,0.49,0.24,0.51,wall-clock/wall-clock-11.glb
+wall-clock-12,Wall Clock #13,wall-clock,168,4.6,0.56,0.11,1.06,wall-clock/wall-clock-12.glb
+wall-clock-13,Wall Clock #14,wall-clock,268,6.1,0.53,0.06,0.5,wall-clock/wall-clock-13.glb
+wall-clock-14,Wall Clock #15,wall-clock,122,3.7,0.38,0.1,0.49,wall-clock/wall-clock-14.glb
+wall-clock-15,Wall Clock #16,wall-clock,160,4.2,0.51,0.06,0.51,wall-clock/wall-clock-15.glb
+wall-clock-16,Wall Clock #17,wall-clock,146,4.1,0.44,0.05,0.44,wall-clock/wall-clock-16.glb
+wall-clock-17,Wall Clock #18,wall-clock,216,5.1,0.54,0.09,1.2,wall-clock/wall-clock-17.glb
+wall-clock-18,Wall Clock #19,wall-clock,280,6.3,0.49,0.07,0.47,wall-clock/wall-clock-18.glb
+wall-clock-19,Wall Clock #20,wall-clock,170,4.4,0.35,0.09,0.39,wall-clock/wall-clock-19.glb
+wall-clock-20,Wall Clock #21,wall-clock,100,3.4,0.4,0.07,0.4,wall-clock/wall-clock-20.glb
+wall-clock-21,Wall Clock #22,wall-clock,144,4.2,0.26,0.17,0.32,wall-clock/wall-clock-21.glb
+wall-clock-22,Wall Clock #23,wall-clock,168,4.5,0.51,0.1,1.01,wall-clock/wall-clock-22.glb
+wall-clock-23,Wall Clock #24,wall-clock,208,5.0,0.75,0.08,0.75,wall-clock/wall-clock-23.glb
+wall-clock-24,Wall Clock #25,wall-clock,122,3.7,0.44,0.09,0.44,wall-clock/wall-clock-24.glb
+wall-clock-25,Wall Clock #26,wall-clock,256,5.9,0.39,0.06,0.39,wall-clock/wall-clock-25.glb
+wall-clock-26,Wall Clock #27,wall-clock,112,3.7,0.37,0.19,0.38,wall-clock/wall-clock-26.glb
+wall-clock-27,Wall Clock #28,wall-clock,216,5.1,0.42,0.1,0.94,wall-clock/wall-clock-27.glb
+wall-clock-28,Wall Clock #29,wall-clock,244,5.4,0.51,0.06,0.51,wall-clock/wall-clock-28.glb
+wall-clock-29,Wall Clock #30,wall-clock,158,4.2,0.55,0.1,0.51,wall-clock/wall-clock-29.glb
+wall-clock-30,Wall Clock #31,wall-clock,112,3.6,0.41,0.07,0.41,wall-clock/wall-clock-30.glb
+wall-clock-31,Wall Clock #32,wall-clock,160,4.4,0.47,0.24,0.48,wall-clock/wall-clock-31.glb
+wall-clock-32,Wall Clock #33,wall-clock,228,5.4,0.5,0.1,0.94,wall-clock/wall-clock-32.glb
+wall-clock-33,Wall Clock #34,wall-clock,232,5.5,0.59,0.07,0.57,wall-clock/wall-clock-33.glb
+wall-clock-34,Wall Clock #35,wall-clock,122,3.7,0.37,0.1,0.43,wall-clock/wall-clock-34.glb
+wall-clock-35,Wall Clock #36,wall-clock,148,4.1,0.45,0.06,0.45,wall-clock/wall-clock-35.glb
+wall-clock-36,Wall Clock #37,wall-clock,84,3.3,0.31,0.21,0.39,wall-clock/wall-clock-36.glb
+wall-clock-37,Wall Clock #38,wall-clock,180,4.8,0.46,0.1,0.83,wall-clock/wall-clock-37.glb
+wall-clock-38,Wall Clock #39,wall-clock,280,6.3,0.46,0.06,0.48,wall-clock/wall-clock-38.glb
+wall-clock-39,Wall Clock #40,wall-clock,254,5.7,0.49,0.1,0.53,wall-clock/wall-clock-39.glb
+wall-clock-40,Wall Clock #41,wall-clock,112,3.6,0.46,0.07,0.46,wall-clock/wall-clock-40.glb
+wall-clock-41,Wall Clock #42,wall-clock,242,5.7,0.32,0.05,0.32,wall-clock/wall-clock-41.glb
+wall-clock-42,Wall Clock #43,wall-clock,216,5.2,0.48,0.11,0.88,wall-clock/wall-clock-42.glb
+wall-clock-43,Wall Clock #44,wall-clock,256,5.9,0.42,0.07,0.42,wall-clock/wall-clock-43.glb
+wall-clock-44,Wall Clock #45,wall-clock,158,4.2,0.5,0.1,0.52,wall-clock/wall-clock-44.glb
+wall-clock-45,Wall Clock #46,wall-clock,244,5.6,0.45,0.08,0.45,wall-clock/wall-clock-45.glb
+wall-clock-46,Wall Clock #47,wall-clock,148,4.3,0.3,0.15,0.31,wall-clock/wall-clock-46.glb
+wall-clock-47,Wall Clock #48,wall-clock,216,5.1,0.53,0.09,1.18,wall-clock/wall-clock-47.glb
+wall-clock-48,Wall Clock #49,wall-clock,244,5.5,0.62,0.08,0.62,wall-clock/wall-clock-48.glb
+wall-clock-49,Wall Clock #50,wall-clock,254,5.7,0.55,0.1,0.53,wall-clock/wall-clock-49.glb
+picture-frame-00,Picture Frame #01,picture-frame,206,4.0,0.89,0.03,0.4,picture-frame/picture-frame-00.glb
+picture-frame-01,Picture Frame #02,picture-frame,74,2.6,0.58,0.03,0.58,picture-frame/picture-frame-01.glb
+picture-frame-02,Picture Frame #03,picture-frame,62,2.6,0.89,0.03,0.58,picture-frame/picture-frame-02.glb
+picture-frame-03,Picture Frame #04,picture-frame,68,2.7,0.31,0.04,0.66,picture-frame/picture-frame-03.glb
+picture-frame-04,Picture Frame #05,picture-frame,70,2.6,0.51,0.03,0.51,picture-frame/picture-frame-04.glb
+picture-frame-05,Picture Frame #06,picture-frame,208,4.1,0.89,0.03,0.43,picture-frame/picture-frame-05.glb
+picture-frame-06,Picture Frame #07,picture-frame,70,2.6,0.59,0.04,0.59,picture-frame/picture-frame-06.glb
+picture-frame-07,Picture Frame #08,picture-frame,62,2.6,0.49,0.04,0.6,picture-frame/picture-frame-07.glb
+picture-frame-08,Picture Frame #09,picture-frame,68,2.6,0.35,0.03,0.35,picture-frame/picture-frame-08.glb
+picture-frame-09,Picture Frame #10,picture-frame,72,2.7,0.38,0.03,0.72,picture-frame/picture-frame-09.glb
+picture-frame-10,Picture Frame #11,picture-frame,68,2.6,0.7,0.03,0.49,picture-frame/picture-frame-10.glb
+picture-frame-11,Picture Frame #12,picture-frame,206,4.1,0.81,0.03,0.55,picture-frame/picture-frame-11.glb
+picture-frame-12,Picture Frame #13,picture-frame,196,4.1,0.86,0.03,0.36,picture-frame/picture-frame-12.glb
+picture-frame-13,Picture Frame #14,picture-frame,66,2.6,0.44,0.04,0.44,picture-frame/picture-frame-13.glb
+picture-frame-14,Picture Frame #15,picture-frame,72,2.7,0.39,0.04,0.49,picture-frame/picture-frame-14.glb
+picture-frame-15,Picture Frame #16,picture-frame,68,2.6,0.77,0.03,0.6,picture-frame/picture-frame-15.glb
+picture-frame-16,Picture Frame #17,picture-frame,208,4.1,0.97,0.03,0.54,picture-frame/picture-frame-16.glb
+picture-frame-17,Picture Frame #18,picture-frame,68,2.6,0.55,0.04,0.49,picture-frame/picture-frame-17.glb
+picture-frame-18,Picture Frame #19,picture-frame,68,2.6,0.45,0.03,0.45,picture-frame/picture-frame-18.glb
+picture-frame-19,Picture Frame #20,picture-frame,72,2.7,0.39,0.04,0.49,picture-frame/picture-frame-19.glb
+picture-frame-20,Picture Frame #21,picture-frame,66,2.6,0.43,0.04,0.43,picture-frame/picture-frame-20.glb
+picture-frame-21,Picture Frame #22,picture-frame,68,2.7,0.41,0.04,0.71,picture-frame/picture-frame-21.glb
+picture-frame-22,Picture Frame #23,picture-frame,194,4.1,0.81,0.04,0.41,picture-frame/picture-frame-22.glb
+picture-frame-23,Picture Frame #24,picture-frame,68,2.6,0.58,0.03,0.58,picture-frame/picture-frame-23.glb
+picture-frame-24,Picture Frame #25,picture-frame,68,2.6,0.74,0.03,0.58,picture-frame/picture-frame-24.glb
+picture-frame-25,Picture Frame #26,picture-frame,68,2.6,0.36,0.04,0.47,picture-frame/picture-frame-25.glb
+picture-frame-26,Picture Frame #27,picture-frame,220,4.2,0.82,0.04,0.44,picture-frame/picture-frame-26.glb
+picture-frame-27,Picture Frame #28,picture-frame,202,4.1,0.96,0.03,0.39,picture-frame/picture-frame-27.glb
+picture-frame-28,Picture Frame #29,picture-frame,68,2.6,0.43,0.03,0.6,picture-frame/picture-frame-28.glb
+picture-frame-29,Picture Frame #30,picture-frame,72,2.7,0.55,0.04,0.58,picture-frame/picture-frame-29.glb
+picture-frame-30,Picture Frame #31,picture-frame,68,2.6,0.4,0.03,0.66,picture-frame/picture-frame-30.glb
+picture-frame-31,Picture Frame #32,picture-frame,228,4.2,0.95,0.03,0.37,picture-frame/picture-frame-31.glb
+picture-frame-32,Picture Frame #33,picture-frame,188,4.0,0.95,0.03,0.38,picture-frame/picture-frame-32.glb
+picture-frame-33,Picture Frame #34,picture-frame,68,2.6,0.46,0.03,0.46,picture-frame/picture-frame-33.glb
+picture-frame-34,Picture Frame #35,picture-frame,68,2.6,0.79,0.03,0.4,picture-frame/picture-frame-34.glb
+picture-frame-35,Picture Frame #36,picture-frame,68,2.6,0.83,0.04,0.38,picture-frame/picture-frame-35.glb
+picture-frame-36,Picture Frame #37,picture-frame,214,4.1,0.96,0.03,0.37,picture-frame/picture-frame-36.glb
+picture-frame-37,Picture Frame #38,picture-frame,66,2.6,0.33,0.03,0.33,picture-frame/picture-frame-37.glb
+picture-frame-38,Picture Frame #39,picture-frame,66,2.6,0.42,0.04,0.49,picture-frame/picture-frame-38.glb
+picture-frame-39,Picture Frame #40,picture-frame,220,4.3,0.78,0.03,0.37,picture-frame/picture-frame-39.glb
+picture-frame-40,Picture Frame #41,picture-frame,68,2.6,0.53,0.04,0.53,picture-frame/picture-frame-40.glb
+picture-frame-41,Picture Frame #42,picture-frame,72,2.6,0.84,0.04,0.51,picture-frame/picture-frame-41.glb
+picture-frame-42,Picture Frame #43,picture-frame,192,4.1,0.86,0.04,0.42,picture-frame/picture-frame-42.glb
+picture-frame-43,Picture Frame #44,picture-frame,68,2.6,0.3,0.04,0.3,picture-frame/picture-frame-43.glb
+picture-frame-44,Picture Frame #45,picture-frame,70,2.7,0.36,0.03,0.49,picture-frame/picture-frame-44.glb
+picture-frame-45,Picture Frame #46,picture-frame,68,2.6,0.32,0.03,0.64,picture-frame/picture-frame-45.glb
+picture-frame-46,Picture Frame #47,picture-frame,216,4.2,0.95,0.03,0.46,picture-frame/picture-frame-46.glb
+picture-frame-47,Picture Frame #48,picture-frame,194,4.1,0.93,0.03,0.45,picture-frame/picture-frame-47.glb
+picture-frame-48,Picture Frame #49,picture-frame,66,2.6,0.44,0.04,0.74,picture-frame/picture-frame-48.glb
+picture-frame-49,Picture Frame #50,picture-frame,76,2.7,0.35,0.03,0.69,picture-frame/picture-frame-49.glb
+vase-00,Vase #01,vase,132,4.2,0.32,0.27,0.59,vase/vase-00.glb
+vase-01,Vase #02,vase,116,3.9,0.28,0.24,0.81,vase/vase-01.glb
+vase-02,Vase #03,vase,68,3.0,0.26,0.23,0.22,vase/vase-02.glb
+vase-03,Vase #04,vase,76,3.0,0.16,0.16,0.34,vase/vase-03.glb
+vase-04,Vase #05,vase,102,3.6,0.2,0.2,0.43,vase/vase-04.glb
+vase-05,Vase #06,vase,162,4.5,0.21,0.2,0.37,vase/vase-05.glb
+vase-06,Vase #07,vase,84,3.3,0.16,0.14,0.35,vase/vase-06.glb
+vase-07,Vase #08,vase,92,3.4,0.22,0.22,0.16,vase/vase-07.glb
+vase-08,Vase #09,vase,120,3.8,0.18,0.1,0.63,vase/vase-08.glb
+vase-09,Vase #10,vase,102,3.6,0.23,0.23,0.5,vase/vase-09.glb
+vase-10,Vase #11,vase,162,4.5,0.32,0.31,0.53,vase/vase-10.glb
+vase-11,Vase #12,vase,114,3.7,0.28,0.28,0.58,vase/vase-11.glb
+vase-12,Vase #13,vase,68,3.1,0.56,0.49,0.35,vase/vase-12.glb
+vase-13,Vase #14,vase,56,2.7,0.27,0.24,0.47,vase/vase-13.glb
+vase-14,Vase #15,vase,76,3.2,0.24,0.21,0.55,vase/vase-14.glb
+vase-15,Vase #16,vase,162,4.6,0.25,0.24,0.6,vase/vase-15.glb
+vase-16,Vase #17,vase,146,4.2,0.2,0.2,0.64,vase/vase-16.glb
+vase-17,Vase #18,vase,68,3.0,0.27,0.23,0.18,vase/vase-17.glb
+vase-18,Vase #19,vase,108,3.5,0.15,0.14,0.56,vase/vase-18.glb
+vase-19,Vase #20,vase,76,3.3,0.27,0.23,0.53,vase/vase-19.glb
+vase-20,Vase #21,vase,132,4.1,0.26,0.22,0.5,vase/vase-20.glb
+vase-21,Vase #22,vase,242,5.8,0.28,0.28,0.89,vase/vase-21.glb
+vase-22,Vase #23,vase,92,3.4,0.23,0.23,0.18,vase/vase-22.glb
+vase-23,Vase #24,vase,76,3.0,0.31,0.31,0.57,vase/vase-23.glb
+vase-24,Vase #25,vase,102,3.6,0.19,0.19,0.29,vase/vase-24.glb
+vase-25,Vase #26,vase,162,4.6,0.22,0.21,0.4,vase/vase-25.glb
+vase-26,Vase #27,vase,146,4.2,0.23,0.23,0.59,vase/vase-26.glb
+vase-27,Vase #28,vase,92,3.4,0.33,0.33,0.27,vase/vase-27.glb
+vase-28,Vase #29,vase,152,4.3,0.3,0.26,0.93,vase/vase-28.glb
+vase-29,Vase #30,vase,76,3.2,0.24,0.21,0.48,vase/vase-29.glb
+vase-30,Vase #31,vase,132,4.1,0.25,0.21,0.45,vase/vase-30.glb
+vase-31,Vase #32,vase,178,4.7,0.34,0.34,0.91,vase/vase-31.glb
+vase-32,Vase #33,vase,92,3.4,0.39,0.39,0.32,vase/vase-32.glb
+vase-33,Vase #34,vase,172,4.6,0.19,0.17,0.64,vase/vase-33.glb
+vase-34,Vase #35,vase,102,3.7,0.3,0.3,0.54,vase/vase-34.glb
+vase-35,Vase #36,vase,162,4.6,0.29,0.28,0.43,vase/vase-35.glb
+vase-36,Vase #37,vase,210,5.3,0.29,0.29,0.92,vase/vase-36.glb
+vase-37,Vase #38,vase,92,3.4,0.34,0.34,0.26,vase/vase-37.glb
+vase-38,Vase #39,vase,76,2.9,0.13,0.13,0.4,vase/vase-38.glb
+vase-39,Vase #40,vase,76,3.2,0.21,0.18,0.52,vase/vase-39.glb
+vase-40,Vase #41,vase,162,4.6,0.33,0.33,0.52,vase/vase-40.glb
+vase-41,Vase #42,vase,242,5.9,0.25,0.25,0.73,vase/vase-41.glb
+vase-42,Vase #43,vase,92,3.4,0.24,0.24,0.15,vase/vase-42.glb
+vase-43,Vase #44,vase,76,3.0,0.19,0.19,0.58,vase/vase-43.glb
+vase-44,Vase #45,vase,76,3.2,0.25,0.21,0.42,vase/vase-44.glb
+vase-45,Vase #46,vase,162,4.5,0.18,0.17,0.34,vase/vase-45.glb
+vase-46,Vase #47,vase,146,4.3,0.19,0.2,0.5,vase/vase-46.glb
+vase-47,Vase #48,vase,92,3.4,0.24,0.24,0.17,vase/vase-47.glb
+vase-48,Vase #49,vase,56,2.7,0.17,0.15,0.41,vase/vase-48.glb
+vase-49,Vase #50,vase,102,3.7,0.21,0.21,0.4,vase/vase-49.glb
+candle-holder-00,Candle Holder #01,candle-holder,98,3.6,0.37,0.37,0.23,candle-holder/candle-holder-00.glb
+candle-holder-01,Candle Holder #02,candle-holder,214,5.4,0.36,0.12,0.58,candle-holder/candle-holder-01.glb
+candle-holder-02,Candle Holder #03,candle-holder,120,3.8,0.22,0.22,0.47,candle-holder/candle-holder-02.glb
+candle-holder-03,Candle Holder #04,candle-holder,140,4.3,0.31,0.14,0.18,candle-holder/candle-holder-03.glb
+candle-holder-04,Candle Holder #05,candle-holder,94,3.5,0.12,0.1,0.64,candle-holder/candle-holder-04.glb
+candle-holder-05,Candle Holder #06,candle-holder,98,3.6,0.4,0.4,0.21,candle-holder/candle-holder-05.glb
+candle-holder-06,Candle Holder #07,candle-holder,214,5.4,0.41,0.12,0.52,candle-holder/candle-holder-06.glb
+candle-holder-07,Candle Holder #08,candle-holder,120,3.7,0.21,0.21,0.52,candle-holder/candle-holder-07.glb
+candle-holder-08,Candle Holder #09,candle-holder,170,4.8,0.38,0.14,0.18,candle-holder/candle-holder-08.glb
+candle-holder-09,Candle Holder #10,candle-holder,94,3.5,0.12,0.1,0.51,candle-holder/candle-holder-09.glb
+candle-holder-10,Candle Holder #11,candle-holder,60,2.9,0.28,0.28,0.12,candle-holder/candle-holder-10.glb
+candle-holder-11,Candle Holder #12,candle-holder,214,5.4,0.3,0.12,0.57,candle-holder/candle-holder-11.glb
+candle-holder-12,Candle Holder #13,candle-holder,120,3.7,0.18,0.18,0.47,candle-holder/candle-holder-12.glb
+candle-holder-13,Candle Holder #14,candle-holder,132,4.1,0.44,0.12,0.1,candle-holder/candle-holder-13.glb
+candle-holder-14,Candle Holder #15,candle-holder,94,3.5,0.12,0.1,0.45,candle-holder/candle-holder-14.glb
+candle-holder-15,Candle Holder #16,candle-holder,60,2.9,0.4,0.4,0.21,candle-holder/candle-holder-15.glb
+candle-holder-16,Candle Holder #17,candle-holder,214,5.4,0.36,0.12,0.5,candle-holder/candle-holder-16.glb
+candle-holder-17,Candle Holder #18,candle-holder,120,3.8,0.16,0.16,0.37,candle-holder/candle-holder-17.glb
+candle-holder-18,Candle Holder #19,candle-holder,110,3.8,0.34,0.14,0.18,candle-holder/candle-holder-18.glb
+candle-holder-19,Candle Holder #20,candle-holder,94,3.5,0.12,0.1,0.51,candle-holder/candle-holder-19.glb
+candle-holder-20,Candle Holder #21,candle-holder,98,3.6,0.28,0.28,0.18,candle-holder/candle-holder-20.glb
+candle-holder-21,Candle Holder #22,candle-holder,214,5.3,0.3,0.12,0.64,candle-holder/candle-holder-21.glb
+candle-holder-22,Candle Holder #23,candle-holder,120,3.7,0.24,0.24,0.55,candle-holder/candle-holder-22.glb
+candle-holder-23,Candle Holder #24,candle-holder,110,3.7,0.4,0.14,0.18,candle-holder/candle-holder-23.glb
+candle-holder-24,Candle Holder #25,candle-holder,94,3.5,0.12,0.1,0.52,candle-holder/candle-holder-24.glb
+candle-holder-25,Candle Holder #26,candle-holder,136,4.2,0.27,0.27,0.22,candle-holder/candle-holder-25.glb
+candle-holder-26,Candle Holder #27,candle-holder,276,6.4,0.3,0.34,0.68,candle-holder/candle-holder-26.glb
+candle-holder-27,Candle Holder #28,candle-holder,120,3.7,0.21,0.21,0.48,candle-holder/candle-holder-27.glb
+candle-holder-28,Candle Holder #29,candle-holder,132,4.2,0.53,0.12,0.1,candle-holder/candle-holder-28.glb
+candle-holder-29,Candle Holder #30,candle-holder,94,3.6,0.12,0.1,0.43,candle-holder/candle-holder-29.glb
+candle-holder-30,Candle Holder #31,candle-holder,60,2.9,0.42,0.42,0.14,candle-holder/candle-holder-30.glb
+candle-holder-31,Candle Holder #32,candle-holder,276,6.5,0.26,0.3,0.59,candle-holder/candle-holder-31.glb
+candle-holder-32,Candle Holder #33,candle-holder,120,3.7,0.18,0.18,0.44,candle-holder/candle-holder-32.glb
+candle-holder-33,Candle Holder #34,candle-holder,192,5.3,0.34,0.12,0.1,candle-holder/candle-holder-33.glb
+candle-holder-34,Candle Holder #35,candle-holder,94,3.4,0.12,0.1,0.44,candle-holder/candle-holder-34.glb
+candle-holder-35,Candle Holder #36,candle-holder,98,3.6,0.36,0.36,0.19,candle-holder/candle-holder-35.glb
+candle-holder-36,Candle Holder #37,candle-holder,276,6.5,0.3,0.35,0.54,candle-holder/candle-holder-36.glb
+candle-holder-37,Candle Holder #38,candle-holder,120,3.7,0.23,0.23,0.6,candle-holder/candle-holder-37.glb
+candle-holder-38,Candle Holder #39,candle-holder,192,5.2,0.59,0.12,0.1,candle-holder/candle-holder-38.glb
+candle-holder-39,Candle Holder #40,candle-holder,94,3.5,0.12,0.1,0.59,candle-holder/candle-holder-39.glb
+candle-holder-40,Candle Holder #41,candle-holder,98,3.6,0.3,0.3,0.23,candle-holder/candle-holder-40.glb
+candle-holder-41,Candle Holder #42,candle-holder,276,6.5,0.3,0.34,0.58,candle-holder/candle-holder-41.glb
+candle-holder-42,Candle Holder #43,candle-holder,120,3.8,0.17,0.17,0.43,candle-holder/candle-holder-42.glb
+candle-holder-43,Candle Holder #44,candle-holder,110,3.8,0.37,0.14,0.18,candle-holder/candle-holder-43.glb
+candle-holder-44,Candle Holder #45,candle-holder,94,3.5,0.12,0.1,0.56,candle-holder/candle-holder-44.glb
+candle-holder-45,Candle Holder #46,candle-holder,136,4.2,0.31,0.31,0.2,candle-holder/candle-holder-45.glb
+candle-holder-46,Candle Holder #47,candle-holder,276,6.5,0.25,0.28,0.56,candle-holder/candle-holder-46.glb
+candle-holder-47,Candle Holder #48,candle-holder,120,3.7,0.22,0.22,0.55,candle-holder/candle-holder-47.glb
+candle-holder-48,Candle Holder #49,candle-holder,132,4.2,0.31,0.12,0.1,candle-holder/candle-holder-48.glb
+candle-holder-49,Candle Holder #50,candle-holder,94,3.5,0.12,0.1,0.43,candle-holder/candle-holder-49.glb
+table-lamp-00,Table Lamp #01,table-lamp,134,4.1,0.29,0.29,0.5,table-lamp/table-lamp-00.glb
+table-lamp-01,Table Lamp #02,table-lamp,86,3.2,0.26,0.26,0.54,table-lamp/table-lamp-01.glb
+table-lamp-02,Table Lamp #03,table-lamp,112,3.8,0.32,0.32,0.49,table-lamp/table-lamp-02.glb
+table-lamp-03,Table Lamp #04,table-lamp,106,3.6,0.29,0.29,0.69,table-lamp/table-lamp-03.glb
+table-lamp-04,Table Lamp #05,table-lamp,74,3.2,0.38,0.18,0.43,table-lamp/table-lamp-04.glb
+table-lamp-05,Table Lamp #06,table-lamp,134,4.1,0.26,0.26,0.61,table-lamp/table-lamp-05.glb
+table-lamp-06,Table Lamp #07,table-lamp,86,3.3,0.31,0.3,0.55,table-lamp/table-lamp-06.glb
+table-lamp-07,Table Lamp #08,table-lamp,112,3.8,0.26,0.26,0.49,table-lamp/table-lamp-07.glb
+table-lamp-08,Table Lamp #09,table-lamp,138,4.2,0.23,0.23,0.6,table-lamp/table-lamp-08.glb
+table-lamp-09,Table Lamp #10,table-lamp,74,3.2,0.4,0.18,0.44,table-lamp/table-lamp-09.glb
+table-lamp-10,Table Lamp #11,table-lamp,172,4.8,0.3,0.3,0.56,table-lamp/table-lamp-10.glb
+table-lamp-11,Table Lamp #12,table-lamp,124,3.9,0.32,0.32,0.64,table-lamp/table-lamp-11.glb
+table-lamp-12,Table Lamp #13,table-lamp,112,3.8,0.32,0.32,0.48,table-lamp/table-lamp-12.glb
+table-lamp-13,Table Lamp #14,table-lamp,100,3.6,0.3,0.29,0.66,table-lamp/table-lamp-13.glb
+table-lamp-14,Table Lamp #15,table-lamp,74,3.2,0.35,0.18,0.36,table-lamp/table-lamp-14.glb
+table-lamp-15,Table Lamp #16,table-lamp,140,4.2,0.31,0.31,0.56,table-lamp/table-lamp-15.glb
+table-lamp-16,Table Lamp #17,table-lamp,92,3.3,0.2,0.2,0.5,table-lamp/table-lamp-16.glb
+table-lamp-17,Table Lamp #18,table-lamp,112,3.8,0.4,0.4,0.35,table-lamp/table-lamp-17.glb
+table-lamp-18,Table Lamp #19,table-lamp,106,3.6,0.35,0.35,0.67,table-lamp/table-lamp-18.glb
+table-lamp-19,Table Lamp #20,table-lamp,74,3.2,0.35,0.18,0.4,table-lamp/table-lamp-19.glb
+table-lamp-20,Table Lamp #21,table-lamp,140,4.2,0.26,0.26,0.45,table-lamp/table-lamp-20.glb
+table-lamp-21,Table Lamp #22,table-lamp,92,3.3,0.24,0.24,0.67,table-lamp/table-lamp-21.glb
+table-lamp-22,Table Lamp #23,table-lamp,144,4.4,0.25,0.25,0.46,table-lamp/table-lamp-22.glb
+table-lamp-23,Table Lamp #24,table-lamp,138,4.2,0.28,0.28,0.64,table-lamp/table-lamp-23.glb
+table-lamp-24,Table Lamp #25,table-lamp,74,3.2,0.43,0.18,0.41,table-lamp/table-lamp-24.glb
+table-lamp-25,Table Lamp #26,table-lamp,140,4.2,0.32,0.32,0.52,table-lamp/table-lamp-25.glb
+table-lamp-26,Table Lamp #27,table-lamp,92,3.3,0.23,0.23,0.62,table-lamp/table-lamp-26.glb
+table-lamp-27,Table Lamp #28,table-lamp,106,3.7,0.23,0.22,0.52,table-lamp/table-lamp-27.glb
+table-lamp-28,Table Lamp #29,table-lamp,100,3.6,0.28,0.28,0.68,table-lamp/table-lamp-28.glb
+table-lamp-29,Table Lamp #30,table-lamp,74,3.2,0.39,0.18,0.41,table-lamp/table-lamp-29.glb
+table-lamp-30,Table Lamp #31,table-lamp,134,4.1,0.29,0.29,0.51,table-lamp/table-lamp-30.glb
+table-lamp-31,Table Lamp #32,table-lamp,124,3.9,0.4,0.4,0.5,table-lamp/table-lamp-31.glb
+table-lamp-32,Table Lamp #33,table-lamp,106,3.7,0.3,0.29,0.53,table-lamp/table-lamp-32.glb
+table-lamp-33,Table Lamp #34,table-lamp,138,4.2,0.3,0.3,0.66,table-lamp/table-lamp-33.glb
+table-lamp-34,Table Lamp #35,table-lamp,74,3.2,0.32,0.18,0.43,table-lamp/table-lamp-34.glb
+table-lamp-35,Table Lamp #36,table-lamp,134,4.1,0.26,0.26,0.59,table-lamp/table-lamp-35.glb
+table-lamp-36,Table Lamp #37,table-lamp,86,3.3,0.3,0.29,0.59,table-lamp/table-lamp-36.glb
+table-lamp-37,Table Lamp #38,table-lamp,106,3.8,0.33,0.32,0.49,table-lamp/table-lamp-37.glb
+table-lamp-38,Table Lamp #39,table-lamp,106,3.6,0.25,0.25,0.63,table-lamp/table-lamp-38.glb
+table-lamp-39,Table Lamp #40,table-lamp,74,3.2,0.37,0.18,0.37,table-lamp/table-lamp-39.glb
+table-lamp-40,Table Lamp #41,table-lamp,172,4.7,0.27,0.27,0.55,table-lamp/table-lamp-40.glb
+table-lamp-41,Table Lamp #42,table-lamp,124,3.9,0.23,0.23,0.63,table-lamp/table-lamp-41.glb
+table-lamp-42,Table Lamp #43,table-lamp,112,3.8,0.38,0.38,0.45,table-lamp/table-lamp-42.glb
+table-lamp-43,Table Lamp #44,table-lamp,106,3.6,0.35,0.35,0.65,table-lamp/table-lamp-43.glb
+table-lamp-44,Table Lamp #45,table-lamp,74,3.2,0.43,0.18,0.42,table-lamp/table-lamp-44.glb
+table-lamp-45,Table Lamp #46,table-lamp,172,4.8,0.27,0.27,0.55,table-lamp/table-lamp-45.glb
+table-lamp-46,Table Lamp #47,table-lamp,92,3.3,0.36,0.36,0.46,table-lamp/table-lamp-46.glb
+table-lamp-47,Table Lamp #48,table-lamp,112,3.8,0.24,0.24,0.56,table-lamp/table-lamp-47.glb
+table-lamp-48,Table Lamp #49,table-lamp,106,3.7,0.29,0.29,0.56,table-lamp/table-lamp-48.glb
+table-lamp-49,Table Lamp #50,table-lamp,74,3.2,0.33,0.18,0.44,table-lamp/table-lamp-49.glb
+book-stack-00,Book Stack #01,book-stack,70,3.1,0.23,0.22,0.1,book-stack/book-stack-00.glb
+book-stack-01,Book Stack #02,book-stack,122,3.6,0.49,0.18,0.25,book-stack/book-stack-01.glb
+book-stack-02,Book Stack #03,book-stack,158,4.9,0.28,0.24,0.37,book-stack/book-stack-02.glb
+book-stack-03,Book Stack #04,book-stack,98,3.4,0.31,0.34,0.25,book-stack/book-stack-03.glb
+book-stack-04,Book Stack #05,book-stack,164,4.7,0.61,0.24,0.15,book-stack/book-stack-04.glb
+book-stack-05,Book Stack #06,book-stack,94,3.5,0.29,0.23,0.15,book-stack/book-stack-05.glb
+book-stack-06,Book Stack #07,book-stack,178,4.4,0.57,0.18,0.25,book-stack/book-stack-06.glb
+book-stack-07,Book Stack #08,book-stack,182,4.9,0.32,0.22,0.31,book-stack/book-stack-07.glb
+book-stack-08,Book Stack #09,book-stack,94,3.4,0.35,0.34,0.25,book-stack/book-stack-08.glb
+book-stack-09,Book Stack #10,book-stack,164,4.7,0.62,0.22,0.15,book-stack/book-stack-09.glb
+book-stack-10,Book Stack #11,book-stack,142,4.3,0.31,0.25,0.22,book-stack/book-stack-10.glb
+book-stack-11,Book Stack #12,book-stack,146,4.0,0.51,0.17,0.25,book-stack/book-stack-11.glb
+book-stack-12,Book Stack #13,book-stack,110,3.7,0.26,0.24,0.2,book-stack/book-stack-12.glb
+book-stack-13,Book Stack #14,book-stack,66,2.9,0.23,0.17,0.24,book-stack/book-stack-13.glb
+book-stack-14,Book Stack #15,book-stack,212,5.4,0.64,0.25,0.18,book-stack/book-stack-14.glb
+book-stack-15,Book Stack #16,book-stack,70,3.1,0.3,0.25,0.08,book-stack/book-stack-15.glb
+book-stack-16,Book Stack #17,book-stack,156,4.1,0.52,0.17,0.25,book-stack/book-stack-16.glb
+book-stack-17,Book Stack #18,book-stack,110,3.7,0.23,0.23,0.19,book-stack/book-stack-17.glb
+book-stack-18,Book Stack #19,book-stack,88,3.2,0.27,0.17,0.23,book-stack/book-stack-18.glb
+book-stack-19,Book Stack #20,book-stack,212,5.4,0.61,0.23,0.18,book-stack/book-stack-19.glb
+book-stack-20,Book Stack #21,book-stack,94,3.5,0.27,0.23,0.15,book-stack/book-stack-20.glb
+book-stack-21,Book Stack #22,book-stack,124,3.7,0.46,0.18,0.25,book-stack/book-stack-21.glb
+book-stack-22,Book Stack #23,book-stack,182,4.9,0.3,0.25,0.31,book-stack/book-stack-22.glb
+book-stack-23,Book Stack #24,book-stack,88,3.3,0.3,0.34,0.25,book-stack/book-stack-23.glb
+book-stack-24,Book Stack #25,book-stack,164,4.7,0.62,0.25,0.13,book-stack/book-stack-24.glb
+book-stack-25,Book Stack #26,book-stack,118,3.9,0.31,0.27,0.2,book-stack/book-stack-25.glb
+book-stack-26,Book Stack #27,book-stack,136,3.8,0.44,0.16,0.22,book-stack/book-stack-26.glb
+book-stack-27,Book Stack #28,book-stack,134,4.1,0.3,0.18,0.23,book-stack/book-stack-27.glb
+book-stack-28,Book Stack #29,book-stack,138,4.0,0.42,0.34,0.26,book-stack/book-stack-28.glb
+book-stack-29,Book Stack #30,book-stack,164,4.6,0.62,0.22,0.18,book-stack/book-stack-29.glb
+book-stack-30,Book Stack #31,book-stack,166,4.7,0.3,0.26,0.25,book-stack/book-stack-30.glb
+book-stack-31,Book Stack #32,book-stack,156,4.1,0.52,0.17,0.24,book-stack/book-stack-31.glb
+book-stack-32,Book Stack #33,book-stack,206,5.3,0.32,0.27,0.34,book-stack/book-stack-32.glb
+book-stack-33,Book Stack #34,book-stack,84,3.3,0.31,0.34,0.25,book-stack/book-stack-33.glb
+book-stack-34,Book Stack #35,book-stack,236,5.9,0.64,0.26,0.2,book-stack/book-stack-34.glb
+book-stack-35,Book Stack #36,book-stack,70,3.1,0.27,0.25,0.12,book-stack/book-stack-35.glb
+book-stack-36,Book Stack #37,book-stack,114,3.5,0.42,0.18,0.22,book-stack/book-stack-36.glb
+book-stack-37,Book Stack #38,book-stack,134,4.4,0.29,0.21,0.26,book-stack/book-stack-37.glb
+book-stack-38,Book Stack #39,book-stack,76,3.0,0.24,0.18,0.24,book-stack/book-stack-38.glb
+book-stack-39,Book Stack #40,book-stack,212,5.5,0.7,0.26,0.18,book-stack/book-stack-39.glb
+book-stack-40,Book Stack #41,book-stack,166,4.7,0.32,0.25,0.24,book-stack/book-stack-40.glb
+book-stack-41,Book Stack #42,book-stack,132,3.8,0.52,0.18,0.25,book-stack/book-stack-41.glb
+book-stack-42,Book Stack #43,book-stack,182,5.3,0.3,0.24,0.35,book-stack/book-stack-42.glb
+book-stack-43,Book Stack #44,book-stack,108,3.5,0.3,0.17,0.25,book-stack/book-stack-43.glb
+book-stack-44,Book Stack #45,book-stack,116,3.9,0.58,0.21,0.12,book-stack/book-stack-44.glb
+book-stack-45,Book Stack #46,book-stack,142,4.3,0.32,0.24,0.24,book-stack/book-stack-45.glb
+book-stack-46,Book Stack #47,book-stack,102,3.4,0.4,0.18,0.25,book-stack/book-stack-46.glb
+book-stack-47,Book Stack #48,book-stack,182,4.9,0.31,0.23,0.31,book-stack/book-stack-47.glb
+book-stack-48,Book Stack #49,book-stack,88,3.3,0.28,0.34,0.25,book-stack/book-stack-48.glb
+book-stack-49,Book Stack #50,book-stack,140,4.3,0.63,0.22,0.11,book-stack/book-stack-49.glb
+kente-throw-roll-00,Kente Throw Roll #01,kente-throw-roll,228,4.5,0.58,0.33,0.16,kente-throw-roll/kente-throw-roll-00.glb
+kente-throw-roll-01,Kente Throw Roll #02,kente-throw-roll,258,5.7,0.46,0.35,0.26,kente-throw-roll/kente-throw-roll-01.glb
+kente-throw-roll-02,Kente Throw Roll #03,kente-throw-roll,104,3.1,0.23,0.25,0.64,kente-throw-roll/kente-throw-roll-02.glb
+kente-throw-roll-03,Kente Throw Roll #04,kente-throw-roll,220,4.3,0.61,0.61,1.03,kente-throw-roll/kente-throw-roll-03.glb
+kente-throw-roll-04,Kente Throw Roll #05,kente-throw-roll,150,3.7,0.97,0.35,1.16,kente-throw-roll/kente-throw-roll-04.glb
+kente-throw-roll-05,Kente Throw Roll #06,kente-throw-roll,168,3.5,0.96,0.2,0.19,kente-throw-roll/kente-throw-roll-05.glb
+kente-throw-roll-06,Kente Throw Roll #07,kente-throw-roll,198,4.8,0.45,0.31,0.19,kente-throw-roll/kente-throw-roll-06.glb
+kente-throw-roll-07,Kente Throw Roll #08,kente-throw-roll,164,3.5,0.2,0.21,0.61,kente-throw-roll/kente-throw-roll-07.glb
+kente-throw-roll-08,Kente Throw Roll #09,kente-throw-roll,208,4.2,0.54,0.54,1.13,kente-throw-roll/kente-throw-roll-08.glb
+kente-throw-roll-09,Kente Throw Roll #10,kente-throw-roll,216,4.3,0.82,0.35,1.1,kente-throw-roll/kente-throw-roll-09.glb
+kente-throw-roll-10,Kente Throw Roll #11,kente-throw-roll,188,3.9,0.81,0.44,0.22,kente-throw-roll/kente-throw-roll-10.glb
+kente-throw-roll-11,Kente Throw Roll #12,kente-throw-roll,198,4.8,0.45,0.34,0.18,kente-throw-roll/kente-throw-roll-11.glb
+kente-throw-roll-12,Kente Throw Roll #13,kente-throw-roll,140,3.3,0.19,0.2,1.04,kente-throw-roll/kente-throw-roll-12.glb
+kente-throw-roll-13,Kente Throw Roll #14,kente-throw-roll,240,4.6,0.44,0.44,1.1,kente-throw-roll/kente-throw-roll-13.glb
+kente-throw-roll-14,Kente Throw Roll #15,kente-throw-roll,194,4.1,0.96,0.35,1.26,kente-throw-roll/kente-throw-roll-14.glb
+kente-throw-roll-15,Kente Throw Roll #16,kente-throw-roll,252,4.6,0.72,0.3,0.15,kente-throw-roll/kente-throw-roll-15.glb
+kente-throw-roll-16,Kente Throw Roll #17,kente-throw-roll,126,3.8,0.43,0.34,0.1,kente-throw-roll/kente-throw-roll-16.glb
+kente-throw-roll-17,Kente Throw Roll #18,kente-throw-roll,128,3.2,0.22,0.23,0.77,kente-throw-roll/kente-throw-roll-17.glb
+kente-throw-roll-18,Kente Throw Roll #19,kente-throw-roll,220,4.3,0.43,0.43,1.1,kente-throw-roll/kente-throw-roll-18.glb
+kente-throw-roll-19,Kente Throw Roll #20,kente-throw-roll,172,3.9,0.83,0.35,1.09,kente-throw-roll/kente-throw-roll-19.glb
+kente-throw-roll-20,Kente Throw Roll #21,kente-throw-roll,120,3.2,0.67,0.15,0.14,kente-throw-roll/kente-throw-roll-20.glb
+kente-throw-roll-21,Kente Throw Roll #22,kente-throw-roll,142,3.9,0.45,0.35,0.11,kente-throw-roll/kente-throw-roll-21.glb
+kente-throw-roll-22,Kente Throw Roll #23,kente-throw-roll,112,2.8,0.21,0.18,0.75,kente-throw-roll/kente-throw-roll-22.glb
+kente-throw-roll-23,Kente Throw Roll #24,kente-throw-roll,196,4.1,0.61,0.61,1.1,kente-throw-roll/kente-throw-roll-23.glb
+kente-throw-roll-24,Kente Throw Roll #25,kente-throw-roll,150,3.7,0.91,0.35,1.21,kente-throw-roll/kente-throw-roll-24.glb
+kente-throw-roll-25,Kente Throw Roll #26,kente-throw-roll,92,2.7,1.12,0.19,0.22,kente-throw-roll/kente-throw-roll-25.glb
+kente-throw-roll-26,Kente Throw Roll #27,kente-throw-roll,134,3.8,0.4,0.34,0.11,kente-throw-roll/kente-throw-roll-26.glb
+kente-throw-roll-27,Kente Throw Roll #28,kente-throw-roll,164,3.5,0.22,0.23,0.61,kente-throw-roll/kente-throw-roll-27.glb
+kente-throw-roll-28,Kente Throw Roll #29,kente-throw-roll,252,4.7,0.62,0.62,1.04,kente-throw-roll/kente-throw-roll-28.glb
+kente-throw-roll-29,Kente Throw Roll #30,kente-throw-roll,216,4.3,0.77,0.35,1.25,kente-throw-roll/kente-throw-roll-29.glb
+kente-throw-roll-30,Kente Throw Roll #31,kente-throw-roll,248,4.2,1.06,0.24,0.12,kente-throw-roll/kente-throw-roll-30.glb
+kente-throw-roll-31,Kente Throw Roll #32,kente-throw-roll,130,3.8,0.43,0.33,0.13,kente-throw-roll/kente-throw-roll-31.glb
+kente-throw-roll-32,Kente Throw Roll #33,kente-throw-roll,164,3.5,0.21,0.22,0.73,kente-throw-roll/kente-throw-roll-32.glb
+kente-throw-roll-33,Kente Throw Roll #34,kente-throw-roll,220,4.3,0.51,0.51,0.9,kente-throw-roll/kente-throw-roll-33.glb
+kente-throw-roll-34,Kente Throw Roll #35,kente-throw-roll,300,5.4,0.86,0.35,1.09,kente-throw-roll/kente-throw-roll-34.glb
+kente-throw-roll-35,Kente Throw Roll #36,kente-throw-roll,212,4.0,0.82,0.39,0.2,kente-throw-roll/kente-throw-roll-35.glb
+kente-throw-roll-36,Kente Throw Roll #37,kente-throw-roll,190,4.7,0.4,0.32,0.21,kente-throw-roll/kente-throw-roll-36.glb
+kente-throw-roll-37,Kente Throw Roll #38,kente-throw-roll,104,3.1,0.16,0.17,1.01,kente-throw-roll/kente-throw-roll-37.glb
+kente-throw-roll-38,Kente Throw Roll #39,kente-throw-roll,196,4.1,0.61,0.61,0.79,kente-throw-roll/kente-throw-roll-38.glb
+kente-throw-roll-39,Kente Throw Roll #40,kente-throw-roll,300,5.5,0.87,0.35,1.05,kente-throw-roll/kente-throw-roll-39.glb
+kente-throw-roll-40,Kente Throw Roll #41,kente-throw-roll,68,2.6,0.72,0.16,0.18,kente-throw-roll/kente-throw-roll-40.glb
+kente-throw-roll-41,Kente Throw Roll #42,kente-throw-roll,130,3.8,0.44,0.29,0.13,kente-throw-roll/kente-throw-roll-41.glb
+kente-throw-roll-42,Kente Throw Roll #43,kente-throw-roll,140,3.3,0.24,0.25,0.8,kente-throw-roll/kente-throw-roll-42.glb
+kente-throw-roll-43,Kente Throw Roll #44,kente-throw-roll,208,4.2,0.46,0.46,0.99,kente-throw-roll/kente-throw-roll-43.glb
+kente-throw-roll-44,Kente Throw Roll #45,kente-throw-roll,216,4.3,0.77,0.35,1.21,kente-throw-roll/kente-throw-roll-44.glb
+kente-throw-roll-45,Kente Throw Roll #46,kente-throw-roll,80,2.6,0.52,0.17,0.2,kente-throw-roll/kente-throw-roll-45.glb
+kente-throw-roll-46,Kente Throw Roll #47,kente-throw-roll,210,4.5,0.37,0.35,0.21,kente-throw-roll/kente-throw-roll-46.glb
+kente-throw-roll-47,Kente Throw Roll #48,kente-throw-roll,116,3.2,0.21,0.22,0.91,kente-throw-roll/kente-throw-roll-47.glb
+kente-throw-roll-48,Kente Throw Roll #49,kente-throw-roll,196,4.1,0.58,0.58,1.04,kente-throw-roll/kente-throw-roll-48.glb
+kente-throw-roll-49,Kente Throw Roll #50,kente-throw-roll,300,5.5,0.76,0.35,1.08,kente-throw-roll/kente-throw-roll-49.glb
+sculpture-00,Sculpture #01,sculpture,154,4.4,0.15,0.1,0.36,sculpture/sculpture-00.glb
+sculpture-01,Sculpture #02,sculpture,178,5.0,0.22,0.19,0.42,sculpture/sculpture-01.glb
+sculpture-02,Sculpture #03,sculpture,94,3.5,0.19,0.19,0.47,sculpture/sculpture-02.glb
+sculpture-03,Sculpture #04,sculpture,120,3.9,0.1,0.09,0.35,sculpture/sculpture-03.glb
+sculpture-04,Sculpture #05,sculpture,94,3.3,0.13,0.06,0.11,sculpture/sculpture-04.glb
+sculpture-05,Sculpture #06,sculpture,182,4.9,0.23,0.23,0.59,sculpture/sculpture-05.glb
+sculpture-06,Sculpture #07,sculpture,132,4.2,0.21,0.07,0.24,sculpture/sculpture-06.glb
+sculpture-07,Sculpture #08,sculpture,90,3.3,0.09,0.1,0.36,sculpture/sculpture-07.glb
+sculpture-08,Sculpture #09,sculpture,178,4.9,0.17,0.15,0.72,sculpture/sculpture-08.glb
+sculpture-09,Sculpture #10,sculpture,126,4.0,0.16,0.16,0.29,sculpture/sculpture-09.glb
+sculpture-10,Sculpture #11,sculpture,202,5.2,0.2,0.18,0.61,sculpture/sculpture-10.glb
+sculpture-11,Sculpture #12,sculpture,178,5.0,0.26,0.23,0.5,sculpture/sculpture-11.glb
+sculpture-12,Sculpture #13,sculpture,98,3.7,0.19,0.19,0.5,sculpture/sculpture-12.glb
+sculpture-13,Sculpture #14,sculpture,166,4.8,0.21,0.21,0.68,sculpture/sculpture-13.glb
+sculpture-14,Sculpture #15,sculpture,114,3.8,0.19,0.19,0.25,sculpture/sculpture-14.glb
+sculpture-15,Sculpture #16,sculpture,114,3.8,0.12,0.08,0.27,sculpture/sculpture-15.glb
+sculpture-16,Sculpture #17,sculpture,178,5.0,0.3,0.19,0.46,sculpture/sculpture-16.glb
+sculpture-17,Sculpture #18,sculpture,88,3.4,0.11,0.13,0.32,sculpture/sculpture-17.glb
+sculpture-18,Sculpture #19,sculpture,178,4.8,0.16,0.16,0.72,sculpture/sculpture-18.glb
+sculpture-19,Sculpture #20,sculpture,114,3.8,0.22,0.16,0.25,sculpture/sculpture-19.glb
+sculpture-20,Sculpture #21,sculpture,162,4.5,0.17,0.16,0.54,sculpture/sculpture-20.glb
+sculpture-21,Sculpture #22,sculpture,132,4.2,0.3,0.1,0.34,sculpture/sculpture-21.glb
+sculpture-22,Sculpture #23,sculpture,106,3.7,0.21,0.21,0.41,sculpture/sculpture-22.glb
+sculpture-23,Sculpture #24,sculpture,132,4.2,0.17,0.15,0.59,sculpture/sculpture-23.glb
+sculpture-24,Sculpture #25,sculpture,82,3.2,0.18,0.08,0.16,sculpture/sculpture-24.glb
+sculpture-25,Sculpture #26,sculpture,134,4.0,0.2,0.14,0.48,sculpture/sculpture-25.glb
+sculpture-26,Sculpture #27,sculpture,178,5.0,0.21,0.15,0.4,sculpture/sculpture-26.glb
+sculpture-27,Sculpture #28,sculpture,118,4.0,0.17,0.17,0.52,sculpture/sculpture-27.glb
+sculpture-28,Sculpture #29,sculpture,166,4.7,0.19,0.19,0.61,sculpture/sculpture-28.glb
+sculpture-29,Sculpture #30,sculpture,138,4.1,0.23,0.23,0.3,sculpture/sculpture-29.glb
+sculpture-30,Sculpture #31,sculpture,202,5.1,0.18,0.18,0.58,sculpture/sculpture-30.glb
+sculpture-31,Sculpture #32,sculpture,178,5.1,0.24,0.16,0.44,sculpture/sculpture-31.glb
+sculpture-32,Sculpture #33,sculpture,94,3.5,0.18,0.18,0.3,sculpture/sculpture-32.glb
+sculpture-33,Sculpture #34,sculpture,132,4.1,0.16,0.14,0.55,sculpture/sculpture-33.glb
+sculpture-34,Sculpture #35,sculpture,102,3.7,0.22,0.21,0.43,sculpture/sculpture-34.glb
+sculpture-35,Sculpture #36,sculpture,162,4.5,0.17,0.17,0.43,sculpture/sculpture-35.glb
+sculpture-36,Sculpture #37,sculpture,178,5.1,0.29,0.17,0.41,sculpture/sculpture-36.glb
+sculpture-37,Sculpture #38,sculpture,134,4.1,0.18,0.18,0.51,sculpture/sculpture-37.glb
+sculpture-38,Sculpture #39,sculpture,166,4.7,0.21,0.21,0.47,sculpture/sculpture-38.glb
+sculpture-39,Sculpture #40,sculpture,162,4.5,0.25,0.2,0.47,sculpture/sculpture-39.glb
+sculpture-40,Sculpture #41,sculpture,154,4.4,0.15,0.11,0.39,sculpture/sculpture-40.glb
+sculpture-41,Sculpture #42,sculpture,178,5.1,0.26,0.16,0.39,sculpture/sculpture-41.glb
+sculpture-42,Sculpture #43,sculpture,114,3.8,0.15,0.15,0.36,sculpture/sculpture-42.glb
+sculpture-43,Sculpture #44,sculpture,178,4.9,0.14,0.14,0.46,sculpture/sculpture-43.glb
+sculpture-44,Sculpture #45,sculpture,126,4.0,0.16,0.15,0.26,sculpture/sculpture-44.glb
+sculpture-45,Sculpture #46,sculpture,114,3.7,0.2,0.14,0.46,sculpture/sculpture-45.glb
+sculpture-46,Sculpture #47,sculpture,178,5.1,0.28,0.23,0.35,sculpture/sculpture-46.glb
+sculpture-47,Sculpture #48,sculpture,78,3.3,0.2,0.2,0.29,sculpture/sculpture-47.glb
+sculpture-48,Sculpture #49,sculpture,132,4.1,0.13,0.11,0.44,sculpture/sculpture-48.glb
+sculpture-49,Sculpture #50,sculpture,138,4.2,0.24,0.16,0.34,sculpture/sculpture-49.glb
+wall-mask-00,Wall Mask #01,wall-mask,172,4.8,0.2,0.11,0.36,wall-mask/wall-mask-00.glb
+wall-mask-01,Wall Mask #02,wall-mask,116,3.9,0.21,0.1,0.37,wall-mask/wall-mask-01.glb
+wall-mask-02,Wall Mask #03,wall-mask,154,4.5,0.21,0.15,0.39,wall-mask/wall-mask-02.glb
+wall-mask-03,Wall Mask #04,wall-mask,192,5.0,0.32,0.1,0.56,wall-mask/wall-mask-03.glb
+wall-mask-04,Wall Mask #05,wall-mask,140,4.2,0.21,0.1,0.71,wall-mask/wall-mask-04.glb
+wall-mask-05,Wall Mask #06,wall-mask,108,3.8,0.2,0.09,0.42,wall-mask/wall-mask-05.glb
+wall-mask-06,Wall Mask #07,wall-mask,168,4.6,0.23,0.08,0.35,wall-mask/wall-mask-06.glb
+wall-mask-07,Wall Mask #08,wall-mask,218,5.4,0.2,0.14,0.39,wall-mask/wall-mask-07.glb
+wall-mask-08,Wall Mask #09,wall-mask,164,4.7,0.29,0.1,0.59,wall-mask/wall-mask-08.glb
+wall-mask-09,Wall Mask #10,wall-mask,152,4.4,0.19,0.1,0.63,wall-mask/wall-mask-09.glb
+wall-mask-10,Wall Mask #11,wall-mask,140,4.2,0.2,0.08,0.33,wall-mask/wall-mask-10.glb
+wall-mask-11,Wall Mask #12,wall-mask,92,3.6,0.23,0.08,0.29,wall-mask/wall-mask-11.glb
+wall-mask-12,Wall Mask #13,wall-mask,130,4.1,0.19,0.13,0.44,wall-mask/wall-mask-12.glb
+wall-mask-13,Wall Mask #14,wall-mask,184,5.0,0.23,0.09,0.53,wall-mask/wall-mask-13.glb
+wall-mask-14,Wall Mask #15,wall-mask,232,5.5,0.17,0.09,0.5,wall-mask/wall-mask-14.glb
+wall-mask-15,Wall Mask #16,wall-mask,128,4.1,0.26,0.09,0.36,wall-mask/wall-mask-15.glb
+wall-mask-16,Wall Mask #17,wall-mask,104,3.7,0.27,0.1,0.41,wall-mask/wall-mask-16.glb
+wall-mask-17,Wall Mask #18,wall-mask,166,4.6,0.16,0.15,0.34,wall-mask/wall-mask-17.glb
+wall-mask-18,Wall Mask #19,wall-mask,192,5.0,0.3,0.09,0.53,wall-mask/wall-mask-18.glb
+wall-mask-19,Wall Mask #20,wall-mask,280,6.2,0.18,0.09,0.74,wall-mask/wall-mask-19.glb
+wall-mask-20,Wall Mask #21,wall-mask,80,3.4,0.17,0.09,0.29,wall-mask/wall-mask-20.glb
+wall-mask-21,Wall Mask #22,wall-mask,132,4.1,0.15,0.08,0.29,wall-mask/wall-mask-21.glb
+wall-mask-22,Wall Mask #23,wall-mask,130,4.1,0.24,0.18,0.57,wall-mask/wall-mask-22.glb
+wall-mask-23,Wall Mask #24,wall-mask,192,5.1,0.26,0.09,0.58,wall-mask/wall-mask-23.glb
+wall-mask-24,Wall Mask #25,wall-mask,244,5.8,0.18,0.1,0.5,wall-mask/wall-mask-24.glb
+wall-mask-25,Wall Mask #26,wall-mask,140,4.2,0.2,0.08,0.24,wall-mask/wall-mask-25.glb
+wall-mask-26,Wall Mask #27,wall-mask,144,4.2,0.29,0.11,0.36,wall-mask/wall-mask-26.glb
+wall-mask-27,Wall Mask #28,wall-mask,170,4.8,0.25,0.21,0.48,wall-mask/wall-mask-27.glb
+wall-mask-28,Wall Mask #29,wall-mask,164,4.6,0.27,0.1,0.67,wall-mask/wall-mask-28.glb
+wall-mask-29,Wall Mask #30,wall-mask,240,5.5,0.22,0.09,0.64,wall-mask/wall-mask-29.glb
+wall-mask-30,Wall Mask #31,wall-mask,128,4.1,0.24,0.09,0.38,wall-mask/wall-mask-30.glb
+wall-mask-31,Wall Mask #32,wall-mask,116,3.9,0.23,0.08,0.35,wall-mask/wall-mask-31.glb
+wall-mask-32,Wall Mask #33,wall-mask,170,4.7,0.25,0.17,0.58,wall-mask/wall-mask-32.glb
+wall-mask-33,Wall Mask #34,wall-mask,144,4.3,0.3,0.09,0.63,wall-mask/wall-mask-33.glb
+wall-mask-34,Wall Mask #35,wall-mask,140,4.2,0.22,0.09,0.73,wall-mask/wall-mask-34.glb
+wall-mask-35,Wall Mask #36,wall-mask,84,3.5,0.2,0.09,0.37,wall-mask/wall-mask-35.glb
+wall-mask-36,Wall Mask #37,wall-mask,80,3.4,0.21,0.09,0.41,wall-mask/wall-mask-36.glb
+wall-mask-37,Wall Mask #38,wall-mask,150,4.4,0.26,0.16,0.56,wall-mask/wall-mask-37.glb
+wall-mask-38,Wall Mask #39,wall-mask,200,5.2,0.29,0.09,0.56,wall-mask/wall-mask-38.glb
+wall-mask-39,Wall Mask #40,wall-mask,192,5.0,0.16,0.07,0.46,wall-mask/wall-mask-39.glb
+wall-mask-40,Wall Mask #41,wall-mask,136,4.2,0.2,0.1,0.35,wall-mask/wall-mask-40.glb
+wall-mask-41,Wall Mask #42,wall-mask,148,4.5,0.17,0.09,0.31,wall-mask/wall-mask-41.glb
+wall-mask-42,Wall Mask #43,wall-mask,102,3.8,0.19,0.16,0.4,wall-mask/wall-mask-42.glb
+wall-mask-43,Wall Mask #44,wall-mask,164,4.7,0.3,0.09,0.57,wall-mask/wall-mask-43.glb
+wall-mask-44,Wall Mask #45,wall-mask,200,5.1,0.19,0.09,0.64,wall-mask/wall-mask-44.glb
+wall-mask-45,Wall Mask #46,wall-mask,120,4.0,0.18,0.08,0.38,wall-mask/wall-mask-45.glb
+wall-mask-46,Wall Mask #47,wall-mask,108,3.8,0.28,0.1,0.36,wall-mask/wall-mask-46.glb
+wall-mask-47,Wall Mask #48,wall-mask,170,4.7,0.25,0.22,0.63,wall-mask/wall-mask-47.glb
+wall-mask-48,Wall Mask #49,wall-mask,232,5.7,0.23,0.09,0.44,wall-mask/wall-mask-48.glb
+wall-mask-49,Wall Mask #50,wall-mask,264,5.9,0.22,0.1,0.74,wall-mask/wall-mask-49.glb
+plant-hanger-00,Plant Hanger #01,plant-hanger,176,5.1,0.6,0.4,1.54,plant-hanger/plant-hanger-00.glb
+plant-hanger-01,Plant Hanger #02,plant-hanger,156,4.8,0.87,0.76,1.4,plant-hanger/plant-hanger-01.glb
+plant-hanger-02,Plant Hanger #03,plant-hanger,408,9.4,1.04,0.73,1.5,plant-hanger/plant-hanger-02.glb
+plant-hanger-03,Plant Hanger #04,plant-hanger,274,6.9,0.9,0.35,1.82,plant-hanger/plant-hanger-03.glb
+plant-hanger-04,Plant Hanger #05,plant-hanger,200,5.6,0.59,0.4,1.84,plant-hanger/plant-hanger-04.glb
+plant-hanger-05,Plant Hanger #06,plant-hanger,168,5.0,1.01,0.88,1.65,plant-hanger/plant-hanger-05.glb
+plant-hanger-06,Plant Hanger #07,plant-hanger,396,9.2,1.05,0.73,1.48,plant-hanger/plant-hanger-06.glb
+plant-hanger-07,Plant Hanger #08,plant-hanger,198,5.3,0.7,0.35,1.78,plant-hanger/plant-hanger-07.glb
+plant-hanger-08,Plant Hanger #09,plant-hanger,212,5.7,0.57,0.4,1.42,plant-hanger/plant-hanger-08.glb
+plant-hanger-09,Plant Hanger #10,plant-hanger,168,4.9,0.79,0.69,1.49,plant-hanger/plant-hanger-09.glb
+plant-hanger-10,Plant Hanger #11,plant-hanger,236,6.5,1.04,0.73,1.23,plant-hanger/plant-hanger-10.glb
+plant-hanger-11,Plant Hanger #12,plant-hanger,210,5.5,0.77,0.35,1.8,plant-hanger/plant-hanger-11.glb
+plant-hanger-12,Plant Hanger #13,plant-hanger,174,5.1,0.61,0.34,1.48,plant-hanger/plant-hanger-12.glb
+plant-hanger-13,Plant Hanger #14,plant-hanger,168,4.9,0.74,0.64,1.29,plant-hanger/plant-hanger-13.glb
+plant-hanger-14,Plant Hanger #15,plant-hanger,384,9.1,1.44,0.73,1.49,plant-hanger/plant-hanger-14.glb
+plant-hanger-15,Plant Hanger #16,plant-hanger,286,6.9,0.82,0.35,1.81,plant-hanger/plant-hanger-15.glb
+plant-hanger-16,Plant Hanger #17,plant-hanger,188,5.4,0.63,0.4,1.92,plant-hanger/plant-hanger-16.glb
+plant-hanger-17,Plant Hanger #18,plant-hanger,180,5.1,0.96,0.83,1.72,plant-hanger/plant-hanger-17.glb
+plant-hanger-18,Plant Hanger #19,plant-hanger,284,7.1,1.15,0.73,1.59,plant-hanger/plant-hanger-18.glb
+plant-hanger-19,Plant Hanger #20,plant-hanger,298,7.2,0.88,0.35,1.89,plant-hanger/plant-hanger-19.glb
+plant-hanger-20,Plant Hanger #21,plant-hanger,188,5.4,0.63,0.4,1.85,plant-hanger/plant-hanger-20.glb
+plant-hanger-21,Plant Hanger #22,plant-hanger,144,4.7,0.97,0.84,1.64,plant-hanger/plant-hanger-21.glb
+plant-hanger-22,Plant Hanger #23,plant-hanger,248,6.5,1.26,0.73,1.36,plant-hanger/plant-hanger-22.glb
+plant-hanger-23,Plant Hanger #24,plant-hanger,186,5.0,0.8,0.35,1.89,plant-hanger/plant-hanger-23.glb
+plant-hanger-24,Plant Hanger #25,plant-hanger,212,5.8,0.63,0.4,1.97,plant-hanger/plant-hanger-24.glb
+plant-hanger-25,Plant Hanger #26,plant-hanger,168,5.0,0.76,0.66,1.72,plant-hanger/plant-hanger-25.glb
+plant-hanger-26,Plant Hanger #27,plant-hanger,284,7.1,1.08,0.73,1.47,plant-hanger/plant-hanger-26.glb
+plant-hanger-27,Plant Hanger #28,plant-hanger,310,7.5,0.78,0.35,1.8,plant-hanger/plant-hanger-27.glb
+plant-hanger-28,Plant Hanger #29,plant-hanger,224,5.8,0.5,0.4,1.81,plant-hanger/plant-hanger-28.glb
+plant-hanger-29,Plant Hanger #30,plant-hanger,156,4.9,0.91,0.79,1.47,plant-hanger/plant-hanger-29.glb
+plant-hanger-30,Plant Hanger #31,plant-hanger,396,9.2,1.07,0.73,1.35,plant-hanger/plant-hanger-30.glb
+plant-hanger-31,Plant Hanger #32,plant-hanger,322,7.7,0.9,0.35,1.83,plant-hanger/plant-hanger-31.glb
+plant-hanger-32,Plant Hanger #33,plant-hanger,188,5.3,0.53,0.4,1.92,plant-hanger/plant-hanger-32.glb
+plant-hanger-33,Plant Hanger #34,plant-hanger,168,5.0,0.89,0.77,1.29,plant-hanger/plant-hanger-33.glb
+plant-hanger-34,Plant Hanger #35,plant-hanger,336,8.3,1.38,0.73,1.41,plant-hanger/plant-hanger-34.glb
+plant-hanger-35,Plant Hanger #36,plant-hanger,298,7.2,0.89,0.35,1.71,plant-hanger/plant-hanger-35.glb
+plant-hanger-36,Plant Hanger #37,plant-hanger,188,5.4,0.58,0.4,1.68,plant-hanger/plant-hanger-36.glb
+plant-hanger-37,Plant Hanger #38,plant-hanger,144,4.6,0.83,0.72,1.3,plant-hanger/plant-hanger-37.glb
+plant-hanger-38,Plant Hanger #39,plant-hanger,384,9.0,1.05,0.73,1.35,plant-hanger/plant-hanger-38.glb
+plant-hanger-39,Plant Hanger #40,plant-hanger,298,7.4,0.94,0.35,1.43,plant-hanger/plant-hanger-39.glb
+plant-hanger-40,Plant Hanger #41,plant-hanger,186,5.4,0.69,0.34,1.47,plant-hanger/plant-hanger-40.glb
+plant-hanger-41,Plant Hanger #42,plant-hanger,144,4.7,1.0,0.87,1.52,plant-hanger/plant-hanger-41.glb
+plant-hanger-42,Plant Hanger #43,plant-hanger,272,6.9,1.05,0.73,1.18,plant-hanger/plant-hanger-42.glb
+plant-hanger-43,Plant Hanger #44,plant-hanger,298,7.4,0.73,0.35,1.6,plant-hanger/plant-hanger-43.glb
+plant-hanger-44,Plant Hanger #45,plant-hanger,188,5.4,0.66,0.4,1.96,plant-hanger/plant-hanger-44.glb
+plant-hanger-45,Plant Hanger #46,plant-hanger,168,4.9,0.9,0.78,1.6,plant-hanger/plant-hanger-45.glb
+plant-hanger-46,Plant Hanger #47,plant-hanger,248,6.6,1.28,0.73,1.62,plant-hanger/plant-hanger-46.glb
+plant-hanger-47,Plant Hanger #48,plant-hanger,198,5.3,0.64,0.35,1.54,plant-hanger/plant-hanger-47.glb
+plant-hanger-48,Plant Hanger #49,plant-hanger,174,5.1,0.65,0.34,1.9,plant-hanger/plant-hanger-48.glb
+plant-hanger-49,Plant Hanger #50,plant-hanger,180,5.2,1.03,0.89,1.66,plant-hanger/plant-hanger-49.glb
