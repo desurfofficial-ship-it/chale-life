@@ -19,6 +19,7 @@ import { COLORS } from '@/lib/mapConfig'
 import { getState } from '../store/gameStore'
 import { isInsideGyanHouse } from '../world/colliders'
 import { useAnimatedRef } from '../components/world/SceneBatcher'
+import { getTycoonState } from '../store/tycoonStore'
 
 /** True when the intro camera + Gyan house path should run. */
 export function isOnboardingActive(): boolean {
@@ -211,11 +212,17 @@ export function GyanHouse({ mats }: { mats?: RoomMats }) {
 
   useFrame(({ clock }) => {
     if (glow.current) glow.current.intensity = 5 + Math.sin(clock.elapsedTime * 2.1) * 0.25
-    // Cutaway: hide the whole exterior group (walls + roof + lamps + the
-    // find-home beacon) so the player sees ONLY the room from above.
+    // Cutaway ONLY in walk mode when the player is inside the house.
+    // In tycoon (city) mode the roof must stay on — otherwise the city
+    // overview shows a hollow house under the high camera (bug report:
+    // "room still has roof / cutaway looks wrong from city view").
     const p = getState().player.position
     const inside = isInsideGyanHouse(p.x, p.z)
-    if (exteriorRef.current) exteriorRef.current.visible = !inside
+    const cityMode = getTycoonState().tycoonMode
+    if (exteriorRef.current) {
+      // Hide exterior → pure room view (like the interior reference).
+      exteriorRef.current.visible = cityMode ? true : !inside
+    }
   })
 
   // Front wall: full-height slabs with a door hole + a window hole.
