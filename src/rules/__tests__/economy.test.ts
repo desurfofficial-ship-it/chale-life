@@ -81,3 +81,26 @@ describe('economy: formatGHS', () => {
     expect(formatGHS(0.99)).toBe('₵0.99');
   });
 });
+
+describe('P0 economy integrity', () => {
+  it('rejects non-finite and negative costs in buy', () => {
+    const w = createStarterWallet();
+    expect(buy(w, Number.NaN).ok).toBe(false);
+    expect(buy(w, Number.POSITIVE_INFINITY).ok).toBe(false);
+    expect(buy(w, -5).ok).toBe(false);
+    expect(buy(w, -5).wallet.balanceGHS).toBe(w.balanceGHS);
+  });
+
+  it('rejects non-finite credits in pay', () => {
+    const w = createStarterWallet();
+    expect(pay(w, Number.NaN).balanceGHS).toBe(w.balanceGHS);
+    expect(pay(w, Number.NEGATIVE_INFINITY).balanceGHS).toBe(w.balanceGHS);
+    expect(pay(w, 0).balanceGHS).toBe(w.balanceGHS);
+  });
+
+  it('canAfford is false for non-finite amounts', () => {
+    const w = createStarterWallet();
+    expect(canAfford(w, Number.NaN)).toBe(false);
+    expect(canAfford({ balanceGHS: Number.NaN }, 1)).toBe(false);
+  });
+});
