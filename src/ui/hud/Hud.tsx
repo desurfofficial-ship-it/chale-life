@@ -32,6 +32,7 @@ import {
 import { isLow, lowNeedsHints, LOW_THRESHOLD } from '../../rules/needs';
 import { useCountdownNow } from '../useTicker';
 import { isInsideGyanHouse } from '../../world/colliders';
+import { OfficesMenu } from '../office/OfficesMenu';
 
 export interface HudProps {
   /** Called by the Act button — the Engine decides what "Act" means. */
@@ -427,6 +428,8 @@ export function Hud({ onAct, actLabel, actEnabled = true, actReason = null, toas
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start' }}>
         <WalletCard />
         <NeedsCard />
+        {/* O-002: Go-to list of the six world-run offices */}
+        <OfficesMenu />
       </div>
 
       {/* Bottom group (G-008d item 6): the objective card and toast stay
