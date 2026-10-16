@@ -23,6 +23,8 @@ function round2(value: number): number {
 }
 
 export function canAfford(wallet: WalletState, amountGHS: number): boolean {
+  if (!Number.isFinite(wallet.balanceGHS) || !Number.isFinite(amountGHS)) return false;
+  if (wallet.balanceGHS < 0 || amountGHS < 0) return false;
   return wallet.balanceGHS >= amountGHS;
 }
 
@@ -31,8 +33,9 @@ export function canAfford(wallet: WalletState, amountGHS: number): boolean {
  * are rejected — payouts go through `pay`, never through `buy`.
  */
 export function pay(wallet: WalletState, amountGHS: number): WalletState {
-  if (amountGHS <= 0) return wallet;
-  return { balanceGHS: round2(wallet.balanceGHS + amountGHS) };
+  if (!Number.isFinite(amountGHS) || amountGHS <= 0) return wallet;
+  if (!Number.isFinite(wallet.balanceGHS)) return wallet;
+  return { balanceGHS: round2(Math.max(0, wallet.balanceGHS) + amountGHS) };
 }
 
 export interface BuyResult {
@@ -43,8 +46,11 @@ export interface BuyResult {
 
 /** Spend cash on something. Refuses (unchanged wallet) when short. */
 export function buy(wallet: WalletState, costGHS: number): BuyResult {
-  if (costGHS < 0) {
+  if (!Number.isFinite(costGHS) || costGHS < 0) {
     return { ok: false, wallet, reason: 'Cost cannot be negative.' };
+  }
+  if (!Number.isFinite(wallet.balanceGHS) || wallet.balanceGHS < 0) {
+    return { ok: false, wallet, reason: 'Wallet balance is invalid.' };
   }
   if (!canAfford(wallet, costGHS)) {
     return {

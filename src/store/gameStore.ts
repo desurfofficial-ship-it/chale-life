@@ -30,7 +30,8 @@
 
 import { resolveAct, type ActSession } from '../rules/act';
 import { clampNeed, drainNeeds } from '../rules/needs';
-import { comfortPctFromOwned } from '../data/furniture';
+import { worldBounds } from '../world/colliders';
+import { comfortPctFromOwned, findFurnitureById } from '../data/furniture';
 
 export interface Vec3 {
   x: number;
@@ -106,6 +107,7 @@ function notify(): void {
 }
 
 export function setPlayerPosition(x: number, y: number, z: number): void {
+  if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) return;
   state.player.position.x = x;
   state.player.position.y = y;
   state.player.position.z = z;
@@ -149,11 +151,15 @@ let teleportToken = 0;
 
 /** Ask the game loop to re-seed the walker at (x, z) next frame. */
 export function requestTeleport(x: number, z: number): void {
+  // P0: refuse non-finite; clamp into worldBounds so Go-to never ejects the walker.
+  if (!Number.isFinite(x) || !Number.isFinite(z)) return;
+  const cx = Math.min(worldBounds.maxX, Math.max(worldBounds.minX, x));
+  const cz = Math.min(worldBounds.maxZ, Math.max(worldBounds.minZ, z));
   teleportToken += 1;
-  teleportReq = { x, z, token: teleportToken };
+  teleportReq = { x: cx, z: cz, token: teleportToken };
   // Write the store too so the same-frame camera/HUD read sees the target
   // (the loop re-seeds kinematics from this point, so it sticks).
-  setPlayerPosition(x, 0, z);
+  setPlayerPosition(cx, 0, cz);
 }
 
 /** Consume the pending teleport (GameLoop only). Null when none is pending. */
@@ -558,7 +564,9 @@ export function publishHud(snapshot: HudSnapshot): void {
  * Prefer pure rules for the amount; this only latches the number.
  */
 export function setWalletBalanceGHS(balanceGHS: number): void {
-  const next = Math.round(balanceGHS * 100) / 100;
+  // P0: reject non-finite / negative — never corrupt the economy.
+  if (!Number.isFinite(balanceGHS)) return;
+  const next = Math.round(Math.max(0, balanceGHS) * 100) / 100;
   if (state.wallet.balanceGHS === next) return;
   state.wallet.balanceGHS = next;
   notify();
@@ -568,10 +576,18 @@ export function setWalletBalanceGHS(balanceGHS: number): void {
  * Buy a home furniture item (marketplace). Debits wallet and appends id to
  * home.furnitureIds. Returns false if already owned or insufficient funds.
  */
-export function buyHomeFurniture(id: string, costGHS: number): boolean {
+export function buyHomeFurniture(id: string, costGHS?: number): boolean {
+  // P0: only catalogue IDs; price is always the trusted catalogue cost
+  // (caller-supplied costGHS is ignored so negative/NaN cannot mint cash).
+  const item = findFurnitureById(id);
+  if (!item) return false;
   if (state.home.furnitureIds.includes(id)) return false;
-  if (state.wallet.balanceGHS < costGHS) return false;
-  state.wallet.balanceGHS = Math.round((state.wallet.balanceGHS - costGHS) * 100) / 100;
+  const price = item.costGHS;
+  if (!Number.isFinite(price) || price < 0) return false;
+  if (!Number.isFinite(state.wallet.balanceGHS) || state.wallet.balanceGHS < price) return false;
+  // costGHS arg kept for call-site compatibility; never trusted.
+  void costGHS;
+  state.wallet.balanceGHS = Math.round((state.wallet.balanceGHS - price) * 100) / 100;
   state.home = {
     ...state.home,
     furnitureIds: [...state.home.furnitureIds, id],
