@@ -372,7 +372,7 @@ export function LandmarkLabels({
 // ───────────────────────────────────────────────────── map pin (mission) ────
 // One merged geometry (cone + sphere + highlight dot, vertex-colored) so each
 // pin is a single draw call. The pin still bobs/spins as a group.
-let pinGeo: THREE.BufferGeometry | null = null
+const pinGeo: THREE.BufferGeometry | null = null
 function getPinGeometry(): THREE.BufferGeometry {
   if (pinGeo) return pinGeo
   const cone = new THREE.ConeGeometry(0.55, 1.4, 12)

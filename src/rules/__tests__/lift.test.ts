@@ -40,7 +40,7 @@ describe('lift scheduler (O-001)', () => {
   });
 
   it('solo trip time = distance/speed + door times', () => {
-    let s = callLift(createLift(DEF), { id: 'a', from: 0, to: 3 });
+    const s = callLift(createLift(DEF), { id: 'a', from: 0, to: 3 });
     const { events } = run(s, 30, 0.01);
     const alight = events.find((e) => e.type === 'alight' && e.id === 'a')!;
     expect(alight).toBeDefined();

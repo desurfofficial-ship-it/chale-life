@@ -561,7 +561,7 @@ function ServiceVehicle({ kind, gateIndex }: { kind: (typeof TRUCK_KINDS)[number
       let x = depot.x + (kind === 'fuel' ? 0 : kind === 'baggage' ? 4 : kind === 'cater' ? 8 : kind === 'pushback' ? 12 : 16);
       let z = depot.z;
       let yaw = 0;
-      let show = true;
+      const show = true;
 
       const slotX = g.x + (kind === 'fuel' || kind === 'cater' ? 5.2 : -5.2);
       const slotZ = g.z + (kind === 'baggage' ? 3.2 : kind === 'pushback' ? -2.5 : 1.2);

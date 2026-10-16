@@ -120,7 +120,7 @@ export function StreetTraffic() {
     for (let i = 0; i < n; i++) {
       const c = fleet[i];
       const loop = loops[c.loop];
-      let s = c.s0 + t * SPEED * c.dir;
+      const s = c.s0 + t * SPEED * c.dir;
       // okada weave
       const weave = c.kind === 'okada' ? Math.sin(t * 2.1 + i) * 0.35 : 0;
       poseAt(loop.segs, loop.total, s, pose);

@@ -95,7 +95,7 @@ export function tickBusiness(
   let seated = state.seated;
   let revenue = state.dayRevenueGHS;
   let stock = state.stock;
-  let log = state.log;
+  const log = state.log;
   let customers = state.customers.map((c) => ({ ...c, sinceMin: c.sinceMin + dtGameMin }));
 
   // staff on-shift only when open
