@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'reac
 import { useThree, type ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { BusinessDef } from '../../data/businesses';
-import { isBusinessOpen, busyLabel } from '../../rules/business';
+import { isBusinessOpen } from '../../rules/business';
 import { registerAmbient } from '../../engine/ambient';
 import { getZoom } from '../../store/gameStore';
 import { getAmbientHour } from '../../store/ambientClock';
@@ -204,4 +204,3 @@ export function BusinessBuilding({ def }: { def: BusinessDef }) {
   );
 }
 
-void busyLabel;
