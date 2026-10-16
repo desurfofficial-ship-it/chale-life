@@ -82,3 +82,21 @@ describe('B-001 business rules', () => {
     expect(busyLabel({ ...sim, seated: 11, queue: 2 }, 12)).toBe('Packed');
   });
 });
+
+
+describe('P0 canBuyItem integrity', () => {
+  it('rejects non-finite and negative menu prices', () => {
+    const prov = findBusiness('BIZ_KOFI_PROVISION')!;
+    const sim = createBusinessSim(prov);
+    const base = prov.menu[0];
+    expect(canBuyItem(prov, sim, { ...base, priceGHS: Number.NaN }, 100, 10).ok).toBe(false);
+    expect(canBuyItem(prov, sim, { ...base, priceGHS: -5 }, 100, 10).ok).toBe(false);
+  });
+
+  it('rejects non-finite wallet balances', () => {
+    const prov = findBusiness('BIZ_KOFI_PROVISION')!;
+    const sim = createBusinessSim(prov);
+    expect(canBuyItem(prov, sim, prov.menu[0], Number.NaN, 10).ok).toBe(false);
+  });
+});
+
