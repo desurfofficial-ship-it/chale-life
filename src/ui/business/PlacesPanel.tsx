@@ -5,8 +5,8 @@
  */
 import { useState, type CSSProperties } from 'react';
 import { OFFICES } from '../../data/offices';
-import { BUSINESSES } from '../../data/businesses';
-import { isBusinessOpen } from '../../rules/business';
+import { BUSINESSES } from '../../data/worldBusinesses';
+import { isBusinessOpen } from '../../rules/worldBusiness';
 import { isOpen as isOfficeOpen } from '../../rules/office';
 import { getAmbientHour } from '../../store/ambientClock';
 import { requestTeleport, requestFrame } from '../../store/gameStore';
