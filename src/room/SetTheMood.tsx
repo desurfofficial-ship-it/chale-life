@@ -162,6 +162,14 @@ function DaylightRig() {
     }
     if (amb.current) amb.current.intensity = d.ambient
   }, [hour, bg, scene])
+  // P2-4: the mood editor mounts per visit — release its background texture
+  // and don't leave the scene pointing at disposed GPU memory
+  useEffect(() => {
+    return () => {
+      if (scene.background === bg.tex) scene.background = null
+      bg.tex.dispose()
+    }
+  }, [bg, scene])
   return (
     <>
       <hemisphereLight ref={amb} args={['#cfd8ff', '#3a2e28', 0.5]} />

@@ -119,6 +119,8 @@ export function StreetLamp({ position, rotation = 0 }: { position: [number, numb
     const t = new THREE.CanvasTexture(c)
     return t
   }, [])
+  // P2-4: per-lamp glow texture — free it when the lamp unmounts
+  useEffect(() => () => glow.dispose(), [glow])
   return (
     <group position={position} rotation={[0, rotation, 0]}>
       <mesh position={[0, 2.6, 0]}>

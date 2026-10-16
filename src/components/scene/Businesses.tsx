@@ -13,7 +13,7 @@
 //     (lib/signAtlas) → ONE draw call for every sign in the city;
 //   • repeated small props (plastic chairs, umbrellas, crops) are NOT built
 //     here — the district modules collect them into instanced meshes.
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 import { Building } from './Buildings'
 import { signGeometry, getSignMaterial } from '@/lib/signAtlas'
@@ -455,6 +455,13 @@ export function Hills({ items }: { items: { x: number; z: number; r: number; h: 
     }
     return parts.length ? mergeAll(parts) : null
   }, [items])
+  // P2-4: the merged ridge geometry is owned by this component — free it if
+  // the component unmounts or the items prop re-merges
+  useEffect(() => {
+    return () => {
+      geo?.dispose()
+    }
+  }, [geo])
   if (!geo) return null
   return (
     <mesh geometry={geo} receiveShadow name="hills" userData={{ noCollide: true }}>

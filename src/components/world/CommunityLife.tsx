@@ -198,6 +198,8 @@ function People({ data: D }: { data: CommunityData }) {
     for (const m of Object.values(M)) m.instanceMatrix.needsUpdate = true
   })
   const mat = useMemo(() => new THREE.MeshStandardMaterial({ roughness: 0.85 }), [])
+  // P2-4: per-mount material — free it on unmount
+  useEffect(() => () => mat.dispose(), [mat])
   return (
     <group name="t14-people">
       <instancedMesh ref={torso} name="t14-npc-torso" args={[G.torso, mat, n]} castShadow frustumCulled={false} />
@@ -332,6 +334,8 @@ function Vehicles({ data: D }: { data: CommunityData }) {
   }, [plan, dummy, tintColor])
 
   const mat = useMemo(() => new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0.25 }), [])
+  // P2-4: per-mount material — free it on unmount
+  useEffect(() => () => mat.dispose(), [mat])
   return (
     <group name="t14-vehicles">
       {VEH_KINDS.map((k) => plan[k].length ? (

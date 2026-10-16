@@ -348,6 +348,12 @@ export function LandmarkLabels({
       }),
     []
   )
+  // P2-4: label canvas textures are per-mount — release them on unmount
+  useEffect(() => {
+    return () => {
+      for (const s of statics) s.tex.dispose()
+    }
+  }, [statics])
   const rtRef = useRef<LabelRuntime[]>([])
   const scratchRef = useRef<LabelScratch | null>(null)
   useEffect(() => {
@@ -406,6 +412,13 @@ export function MapPin({
     [color]
   )
   const phase = useMemo(() => seededSpanAt(position, Math.PI * 2), [position])
+  // P2-4: pin material is per-instance (tinted) — free it on unmount
+  // (the pin GEOMETRY is a module singleton — never dispose that)
+  useEffect(() => {
+    return () => {
+      mat.dispose()
+    }
+  }, [mat])
   useEffect(() => {
     markAnimated(ref.current)
     return () => unmarkAnimated(ref.current)

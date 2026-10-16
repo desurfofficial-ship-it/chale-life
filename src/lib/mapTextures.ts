@@ -6,6 +6,21 @@ import { COMMUNITY } from './communityLayout'
 import { OSU_STREET, NIMA_QUARTER } from './osuNimaLayout'
 import { hashId, mulberry32 } from './seeded'
 
+// ─── shared static texture cache (P2-4) ───────────────────────────────────
+// flag/balloon/sign/… canvases are content-identical per key but used to be
+// re-created (and re-uploaded to the GPU) for every mounting component.
+// Cache them app-lifetime — "hoist to module scope if they're shared" — and
+// NEVER dispose the returned textures from component cleanups.
+const staticTexCache = new Map<string, THREE.CanvasTexture>()
+function cachedTexture(key: string, build: () => THREE.CanvasTexture): THREE.CanvasTexture {
+  let t = staticTexCache.get(key)
+  if (!t) {
+    t = build()
+    staticTexCache.set(key, t)
+  }
+  return t
+}
+
 // ─────────────────────────────────────────────────────────── ground texture ─
 // World PLATE.w×PLATE.d → canvas (10 px per unit), origin at canvas center.
 // The plate spans x −160…212 → its centre (and the plane mesh position) is
@@ -16,6 +31,11 @@ import { hashId, mulberry32 } from './seeded'
 const S = 8
 
 export function buildGroundTexture(): THREE.CanvasTexture {
+  // 4960×1856 canvas — never rebuild it on remounts (StrictMode / HMR)
+  return cachedTexture('ground', buildGroundCanvas)
+}
+
+function buildGroundCanvas(): THREE.CanvasTexture {
   const CW = PLATE.w * S
   const CH = PLATE.d * S
   const c = document.createElement('canvas')
@@ -853,6 +873,10 @@ export function buildGroundTexture(): THREE.CanvasTexture {
 // radial fade for the ocean skirt disc (opaque core → transparent rim)
 // NOTE: three.js alphaMap reads the GREEN channel → write grayscale
 export function skirtDiscAlpha(): THREE.CanvasTexture {
+  return cachedTexture('skirt-disc', buildSkirtDiscAlpha)
+}
+
+function buildSkirtDiscAlpha(): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = c.height = 512
   const g = c.getContext('2d')!
@@ -867,6 +891,10 @@ export function skirtDiscAlpha(): THREE.CanvasTexture {
 
 // rectangular edge fade for the land apron (fades on all four sides)
 export function skirtRectAlpha(): THREE.CanvasTexture {
+  return cachedTexture('skirt-rect', buildSkirtRectAlpha)
+}
+
+function buildSkirtRectAlpha(): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = c.height = 256
   const g = c.getContext('2d')!
@@ -1239,6 +1267,10 @@ export function getFacadeMaterials(): { wall: THREE.MeshStandardMaterial; glass:
 
 // ─────────────────────────────────────────────────────────────── shop signs ─
 export function signTexture(text: string, bg: string, fg = '#111111'): THREE.CanvasTexture {
+  return cachedTexture(`sign:${text}|${bg}|${fg}`, () => buildSignTexture(text, bg, fg))
+}
+
+function buildSignTexture(text: string, bg: string, fg: string): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = 512
   c.height = 128
@@ -1259,6 +1291,10 @@ export function signTexture(text: string, bg: string, fg = '#111111'): THREE.Can
 
 // ───────────────────────────────────────────────────────────── ghana flag ──
 export function flagTexture(): THREE.CanvasTexture {
+  return cachedTexture('flag', buildFlagTexture)
+}
+
+function buildFlagTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = 256
   c.height = 160
@@ -1277,6 +1313,10 @@ export function flagTexture(): THREE.CanvasTexture {
 
 // ───────────────────────────── balloon envelope (red/gold/green stripes) ────
 export function balloonTexture(): THREE.CanvasTexture {
+  return cachedTexture('balloon', buildBalloonTexture)
+}
+
+function buildBalloonTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = 256
   c.height = 256
@@ -1294,6 +1334,10 @@ export function balloonTexture(): THREE.CanvasTexture {
 
 // ───────────────────────────────────────────── lighthouse banding texture ───
 export function lighthouseTexture(): THREE.CanvasTexture {
+  return cachedTexture('lighthouse', buildLighthouseTexture)
+}
+
+function buildLighthouseTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = 128
   c.height = 512
@@ -1309,6 +1353,10 @@ export function lighthouseTexture(): THREE.CanvasTexture {
 
 // ────────────────────────────────────────────────────────── checker (race) ──
 export function checkerTexture(): THREE.CanvasTexture {
+  return cachedTexture('checker', buildCheckerTexture)
+}
+
+function buildCheckerTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = 240
   c.height = 120
@@ -1327,6 +1375,10 @@ export function checkerTexture(): THREE.CanvasTexture {
 
 // ───────────────────────────── Chale Wote street-art murals (3 variants) ────
 export function muralTexture(variant = 0): THREE.CanvasTexture {
+  return cachedTexture(`mural:${variant}`, () => buildMuralTexture(variant))
+}
+
+function buildMuralTexture(variant: number): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = 512
   c.height = 256
@@ -1422,6 +1474,10 @@ export function muralTexture(variant = 0): THREE.CanvasTexture {
 
 // ───────────────────────── festival bunting strip (transparent background) ──
 export function buntingTexture(): THREE.CanvasTexture {
+  return cachedTexture('bunting', buildBuntingTexture)
+}
+
+function buildBuntingTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = 512
   c.height = 48
@@ -1452,6 +1508,10 @@ export function buntingTexture(): THREE.CanvasTexture {
 
 // ─────────────────────────────────────────────────────────────── sun glow ──
 export function glowTexture(color = '#ffb46b'): THREE.CanvasTexture {
+  return cachedTexture(`glow:${color}`, () => buildGlowTexture(color))
+}
+
+function buildGlowTexture(color: string): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = 256
   c.height = 256

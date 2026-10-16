@@ -34,6 +34,16 @@ function useSlotMaterials(mats: RoomMats, selected: Slot | null) {
     for (const s of Object.keys(REPEAT) as Slot[]) m[s] = new THREE.MeshStandardMaterial({ roughness: 0.8 })
     return m
   }, [])
+  // P2-4: slot materials + their cloned maps live per room mount — free them
+  // when the room unmounts (entering/leaving the house used to leak both).
+  useEffect(() => {
+    return () => {
+      for (const s of Object.keys(REPEAT) as Slot[]) {
+        set[s].map?.dispose()
+        set[s].dispose()
+      }
+    }
+  }, [set])
   useEffect(() => {
     for (const s of Object.keys(REPEAT) as Slot[]) {
       const sw = SWATCH[mats[s]]
@@ -105,6 +115,19 @@ export function GyanRoom({
     shadeMat.emissiveIntensity = 0.15 + lampsOn * 0.9
     fixed.bulb.emissiveIntensity = 0.4 + lampsOn * 2
   }, [lampsOn, shadeMat, fixed.bulb])
+  // P2-4: the whole fixture material set is per-mount — dispose on unmount
+  // (book is a small array of spine materials; the rest are single mats)
+  useEffect(() => {
+    return () => {
+      for (const v of Object.values(fixed)) {
+        if (Array.isArray(v)) {
+          for (const m of v) m.dispose()
+        } else {
+          v.dispose()
+        }
+      }
+    }
+  }, [fixed])
 
   const pick = (slot: Slot) => (e: ThreeEvent<MouseEvent>) => {
     if (!onPick) return

@@ -4,7 +4,7 @@
 // Palms/trees/lamps/people/umbrellas/benches used to be individual groups of
 // meshes (≈1200 draw calls across the map). Each type is now merged into a
 // single geometry with baked vertex colors and rendered as one InstancedMesh.
-import { useLayoutEffect, useMemo, useRef } from 'react'
+import { useLayoutEffect, useMemo, useRef, useEffect } from 'react'
 import * as THREE from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 
@@ -258,6 +258,9 @@ export function InstancedLamps({ items }: { items: PropItem[] }) {
     g.fillRect(0, 0, 64, 64)
     return new THREE.CanvasTexture(c)
   }, [])
+  // P2-4: per-mount lamp textures/geometry — free them on unmount (the glow
+  // canvas here is local, not the shared mapTextures cache)
+  useEffect(() => () => glow.dispose(), [glow])
   const pointsGeo = useMemo(() => {
     const g = new THREE.BufferGeometry()
     const arr = new Float32Array(items.length * 3)
@@ -271,6 +274,7 @@ export function InstancedLamps({ items }: { items: PropItem[] }) {
     g.setAttribute('position', new THREE.BufferAttribute(arr, 3))
     return g
   }, [items])
+  useEffect(() => () => pointsGeo.dispose(), [pointsGeo])
   return (
     <group>
       <instancedMesh name="inst-lamp" ref={ref} args={[pole, undefined, items.length]} castShadow frustumCulled={false}>
