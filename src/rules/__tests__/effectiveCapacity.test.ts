@@ -18,7 +18,6 @@ describe('effectiveCapacity from staff', () => {
   it('half staff reduces capacity proportionally', () => {
     const def = findBusiness('BIZ_KWAME_BARBER')!;
     let sim = createBusinessSim(def);
-    // turn off half (ceil)
     const half = Math.ceil(sim.staff.length / 2);
     for (let i = 0; i < half; i++) {
       sim = setStaffOnShift(sim, sim.staff[i].id, false);
@@ -29,16 +28,25 @@ describe('effectiveCapacity from staff', () => {
     expect(effectiveCapacity(def, sim)).toBeLessThan(def.capacity);
   });
 
-  it('zero staff blocks seating during a tick while open', () => {
+  it('zero staff stays zero across open ticks (no auto-restore)', () => {
     const def = findBusiness('BIZ_KWAME_BARBER')!;
     let sim = createBusinessSim(def);
-    for (const s of sim.staff) {
+    for (const s of [...sim.staff]) {
       sim = setStaffOnShift(sim, s.id, false);
     }
-    // force reopen path: tick with all off then prevent auto-restore by...
-    // our tick restores all-on when every staff off while open — document that
-    // effectiveCapacity is 0 only mid-toggle; after tick auto-restore applies.
-    // So test pure helper: capacity 0 when all off.
     expect(effectiveCapacity(def, sim)).toBe(0);
+    sim = tickBusiness(def, sim, 5, 12);
+    expect(sim.staff.every((s) => !s.onShift)).toBe(true);
+    expect(effectiveCapacity(def, sim)).toBe(0);
+  });
+
+  it('closed hour does not wipe roster for next open', () => {
+    const def = findBusiness('BIZ_KWAME_BARBER')!;
+    let sim = createBusinessSim(def);
+    const id = sim.staff[0].id;
+    sim = setStaffOnShift(sim, id, false);
+    sim = tickBusiness(def, sim, 2, 3); // closed for barber (opens 8)
+    expect(sim.staff.find((s) => s.id === id)?.onShift).toBe(false);
+    expect(sim.staff.filter((s) => s.onShift).length).toBe(sim.staff.length - 1);
   });
 });
