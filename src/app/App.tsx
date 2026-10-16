@@ -281,8 +281,14 @@ export function App() {
       </Suspense>
       {/* G-001 HUD + E-003 Act wiring: label/enabled from actPromptFor on the
           store snapshot, toast from resolveAct via the store (2 s lifetime
-          is the Hud's own). */}
-      {isOnboardingActive() ? <OnboardingOverlay /> : hud}
+          is the Hud's own).
+          FIX: hide the walk-mode HUD when the TycoonHud is mounted — the two
+          overlays' top-left cards (WalletCard vs the Walk button + TycoonHud's
+          cash pill) and top-right clusters (Joystick/Recenter zone vs the
+          TycoonHud day/clock/weather bar) otherwise stack on top of each other
+          (z-index 20 HUD vs 25+ TycoonHud vs 45 Walk button). The TycoonHud is
+          the sole presentation layer in city mode. */}
+      {isOnboardingActive() ? <OnboardingOverlay /> : !tycoonMode ? hud : null}
       {!tycoonMode && !isOnboardingActive() ? (
         <button
           type="button"
@@ -361,7 +367,13 @@ export function App() {
           onFitBusinesses={() => requestFitMyBusinesses()}
         />
       ) : null}
-      {!isOnboardingActive() ? (
+      {/* Walk-mode camera + movement controls. FIX: hide the Joystick and
+          RecenterButton when in tycoon (city) mode — they overlap with the
+          TycoonHud's top bar (Recenter button at right:92px sits on top of the
+          day/clock/weather pill at z-index 32 vs 30) and the joystick has no
+          role in city overview. The TycoonHud's CameraRail (Map / Mine) handles
+          recentering in city mode instead. */}
+      {!isOnboardingActive() && !tycoonMode ? (
         <>
           <Joystick />
           <RecenterButton />
