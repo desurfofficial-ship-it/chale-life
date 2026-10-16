@@ -129,7 +129,7 @@ export function GyanRoom({
   })
 
   return (
-    <group>
+    <group userData={{ noBatch: true }}>
       {/* ── floor ── */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]} receiveShadow material={M.floor} {...tag('floor')}>
         <planeGeometry args={[w, d]} />
