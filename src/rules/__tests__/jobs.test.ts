@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { ACCRA_LEGAL_JOBS, findJobById } from '../../data/jobs';
 import { locations } from '../../data/locations';
 import { colliders } from '../../world/colliders';
+import { loadColliderFixture } from '../../test-support/colliderFixture';
+// P2-2: the capture is fetched (not bundled) — node tests ingest from disk
+loadColliderFixture();
 import { DAAVI_BENCH, DAAVI_JOB_SPOT, markerPositionFor } from '../proximity';
 
 /** ACCRA MAP geometry — Daavi St band + the solids around the reserved plot. */

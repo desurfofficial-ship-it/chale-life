@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { locations } from '../data/locations';
 import { colliders, worldBounds } from '../world/colliders';
+import { loadColliderFixture } from '../test-support/colliderFixture';
+// P2-2: the capture is fetched (not bundled) — node tests ingest from disk
+loadColliderFixture();
 import { circleIntersectsBox, type Box } from './collision';
 import { DEFAULT_MOVEMENT } from './movement';
 import { getState, getHud } from '../store/gameStore';
