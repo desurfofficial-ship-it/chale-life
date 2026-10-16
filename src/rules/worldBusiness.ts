@@ -84,6 +84,19 @@ function pushLog(log: readonly string[], line: string): readonly string[] {
 }
 
 /** Tick one business by dtGameMin game-minutes at hour. */
+
+/**
+ * Staff on shift scales service capacity. Zero on-shift staff → capacity 0
+ * (no seating). Full roster → catalogue capacity. Linear in between.
+ */
+export function effectiveCapacity(def: BusinessDef, state: BusinessSimState): number {
+  const total = state.staff.length;
+  if (total === 0) return def.capacity;
+  const on = state.staff.filter((s) => s.onShift).length;
+  if (on <= 0) return 0;
+  return Math.max(1, Math.round((def.capacity * on) / total));
+}
+
 export function tickBusiness(
   def: BusinessDef,
   state: BusinessSimState,
@@ -115,7 +128,9 @@ export function tickBusiness(
   }
 
   // arrivals
-  const rate = customerArrivalRate(def, hour); // per hour
+  const staffRatio =
+    staff.length === 0 ? 1 : staff.filter((s) => s.onShift).length / staff.length;
+  const rate = customerArrivalRate(def, hour) * staffRatio; // per hour, staff-scaled
   const arrive = (rate * dtGameMin) / 60;
   // poisson-ish: accumulate fractional via hash of time is overkill — use floor+random-free fractional bank
   const add = Math.floor(arrive + (state.queue % 1));
@@ -137,14 +152,15 @@ export function tickBusiness(
   }
 
   // seat from queue
-  const free = Math.max(0, def.capacity - seated);
+  const cap = effectiveCapacity(def, { ...state, staff });
+  const free = Math.max(0, cap - seated);
   const seatN = Math.min(free, queue, Math.max(1, Math.floor(dtGameMin / 2)));
   if (seatN > 0 && queue > 0) {
     let left = seatN;
     customers = customers.map((c) => {
       if (c.phase === 'queue' && left > 0) {
         left--;
-        return { ...c, phase: 'seated' as const, sinceMin: 0, seat: def.capacity - free + (seatN - left) };
+        return { ...c, phase: 'seated' as const, sinceMin: 0, seat: cap - free + (seatN - left) };
       }
       return c;
     });
