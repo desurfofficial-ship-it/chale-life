@@ -91,7 +91,7 @@ function PropFallback({ spec }: { spec: PropSpec }) {
   );
 }
 
-function Cutaway({ def }: { def: BusinessDef }) {
+function Cutaway({ def, richProps }: { def: BusinessDef; richProps: boolean }) {
   const { w, d } = def.site;
   const sim = useBiz(() => getBusinessState().sims[def.id]);
   const seats = def.capacity;
@@ -136,14 +136,17 @@ function Cutaway({ def }: { def: BusinessDef }) {
           </mesh>
         );
       })}
-      {/* low-poly GLB props (on-demand with cutaway — not loaded at distance) */}
-      <Suspense fallback={null}>
-        {propsFor(def).map((spec, i) => (
-          <Suspense key={`p${i}`} fallback={<PropFallback spec={spec} />}>
-            <PropMesh spec={spec} />
-          </Suspense>
-        ))}
-      </Suspense>
+      {/* GLB props only for the selected business — keeps draw calls under the
+          earnAndEat e2e budget (<450) when many cutaways are near the camera. */}
+      {richProps ? (
+        <Suspense fallback={null}>
+          {propsFor(def).map((spec, i) => (
+            <Suspense key={`p${i}`} fallback={<PropFallback spec={spec} />}>
+              <PropMesh spec={spec} />
+            </Suspense>
+          ))}
+        </Suspense>
+      ) : null}
       {/* staff pills as simple capsules */}
       {staff.filter((s) => s.onShift).map((s, i) => {
         const x = -w / 2 + 1.5 + (i % 3) * 1.2;
@@ -225,7 +228,7 @@ export function BusinessBuilding({ def }: { def: BusinessDef }) {
     >
       {!open ? <Shell def={def} onTap={onTap} openNow={openNow} /> : (
         <group onClick={onTap}>
-          <Cutaway def={def} />
+          <Cutaway def={def} richProps={selected === def.id} />
           {/* low facade lip so cutaway reads as sliced model */}
           <mesh position={[0, 0.15, def.site.d / 2 - 0.05]}>
             <boxGeometry args={[def.site.w, 0.3, 0.1]} />
