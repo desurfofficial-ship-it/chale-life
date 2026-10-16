@@ -19,3 +19,9 @@ firebase-applet-config.json
 # Only optimised output (public/models/) is committed, with a row in
 # docs/assets/LICENSES.csv per file (checked in CI).
 asset-sources/
+
+# P1-2: the gitleaks secret-scanning BINARY (21 MB ELF) was committed by
+# accident in E-010 — CI used to curl-extract it at the repo root and it
+# tripped 14 GitHub secret-scanning alerts. CI now uses gitleaks-action;
+# never commit the binary (fetch it from gitleaks releases if needed).
+/gitleaks
