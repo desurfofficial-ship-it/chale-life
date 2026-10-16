@@ -657,9 +657,22 @@ export function buyBusinessItem(businessId: string, itemId: string): { ok: boole
       priceGHS?: number;
     };
   };
-  const r = biz.tryBuy(businessId, itemId, state.wallet.balanceGHS);
+  // Snapshot balance before tryBuy so a concurrent tap cannot race the debit.
+  const balanceBefore = state.wallet.balanceGHS;
+  if (!Number.isFinite(balanceBefore) || balanceBefore < 0) {
+    return { ok: false, reason: 'Wallet balance is invalid.' };
+  }
+  const r = biz.tryBuy(businessId, itemId, balanceBefore);
   if (!r.ok) return { ok: false, reason: r.reason };
-  state.wallet.balanceGHS = Math.round((state.wallet.balanceGHS - (r.priceGHS ?? 0)) * 100) / 100;
+  // P0: only debit a trusted finite price from the business menu (never free via undefined).
+  const price = r.priceGHS;
+  if (!Number.isFinite(price) || (price as number) < 0) {
+    return { ok: false, reason: 'Invalid item price.' };
+  }
+  if (balanceBefore < (price as number)) {
+    return { ok: false, reason: 'Not enough cash.' };
+  }
+  state.wallet.balanceGHS = Math.round((balanceBefore - (price as number)) * 100) / 100;
   if (r.hungerRestore) {
     state.needs.hunger = clampNeed(state.needs.hunger + r.hungerRestore);
   }
