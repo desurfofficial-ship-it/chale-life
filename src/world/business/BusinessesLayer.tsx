@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import { BUSINESSES } from '../../data/businesses';
 import { registerAmbient } from '../../engine/ambient';
 import { tickBusinesses } from '../../store/businessStore';
-import { getZoom, getState } from '../../store/gameStore';
+import { getState } from '../../store/gameStore';
 import { BusinessBuilding } from './BusinessBuilding';
 
 export function BusinessesLayer() {
@@ -28,5 +28,3 @@ export function BusinessesLayer() {
   );
 }
 
-// silence unused in some builds
-void getZoom;
