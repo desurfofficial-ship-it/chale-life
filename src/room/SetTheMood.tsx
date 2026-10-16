@@ -3,19 +3,24 @@
 // ─── SET THE MOOD — Gyan's room as a dollhouse you dress by hand ────────────
 // Portrait-phone layout (390×844 first). Tap a surface then a swatch, or drag
 // a swatch straight onto the room. Pull the sun across the sky with the
-// daylight slider. Mood meter (Cozy / Bright / Moody) reacts to every change.
-// State persists in localStorage ('chale-room-v1').
+// daylight slider. Mood meter reacts to every change.
+//
+// Tabs: Devices (real toggles — ceiling lamp / desk lamp / fan drive the 3D
+// room), Surfaces (paint), Day (daylight), Shop (furniture that renders the
+// moment you buy it). State persists via roomPrefs (shared with the walkable
+// world room) + localStorage ('chale-room-v1').
 import { Suspense, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import * as THREE from 'three'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { OrbitControls, ContactShadows } from '@react-three/drei'
 import { create } from 'zustand'
-import { listHomeFurniture, findFurnitureById } from '../data/furniture'
-import { getState, subscribe, buyHomeFurniture } from '../store/gameStore'
+import { listHomeFurniture, findFurnitureById, comfortPctFromOwned } from '../data/furniture'
+import { useStoreSnapshot, buyHomeFurniture } from '../store/gameStore'
 import {
   HOME_ZONES,
   zoneUnlocked,
   deviceUnlocked,
+  type ZoneDevice,
   type ZoneId,
 } from '../data/roomZones'
 import { findHousingTierById } from '../data/housing'
@@ -24,11 +29,7 @@ import {
   MOODS, SLOTS, SWATCH, SWATCHES, moodScores, moodSentence, swatchURL,
   type MatKind, type MoodId, type RoomMats, type Slot,
 } from './materials'
-import { PlayerCharacter } from '../components/world/PlayerCharacter'
-
-// ?nochar=1 hides the player (the headless SwiftShader proof renderer on ARM
-// crashes its GPU process on skinned meshes; real phones are unaffected)
-const SHOW_PLAYER = typeof window === 'undefined' || !new URLSearchParams(window.location.search).get('nochar')
+import { loadRoomMats, saveRoomMats, loadRoomDevices, saveRoomDevices, type RoomDevices } from './roomPrefs'
 
 // ── store ────────────────────────────────────────────────────────────────────
 interface MoodState {
@@ -44,21 +45,8 @@ interface MoodState {
   undo: () => void
   redo: () => void
 }
-const KEY = 'chale-room-v1'
-function load(): { mats: RoomMats; hour: number } {
-  try {
-    const raw = typeof window !== 'undefined' ? window.localStorage.getItem(KEY) : null
-    if (raw) {
-      const v = JSON.parse(raw)
-      if (v.mats && Object.values(v.mats).every((id) => SWATCH[id as string])) return v
-    }
-  } catch {
-    /* ignore */
-  }
-  return { mats: { ...MOODS[0].mats }, hour: MOODS[0].hour }
-}
 export const useMood = create<MoodState>((set, get) => ({
-  ...load(),
+  ...loadRoomMats(),
   selected: 'floor',
   past: [],
   future: [],
@@ -89,11 +77,7 @@ if (typeof window !== 'undefined') {
   // tooling/proof hook: lets automated demos drive the editor
   ;(window as unknown as Record<string, unknown>).__MOOD_STORE = useMood
   useMood.subscribe((s) => {
-    try {
-      window.localStorage.setItem(KEY, JSON.stringify({ mats: s.mats, hour: s.hour }))
-    } catch {
-      /* private mode */
-    }
+    saveRoomMats(s.mats, s.hour)
   })
 }
 
@@ -253,38 +237,120 @@ function Plinth() {
   )
 }
 
+// ── shared UI atoms ──────────────────────────────────────────────────────────
+const chipBase: CSSProperties = {
+  minHeight: 40,
+  padding: '0 14px',
+  borderRadius: 12,
+  border: '1px solid rgba(255,255,255,0.12)',
+  background: 'rgba(255,255,255,0.06)',
+  color: 'rgba(255,255,255,0.85)',
+  fontWeight: 700,
+  fontSize: 13,
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
+}
+const sectionLabel: CSSProperties = {
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: '0.14em',
+  textTransform: 'uppercase',
+  color: 'rgba(255,255,255,0.45)',
+  marginBottom: 8,
+}
 
+/** Small on/off switch (no emojis, works on touch). */
+function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={on}
+      onClick={onClick}
+      style={{
+        width: 52,
+        height: 30,
+        borderRadius: 999,
+        border: `1px solid ${on ? 'rgba(252,209,22,0.7)' : 'rgba(255,255,255,0.18)'}`,
+        background: on ? 'rgba(252,209,22,0.25)' : 'rgba(255,255,255,0.08)',
+        position: 'relative',
+        cursor: 'pointer',
+        transition: 'background 160ms linear, border-color 160ms linear',
+        flexShrink: 0,
+      }}
+    >
+      <span
+        style={{
+          position: 'absolute',
+          top: 3,
+          left: on ? 25 : 3,
+          width: 22,
+          height: 22,
+          borderRadius: 999,
+          background: on ? '#fcd116' : 'rgba(255,255,255,0.55)',
+          transition: 'left 160ms ease, background 160ms linear',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.4)',
+        }}
+      />
+    </button>
+  )
+}
 
+const KIND_META: Record<string, { label: string; color: string }> = {
+  lamp: { label: 'Lamp', color: '#fcd116' },
+  fan: { label: 'Fan', color: '#5fd4ff' },
+  ac: { label: 'AC', color: '#7aa7ff' },
+  outlet: { label: 'Power', color: '#9aa3ad' },
+}
 
+const RARITY_BORDER: Record<string, string> = {
+  basic: '1px solid rgba(255,255,255,0.12)',
+  standard: '1px solid rgba(95,212,255,0.4)',
+  premium: '1px solid rgba(252,209,22,0.55)',
+}
 
-/** Furniture marketplace — House Control style tiles. */
-function FurnitureShop() {
-  const [owned, setOwned] = useState<readonly string[]>(() => getState().home.furnitureIds)
-  const [balance, setBalance] = useState(() => getState().wallet.balanceGHS)
-  useEffect(() => {
-    return subscribe(() => {
-      setOwned(getState().home.furnitureIds)
-      setBalance(getState().wallet.balanceGHS)
-    })
-  }, [])
+/** Furniture marketplace — House Control style tiles. Buying renders the
+ *  piece in the room above instantly (replaceable pieces swap the starter). */
+function FurnitureShop({ ownedCount }: { ownedCount: number }) {
+  const owned = useStoreSnapshot((s) => s.home.furnitureIds)
+  const balance = useStoreSnapshot((s) => s.wallet.balanceGHS)
   const items = listHomeFurniture()
+  const comfort = useMemo(() => comfortPctFromOwned(owned), [owned])
   const buy = (id: string) => {
     const item = findFurnitureById(id)
     if (!item) return
-    if (buyHomeFurniture(id, item.costGHS)) {
-      setOwned(getState().home.furnitureIds)
-      setBalance(getState().wallet.balanceGHS)
-    }
+    buyHomeFurniture(id, item.costGHS)
   }
   return (
-    <div style={{ display: 'grid', gap: 8 }}>
-      <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-        Wallet GHS {balance.toFixed(0)}
+    <div style={{ display: 'grid', gap: 10 }}>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+        <span style={{ ...sectionLabel, marginBottom: 0 }}>Furniture</span>
+        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>
+          Owned {ownedCount} · Comfort {comfort}%
+        </span>
+        <span
+          style={{
+            marginLeft: 'auto',
+            fontSize: 12,
+            fontWeight: 800,
+            color: '#fcd116',
+            background: 'rgba(252,209,22,0.1)',
+            border: '1px solid rgba(252,209,22,0.3)',
+            borderRadius: 999,
+            padding: '4px 10px',
+          }}
+        >
+          GHS {balance.toFixed(0)}
+        </span>
+      </div>
+      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', lineHeight: 1.4 }}>
+        Pieces appear in the room the moment you buy. A bed, sofa, wardrobe, desk,
+        coffee table, rug, fan or bookshelf replaces the starter one.
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
         {items.map((f) => {
           const has = owned.includes(f.id)
           const can = !has && balance >= f.costGHS
+          const size = f.dimensions ? `${f.dimensions.widthMeters.toFixed(1)} × ${f.dimensions.depthMeters.toFixed(1)} m` : null
           return (
             <button
               key={f.id}
@@ -295,16 +361,28 @@ function FurnitureShop() {
                 textAlign: 'left',
                 padding: '12px 12px',
                 borderRadius: 14,
-                border: has ? '1px solid rgba(16,185,129,0.45)' : '1px solid rgba(255,255,255,0.1)',
+                border: has ? '1px solid rgba(16,185,129,0.45)' : RARITY_BORDER[f.rarity] ?? RARITY_BORDER.basic,
                 background: has ? 'rgba(16,185,129,0.12)' : 'rgba(255,255,255,0.05)',
                 color: '#e8eef7',
                 cursor: can || has ? 'pointer' : 'default',
                 opacity: can || has ? 1 : 0.55,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 4,
               }}
             >
               <div style={{ fontWeight: 800, fontSize: 13, lineHeight: 1.2 }}>{f.title}</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>GHS {f.costGHS}</div>
-              <div style={{ fontSize: 11, fontWeight: 700, marginTop: 6, color: has ? '#6ee7b7' : can ? '#fcd116' : 'rgba(255,255,255,0.35)' }}>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                {f.summary}
+              </div>
+              <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.35)', display: 'flex', gap: 8 }}>
+                <span>GHS {f.costGHS}</span>
+                {size && <span>{size}</span>}
+                <span style={{ color: f.rarity === 'premium' ? '#fcd116' : f.rarity === 'standard' ? '#5fd4ff' : 'rgba(255,255,255,0.3)' }}>
+                  {f.rarity}
+                </span>
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 800, color: has ? '#6ee7b7' : can ? '#fcd116' : 'rgba(255,255,255,0.35)' }}>
                 {has ? 'Owned' : can ? 'Buy' : 'Need cash'}
               </div>
             </button>
@@ -319,6 +397,7 @@ function FurnitureShop() {
  * Room editor — House Control–inspired layout:
  *   3D dollhouse on top, dark glass panel below with scene chips + tiles.
  * Tap a surface in 3D to select it; scene chips set the whole mood at once.
+ * Device toggles drive the actual room (lights, fan) here AND in the world.
  */
 export default function SetTheMood() {
   const { mats, hour, selected, apply, preset, select, setHour, undo, redo, past, future } = useMood()
@@ -326,7 +405,7 @@ export default function SetTheMood() {
   const sentence = useMemo(() => moodSentence(mats, scores), [mats, scores])
   const lamps = daylight(hour).lamps
 
-  // Panel tab: surfaces (paint) | lights (daylight) | shop (furniture)
+  // Panel tab: devices | surfaces (paint) | lights (daylight) | shop
   const [panel, setPanel] = useState<'devices' | 'surfaces' | 'lights' | 'shop'>(() => {
     if (typeof window === 'undefined') return 'devices'
     const r = new URLSearchParams(window.location.search).get('room')
@@ -335,21 +414,32 @@ export default function SetTheMood() {
     if (r === 'lights') return 'lights'
     return 'devices'
   })
-  const tierId = getState().home.tierId || 'single_room'
+  const tierId = useStoreSnapshot((s) => s.home.tierId) || 'single_room'
   const tier = findHousingTierById(tierId)
+  const owned = useStoreSnapshot((s) => s.home.furnitureIds)
   const [zoneId, setZoneId] = useState<ZoneId>('room')
-  // Device on/off state (local for now — visual + future IoT hook)
-  const [deviceOn, setDeviceOn] = useState<Record<string, boolean>>(() => {
-    const init: Record<string, boolean> = {}
-    for (const z of HOME_ZONES) for (const d of z.devices) init[d.id] = d.kind === 'lamp'
-    return init
-  })
+  const [drift, setDrift] = useState(true)
+  // Device toggles drive the 3D room + persist to the walkable world
+  const [devices, setDevices] = useState<RoomDevices>(() => loadRoomDevices())
   const [acTemp, setAcTemp] = useState(24)
+  const [acOn, setAcOn] = useState(false)
   const slotDef = SLOTS.find((s) => s.id === selected)!
   const [matKind, setMatKind] = useState<MatKind>(slotDef.kinds[0])
   useEffect(() => {
     if (!slotDef.kinds.includes(matKind)) setMatKind(slotDef.kinds[0])
   }, [selected, slotDef, matKind])
+
+  const toggleDevice = (d: ZoneDevice) => {
+    // room_ceiling / room_desk / room_fan map to real room devices
+    const map: Record<string, keyof RoomDevices> = { room_ceiling: 'ceiling', room_desk: 'desk', room_fan: 'fan' }
+    const key = map[d.id]
+    if (!key) return
+    setDevices((s) => {
+      const next = { ...s, [key]: !s[key] }
+      saveRoomDevices(next)
+      return next
+    })
+  }
 
   const goStreet = () => {
     try {
@@ -365,24 +455,11 @@ export default function SetTheMood() {
   }
 
   const kinds: MatKind[] = ['wood', 'stone', 'fabric', 'paint']
-  const sceneChips: { id: MoodId; label: string }[] = [
-    { id: 'bright', label: 'Bright' },
-    { id: 'cozy', label: 'Cozy' },
-    { id: 'moody', label: 'Night' },
-  ]
+  const sceneChips = MOODS.map((m) => ({ id: m.id, label: m.label }))
+  const topMood = (Object.keys(scores) as MoodId[]).sort((a, b) => scores[b] - scores[a])[0]
 
-  const chipBase: CSSProperties = {
-    minHeight: 40,
-    padding: '0 14px',
-    borderRadius: 12,
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.06)',
-    color: 'rgba(255,255,255,0.85)',
-    fontWeight: 700,
-    fontSize: 13,
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-  }
+  const zone = HOME_ZONES.find((z) => z.id === zoneId)!
+  const zoneOpen = zoneUnlocked(zone, tierId)
 
   return (
     <div
@@ -401,7 +478,10 @@ export default function SetTheMood() {
           <ambientLight intensity={0.35 + lamps * 0.15} />
           <directionalLight position={[4, 8, 2]} intensity={0.55 + lamps * 0.35} color="#fff1d6" />
           <Suspense fallback={null}>
-            <GyanRoom mode="dollhouse" mats={mats} selected={selected} onPick={select} lampsOn={lamps} />
+            <group position={[0, -0.02, 0]}>
+              <GyanRoom mode="dollhouse" mats={mats} selected={selected} onPick={select} lampsOn={lamps} owned={owned} devices={devices} />
+            </group>
+            <Plinth />
             <ContactShadows position={[0, 0.01, 0]} opacity={0.45} scale={12} blur={2.4} far={4} />
           </Suspense>
           <OrbitControls
@@ -411,7 +491,10 @@ export default function SetTheMood() {
             minDistance={4}
             maxDistance={11}
             target={[0, 1.1, 0]}
+            onStart={() => setDrift(false)}
           />
+          <IdleDrift active={drift} />
+          <Bridge />
           <DaylightRig />
         </Canvas>
       </div>
@@ -453,9 +536,15 @@ export default function SetTheMood() {
             border: '1px solid rgba(255,255,255,0.1)',
             fontWeight: 800,
             fontSize: 14,
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 8,
           }}
         >
           Room
+          <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.45)' }}>
+            {tier?.shortLabel ?? 'Single Room'} · Comfort {comfortPctFromOwned(owned)}%
+          </span>
         </div>
         <div style={{ display: 'flex', gap: 6, pointerEvents: 'auto' }}>
           <button type="button" onClick={undo} disabled={!past.length} style={{ ...chipBase, opacity: past.length ? 1 : 0.35, background: 'rgba(14,16,24,0.82)' }}>
@@ -488,12 +577,10 @@ export default function SetTheMood() {
         }}
       >
         {/* Scene chips — one tap sets the whole mood */}
-        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', marginBottom: 8 }}>
-          Scenes
-        </div>
+        <div style={sectionLabel}>Scenes</div>
         <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginBottom: 14 }}>
           {sceneChips.map((c) => {
-            const on = scores[c.id] >= Math.max(scores.cozy, scores.bright, scores.moody) - 0.02 && scores[c.id] > 0.4
+            const on = c.id === topMood && scores[c.id] > 0.4
             return (
               <button
                 key={c.id}
@@ -512,11 +599,8 @@ export default function SetTheMood() {
           })}
         </div>
 
-        {/* Panel tabs */}
         {/* Zone chips — starter only has Room; upgrades unlock Living/Kitchen/… */}
-        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', marginBottom: 8 }}>
-          Rooms · {tier?.shortLabel ?? 'Single Room'}
-        </div>
+        <div style={sectionLabel}>Rooms · {tier?.shortLabel ?? 'Single Room'}</div>
         <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4, marginBottom: 12 }}>
           {HOME_ZONES.map((z) => {
             const open = zoneUnlocked(z, tierId)
@@ -560,7 +644,7 @@ export default function SetTheMood() {
               onClick={() => setPanel(id)}
               style={{
                 flex: 1,
-                minHeight: 40,
+                minHeight: 42,
                 borderRadius: 12,
                 border: panel === id ? '1px solid #fcd116' : '1px solid rgba(255,255,255,0.1)',
                 background: panel === id ? 'rgba(252,209,22,0.16)' : 'rgba(255,255,255,0.04)',
@@ -568,6 +652,7 @@ export default function SetTheMood() {
                 fontWeight: 800,
                 fontSize: 13,
                 cursor: 'pointer',
+                transition: 'background 150ms linear, color 150ms linear',
               }}
             >
               {label}
@@ -580,85 +665,89 @@ export default function SetTheMood() {
           {sentence}
         </div>
 
-        
         {panel === 'devices' && (
           <div>
-            {(() => {
-              const zone = HOME_ZONES.find((z) => z.id === zoneId)!
-              const open = zoneUnlocked(zone, tierId)
-              if (!open) {
-                return (
-                  <div style={{ padding: 14, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.55)', fontSize: 13, lineHeight: 1.4 }}>
-                    {zone.label} unlocks when you upgrade your home past {zone.minTierId.replace(/_/g, ' ')}.
-                    Starter players only control the single room.
-                  </div>
-                )
-              }
-              return (
-                <div style={{ display: 'grid', gap: 8 }}>
-                  {zone.devices.map((d) => {
-                    const unlocked = deviceUnlocked(d, tierId)
-                    const on = !!deviceOn[d.id]
-                    if (!unlocked) {
-                      return (
-                        <div key={d.id} style={{ padding: '12px 14px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>
-                          Lock {d.title} — upgrade home to use
-                        </div>
-                      )
-                    }
-                    if (d.kind === 'ac') {
-                      return (
-                        <div key={d.id} style={{ padding: '12px 14px', borderRadius: 14, background: on ? 'rgba(59,130,246,0.15)' : 'rgba(255,255,255,0.05)', border: on ? '1px solid rgba(59,130,246,0.5)' : '1px solid rgba(255,255,255,0.1)' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                            <div>
-                              <div style={{ fontWeight: 800, fontSize: 14 }}>{d.title}</div>
-                              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>{on ? 'Cool' : 'Off'}</div>
-                            </div>
-                            <button type="button" onClick={() => setDeviceOn((s) => ({ ...s, [d.id]: !s[d.id] }))}
-                              style={{ minWidth: 52, minHeight: 36, borderRadius: 10, border: 'none', fontWeight: 800, cursor: 'pointer', background: on ? '#3b82f6' : 'rgba(255,255,255,0.12)', color: '#fff' }}>
-                              {on ? 'On' : 'Off'}
-                            </button>
-                          </div>
-                          {on && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
-                              <button type="button" onClick={() => setAcTemp((x) => Math.max(16, x - 1))}
-                                style={{ width: 36, height: 36, borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>-</button>
-                              <div style={{ fontSize: 22, fontWeight: 900, minWidth: 48, textAlign: 'center' }}>{acTemp}°</div>
-                              <button type="button" onClick={() => setAcTemp((x) => Math.min(30, x + 1))}
-                                style={{ width: 36, height: 36, borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>+</button>
-                            </div>
-                          )}
-                        </div>
-                      )
-                    }
-                    return (
-                      <button
-                        key={d.id}
-                        type="button"
-                        onClick={() => setDeviceOn((s) => ({ ...s, [d.id]: !s[d.id] }))}
-                        style={{
-                          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                          padding: '12px 14px', borderRadius: 14, textAlign: 'left', cursor: 'pointer',
-                          background: on ? 'rgba(252,209,22,0.14)' : 'rgba(255,255,255,0.05)',
-                          border: on ? '1px solid rgba(252,209,22,0.45)' : '1px solid rgba(255,255,255,0.1)',
-                          color: '#e8eef7',
-                        }}
-                      >
-                        <div>
-                          <div style={{ fontWeight: 800, fontSize: 14 }}>{d.title}</div>
-                          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{d.kind} · {on ? 'On' : 'Off'}</div>
-                        </div>
-                        <span style={{ fontWeight: 800, fontSize: 12, color: on ? '#fcd116' : 'rgba(255,255,255,0.4)' }}>{on ? 'On' : 'Off'}</span>
-                      </button>
-                    )
-                  })}
+            {!zoneOpen ? (
+              <div style={{ padding: 14, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.55)', fontSize: 13, lineHeight: 1.4 }}>
+                {zone.label} unlocks when you upgrade your home past {zone.minTierId.replace(/_/g, ' ')}.
+                Starter players only control the single room.
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gap: 8 }}>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', lineHeight: 1.4 }}>
+                  Toggles change the room above — and the same room when you walk
+                  home in the world.
                 </div>
-              )
-            })()}
+                {zone.devices.map((d) => {
+                  const unlocked = deviceUnlocked(d, tierId)
+                  const realKey = ({ room_ceiling: 'ceiling', room_desk: 'desk', room_fan: 'fan' } as Record<string, keyof RoomDevices | undefined>)[d.id]
+                  const on = realKey ? devices[realKey] : d.kind === 'ac' ? acOn : false
+                  const meta = KIND_META[d.kind] ?? KIND_META.outlet
+                  if (!unlocked) {
+                    return (
+                      <div key={d.id} style={{ padding: '12px 14px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.35)', fontSize: 13, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span>{d.title}</span>
+                        <span style={{ fontSize: 11 }}>Upgrade home to use</span>
+                      </div>
+                    )
+                  }
+                  if (d.kind === 'ac') {
+                    return (
+                      <div key={d.id} style={{ padding: '12px 14px', borderRadius: 14, background: on ? 'rgba(59,130,246,0.15)' : 'rgba(255,255,255,0.05)', border: on ? '1px solid rgba(59,130,246,0.5)' : '1px solid rgba(255,255,255,0.1)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                          <div>
+                            <div style={{ fontWeight: 800, fontSize: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <span style={{ width: 8, height: 8, borderRadius: 999, background: meta.color, display: 'inline-block' }} />
+                              {d.title}
+                            </div>
+                            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{on ? `Cool · ${acTemp}°` : 'Off'}</div>
+                          </div>
+                          <Toggle on={on} onClick={() => setAcOn((v) => !v)} />
+                        </div>
+                        {on && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
+                            <button type="button" onClick={() => setAcTemp((x) => Math.max(16, x - 1))}
+                              style={{ width: 36, height: 36, borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>-</button>
+                            <div style={{ fontSize: 22, fontWeight: 900, minWidth: 48, textAlign: 'center' }}>{acTemp}°</div>
+                            <button type="button" onClick={() => setAcTemp((x) => Math.min(30, x + 1))}
+                              style={{ width: 36, height: 36, borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>+</button>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  }
+                  return (
+                    <button
+                      key={d.id}
+                      type="button"
+                      onClick={() => (realKey ? toggleDevice(d) : undefined)}
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        padding: '12px 14px', borderRadius: 14, textAlign: 'left', cursor: 'pointer',
+                        background: on ? 'rgba(252,209,22,0.14)' : 'rgba(255,255,255,0.05)',
+                        border: on ? '1px solid rgba(252,209,22,0.45)' : '1px solid rgba(255,255,255,0.1)',
+                        color: '#e8eef7',
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontWeight: 800, fontSize: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ width: 8, height: 8, borderRadius: 999, background: meta.color, display: 'inline-block' }} />
+                          {d.title}
+                        </div>
+                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
+                          {meta.label} · {on ? 'On' : 'Off'}
+                        </div>
+                      </div>
+                      <Toggle on={on} onClick={() => (realKey ? toggleDevice(d) : undefined)} />
+                    </button>
+                  )
+                })}
+              </div>
+            )}
           </div>
         )}
 
-{panel === 'surfaces' && (
+        {panel === 'surfaces' && (
           <div>
             {/* Slot picker */}
             <div style={{ display: 'flex', gap: 6, overflowX: 'auto', marginBottom: 10, paddingBottom: 2 }}>
@@ -698,8 +787,11 @@ export default function SetTheMood() {
                   {k}
                 </button>
               ))}
+              <span style={{ marginLeft: 'auto', fontSize: 12, color: 'rgba(255,255,255,0.5)', alignSelf: 'center' }}>
+                {SWATCHES.filter((s) => s.kind === matKind).length} finishes
+              </span>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8 }}>
               {SWATCHES.filter((s) => s.kind === matKind).map((s) => {
                 const on = mats[selected] === s.id
                 return (
@@ -715,10 +807,14 @@ export default function SetTheMood() {
                       background: s.color,
                       cursor: 'pointer',
                       boxShadow: on ? '0 0 0 2px rgba(252,209,22,0.35)' : undefined,
+                      transition: 'transform 120ms ease',
                     }}
                   />
                 )
               })}
+            </div>
+            <div style={{ marginTop: 10, fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>
+              {slotDef.label} · {SWATCH[mats[selected]]?.name ?? '—'}
             </div>
           </div>
         )}
@@ -765,13 +861,17 @@ export default function SetTheMood() {
                 )
               })}
             </div>
-            <div style={{ marginTop: 14, fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>
-              Lamps {Math.round(lamps * 100)}% · Hour {hour.toFixed(1)}
+            <div style={{ marginTop: 14, fontSize: 13, color: 'rgba(255,255,255,0.55)', display: 'flex', gap: 14 }}>
+              <span>Lamps {Math.round(lamps * 100)}%</span>
+              <span>Hour {hour.toFixed(1)}</span>
+              <span style={{ color: devices.ceiling ? '#fcd116' : 'rgba(255,255,255,0.35)' }}>
+                Ceiling {devices.ceiling ? 'on' : 'off'}
+              </span>
             </div>
           </div>
         )}
 
-        {panel === 'shop' && <FurnitureShop />}
+        {panel === 'shop' && <FurnitureShop ownedCount={owned.length} />}
       </div>
     </div>
   )
