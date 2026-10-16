@@ -3,7 +3,7 @@
  * B-001 — One world-run shop/restaurant: facade shell when zoomed out;
  * roofless pastel cutaway when zoomed in (same DETAIL_ZOOM as offices).
  */
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useThree, type ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { BusinessDef } from '../../data/worldBusinesses';
@@ -18,6 +18,8 @@ import {
 } from '../../store/businessStore';
 import { markAnimated, unmarkAnimated } from '../../components/world/SceneBatcher';
 import { signTexture } from '../../lib/mapTextures';
+import { useGLTF } from '@react-three/drei';
+import { propsFor, type PropSpec } from './businessFurniture';
 
 export const DETAIL_ZOOM = 20;
 export const DETAIL_RADIUS_M = 45;
@@ -66,6 +68,29 @@ function Shell({ def, onTap, openNow }: { def: BusinessDef; onTap: (e: ThreeEven
   );
 }
 
+
+/** One low-poly prop; falls back to a box if the GLB fails. */
+function PropMesh({ spec }: { spec: PropSpec }) {
+  const { scene } = useGLTF(spec.path);
+  const clone = scene.clone(true);
+  const s = spec.scale ?? 1;
+  return (
+    <group position={[spec.x, spec.y, spec.z]} rotation={[0, spec.rotY ?? 0, 0]} scale={[s, s, s]}>
+      <primitive object={clone} />
+    </group>
+  );
+}
+
+function PropFallback({ spec }: { spec: PropSpec }) {
+  const s = spec.scale ?? 1;
+  return (
+    <mesh position={[spec.x, 0.4 * s, spec.z]} castShadow>
+      <boxGeometry args={[0.6 * s, 0.8 * s, 0.6 * s]} />
+      <meshStandardMaterial color="#b0bec5" />
+    </mesh>
+  );
+}
+
 function Cutaway({ def }: { def: BusinessDef }) {
   const { w, d } = def.site;
   const sim = useBiz(() => getBusinessState().sims[def.id]);
@@ -111,6 +136,14 @@ function Cutaway({ def }: { def: BusinessDef }) {
           </mesh>
         );
       })}
+      {/* low-poly GLB props (on-demand with cutaway — not loaded at distance) */}
+      <Suspense fallback={null}>
+        {propsFor(def).map((spec, i) => (
+          <Suspense key={`p${i}`} fallback={<PropFallback spec={spec} />}>
+            <PropMesh spec={spec} />
+          </Suspense>
+        ))}
+      </Suspense>
       {/* staff pills as simple capsules */}
       {staff.filter((s) => s.onShift).map((s, i) => {
         const x = -w / 2 + 1.5 + (i % 3) * 1.2;
