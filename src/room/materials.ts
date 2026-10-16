@@ -10,7 +10,20 @@ export interface Swatch {
   kind: MatKind
   color: string // base colour
   alt?: string // secondary colour (grain / pattern)
-  pattern: 'planks' | 'slats' | 'terrazzo' | 'tiles' | 'laterite' | 'weave' | 'kente' | 'knit' | 'plaster' | 'velvet'
+  pattern:
+    | 'planks'
+    | 'slats'
+    | 'terrazzo'
+    | 'tiles'
+    | 'laterite'
+    | 'weave'
+    | 'kente'
+    | 'knit'
+    | 'plaster'
+    | 'velvet'
+    | 'marble'
+    | 'concrete'
+    | 'chevron'
   rough: number
 }
 
@@ -43,6 +56,38 @@ export const SWATCHES: Swatch[] = [
   { id: 'clay', name: 'Clay', kind: 'paint', color: '#c27b56', pattern: 'plaster', rough: 0.92 },
   { id: 'charcoal', name: 'Charcoal', kind: 'paint', color: '#34343a', pattern: 'plaster', rough: 0.9 },
   { id: 'navy', name: 'Night navy', kind: 'paint', color: '#25304d', pattern: 'plaster', rough: 0.9 },
+
+  // ── modern range — city apartments, contemporary finishes ────────────────
+  // wood
+  { id: 'ashGrey', name: 'Ash grey', kind: 'wood', color: '#a3a4a2', alt: '#8b8c8a', pattern: 'planks', rough: 0.6 },
+  { id: 'espresso', name: 'Espresso', kind: 'wood', color: '#4a352a', alt: '#33241c', pattern: 'slats', rough: 0.52 },
+  { id: 'whitewash', name: 'Whitewash', kind: 'wood', color: '#eae4d8', alt: '#d5ccbc', pattern: 'planks', rough: 0.68 },
+  { id: 'herringAsh', name: 'Herringbone ash', kind: 'wood', color: '#c9bfae', alt: '#a89a86', pattern: 'chevron', rough: 0.6 },
+  // stone
+  { id: 'marbleWhite', name: 'Marble white', kind: 'stone', color: '#f2f1ee', alt: '#c9c9c4', pattern: 'marble', rough: 0.25 },
+  { id: 'concreteGrey', name: 'Concrete', kind: 'stone', color: '#b0b0ab', alt: '#96968f', pattern: 'concrete', rough: 0.85 },
+  { id: 'mintTile', name: 'Mint tile', kind: 'stone', color: '#bfe0d2', alt: '#9fc9b8', pattern: 'tiles', rough: 0.4 },
+  { id: 'basaltTile', name: 'Basalt tile', kind: 'stone', color: '#43464a', alt: '#33363a', pattern: 'tiles', rough: 0.45 },
+  { id: 'porcelain', name: 'Porcelain', kind: 'stone', color: '#e9e7e2', alt: '#d3d0c8', pattern: 'tiles', rough: 0.3 },
+  // fabric
+  { id: 'greyWeave', name: 'Stone weave', kind: 'fabric', color: '#8f9094', alt: '#7c7d81', pattern: 'weave', rough: 0.95 },
+  { id: 'blushVelvet', name: 'Blush velvet', kind: 'fabric', color: '#d9a7a2', alt: '#b9827e', pattern: 'velvet', rough: 0.7 },
+  { id: 'oliveWeave', name: 'Olive weave', kind: 'fabric', color: '#71754f', alt: '#5d6142', pattern: 'weave', rough: 0.95 },
+  { id: 'denimBlue', name: 'Denim', kind: 'fabric', color: '#4a678f', alt: '#3a5276', pattern: 'weave', rough: 0.95 },
+  { id: 'mustardVelvet', name: 'Mustard velvet', kind: 'fabric', color: '#c99a33', alt: '#a67d28', pattern: 'velvet', rough: 0.7 },
+  { id: 'tealVelvet', name: 'Teal velvet', kind: 'fabric', color: '#2f837c', alt: '#256a64', pattern: 'velvet', rough: 0.7 },
+  { id: 'charcoalWeave', name: 'Charcoal weave', kind: 'fabric', color: '#43444a', alt: '#34353a', pattern: 'weave', rough: 0.95 },
+  // paint
+  { id: 'sageGreen', name: 'Sage green', kind: 'paint', color: '#9caf88', pattern: 'plaster', rough: 0.92 },
+  { id: 'metroGrey', name: 'Metro grey', kind: 'paint', color: '#7e838a', pattern: 'plaster', rough: 0.9 },
+  { id: 'blushPink', name: 'Blush pink', kind: 'paint', color: '#e6c2ba', pattern: 'plaster', rough: 0.92 },
+  { id: 'violetDusk', name: 'Violet dusk', kind: 'paint', color: '#6f5aa8', pattern: 'plaster', rough: 0.88 },
+  { id: 'mintPaint', name: 'Mint', kind: 'paint', color: '#bfe0cf', pattern: 'plaster', rough: 0.92 },
+  { id: 'coralEmber', name: 'Coral ember', kind: 'paint', color: '#e07856', pattern: 'plaster', rough: 0.9 },
+  { id: 'matteBlack', name: 'Matte black', kind: 'paint', color: '#202024', pattern: 'plaster', rough: 0.9 },
+  { id: 'doveWhite', name: 'Dove white', kind: 'paint', color: '#f4f2ee', pattern: 'plaster', rough: 0.95 },
+  { id: 'slateBlue', name: 'Slate blue', kind: 'paint', color: '#4a5d78', pattern: 'plaster', rough: 0.9 },
+  { id: 'mustardPaint', name: 'Mustard', kind: 'paint', color: '#d9a13b', pattern: 'plaster', rough: 0.9 },
 ]
 
 export const SWATCH = Object.fromEntries(SWATCHES.map((s) => [s.id, s])) as Record<string, Swatch>
@@ -63,7 +108,7 @@ export const SLOTS: { id: Slot; label: string; kinds: MatKind[] }[] = [
 
 export type RoomMats = Record<Slot, string>
 
-export type MoodId = 'cozy' | 'bright' | 'moody'
+export type MoodId = 'cozy' | 'bright' | 'moody' | 'modern' | 'afrofusion'
 
 export const MOODS: { id: MoodId; label: string; sub: string; mats: RoomMats; hour: number }[] = [
   {
@@ -77,6 +122,16 @@ export const MOODS: { id: MoodId; label: string; sub: string; mats: RoomMats; ho
   {
     id: 'moody', label: 'Moody', sub: 'after dark', hour: 22.2,
     mats: { floor: 'smokedOak', walls: 'charcoal', accentWall: 'blackAsh', upholstery: 'velvet', bedding: 'indigo', rug: 'kente', woodwork: 'blackAsh', accents: 'velvet' },
+  },
+  {
+    // contemporary city look — marble, concrete, clean greys, one mustard pop
+    id: 'modern', label: 'Modern', sub: 'city clean', hour: 14,
+    mats: { floor: 'marbleWhite', walls: 'doveWhite', accentWall: 'ashGrey', upholstery: 'greyWeave', bedding: 'linen', rug: 'denimBlue', woodwork: 'espresso', accents: 'mustardVelvet' },
+  },
+  {
+    // heritage × contemporary — Ghanaian palette on modern silhouettes
+    id: 'afrofusion', label: 'Afro-fusion', sub: 'heritage × modern', hour: 17.6,
+    mats: { floor: 'odum', walls: 'sageGreen', accentWall: 'kente', upholstery: 'oliveWeave', bedding: 'linen', rug: 'rustWool', woodwork: 'espresso', accents: 'tealVelvet' },
   },
 ]
 
@@ -107,7 +162,11 @@ export function moodScores(mats: RoomMats, hour: number): Record<MoodId, number>
   // make them add to exactly 100
   const fix = 100 - pct.reduce((a, b) => a + b, 0)
   pct[pct.indexOf(Math.max(...pct))] += fix
-  return { cozy: pct[0], bright: pct[1], moody: pct[2] }
+  const out = {} as Record<MoodId, number>
+  MOODS.forEach((m, i) => {
+    out[m.id] = pct[i]
+  })
+  return out
 }
 
 export function moodSentence(mats: RoomMats, scores: Record<MoodId, number>): string {
@@ -251,6 +310,68 @@ export function swatchTexture(id: string): THREE.CanvasTexture {
         g.arc(rnd() * N, rnd() * N, 3 + rnd() * 14, 0, Math.PI * 2)
         g.fill()
       }
+      break
+    case 'marble': {
+      // soft grey veins over a near-white ground (polished stone)
+      g.fillStyle = shadeHex(s.color, 0.02)
+      g.fillRect(0, 0, N, N)
+      for (let v = 0; v < 9; v++) {
+        g.strokeStyle = rnd() > 0.5 ? alt : shadeHex(alt, 0.12)
+        g.globalAlpha = 0.25 + rnd() * 0.3
+        g.lineWidth = 0.7 + rnd() * 2.4
+        g.beginPath()
+        let x = rnd() * N
+        let y = -8
+        g.moveTo(x, y)
+        while (y < N + 8) {
+          y += 14 + rnd() * 22
+          x += (rnd() - 0.5) * 46
+          g.lineTo(x, y)
+        }
+        g.stroke()
+      }
+      g.globalAlpha = 1
+      break
+    }
+    case 'concrete': {
+      // micro-cement: blotchy tonal patches + fine pores
+      for (let i = 0; i < 26; i++) {
+        g.fillStyle = shadeHex(s.color, (rnd() - 0.5) * 0.14)
+        g.globalAlpha = 0.5
+        g.beginPath()
+        g.ellipse(rnd() * N, rnd() * N, 20 + rnd() * 60, 14 + rnd() * 44, rnd() * 3, 0, Math.PI * 2)
+        g.fill()
+      }
+      g.globalAlpha = 0.35
+      for (let i = 0; i < 700; i++) {
+        g.fillStyle = rnd() > 0.5 ? alt : shadeHex(s.color, -0.1)
+        g.fillRect(rnd() * N, rnd() * N, 1.4, 1.4)
+      }
+      g.globalAlpha = 1
+      break
+    }
+    case 'chevron': {
+      // herringbone parquet — modern floor / slat-feature wall
+      const u = N / 8
+      g.save()
+      for (let row = -1; row < 10; row++) {
+        for (let col = -1; col < 9; col++) {
+          const flip = (row + col) % 2 === 0
+          g.save()
+          g.translate(col * u * 1.42, row * u * 0.71)
+          g.rotate(flip ? Math.PI / 4 : -Math.PI / 4)
+          g.fillStyle = shadeHex(s.color, (rnd() - 0.5) * 0.1)
+          g.fillRect(-u * 0.62, -u * 0.2, u * 1.24, u * 0.4)
+          g.strokeStyle = alt
+          g.globalAlpha = 0.35
+          g.strokeRect(-u * 0.62, -u * 0.2, u * 1.24, u * 0.4)
+          g.restore()
+        }
+      }
+      g.restore()
+      g.globalAlpha = 1
+      break
+    }
   }
   const tex = new THREE.CanvasTexture(c)
   tex.colorSpace = THREE.SRGBColorSpace

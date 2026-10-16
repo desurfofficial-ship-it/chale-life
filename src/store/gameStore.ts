@@ -28,6 +28,7 @@
  *    completedIds.length).
  */
 
+import { useSyncExternalStore } from 'react';
 import { resolveAct, type ActSession } from '../rules/act';
 import { clampNeed, drainNeeds } from '../rules/needs';
 import { worldBounds } from '../world/colliders';
@@ -100,6 +101,17 @@ export function getState(): Readonly<GameState> {
 export function subscribe(fn: Listener): () => void {
   listeners.add(fn);
   return () => listeners.delete(fn);
+}
+
+/**
+ * React selector read of the game state — useSyncExternalStore over the
+ * same notify() bus the HUD-free consumers use. Selector must return a
+ * STABLE snapshot value (state slices are replaced immutably on change,
+ * so object slices are safe; map inside the selector at your own risk).
+ */
+export function useStoreSnapshot<T>(select: (state: GameState) => T): T {
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- plain re-export of React's hook
+  return useSyncExternalStore(subscribe, () => select(state));
 }
 
 function notify(): void {
