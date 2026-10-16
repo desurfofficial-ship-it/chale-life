@@ -405,16 +405,24 @@ function Furniture({ layout, officeId }: { layout: FloorLayout; officeId: string
   const models = useMemo(() => rooms.flatMap((f) => f.models), [rooms]);
   const solid = useMemo(() => parts.filter((p) => !p.glow), [parts]);
   const glow = useMemo(() => parts.filter((p) => p.glow), [parts]);
+  // O-002: screens / server LEDs / ON AIR glow at night like the facade
+  // windows do (offices that are open after 18:00). The GLB desks bake the
+  // monitor into one vertex-coloured mesh, so the emissive batch is the
+  // stand-in screens until a split-screen asset lands.
+  const nightLit = useSel(() => {
+    const hr = getAmbientHour();
+    return hr < 6.5 || hr >= 18 ? 1 : 0;
+  });
   return (
     <>
       <PartBatch parts={solid} />
-      <PartBatch parts={glow} emissive />
+      <PartBatch parts={glow} emissive nightLit={nightLit === 1} />
       <OfficeModels models={models} fallback={(boxes) => <PartBatch parts={boxes} />} />
     </>
   );
 }
 
-function PartBatch({ parts, emissive }: { parts: Part[]; emissive?: boolean }) {
+function PartBatch({ parts, emissive, nightLit = false }: { parts: Part[]; emissive?: boolean; nightLit?: boolean }) {
   const ref = useRef<THREE.InstancedMesh>(null);
   useLayoutEffect(() => {
     const m = ref.current;
@@ -435,7 +443,12 @@ function PartBatch({ parts, emissive }: { parts: Part[]; emissive?: boolean }) {
   return (
     <instancedMesh ref={ref} args={[SHARED.box, undefined, parts.length]} castShadow={!emissive}>
       {emissive ? (
-        <meshStandardMaterial color="#ffffff" emissive="#9ad7ff" emissiveIntensity={0.55} roughness={0.3} />
+        <meshStandardMaterial
+          color="#ffffff"
+          emissive="#9ad7ff"
+          emissiveIntensity={nightLit ? 1.1 : 0.12}
+          roughness={0.3}
+        />
       ) : (
         <meshStandardMaterial color="#ffffff" roughness={0.7} />
       )}

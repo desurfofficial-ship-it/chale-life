@@ -16,6 +16,7 @@ import {
   type BusinessTypeDef,
 } from '../../data/businesses';
 import { formatGHS } from '../../rules/economy';
+import { OFFICES } from '../../data/offices';
 import {
   arrange,
   estimate,
@@ -96,6 +97,8 @@ export interface TycoonHudProps {
   readonly alerts: readonly AlertItem[];
   readonly activeTab: TycoonTab;
   readonly onTab: (tab: TycoonTab) => void;
+  /** O-002: go to a world-run office from city view (id from data/offices). */
+  readonly onGoToOffice?: (id: string) => void;
   /**
    * Buy a plot. Returns true when the purchase actually committed (the store
    * verified the wallet could cover the price), false when it was rejected
@@ -764,6 +767,7 @@ export function TycoonHud(props: TycoonHudProps) {
     alerts,
     activeTab,
     onTab,
+    onGoToOffice,
     onBuyPlot,
     onOpenBusiness,
     onCloseSheet,
@@ -801,6 +805,43 @@ export function TycoonHud(props: TycoonHudProps) {
           <div style={{ background: 'rgba(245,240,230,0.92)', borderRadius: 10, padding: '8px 12px', fontSize: 12, fontWeight: 700, color: '#2d5a3d', fontFamily: FONT }}>
             City view — pinch zoom · drag to pan · tap a plot ring
           </div>
+          {/* O-002: the Offices chip is not walk-mode-only any more — a
+              horizontally-scrollable Go list lives under the city banner */}
+          {onGoToOffice && (
+            <div
+              style={{
+                display: 'flex',
+                gap: 6,
+                marginTop: 6,
+                overflowX: 'auto',
+                pointerEvents: 'auto',
+                paddingBottom: 2,
+              }}
+            >
+              {OFFICES.map((o) => (
+                <button
+                  key={o.id}
+                  type="button"
+                  onClick={() => onGoToOffice(o.id)}
+                  style={{
+                    flex: '0 0 auto',
+                    border: '1px solid rgba(45,90,61,0.35)',
+                    background: 'rgba(245,240,230,0.92)',
+                    color: '#2d5a3d',
+                    borderRadius: 999,
+                    padding: '6px 10px',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    fontFamily: FONT,
+                    cursor: 'pointer',
+                    minHeight: 28,
+                  }}
+                >
+                  {o.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
       {!selectedPlot && activeTab === 'manage' && <ManagePanel businesses={businesses} />}

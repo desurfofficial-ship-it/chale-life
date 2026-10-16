@@ -73,6 +73,7 @@ import { CameraRail } from '../ui/tycoon/CameraRail';
 import type { PlotRef } from '../rules/business';
 import { DebugOverlay } from './DebugOverlay';
 import { OfficePanel } from '../ui/office/OfficePanel';
+import { travelToOffice } from '../ui/office/OfficesMenu';
 import { BusinessPanel } from '../ui/business/BusinessPanel';
 import { PlacesPanel } from '../ui/business/PlacesPanel';
 import { isWebGLAvailable } from './webgl';
@@ -366,6 +367,7 @@ function PlayApp() {
           alerts={tycoonAlerts}
           activeTab={tycoonTab}
           onTab={setActiveTab}
+          onGoToOffice={travelToOffice}
           onBuyPlot={requestBuyPlot}
           onOpenBusiness={requestOpenBusiness}
           onCloseSheet={() => setSelectedPlotId(null)}
