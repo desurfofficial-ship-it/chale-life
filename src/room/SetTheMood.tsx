@@ -12,6 +12,13 @@ import { OrbitControls, ContactShadows } from '@react-three/drei'
 import { create } from 'zustand'
 import { listHomeFurniture, findFurnitureById } from '../data/furniture'
 import { getState, subscribe, buyHomeFurniture } from '../store/gameStore'
+import {
+  HOME_ZONES,
+  zoneUnlocked,
+  deviceUnlocked,
+  type ZoneId,
+} from '../data/roomZones'
+import { findHousingTierById } from '../data/housing'
 import { GyanRoom, ROOM } from './GyanRoom'
 import {
   MOODS, SLOTS, SWATCH, SWATCHES, moodScores, moodSentence, swatchURL,
@@ -320,10 +327,24 @@ export default function SetTheMood() {
   const lamps = daylight(hour).lamps
 
   // Panel tab: surfaces (paint) | lights (daylight) | shop (furniture)
-  const [panel, setPanel] = useState<'surfaces' | 'lights' | 'shop'>(() => {
-    if (typeof window === 'undefined') return 'surfaces'
-    return new URLSearchParams(window.location.search).get('room') === 'shop' ? 'shop' : 'surfaces'
+  const [panel, setPanel] = useState<'devices' | 'surfaces' | 'lights' | 'shop'>(() => {
+    if (typeof window === 'undefined') return 'devices'
+    const r = new URLSearchParams(window.location.search).get('room')
+    if (r === 'shop') return 'shop'
+    if (r === 'surfaces') return 'surfaces'
+    if (r === 'lights') return 'lights'
+    return 'devices'
   })
+  const tierId = getState().home.tierId || 'single_room'
+  const tier = findHousingTierById(tierId)
+  const [zoneId, setZoneId] = useState<ZoneId>('room')
+  // Device on/off state (local for now — visual + future IoT hook)
+  const [deviceOn, setDeviceOn] = useState<Record<string, boolean>>(() => {
+    const init: Record<string, boolean> = {}
+    for (const z of HOME_ZONES) for (const d of z.devices) init[d.id] = d.kind === 'lamp'
+    return init
+  })
+  const [acTemp, setAcTemp] = useState(24)
   const slotDef = SLOTS.find((s) => s.id === selected)!
   const [matKind, setMatKind] = useState<MatKind>(slotDef.kinds[0])
   useEffect(() => {
@@ -492,10 +513,45 @@ export default function SetTheMood() {
         </div>
 
         {/* Panel tabs */}
+        {/* Zone chips — starter only has Room; upgrades unlock Living/Kitchen/… */}
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', marginBottom: 8 }}>
+          Rooms · {tier?.shortLabel ?? 'Single Room'}
+        </div>
+        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4, marginBottom: 12 }}>
+          {HOME_ZONES.map((z) => {
+            const open = zoneUnlocked(z, tierId)
+            const on = zoneId === z.id
+            return (
+              <button
+                key={z.id}
+                type="button"
+                onClick={() => open && setZoneId(z.id)}
+                disabled={!open}
+                style={{
+                  minHeight: 36,
+                  padding: '0 12px',
+                  borderRadius: 999,
+                  border: on && open ? '1px solid #fcd116' : '1px solid rgba(255,255,255,0.12)',
+                  background: on && open ? 'rgba(252,209,22,0.18)' : 'rgba(255,255,255,0.05)',
+                  color: !open ? 'rgba(255,255,255,0.28)' : on ? '#fcd116' : 'rgba(255,255,255,0.85)',
+                  fontWeight: 700,
+                  fontSize: 12,
+                  cursor: open ? 'pointer' : 'not-allowed',
+                  whiteSpace: 'nowrap',
+                }}
+                title={open ? z.label : `Upgrade home to unlock ${z.label}`}
+              >
+                {open ? z.label : `Lock ${z.label}`}
+              </button>
+            )
+          })}
+        </div>
+
         <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
           {([
+            ['devices', 'Devices'],
             ['surfaces', 'Surfaces'],
-            ['lights', 'Lights'],
+            ['lights', 'Day'],
             ['shop', 'Shop'],
           ] as const).map(([id, label]) => (
             <button
@@ -524,7 +580,85 @@ export default function SetTheMood() {
           {sentence}
         </div>
 
-        {panel === 'surfaces' && (
+        
+        {panel === 'devices' && (
+          <div>
+            {(() => {
+              const zone = HOME_ZONES.find((z) => z.id === zoneId)!
+              const open = zoneUnlocked(zone, tierId)
+              if (!open) {
+                return (
+                  <div style={{ padding: 14, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.55)', fontSize: 13, lineHeight: 1.4 }}>
+                    {zone.label} unlocks when you upgrade your home past {zone.minTierId.replace(/_/g, ' ')}.
+                    Starter players only control the single room.
+                  </div>
+                )
+              }
+              return (
+                <div style={{ display: 'grid', gap: 8 }}>
+                  {zone.devices.map((d) => {
+                    const unlocked = deviceUnlocked(d, tierId)
+                    const on = !!deviceOn[d.id]
+                    if (!unlocked) {
+                      return (
+                        <div key={d.id} style={{ padding: '12px 14px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>
+                          Lock {d.title} — upgrade home to use
+                        </div>
+                      )
+                    }
+                    if (d.kind === 'ac') {
+                      return (
+                        <div key={d.id} style={{ padding: '12px 14px', borderRadius: 14, background: on ? 'rgba(59,130,246,0.15)' : 'rgba(255,255,255,0.05)', border: on ? '1px solid rgba(59,130,246,0.5)' : '1px solid rgba(255,255,255,0.1)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                            <div>
+                              <div style={{ fontWeight: 800, fontSize: 14 }}>{d.title}</div>
+                              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>{on ? 'Cool' : 'Off'}</div>
+                            </div>
+                            <button type="button" onClick={() => setDeviceOn((s) => ({ ...s, [d.id]: !s[d.id] }))}
+                              style={{ minWidth: 52, minHeight: 36, borderRadius: 10, border: 'none', fontWeight: 800, cursor: 'pointer', background: on ? '#3b82f6' : 'rgba(255,255,255,0.12)', color: '#fff' }}>
+                              {on ? 'On' : 'Off'}
+                            </button>
+                          </div>
+                          {on && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
+                              <button type="button" onClick={() => setAcTemp((x) => Math.max(16, x - 1))}
+                                style={{ width: 36, height: 36, borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>-</button>
+                              <div style={{ fontSize: 22, fontWeight: 900, minWidth: 48, textAlign: 'center' }}>{acTemp}°</div>
+                              <button type="button" onClick={() => setAcTemp((x) => Math.min(30, x + 1))}
+                                style={{ width: 36, height: 36, borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>+</button>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    }
+                    return (
+                      <button
+                        key={d.id}
+                        type="button"
+                        onClick={() => setDeviceOn((s) => ({ ...s, [d.id]: !s[d.id] }))}
+                        style={{
+                          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                          padding: '12px 14px', borderRadius: 14, textAlign: 'left', cursor: 'pointer',
+                          background: on ? 'rgba(252,209,22,0.14)' : 'rgba(255,255,255,0.05)',
+                          border: on ? '1px solid rgba(252,209,22,0.45)' : '1px solid rgba(255,255,255,0.1)',
+                          color: '#e8eef7',
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontWeight: 800, fontSize: 14 }}>{d.title}</div>
+                          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{d.kind} · {on ? 'On' : 'Off'}</div>
+                        </div>
+                        <span style={{ fontWeight: 800, fontSize: 12, color: on ? '#fcd116' : 'rgba(255,255,255,0.4)' }}>{on ? 'On' : 'Off'}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              )
+            })()}
+          </div>
+        )}
+
+{panel === 'surfaces' && (
           <div>
             {/* Slot picker */}
             <div style={{ display: 'flex', gap: 6, overflowX: 'auto', marginBottom: 10, paddingBottom: 2 }}>
