@@ -112,3 +112,15 @@ describe('service interior props', () => {
     expect(dist).toBeLessThan(60);
   });
 });
+
+describe('service vertical slice near spawn', () => {
+  it('salon and gym exist with menus and stay near spawn', () => {
+    for (const id of ['BIZ_AUNTIE_SALON', 'BIZ_FIT_ZONE_GYM'] as const) {
+      const b = findBusiness(id);
+      expect(b).toBeTruthy();
+      expect(b!.menu.length).toBeGreaterThan(0);
+      const dist = Math.hypot(b!.site.x - SPAWN_XZ.x, b!.site.z - SPAWN_XZ.z);
+      expect(dist).toBeLessThan(80);
+    }
+  });
+});
