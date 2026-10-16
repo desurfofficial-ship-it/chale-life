@@ -103,10 +103,15 @@ export function initKeyboardInput(): () => void {
     syncKeyboard();
   };
   window.addEventListener('blur', onBlur);
+  const onVis = (): void => {
+    if (document.visibilityState === 'hidden') onBlur();
+  };
+  document.addEventListener('visibilitychange', onVis);
   return () => {
     window.removeEventListener('keydown', onKeyDown);
     window.removeEventListener('keyup', onKeyUp);
     window.removeEventListener('blur', onBlur);
+    document.removeEventListener('visibilitychange', onVis);
     pressed.clear();
     keyboard.x = 0;
     keyboard.z = 0;
