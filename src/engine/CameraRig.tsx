@@ -169,9 +169,12 @@ export function CameraRig() {
     }
 
     const base = tycoon ? TYCOON_OFFSET : insideRoom ? ROOM_OFFSET : OFFSET;
-    // When inside, zoom in so the room fills the phone screen
+    // When inside, zoom in so the room fills the phone screen. 64 px/m: the
+    // 6.92 m house spans the full 390 px width of the target phone and the
+    // room fills over half the height — the street stays out of the frame
+    // (52 kept showing the kiosk + opposite compound houses).
     if (insideRoom) {
-      const want = Math.max(getZoom(), 52);
+      const want = Math.max(getZoom(), 64);
       if (Math.abs(getZoom() - want) > 0.5) setZoom(getZoom() + (want - getZoom()) * Math.min(1, dt * 3));
     }
 
