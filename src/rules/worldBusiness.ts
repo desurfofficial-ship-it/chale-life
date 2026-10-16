@@ -98,8 +98,11 @@ export function tickBusiness(
   let log = state.log;
   let customers = state.customers.map((c) => ({ ...c, sinceMin: c.sinceMin + dtGameMin }));
 
-  // staff on-shift only when open
-  const staff = state.staff.map((s) => ({ ...s, onShift: open }));
+  // When closed, force staff off. When open, preserve player onShift choices.
+  let staff = state.staff.map((s) => ({ ...s, onShift: open ? s.onShift : false }));
+  if (open && staff.length > 0 && staff.every((s) => !s.onShift)) {
+    staff = staff.map((s) => ({ ...s, onShift: true }));
+  }
 
   if (!open) {
     // clear floor slowly
@@ -229,4 +232,18 @@ export function footprintsOverlap(
   const bz0 = b.z - b.d / 2;
   const bz1 = b.z + b.d / 2;
   return ax0 < bx1 && ax1 > bx0 && az0 < bz1 && az1 > bz0;
+}
+
+
+/** Toggle one staff member on/off shift (player management). */
+export function setStaffOnShift(
+  state: BusinessSimState,
+  staffId: string,
+  onShift: boolean,
+): BusinessSimState {
+  if (!state.staff.some((s) => s.id === staffId)) return state;
+  return {
+    ...state,
+    staff: state.staff.map((s) => (s.id === staffId ? { ...s, onShift } : s)),
+  };
 }

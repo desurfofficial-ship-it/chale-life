@@ -6,6 +6,7 @@ import {
   createBusinessSim,
   tickBusiness,
   canBuyItem,
+  setStaffOnShift as applyStaffOnShift,
   type BusinessSimState,
 } from '../rules/worldBusiness';
 import { getAmbientHour } from './ambientClock';
@@ -123,4 +124,16 @@ export function __resetBusinessesForTests(): void {
   state = { sims: {}, selectedBusinessId: null };
   simAcc = 0;
   ensureSims();
+}
+
+
+/** Player toggles a staff member on/off shift for a world business. */
+export function requestSetStaffOnShift(businessId: string, staffId: string, onShift: boolean): boolean {
+  const sim = state.sims[businessId];
+  if (!sim) return false;
+  const next = applyStaffOnShift(sim, staffId, onShift);
+  if (next === sim) return false;
+  state = { ...state, sims: { ...state.sims, [businessId]: next } };
+  for (const l of listeners) l();
+  return true;
 }

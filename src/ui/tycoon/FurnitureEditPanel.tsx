@@ -171,6 +171,57 @@ export function FurnitureEditPanel({ business }: { business: BusinessState }) {
         })}
       </div>
 
+      <div style={{ marginBottom: 10 }} data-testid="furniture-tile-grid">
+        <div style={{ fontSize: 12, color: MUTED, marginBottom: 6 }}>
+          Tap a free tile to move the selected piece (N/E/S/W still work).
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${tiles.w}, 28px)`,
+            gap: 3,
+            justifyContent: 'center',
+          }}
+        >
+          {Array.from({ length: tiles.d }, (_, tz) =>
+            Array.from({ length: tiles.w }, (_, tx) => {
+              const occ = business.layout.find((p) => p.tx === tx && p.tz === tz);
+              const isSel = selected != null && occ?.id === selected.id;
+              const edge = tx === 0 || tz === 0 || tx === tiles.w - 1 || tz === tiles.d - 1;
+              return (
+                <button
+                  key={`${tx}-${tz}`}
+                  type="button"
+                  disabled={edge}
+                  aria-label={`Tile ${tx},${tz}`}
+                  onClick={() => {
+                    if (!selected || edge) return;
+                    const ok = requestMoveFurniture(business.id, selected.id, tx, tz, tiles);
+                    setConfirmRemove(false);
+                    setFeedback(ok ? null : 'Cannot place there — outside the room or tile taken.');
+                  }}
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 4,
+                    border: isSel ? `2px solid ${FOREST}` : '1px solid rgba(0,0,0,0.12)',
+                    background: edge
+                      ? '#d4d4d8'
+                      : isSel
+                        ? FOREST
+                        : occ
+                          ? '#a8a29e'
+                          : CREAM,
+                    padding: 0,
+                    cursor: edge ? 'default' : 'pointer',
+                  }}
+                />
+              );
+            }),
+          )}
+        </div>
+      </div>
+
       {selected && (
         <div data-testid="furniture-edit-controls">
           <div
