@@ -363,7 +363,7 @@ function RoomChip() {
         }
         const u = new URL(window.location.href);
         u.searchParams.set('mood', '1');
-        u.searchParams.set('room', 'shop'); // open furniture marketplace tab in room editor
+        u.searchParams.set('room', 'devices'); // room editor devices tab
         u.searchParams.set('from', 'home');
         window.location.href = u.pathname + u.search + u.hash;
       }}
@@ -380,6 +380,9 @@ function RoomChip() {
         alignItems: 'center',
         gap: 8,
         maxWidth: 'min(64vw, 280px)',
+        // HUD root is pointerEvents:none — chip must re-enable hits (same fix as Act pill).
+        pointerEvents: 'auto',
+        touchAction: 'manipulation',
       }}
     >
       Room
