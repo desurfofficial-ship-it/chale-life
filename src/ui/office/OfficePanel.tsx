@@ -334,7 +334,9 @@ function StaffCard({ officeId, staffId }: { officeId: string; staffId: string })
       {s.log.length > 0 ? (
         <div style={{ marginTop: 6, background: '#f7f7fa', borderRadius: 10, padding: '6px 8px' }}>
           {s.log.map((l, i) => (
-            <div key={i} style={{ fontSize: 11, color: '#555', lineHeight: '17px' }}>
+            // P3-3: the log is capped (pushLog slices from the end), so a
+            // plain index key shifts on every append — key by index+content
+            <div key={`${i}:${l}`} style={{ fontSize: 11, color: '#555', lineHeight: '17px' }}>
               {l}
             </div>
           ))}
