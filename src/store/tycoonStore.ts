@@ -391,15 +391,16 @@ export function clockLabel(clock: GameClock): string {
 }
 
 export function weatherIcon(w: WeatherKind): string {
+  // Text labels — no emoji (UI policy: no decorative glyphs in chrome).
   switch (w) {
     case 'rain':
-      return '🌧';
+      return 'Rain';
     case 'cloudy':
-      return '☁️';
+      return 'Cloud';
     case 'night':
-      return '🌙';
+      return 'Night';
     default:
-      return '☀️';
+      return 'Sun';
   }
 }
 

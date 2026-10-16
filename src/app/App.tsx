@@ -314,14 +314,17 @@ export function App() {
           City
         </button>
       ) : null}
+      {/* Walk exits city mode. Placed BELOW the tycoon top bar (cash + day)
+          so it no longer covers the GHS pill (same top-left slot, z-index fight). */}
       {tycoonMode ? (
         <button
           type="button"
           onClick={() => setTycoonMode(false)}
+          data-testid="walk-mode-btn"
           style={{
             position: 'absolute',
             left: 12,
-            top: 'max(12px, env(safe-area-inset-top))',
+            top: 'calc(max(12px, env(safe-area-inset-top)) + 48px)',
             zIndex: 45,
             minHeight: 44,
             padding: '0 14px',
@@ -333,6 +336,7 @@ export function App() {
             fontSize: 14,
             cursor: 'pointer',
             pointerEvents: 'auto',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.18)',
           }}
         >
           Walk

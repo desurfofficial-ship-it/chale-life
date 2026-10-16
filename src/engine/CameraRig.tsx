@@ -37,7 +37,7 @@ import {
 
 const OFFSET = new THREE.Vector3(0, 30, 30);
 /** Tighter high angle so the single room fills the view when inside. */
-const ROOM_OFFSET = new THREE.Vector3(0, 11, 9);
+const ROOM_OFFSET = new THREE.Vector3(0, 9.5, 7.2);
 const TYCOON_OFFSET = new THREE.Vector3(0, 48, 48);
 export const projectedPlayerScreen = { x: 0, y: 0 };
 const _proj = new THREE.Vector3();
@@ -169,13 +169,14 @@ export function CameraRig() {
     }
 
     const base = tycoon ? TYCOON_OFFSET : insideRoom ? ROOM_OFFSET : OFFSET;
-    // When inside, zoom in so the room fills the phone screen. 64 px/m: the
-    // 6.92 m house spans the full 390 px width of the target phone and the
-    // room fills over half the height — the street stays out of the frame
-    // (52 kept showing the kiosk + opposite compound houses).
+    // When inside, zoom in so ONLY the room is on screen (no street, no
+    // neighbouring roofs). 78 px/m fills a 390 px phone from a 6.92 m house.
     if (insideRoom) {
-      const want = Math.max(getZoom(), 64);
-      if (Math.abs(getZoom() - want) > 0.5) setZoom(getZoom() + (want - getZoom()) * Math.min(1, dt * 3));
+      // 78 px/m: ~6.9 m room spans the full phone width and the street/
+      // neighbouring roofs leave the frame — pure interior like the
+      // reference room shot (no roof, no yard band).
+      const want = Math.max(getZoom(), 78);
+      if (Math.abs(getZoom() - want) > 0.5) setZoom(getZoom() + (want - getZoom()) * Math.min(1, dt * 3.5));
     }
 
     const off = rotateOffsetXZ(base.x, base.y, base.z, yawSmoothed.current);
