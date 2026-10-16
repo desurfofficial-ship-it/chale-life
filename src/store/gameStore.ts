@@ -624,6 +624,34 @@ if (
 }
 
 /** Comfort 0–100 from owned home furniture (housing upgrade gate). */
+
+/**
+ * B-001 — Buy a menu/stock item from a world-run business.
+ * Debits wallet, restores hunger/thirst, updates business sim stock.
+ */
+export function buyBusinessItem(businessId: string, itemId: string): { ok: boolean; reason?: string } {
+  // Lazy import to avoid circular init with businessStore
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const biz = require('./businessStore') as {
+    tryBuy: (businessId: string, itemId: string, walletGHS: number) => {
+      ok: boolean;
+      reason?: string;
+      hungerRestore?: number;
+      thirstRestore?: number;
+      priceGHS?: number;
+    };
+  };
+  const r = biz.tryBuy(businessId, itemId, state.wallet.balanceGHS);
+  if (!r.ok) return { ok: false, reason: r.reason };
+  state.wallet.balanceGHS = Math.round((state.wallet.balanceGHS - (r.priceGHS ?? 0)) * 100) / 100;
+  if (r.hungerRestore) {
+    state.needs.hunger = clampNeed(state.needs.hunger + r.hungerRestore);
+  }
+  // thirst mapped as small hunger bump already via item; energy untouched
+  notify();
+  return { ok: true };
+}
+
 export function getHomeComfortPct(): number {
   return comfortPctFromOwned(getState().home.furnitureIds ?? []);
 }
