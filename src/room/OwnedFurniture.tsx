@@ -19,7 +19,7 @@ import { Clone, useGLTF } from '@react-three/drei'
 import { useAnimatedRef } from '../components/world/SceneBatcher'
 import { publicUrl } from '../world/gltfSupport'
 import { findFurnitureById } from '../data/furniture'
-import { quarterToRotY, uidFor } from './homeLayout'
+import { quarterToRotY, uidFor, catalogIdFromUid } from './homeLayout'
 import { getHomeLayoutState, subscribeHomeLayout } from './homeLayoutStore'
 import { categoryOf, layoutOwnedFurniture, ROOM_D, ROOM_W, type Placement, type RoomMode } from './furnitureLayout'
 import { swatchTexture } from './materials'
@@ -343,7 +343,9 @@ function ProcItem({ category }: { category: string }) {
 function PlacedItem({ p, devices }: { p: Placement; devices: RoomDevices }) {
   // one animated ref per placed subtree → SceneBatcher exemption in world mode
   const ref = useAnimatedRef<THREE.Group>()
-  const item = findFurnitureById(p.id)
+  // Placement.id is the instance key (`id#n`) so React can mount two of the
+  // same catalog piece; the catalogue always keys on the bare catalog id.
+  const item = findFurnitureById(catalogIdFromUid(p.id))
   const widthM = item?.dimensions?.widthMeters ?? 0.8
 
   let content: React.ReactNode

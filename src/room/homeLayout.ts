@@ -213,3 +213,9 @@ export function findFreeSpot(
 export function uidFor(id: string, index: number): string {
   return `${id}#${index}`
 }
+
+/** Inverse of uidFor — catalogue lookup must use the bare id, never `id#n`. */
+export function catalogIdFromUid(uid: string): string {
+  const i = uid.lastIndexOf('#')
+  return i >= 0 ? uid.slice(0, i) : uid
+}
