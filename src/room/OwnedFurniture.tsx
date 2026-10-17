@@ -13,13 +13,15 @@
 //   - legacy basics get compact procedural stand-ins (no textures needed)
 // Every placed subtree registers useAnimatedRef so the world SceneBatcher
 // never freezes a loaded asset into a batch merge (the cutaway lesson).
-import { Suspense, useMemo } from 'react'
+import { Suspense, useMemo, useSyncExternalStore } from 'react'
 import * as THREE from 'three'
 import { Clone, useGLTF } from '@react-three/drei'
 import { useAnimatedRef } from '../components/world/SceneBatcher'
 import { publicUrl } from '../world/gltfSupport'
 import { findFurnitureById } from '../data/furniture'
-import { layoutOwnedFurniture, ROOM_D, ROOM_W, type Placement, type RoomMode } from './furnitureLayout'
+import { quarterToRotY, uidFor } from './homeLayout'
+import { getHomeLayoutState, subscribeHomeLayout } from './homeLayoutStore'
+import { categoryOf, layoutOwnedFurniture, ROOM_D, ROOM_W, type Placement, type RoomMode } from './furnitureLayout'
 import { swatchTexture } from './materials'
 import { FanHead } from './GyanRoom'
 import type { RoomDevices } from './roomPrefs'
@@ -399,7 +401,47 @@ export function OwnedFurniture({
   mode: RoomMode
   devices: RoomDevices
 }) {
-  const placements = useMemo(() => layoutOwnedFurniture(owned, mode), [owned, mode])
+  // Reality-check P2: the player's own layout (homeLayoutStore) decides WHERE
+  // each piece stands — place/move/rotate/remove + persistence. Pieces with no
+  // stored placement (legacy saves, or a piece the player removed from the
+  // layout but still owns) fall back to the classic curated anchors.
+  const { layout: overlay } = useSyncExternalStore(subscribeHomeLayout, getHomeLayoutState, getHomeLayoutState)
+  const placements = useMemo(() => {
+    // nth occurrence of each catalog id → stable uid (id#n), matching the
+    // uid the store assigned at place time (purchase order).
+    const seen = new Map<string, number>()
+    const uidOf = (id: string) => {
+      const n = seen.get(id) ?? 0
+      seen.set(id, n + 1)
+      return uidFor(id, n)
+    }
+    const baseQueue = new Map<string, Placement[]>()
+    for (const p of layoutOwnedFurniture(owned, mode)) {
+      const q = baseQueue.get(p.id) ?? []
+      q.push(p)
+      baseQueue.set(p.id, q)
+    }
+    const out: Placement[] = []
+    for (const id of owned) {
+      const uid = uidOf(id)
+      const hit = overlay.find((o) => o.uid === uid)
+      if (hit) {
+        out.push({
+          id: uid, // render key: the instance, so two of one catalog id don't collide
+          category: categoryOf(id),
+          x: hit.x,
+          z: hit.z,
+          rotY: quarterToRotY(hit.rot),
+          replacesFixed: false,
+        })
+        continue
+      }
+      const q = baseQueue.get(id)
+      const base = q?.shift()
+      if (base) out.push({ ...base, id: uid })
+    }
+    return out
+  }, [owned, mode, overlay])
   if (!placements.length) return null
   return (
     <group name="owned-furniture">

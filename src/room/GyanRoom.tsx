@@ -83,6 +83,9 @@ export function GyanRoom({
   lampsOn = 1,
   owned = [],
   devices,
+  /** Reality-check P2: the STARTER room is EMPTY — the player buys and
+   * places every piece (pass true only for legacy previews/tests). */
+  starterFurnished = false,
 }: {
   mode: 'world' | 'dollhouse'
   mats: RoomMats
@@ -93,12 +96,16 @@ export function GyanRoom({
   owned?: readonly string[]
   /** Device toggles (ceiling lamp / desk lamp / fan). Defaults to saved prefs. */
   devices?: Partial<RoomDevices>
+  starterFurnished?: boolean
 }) {
   const dev: RoomDevices = useMemo(
     () => ({ ...DEFAULT_DEVICES, ...(devices ?? loadRoomDevices()) }),
     [devices],
   )
-  // starter pieces the owned list swaps out (buy a sofa → starter sofa leaves)
+  // starter pieces the owned list swaps out (buy a sofa → starter sofa leaves).
+  // With the empty-starter default (sf=false) NONE of these render at all —
+  // every piece in the room is one the player bought and placed.
+  const sf = starterFurnished
   const replaced = useMemo(() => replacedFixedCategories(owned), [owned])
   const show = (cat: string) => !replaced.has(cat)
   const M = useSlotMaterials(mats, selected)
@@ -322,7 +329,7 @@ export function GyanRoom({
       {mode === 'world' ? (
         <group name="starter-room">
           {/* thin floor mat (cheap plastic / rubber) — swapped when a rug is bought */}
-          {show('rug') && (
+          {sf && show('rug') && (
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0.2, 0.012, 0.3]} receiveShadow material={M.rug} {...tag('rug')}>
               <planeGeometry args={[2.4, 1.8]} />
             </mesh>
@@ -330,7 +337,7 @@ export function GyanRoom({
 
           {/* simple mattress bed against back wall (no fancy headboard) —
               a bought bed replaces it at the same anchor */}
-          {show('bed') && (
+          {sf && show('bed') && (
             <group position={[1.6, 0, -d / 2 + 1.0]}>
               <mesh position={[0, 0.12, 0]} material={fixed.metal} castShadow>
                 <boxGeometry args={[1.9, 0.18, 1.1]} />
@@ -341,6 +348,7 @@ export function GyanRoom({
           )}
 
           {/* cheap wood table (cook / eat corner) */}
+          {sf && (
           <group position={[-1.8, 0, -1.4]}>
             <mesh position={[0, 0.72, 0]} material={M.woodwork} castShadow {...tag('woodwork')}>
               <boxGeometry args={[0.9, 0.05, 0.55]} />
@@ -358,8 +366,12 @@ export function GyanRoom({
               <cylinderGeometry args={[0.1, 0.1, 0.08, 12]} />
             </mesh>
           </group>
+          )}
 
-          {/* second cheap table by the window — hosts the desk lamp device */}
+          {/* desk lamp device anchor: on the window table when the starter set
+              renders, otherwise on a small wall bracket — the lamp itself is a
+              DEVICE, not furniture, so it stays in the empty room too */}
+          {sf ? (
           <group position={[-1.9, 0, 1.2]}>
             <mesh position={[0, 0.55, 0]} material={M.woodwork} castShadow {...tag('woodwork')}>
               <boxGeometry args={[0.7, 0.04, 0.5]} />
@@ -369,7 +381,6 @@ export function GyanRoom({
                 <boxGeometry args={[0.04, 0.54, 0.04]} />
               </mesh>
             ))}
-            {/* desk lamp (world): glows when the Desk lamp device is on */}
             <mesh position={[-0.22, 0.68, -0.12]} material={fixed.metal}>
               <cylinderGeometry args={[0.012, 0.012, 0.24]} />
             </mesh>
@@ -377,10 +388,23 @@ export function GyanRoom({
               <coneGeometry args={[0.075, 0.11, 14, 1, true]} />
             </mesh>
           </group>
+          ) : (
+            <group position={[-w / 2 + 0.12, 0, 1.2]}>
+              <mesh position={[0, 1.15, 0]} material={M.woodwork} castShadow {...tag('woodwork')}>
+                <boxGeometry args={[0.24, 0.04, 0.4]} />
+              </mesh>
+              <mesh position={[0.06, 1.28, 0]} material={fixed.metal}>
+                <cylinderGeometry args={[0.012, 0.012, 0.24]} />
+              </mesh>
+              <mesh position={[0.11, 1.41, 0]} rotation={[0, 0, -0.9]} material={deskShadeMat}>
+                <coneGeometry args={[0.075, 0.11, 14, 1, true]} />
+              </mesh>
+            </group>
+          )}
 
           {/* standing fan — classic Accra starter item, spins only when the
               Fan device is on; a bought fan replaces it at the same anchor */}
-          {show('fan') && (
+          {sf && show('fan') && (
             <group position={[0.15, 0, -2.6]}>
               <mesh position={[0, 0.02, 0]} material={fixed.metal}>
                 <cylinderGeometry args={[0.2, 0.22, 0.04, 16]} />
@@ -393,6 +417,7 @@ export function GyanRoom({
           )}
 
           {/* plastic monobloc chair (red — Accra classic) */}
+          {sf && (
           <group position={[0.15, 0, -0.2]}>
             <mesh position={[0, 0.42, 0]} material={fixed.redPlastic} castShadow>
               <boxGeometry args={[0.42, 0.06, 0.42]} />
@@ -406,16 +431,22 @@ export function GyanRoom({
               </mesh>
             ))}
           </group>
+          )}
 
           {/* blue cooler (eat / drink) */}
+          {sf && (
           <mesh position={[2.2, 0.28, 1.6]} material={fixed.chrome} castShadow>
             <boxGeometry args={[0.55, 0.55, 0.4]} />
           </mesh>
+          )}
+          {sf && (
           <mesh position={[2.2, 0.58, 1.6]} material={fixed.metal}>
             <boxGeometry args={[0.55, 0.06, 0.4]} />
           </mesh>
+          )}
 
           {/* wash corner: buckets + basin (bathroom in the same room) */}
+          {sf && (
           <group position={[2.2, 0, -1.8]}>
             <mesh position={[0, 0.22, 0]} material={fixed.chrome} castShadow>
               <cylinderGeometry args={[0.22, 0.2, 0.42, 14]} />
@@ -427,33 +458,40 @@ export function GyanRoom({
               <cylinderGeometry args={[0.14, 0.12, 0.16, 12]} />
             </mesh>
           </group>
+          )}
 
           {/* yellow jerrycan */}
+          {sf && (
           <mesh position={[1.5, 0.2, 1.8]} material={fixed.leaf} castShadow>
             <boxGeometry args={[0.28, 0.4, 0.2]} />
           </mesh>
+          )}
 
           {/* single wall shelf (no books wall of fame) */}
+          {sf && (
           <mesh position={[-0.3, 1.55, -d / 2 + 0.08]} material={M.woodwork} castShadow {...tag('woodwork')}>
             <boxGeometry args={[1.1, 0.06, 0.22]} />
           </mesh>
+          )}
+          {sf && (
           <mesh position={[-0.3, 1.72, -d / 2 + 0.06]} material={fixed.metal}>
             <boxGeometry args={[0.5, 0.28, 0.08]} />
           </mesh>
+          )}
 
           {/* soft ceiling bulb only */}
         </group>
       ) : (
         <>
       {/* rug under the lounge — swapped when a rug is bought */}
-      {show('rug') && (
+      {sf && show('rug') && (
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-1.55, 0.012, -1.35]} receiveShadow material={M.rug} {...tag('rug')}>
           <planeGeometry args={[2.6, 2.0]} />
         </mesh>
       )}
 
       {/* sofa (back-left, facing the room) — a bought sofa replaces it */}
-      {show('sofa') && (
+      {sf && show('sofa') && (
       <group position={[-1.55, 0, -2.45]}>
         <RoundedBox args={[2.2, 0.42, 0.9]} radius={0.08} position={[0, 0.3, 0]} material={M.upholstery} castShadow {...tag('upholstery')} />
         <RoundedBox args={[2.2, 0.55, 0.22]} radius={0.08} position={[0, 0.7, -0.36]} material={M.upholstery} castShadow {...tag('upholstery')} />
@@ -472,7 +510,7 @@ export function GyanRoom({
       )}
 
       {/* coffee table — swapped when one is bought */}
-      {show('coffee_table') && (
+      {sf && show('coffee_table') && (
       <group position={[-1.55, 0, -1.25]}>
         <mesh position={[0, 0.38, 0]} material={M.woodwork} castShadow {...tag('woodwork')}>
           <cylinderGeometry args={[0.5, 0.5, 0.05, 28]} />
@@ -487,6 +525,7 @@ export function GyanRoom({
       )}
 
       {/* wall art above the sofa: kente panel + Black Stars poster */}
+      {sf && (
       <group position={[-1.55, 1.85, -d / 2 + 0.02]}>
         <mesh position={[-0.5, 0, 0]} material={fixed.frame}>
           <boxGeometry args={[0.72, 0.92, 0.03]} />
@@ -509,9 +548,10 @@ export function GyanRoom({
           </mesh>
         </group>
       </group>
+      )}
 
       {/* floating shelf with books (back wall, centre) — swapped by a bookshelf */}
-      {show('bookshelf') && (
+      {sf && show('bookshelf') && (
       <group position={[0.15, 1.5, -d / 2 + 0.13]}>
         <mesh material={M.woodwork} castShadow {...tag('woodwork')}>
           <boxGeometry args={[0.9, 0.04, 0.24]} />
@@ -532,7 +572,7 @@ export function GyanRoom({
 
       {/* standing fan — spins only when the Fan device is on; a bought fan
           replaces it at the same anchor */}
-      {show('fan') && (
+      {sf && show('fan') && (
         <group position={[0.15, 0, -2.45]}>
           <mesh position={[0, 0.02, 0]} material={fixed.metal}>
             <cylinderGeometry args={[0.2, 0.22, 0.04, 16]} />
@@ -545,7 +585,7 @@ export function GyanRoom({
       )}
 
       {/* bed (back-right) — a bought bed replaces it (bedside tables stay) */}
-      {show('bed') && (
+      {sf && show('bed') && (
       <group position={[1.75, 0, -1.85]}>
         <mesh position={[0, 0.17, 0]} material={M.woodwork} castShadow {...tag('woodwork')}>
           <boxGeometry args={[1.7, 0.3, 2.1]} />
@@ -564,7 +604,7 @@ export function GyanRoom({
       </group>
       )}
       {/* bedside tables + lamps (independent of the bed swap) */}
-      {[-1.2, 1.2].map((x) => (
+      {sf && [-1.2, 1.2].map((x) => (
         <group key={x} position={[1.75 + x, 0, -2.6]}>
           <mesh position={[0, 0.25, 0]} material={M.woodwork} castShadow {...tag('woodwork')}>
             <boxGeometry args={[0.46, 0.5, 0.42]} />
@@ -579,7 +619,7 @@ export function GyanRoom({
       ))}
 
       {/* wardrobe (right wall, front) — swapped when one is bought */}
-      {show('wardrobe') && (
+      {sf && show('wardrobe') && (
       <group position={[w / 2 - 0.34, 0, 1.25]}>
         <mesh position={[0, 1.05, 0]} material={M.woodwork} castShadow {...tag('woodwork')}>
           <boxGeometry args={[0.62, 2.1, 1.5]} />
@@ -596,7 +636,7 @@ export function GyanRoom({
       )}
 
       {/* desk + laptop + chair (left wall, front) — swapped by a bought desk */}
-      {show('desk') && (
+      {sf && show('desk') && (
       <group position={[-w / 2 + 0.4, 0, 1.75]}>
         <mesh position={[0, 0.74, 0]} material={M.woodwork} castShadow {...tag('woodwork')}>
           <boxGeometry args={[0.65, 0.04, 1.3]} />
@@ -635,9 +675,9 @@ export function GyanRoom({
       )}
 
       {/* plants in the corners */}
-      <Plant position={[-w / 2 + 0.35, 0, -d / 2 + 0.35]} pot={fixed.pot} leaf={fixed.leaf} scale={1.15} />
-      <Plant position={[w / 2 - 0.4, 0, -0.2]} pot={fixed.pot} leaf={fixed.leaf} scale={0.9} />
-      <Plant position={[-0.7, 0, 2.6]} pot={fixed.pot} leaf={fixed.leaf} scale={0.75} />
+      {sf && <Plant position={[-w / 2 + 0.35, 0, -d / 2 + 0.35]} pot={fixed.pot} leaf={fixed.leaf} scale={1.15} />}
+      {sf && <Plant position={[w / 2 - 0.4, 0, -0.2]} pot={fixed.pot} leaf={fixed.leaf} scale={0.9} />}
+      {sf && <Plant position={[-0.7, 0, 2.6]} pot={fixed.pot} leaf={fixed.leaf} scale={0.75} />}
 
 
         </>
