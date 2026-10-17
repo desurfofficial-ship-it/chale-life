@@ -9,13 +9,23 @@
 // room), Surfaces (paint), Day (daylight), Shop (furniture that renders the
 // moment you buy it). State persists via roomPrefs (shared with the walkable
 // world room) + localStorage ('chale-room-v1').
-import { Suspense, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react'
 import * as THREE from 'three'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls, ContactShadows } from '@react-three/drei'
 import { create } from 'zustand'
 import { listHomeFurniture, findFurnitureById, comfortPctFromOwned } from '../data/furniture'
-import { useStoreSnapshot, buyHomeFurniture } from '../store/gameStore'
+import { useStoreSnapshot, buyHomeFurniture, getState } from '../store/gameStore'
+import {
+  requestPlaceHomeFurniture,
+  requestMoveHomeFurniture,
+  requestRotateHomeFurniture,
+  requestRemoveHomeFurniture,
+  selectHomeFurniture,
+  clearHomeFeedback,
+  getHomeLayoutState,
+  subscribeHomeLayout,
+} from './homeLayoutStore'
 import {
   HOME_ZONES,
   zoneUnlocked,
@@ -311,8 +321,149 @@ const RARITY_BORDER: Record<string, string> = {
   premium: '1px solid rgba(252,209,22,0.55)',
 }
 
+/**
+ * Arrange tab (Reality-check P2) — touch-first editor for the player's OWN
+ * layout: select a piece, move it N/E/S/W on the 0.5 m tile grid, rotate 90°,
+ * remove it. Rejections (outside the room / overlaps / blocks the door) show
+ * as a feedback line. The same request* paths drive the e2e probe and the
+ * layout persists via homeLayoutStore.
+ */
+function ArrangePanel({ owned }: { owned: readonly string[] }) {
+  const st = useSyncExternalStore(subscribeHomeLayout, getHomeLayoutState, getHomeLayoutState)
+  const [confirmRemove, setConfirmRemove] = useState(false)
+  const placedUids = new Set(st.layout.map((p) => p.uid))
+  // owned pieces in purchase order with their stable uid (id#n)
+  const seen = new Map<string, number>()
+  const pieces = owned.map((id) => {
+    const n = seen.get(id) ?? 0
+    seen.set(id, n + 1)
+    return { id, uid: `${id}#${n}` }
+  })
+  const selected = pieces.find((p) => p.uid === st.selectedUid) ?? null
+  const placed = selected ? st.layout.find((p) => p.uid === selected.uid) ?? null : null
+  const tileBtn: CSSProperties = {
+    minHeight: 46,
+    minWidth: 46,
+    borderRadius: 12,
+    border: '1px solid rgba(255,255,255,0.14)',
+    background: 'rgba(255,255,255,0.06)',
+    color: '#e8eef7',
+    fontWeight: 800,
+    fontSize: 15,
+    cursor: 'pointer',
+  }
+  const actionBtn: CSSProperties = {
+    ...tileBtn,
+    flex: 1,
+    fontSize: 13,
+  }
+  return (
+    <div style={{ display: 'grid', gap: 10 }} data-testid="arrange-panel">
+      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', lineHeight: 1.4 }}>
+        Tap a piece, then move it around the room. Layout saves automatically —
+        leave and come back, it stays.
+      </div>
+
+      {/* owned pieces */}
+      {pieces.length === 0 ? (
+        <div style={{ padding: 14, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.55)', fontSize: 13, lineHeight: 1.4 }}>
+          Your room is empty — buy furniture in the Shop tab, then arrange it here.
+        </div>
+      ) : (
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {pieces.map((p) => {
+            const on = st.selectedUid === p.uid
+            const isPlaced = placedUids.has(p.uid)
+            return (
+              <button
+                key={p.uid}
+                type="button"
+                data-testid={`arrange-item-${p.id}`}
+                onClick={() => selectHomeFurniture(on ? null : p.uid)}
+                style={{
+                  padding: '8px 10px',
+                  borderRadius: 12,
+                  border: on ? '1px solid #fcd116' : isPlaced ? '1px solid rgba(16,185,129,0.4)' : '1px solid rgba(255,255,255,0.14)',
+                  background: on ? 'rgba(252,209,22,0.16)' : 'rgba(255,255,255,0.05)',
+                  color: on ? '#fcd116' : '#e8eef7',
+                  fontWeight: 700,
+                  fontSize: 12,
+                  cursor: 'pointer',
+                }}
+              >
+                {findFurnitureById(p.id)?.title ?? p.id}
+                {!isPlaced && <span style={{ color: '#fcd116' }}> · unplaced</span>}
+              </button>
+            )
+          })}
+        </div>
+      )}
+
+      {st.feedback && (
+        <div style={{ fontSize: 12, fontWeight: 700, color: '#fca5a5' }} role="status" data-testid="arrange-feedback">
+          {st.feedback}
+          <button type="button" onClick={clearHomeFeedback} style={{ marginLeft: 8, background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', textDecoration: 'underline', fontSize: 12 }}>
+            dismiss
+          </button>
+        </div>
+      )}
+
+      {selected && !placed ? (
+        <button
+          type="button"
+          data-testid="arrange-place"
+          onClick={() => requestPlaceHomeFurniture(selected.id, getState().home.furnitureIds)}
+          style={{ ...actionBtn, background: 'rgba(16,185,129,0.25)', border: '1px solid rgba(16,185,129,0.5)' }}
+        >
+          Place in the room (auto spot)
+        </button>
+      ) : null}
+
+      {selected && placed ? (
+        <>
+          {/* compass pad: N up (−z), S down (+z), W left (−x), E right (+x) */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 54px)', gridTemplateRows: 'repeat(3, 46px)', gap: 6, justifyContent: 'center' }}>
+            <span />
+            <button type="button" data-testid="arrange-n" aria-label="Move north" onClick={() => requestMoveHomeFurniture(selected.uid, 0, -0.5)} style={tileBtn}>↑</button>
+            <span />
+            <button type="button" data-testid="arrange-w" aria-label="Move west" onClick={() => requestMoveHomeFurniture(selected.uid, -0.5, 0)} style={tileBtn}>←</button>
+            <span style={{ display: 'grid', placeItems: 'center', fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: 800 }}>0.5 m</span>
+            <button type="button" data-testid="arrange-e" aria-label="Move east" onClick={() => requestMoveHomeFurniture(selected.uid, 0.5, 0)} style={tileBtn}>→</button>
+            <span />
+            <button type="button" data-testid="arrange-s" aria-label="Move south" onClick={() => requestMoveHomeFurniture(selected.uid, 0, 0.5)} style={tileBtn}>↓</button>
+            <span />
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button type="button" data-testid="arrange-rotate" onClick={() => requestRotateHomeFurniture(selected.uid)} style={actionBtn}>
+              Rotate 90°
+            </button>
+            {confirmRemove ? (
+              <button
+                type="button"
+                data-testid="arrange-remove-confirm"
+                onClick={() => {
+                  requestRemoveHomeFurniture(selected.uid)
+                  setConfirmRemove(false)
+                }}
+                style={{ ...actionBtn, background: 'rgba(185,28,28,0.3)', border: '1px solid rgba(185,28,28,0.6)', color: '#fecaca' }}
+              >
+                Really remove?
+              </button>
+            ) : (
+              <button type="button" data-testid="arrange-remove" onClick={() => setConfirmRemove(true)} style={actionBtn}>
+                Remove
+              </button>
+            )}
+          </div>
+        </>
+      ) : null}
+    </div>
+  )
+}
+
 /** Furniture marketplace — House Control style tiles. Buying renders the
- *  piece in the room above instantly (replaceable pieces swap the starter). */
+ *  piece in the room above instantly (auto-anchored), then the Arrange tab
+ *  moves / rotates / removes it — the player's own layout (homeLayoutStore). */
 function FurnitureShop({ ownedCount }: { ownedCount: number }) {
   const owned = useStoreSnapshot((s) => s.home.furnitureIds)
   const balance = useStoreSnapshot((s) => s.wallet.balanceGHS)
@@ -321,7 +472,10 @@ function FurnitureShop({ ownedCount }: { ownedCount: number }) {
   const buy = (id: string) => {
     const item = findFurnitureById(id)
     if (!item) return
-    buyHomeFurniture(id, item.costGHS)
+    if (!buyHomeFurniture(id, item.costGHS)) return
+    // Reality-check P2: bought pieces auto-anchor (first free spot) so the
+    // purchase is visible immediately; the Arrange tab rearranges it.
+    requestPlaceHomeFurniture(id, getState().home.furnitureIds)
   }
   return (
     <div style={{ display: 'grid', gap: 10 }}>
@@ -346,8 +500,9 @@ function FurnitureShop({ ownedCount }: { ownedCount: number }) {
         </span>
       </div>
       <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', lineHeight: 1.4 }}>
-        Pieces appear in the room the moment you buy. A bed, sofa, wardrobe, desk,
-        coffee table, rug, fan or bookshelf replaces the starter one.
+        Pieces appear in the room the moment you buy (auto-placed on a free
+        spot). Open the Arrange tab to move, rotate or remove them — your
+        layout is saved and restored every visit.
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
         {items.map((f) => {
@@ -358,6 +513,7 @@ function FurnitureShop({ ownedCount }: { ownedCount: number }) {
             <button
               key={f.id}
               type="button"
+              data-testid={`shop-item-${f.id}`}
               onClick={() => buy(f.id)}
               disabled={!can && !has}
               style={{
@@ -409,10 +565,11 @@ export default function SetTheMood() {
   const lamps = daylight(hour).lamps
 
   // Panel tab: devices | surfaces (paint) | lights (daylight) | shop
-  const [panel, setPanel] = useState<'devices' | 'surfaces' | 'lights' | 'shop'>(() => {
+  const [panel, setPanel] = useState<'arrange' | 'devices' | 'surfaces' | 'lights' | 'shop'>(() => {
     if (typeof window === 'undefined') return 'devices'
     const r = new URLSearchParams(window.location.search).get('room')
     if (r === 'shop') return 'shop'
+    if (r === 'arrange') return 'arrange'
     if (r === 'surfaces') return 'surfaces'
     if (r === 'lights') return 'lights'
     return 'devices'
@@ -636,6 +793,7 @@ export default function SetTheMood() {
 
         <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
           {([
+            ['arrange', 'Arrange'],
             ['devices', 'Devices'],
             ['surfaces', 'Surfaces'],
             ['lights', 'Day'],
@@ -668,6 +826,7 @@ export default function SetTheMood() {
           {sentence}
         </div>
 
+        {panel === 'arrange' && <ArrangePanel owned={owned} />}
         {panel === 'devices' && (
           <div>
             {!zoneOpen ? (
