@@ -45,6 +45,7 @@ import { TycoonLayer, type TycoonWorldProps } from '@/world/tycoon'
 import { OfficesLayer } from '@/world/office/OfficesLayer'
 import { BusinessesLayer } from '@/world/business/BusinessesLayer'
 import { StreetLifeLayer } from '@/world/streetLife'
+import { PropsLayer } from '@/world/props/PropsLayer'
 
 // ───────────────────────────────────────────────── map-edge skirts ──────────
 // The diorama plate is finite; sea + land skirts fade into the sky haze so
@@ -219,6 +220,9 @@ export function AccraWorld({
       <BusinessesLayer />
       {tycoon ? <TycoonLayer {...tycoon} /> : null}
       <StreetLifeLayer hour={hour} />
+
+      {/* W-009: prop-pack dressing (per-district merged meshes, no colliders) */}
+      <PropsLayer />
 
       {/* merge the static plain-coloured world into few draw calls */}
       <SceneBatcher />
