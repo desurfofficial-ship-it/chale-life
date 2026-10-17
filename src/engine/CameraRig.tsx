@@ -41,6 +41,11 @@ const OFFSET = new THREE.Vector3(0, 30, 30);
 const ROOM_OFFSET = new THREE.Vector3(0, 9.5, 7.2);
 const TYCOON_OFFSET = new THREE.Vector3(0, 48, 48);
 export const projectedPlayerScreen = { x: 0, y: 0 };
+/** Smoothed camera yaw — movement rotates screen stick into this frame. */
+let smoothedCameraYaw = 0;
+export function getSmoothedCameraYaw(): number {
+  return smoothedCameraYaw;
+}
 const _proj = new THREE.Vector3();
 const FOLLOW_RATE = 5;
 const FRAME_RATE = 4;
@@ -187,6 +192,7 @@ export function CameraRig() {
       if (Math.abs(getZoom() - want) > 0.5) setZoom(getZoom() + (want - getZoom()) * Math.min(1, dt * 3.5));
     }
 
+    smoothedCameraYaw = yawSmoothed.current;
     const off = rotateOffsetXZ(base.x, base.y, base.z, yawSmoothed.current);
     const lookZ = target.current.z + frameOffsetZ;
     camera.position.set(
