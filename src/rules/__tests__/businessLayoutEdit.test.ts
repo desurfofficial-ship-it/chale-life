@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { arrange, moveFurniture, rotateFurniture, removeFurniture, isValidFurnitureTile } from '../business';
-import { findBusinessType } from '../../data/businesses';
 import { findFurnitureById } from '../../data/furniture';
 
 describe('layout edit', () => {
