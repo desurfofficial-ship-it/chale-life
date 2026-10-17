@@ -147,6 +147,16 @@ export function setPlayerTransform(x: number, z: number, yaw: number): void {
 export const movementInput = { x: 0, z: 0, sprint: false };
 
 /**
+ * Sprint input from the on-screen RUN toggle (keyboard Shift writes
+ * movementInput.sprint directly through inputManager). GameLoop raises the
+ * movement top speed while true — the character anim blends to the run cycle
+ * from the measured ground speed, so there is no mode flag to un-sync.
+ */
+export function requestSprint(on: boolean): void {
+  movementInput.sprint = on;
+}
+
+/**
  * Engine-owned teleport request (capture probes / e2e). GameLoop OWNS the
  * live transform (its kinematics ref rewrites the store every frame), so an
  * external setPlayerPosition is clobbered on the next frame. A teleport must

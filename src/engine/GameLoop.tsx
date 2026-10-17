@@ -17,7 +17,7 @@
 
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
-import { movementStep, type Kinematics } from './movement';
+import { DEFAULT_MOVEMENT, movementStep, type Kinematics } from './movement';
 import { projectedPlayerScreen } from './CameraRig';
 import { colliders, collidersReady, worldBounds } from '../world/colliders';
 import { MAX_TICK_SECONDS } from '../rules/needs';
@@ -87,6 +87,10 @@ export function GameLoop() {
     if (collidersReady()) {
       kin.current = movementStep(kin.current, movementInput, dt, colliders, {
         bounds: worldBounds,
+        // Reality-check P3: sprint = 1.5× the walk top speed. The character
+        // animator blends idle→walk→run from the measured ground speed, so
+        // the animation transitions smoothly through this change.
+        maxSpeed: movementInput.sprint ? DEFAULT_MOVEMENT.maxSpeed * 1.5 : undefined,
       });
     }
     const k = kin.current;
