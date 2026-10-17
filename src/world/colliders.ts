@@ -10,14 +10,16 @@
  * Boxes are { minX, minZ, maxX, maxZ } — NO three.js / engine imports, so
  * engine and rules code can consume this module from anywhere.
  *
- * Source of truth: src/world/accra/data/colliders.json — captured from the
- * live AccraScene with ?capture=1 (lib/colliderExport.ts) during the v6 map
+ * Source of truth: public/data/colliders.json — captured from the live
+ * AccraScene with ?capture=1 (lib/colliderExport.ts) during the v6 map
  * integration; regenerate after world edits and re-run the map's sim suite.
  *
- * The old 60 × 60 m starter-block footprints are gone along with the starter
- * map itself (the Accra map replaces it wholesale).
+ * P2-2: the capture (766 KB) is no longer bundled into JS — it is fetched
+ * at boot from BASE_URL + 'data/colliders.json'. `colliders` starts as the
+ * code-derived Gyan-house walls and is replaced IN PLACE (same array
+ * identity) once the capture lands; movement gates on `collidersReady()`.
+ * Node tests ingest the capture directly via applyColliderCapture().
  */
-import rawBoxes from './accra/data/colliders.json';
 
 export interface ColliderBox {
   minX: number;
@@ -26,7 +28,7 @@ export interface ColliderBox {
   maxZ: number;
 }
 
-interface RawBox {
+export interface RawBox {
   min: [number, number, number];
   max: [number, number, number];
   kind: string;
@@ -79,7 +81,7 @@ function gyanHouseWallColliders(): ColliderBox[] {
 
 /** True if a captured box is the solid Gyan-house shell (blocks the whole room). */
 function isGyanHouseSolid(b: ColliderBox): boolean {
-  const { x, z, w, d } = GYAN_HOUSE_WORLD;
+  const { x, z } = GYAN_HOUSE_WORLD;
   const cx = (b.minX + b.maxX) / 2;
   const cz = (b.minZ + b.maxZ) / 2;
   const bw = b.maxX - b.minX;
@@ -93,19 +95,75 @@ function isGyanHouseSolid(b: ColliderBox): boolean {
   );
 }
 
-const mapped: ColliderBox[] = (rawBoxes as unknown as { boxes: RawBox[] }).boxes
-  .filter((b) => b.min[1] <= 1.2 && b.max[1] >= 0.3)
-  .map((b) => ({
-    minX: b.min[0],
-    minZ: b.min[2],
-    maxX: b.max[0],
-    maxZ: b.max[2],
-  }));
+/**
+ * The live collider set. Starts as the code-derived Gyan-house walls only;
+ * `applyColliderCapture` replaces the contents IN PLACE (callers hold the
+ * same array reference — the World → Engine contract stays identity-stable).
+ */
+export const colliders: ColliderBox[] = [...gyanHouseWallColliders()];
 
-export const colliders: ColliderBox[] = [
-  ...mapped.filter((b) => !isGyanHouseSolid(b)),
-  ...gyanHouseWallColliders(),
-];
+function applyMapped(mapped: ColliderBox[]): void {
+  colliders.length = 0;
+  colliders.push(...mapped.filter((b) => !isGyanHouseSolid(b)), ...gyanHouseWallColliders());
+}
+
+/**
+ * Ingest a captured payload ({ boxes: RawBox[] }) — the same transform the
+ * static import used to run at module load (head-height filter + Gyan-house
+ * solid exclusion). Used by the boot fetch and by node tests directly.
+ */
+export function applyColliderCapture(raw: { boxes: RawBox[] }): void {
+  const mapped = raw.boxes
+    .filter((b) => b.min[1] <= 1.2 && b.max[1] >= 0.3)
+    .map((b) => ({
+      minX: b.min[0],
+      minZ: b.min[2],
+      maxX: b.max[0],
+      maxZ: b.max[2],
+    }));
+  applyMapped(mapped);
+}
+
+let captureLoaded = false;
+let capturePromise: Promise<void> | null = null;
+
+/** True once the fetched capture has replaced the boot-time wall set. */
+export function collidersReady(): boolean {
+  return captureLoaded;
+}
+
+/**
+ * Fetch the captured collider set at boot (P2-2 — keeps 766 KB of data out
+ * of the JS bundle; parse cost moves off the critical thread too).
+ * Idempotent. Resolves even on failure (loud console.error) so the game
+ * degrades to walkable-instead-of-frozen, never to a movement deadlock.
+ */
+export function loadColliders(): Promise<void> {
+  if (capturePromise) return capturePromise;
+  const url = import.meta.env.BASE_URL + 'data/colliders.json';
+  capturePromise = fetch(url)
+    .then((res) => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json() as Promise<{ boxes: RawBox[] }>;
+    })
+    .then((raw) => {
+      applyColliderCapture(raw);
+      captureLoaded = true;
+    })
+    .catch((err: unknown) => {
+      // Movement is gated on collidersReady() — a missing/broken capture
+      // must never softlock the walker, so we go ready-but-degraded.
+      console.error(`[colliders] failed to load ${url}:`, err);
+      captureLoaded = true;
+    });
+  return capturePromise;
+}
+
+// Boot fetch — browsers load the capture immediately; node tests ingest
+// the fixture by hand via applyColliderCapture().
+if (typeof window !== 'undefined') {
+  void loadColliders();
+}
 
 /**
  * Playable plate. PLATE is x −280…340, z −116…116, but NorthReach offices

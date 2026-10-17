@@ -38,10 +38,14 @@ Exports `colliders: ColliderBox[]` (`{ minX, minZ, maxX, maxZ }` in metres)
 and `worldBounds` (same shape). No three.js / engine imports — engine and
 rules consume it from anywhere, including node-side tests.
 
-- **Source of truth:** `src/world/accra/data/colliders.json` — the captured
-  AccraScene set (5,480 boxes). Boxes whose top is below 0.3 m (mats, ground
-  decals) or whose base is above 1.2 m (head-height signs, awnings) are
-  excluded by the same head-height rule the map's movement sim uses.
+- **Source of truth:** `public/data/colliders.json` — the captured AccraScene
+  set (5,480 boxes). P2-2 moved it out of the JS bundle: the app fetches it
+  at boot (`BASE_URL + 'data/colliders.json'`), input-driven movement gates
+  on `collidersReady()`, and node tests ingest the file directly via
+  `src/test-support/colliderFixture.ts`. Boxes whose top is below 0.3 m
+  (mats, ground decals) or whose base is above 1.2 m (head-height signs,
+  awnings) are excluded by the same head-height rule the map's movement sim
+  uses.
 - **Provenance:** captured from the live scene graph with `?capture=1`
   (`src/lib/colliderExport.ts`) during the v6 integration — every collider
   matches a visible mesh. `?capture=1` is NOT yet wired into the game app

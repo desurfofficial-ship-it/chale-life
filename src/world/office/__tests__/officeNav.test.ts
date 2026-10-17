@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { OFFICES } from '../../../data/offices';
 import { colliders } from '../../colliders';
+import { loadColliderFixture } from '../../../test-support/colliderFixture';
+// P2-2: the capture is fetched (not bundled) — node tests ingest from disk
+loadColliderFixture();
 import { OFFICE_FRAME_ZOOM, goToOffice, officeDoorPoint, officesByDistance } from '../officeNav';
 import { DETAIL_RADIUS_M, DETAIL_ZOOM } from '../OfficeBuilding';
 

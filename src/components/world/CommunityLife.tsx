@@ -16,7 +16,7 @@
 import { useLayoutEffect, useMemo, useRef, useEffect } from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
-import { buildSegments, gapSpeedScale, laneOffset, pathLength, poseAt, roundCorners, type Pose } from '@/world/airport/paths'
+import { buildSegments, gapSpeedScale, laneOffset, pathLength, poseAt, type Pose } from '@/world/airport/paths'
 import { registerAmbient } from '@/engine/ambient'
 import { COMMUNITY, type CommunityData } from '@/lib/communityLayout'
 import { npcGeometries, vehicleGeometry } from '@/lib/communityKit'
@@ -46,7 +46,6 @@ const LOOKS: Look[] = Array.from({ length: 24 }, (_, i) => {
 interface Agent { x: number; z: number; r: number; pose: string; look: number; sh: number; load: boolean; walk?: { pts: [number, number][]; L: number[]; total: number; speed: number; off: number; closed: boolean } }
 
 const dummy = new THREE.Object3D()
-const tmpV = new THREE.Vector3()
 
 function buildAgents(D: CommunityData): Agent[] {
   const out: Agent[] = D.npcs.map((n) => ({ x: n.x, z: n.z, r: n.r, pose: n.pose, look: n.look % 24, sh: n.sh ?? 0.46, load: false }))
@@ -198,6 +197,8 @@ function People({ data: D }: { data: CommunityData }) {
     for (const m of Object.values(M)) m.instanceMatrix.needsUpdate = true
   })
   const mat = useMemo(() => new THREE.MeshStandardMaterial({ roughness: 0.85 }), [])
+  // P2-4: per-mount material — free it on unmount
+  useEffect(() => () => mat.dispose(), [mat])
   return (
     <group name="t14-people">
       <instancedMesh ref={torso} name="t14-npc-torso" args={[G.torso, mat, n]} castShadow frustumCulled={false} />
@@ -237,7 +238,6 @@ function loopPath(D: CommunityData, step = 0.5): [number, number][] {
 }
 
 const VEH_KINDS = ['trotro', 'taxi', 'car', 'okada', 'okada-empty'] as const
-const TAXI_TINTS = ['#ffffff', '#c8d6e5', '#e9e1cf', '#a8c3a0', '#f2c6b4']
 
 function Vehicles({ data: D }: { data: CommunityData }) {
   const refs = useRef<Record<string, THREE.InstancedMesh | null>>({})
@@ -332,6 +332,8 @@ function Vehicles({ data: D }: { data: CommunityData }) {
   }, [plan, dummy, tintColor])
 
   const mat = useMemo(() => new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0.25 }), [])
+  // P2-4: per-mount material — free it on unmount
+  useEffect(() => () => mat.dispose(), [mat])
   return (
     <group name="t14-vehicles">
       {VEH_KINDS.map((k) => plan[k].length ? (

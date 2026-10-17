@@ -15,7 +15,7 @@
 // Draw calls: shells → facade batch; signs → sign-atlas batch; every kit mesh
 // uses the shared vertex-coloured materials → SceneBatcher buckets; cables are
 // ONE LineSegments; NPCs + vehicles live in <CommunityLife/> (instanced).
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 import { Building } from '../../scene/Buildings'
 import { signGeometry, getSignMaterial } from '@/lib/signAtlas'
@@ -486,6 +486,9 @@ export function PolesAndCables({ data }: { data: CommunityData }) {
     g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3))
     return g
   }, [])
+  // P2-4: the cable polyline geometry is owned here — free it on unmount
+  // (a prop-passed geometry is never auto-disposed by R3F)
+  useEffect(() => () => lines.dispose(), [lines])
   if (data.poles.length === 0) return null
   return (
     <group name="t15-poles">

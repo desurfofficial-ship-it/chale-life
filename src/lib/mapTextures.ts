@@ -4,6 +4,22 @@ import { COLORS, ROADS, CIRCLE, BEACH, LAGOON, PLATE, PLATE_CX, DAAVI_PLOT, LAND
 import { T13_PAINT } from './t13Layout'
 import { COMMUNITY } from './communityLayout'
 import { OSU_STREET, NIMA_QUARTER } from './osuNimaLayout'
+import { hashId, mulberry32 } from './seeded'
+
+// ─── shared static texture cache (P2-4) ───────────────────────────────────
+// flag/balloon/sign/… canvases are content-identical per key but used to be
+// re-created (and re-uploaded to the GPU) for every mounting component.
+// Cache them app-lifetime — "hoist to module scope if they're shared" — and
+// NEVER dispose the returned textures from component cleanups.
+const staticTexCache = new Map<string, THREE.CanvasTexture>()
+function cachedTexture(key: string, build: () => THREE.CanvasTexture): THREE.CanvasTexture {
+  let t = staticTexCache.get(key)
+  if (!t) {
+    t = build()
+    staticTexCache.set(key, t)
+  }
+  return t
+}
 
 // ─────────────────────────────────────────────────────────── ground texture ─
 // World PLATE.w×PLATE.d → canvas (10 px per unit), origin at canvas center.
@@ -15,12 +31,22 @@ import { OSU_STREET, NIMA_QUARTER } from './osuNimaLayout'
 const S = 8
 
 export function buildGroundTexture(): THREE.CanvasTexture {
+  // 4960×1856 canvas — never rebuild it on remounts (StrictMode / HMR)
+  return cachedTexture('ground', buildGroundCanvas)
+}
+
+function buildGroundCanvas(): THREE.CanvasTexture {
   const CW = PLATE.w * S
   const CH = PLATE.d * S
   const c = document.createElement('canvas')
   c.width = CW
   c.height = CH
   const g = c.getContext('2d')!
+
+  // P2-3: every blotch/speckle comes from a seeded PRNG — the ground looked
+  // slightly different on every reload, which broke "stable across reloads"
+  // (pixel probes, before/after audit shots).
+  const rnd = mulberry32(hashId('accra-ground-v1'))
 
   const X = (x: number) => CW / 2 + (x - PLATE_CX) * S
   const Z = (z: number) => CH / 2 + z * S
@@ -30,10 +56,10 @@ export function buildGroundTexture(): THREE.CanvasTexture {
   g.fillStyle = COLORS.grass
   g.fillRect(0, 0, CW, CH)
   for (let i = 0; i < 2300; i++) {
-    const r = 10 + Math.random() * 34
-    g.fillStyle = Math.random() > 0.5 ? 'rgba(109,156,77,0.35)' : 'rgba(147,196,105,0.30)'
+    const r = 10 + rnd() * 34
+    g.fillStyle = rnd() > 0.5 ? 'rgba(109,156,77,0.35)' : 'rgba(147,196,105,0.30)'
     g.beginPath()
-    g.arc(Math.random() * CW, Math.random() * CH, r, 0, Math.PI * 2)
+    g.arc(rnd() * CW, rnd() * CH, r, 0, Math.PI * 2)
     g.fill()
   }
 
@@ -76,25 +102,25 @@ export function buildGroundTexture(): THREE.CanvasTexture {
   // rocky shore hints along west + east ends of the coast
   g.fillStyle = 'rgba(90,88,92,0.55)'
   for (let i = 0; i < 46; i++) {
-    const rx = -158 + Math.random() * 52
-    const rz = 43.4 + Math.random() * 2.4
+    const rx = -158 + rnd() * 52
+    const rz = 43.4 + rnd() * 2.4
     g.beginPath()
-    g.arc(X(rx), Z(rz), L(0.7 + Math.random() * 1.3), 0, Math.PI * 2)
+    g.arc(X(rx), Z(rz), L(0.7 + rnd() * 1.3), 0, Math.PI * 2)
     g.fill()
   }
   for (let i = 0; i < 46; i++) {
-    const rx = 112 + Math.random() * 92 // east end now reaches the Nungua shore
-    const rz = 43.4 + Math.random() * 2.4
+    const rx = 112 + rnd() * 92 // east end now reaches the Nungua shore
+    const rz = 43.4 + rnd() * 2.4
     g.beginPath()
-    g.arc(X(rx), Z(rz), L(0.7 + Math.random() * 1.3), 0, Math.PI * 2)
+    g.arc(X(rx), Z(rz), L(0.7 + rnd() * 1.3), 0, Math.PI * 2)
     g.fill()
   }
 
   for (let i = 0; i < 40; i++) {
-    const rx = -278 + Math.random() * 104 // Task 13: Chorkor West / Korle Gonno shore
-    const rz = 43.4 + Math.random() * 2.4
+    const rx = -278 + rnd() * 104 // Task 13: Chorkor West / Korle Gonno shore
+    const rz = 43.4 + rnd() * 2.4
     g.beginPath()
-    g.arc(X(rx), Z(rz), L(0.7 + Math.random() * 1.3), 0, Math.PI * 2)
+    g.arc(X(rx), Z(rz), L(0.7 + rnd() * 1.3), 0, Math.PI * 2)
     g.fill()
   }
 
@@ -123,9 +149,9 @@ export function buildGroundTexture(): THREE.CanvasTexture {
   g.fill()
   // mottling so the island lawn reads natural
   for (let i = 0; i < 40; i++) {
-    g.fillStyle = Math.random() > 0.5 ? 'rgba(109,156,77,0.4)' : 'rgba(147,196,105,0.35)'
+    g.fillStyle = rnd() > 0.5 ? 'rgba(109,156,77,0.4)' : 'rgba(147,196,105,0.35)'
     g.beginPath()
-    g.arc(X(ISL.x0 + 4) + Math.random() * L(56), Z(ISL.z0 + 3) + Math.random() * L(26), 5 + Math.random() * 10, 0, Math.PI * 2)
+    g.arc(X(ISL.x0 + 4) + rnd() * L(56), Z(ISL.z0 + 3) + rnd() * L(26), 5 + rnd() * 10, 0, Math.PI * 2)
     g.fill()
   }
   // island lane (z 83…87, dirt) + plot clearings (16×10 each)
@@ -138,7 +164,7 @@ export function buildGroundTexture(): THREE.CanvasTexture {
     g.fillStyle = 'rgba(120,76,42,0.35)'
     for (let i = 0; i < 10; i++) {
       g.beginPath()
-      g.arc(X(px - 7) + Math.random() * L(14), Z(pz - 4) + Math.random() * L(8), 4 + Math.random() * 8, 0, Math.PI * 2)
+      g.arc(X(px - 7) + rnd() * L(14), Z(pz - 4) + rnd() * L(8), 4 + rnd() * 8, 0, Math.PI * 2)
       g.fill()
     }
     g.strokeStyle = 'rgba(244,241,234,0.55)'
@@ -182,7 +208,7 @@ export function buildGroundTexture(): THREE.CanvasTexture {
   for (let i = 0; i < 80; i++) {
     g.fillStyle = 'rgba(139,94,52,0.25)'
     g.beginPath()
-    g.arc(X(-62) + Math.random() * L(46), Z(-32) + Math.random() * L(30), 6 + Math.random() * 14, 0, Math.PI * 2)
+    g.arc(X(-62) + rnd() * L(46), Z(-32) + rnd() * L(30), 6 + rnd() * 14, 0, Math.PI * 2)
     g.fill()
   }
   // market aisle paths between stall rows
@@ -235,7 +261,7 @@ export function buildGroundTexture(): THREE.CanvasTexture {
   g.fillStyle = 'rgba(140,120,96,0.35)'
   for (let i = 0; i < 26; i++) {
     g.beginPath()
-    g.arc(X(-150) + Math.random() * L(30), Z(7) + Math.random() * L(9), 5 + Math.random() * 10, 0, Math.PI * 2)
+    g.arc(X(-150) + rnd() * L(30), Z(7) + rnd() * L(9), 5 + rnd() * 10, 0, Math.PI * 2)
     g.fill()
   }
   g.fillStyle = '#cfc0aa'
@@ -266,7 +292,7 @@ export function buildGroundTexture(): THREE.CanvasTexture {
   g.fillStyle = 'rgba(120,76,42,0.35)'
   for (let i = 0; i < 26; i++) {
     g.beginPath()
-    g.arc(X(DAAVI_PLOT.x0 + 2) + Math.random() * L(24), Z(DAAVI_PLOT.z0 + 2) + Math.random() * L(14.5), 6 + Math.random() * 14, 0, Math.PI * 2)
+    g.arc(X(DAAVI_PLOT.x0 + 2) + rnd() * L(24), Z(DAAVI_PLOT.z0 + 2) + rnd() * L(14.5), 6 + rnd() * 14, 0, Math.PI * 2)
     g.fill()
   }
 
@@ -457,7 +483,7 @@ export function buildGroundTexture(): THREE.CanvasTexture {
     g.fillStyle = 'rgba(120,76,42,0.35)'
     for (let i = 0; i < 10; i++) {
       g.beginPath()
-      g.arc(X(p.x - p.w / 2 + 0.8) + Math.random() * L(p.w - 1.6), Z(p.z - p.d / 2 + 0.6) + Math.random() * L(p.d - 1.2), 4 + Math.random() * 8, 0, Math.PI * 2)
+      g.arc(X(p.x - p.w / 2 + 0.8) + rnd() * L(p.w - 1.6), Z(p.z - p.d / 2 + 0.6) + rnd() * L(p.d - 1.2), 4 + rnd() * 8, 0, Math.PI * 2)
       g.fill()
     }
     g.strokeStyle = 'rgba(244,241,234,0.55)'
@@ -847,6 +873,10 @@ export function buildGroundTexture(): THREE.CanvasTexture {
 // radial fade for the ocean skirt disc (opaque core → transparent rim)
 // NOTE: three.js alphaMap reads the GREEN channel → write grayscale
 export function skirtDiscAlpha(): THREE.CanvasTexture {
+  return cachedTexture('skirt-disc', buildSkirtDiscAlpha)
+}
+
+function buildSkirtDiscAlpha(): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = c.height = 512
   const g = c.getContext('2d')!
@@ -861,6 +891,10 @@ export function skirtDiscAlpha(): THREE.CanvasTexture {
 
 // rectangular edge fade for the land apron (fades on all four sides)
 export function skirtRectAlpha(): THREE.CanvasTexture {
+  return cachedTexture('skirt-rect', buildSkirtRectAlpha)
+}
+
+function buildSkirtRectAlpha(): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = c.height = 256
   const g = c.getContext('2d')!
@@ -1233,6 +1267,10 @@ export function getFacadeMaterials(): { wall: THREE.MeshStandardMaterial; glass:
 
 // ─────────────────────────────────────────────────────────────── shop signs ─
 export function signTexture(text: string, bg: string, fg = '#111111'): THREE.CanvasTexture {
+  return cachedTexture(`sign:${text}|${bg}|${fg}`, () => buildSignTexture(text, bg, fg))
+}
+
+function buildSignTexture(text: string, bg: string, fg: string): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = 512
   c.height = 128
@@ -1253,6 +1291,10 @@ export function signTexture(text: string, bg: string, fg = '#111111'): THREE.Can
 
 // ───────────────────────────────────────────────────────────── ghana flag ──
 export function flagTexture(): THREE.CanvasTexture {
+  return cachedTexture('flag', buildFlagTexture)
+}
+
+function buildFlagTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = 256
   c.height = 160
@@ -1271,6 +1313,10 @@ export function flagTexture(): THREE.CanvasTexture {
 
 // ───────────────────────────── balloon envelope (red/gold/green stripes) ────
 export function balloonTexture(): THREE.CanvasTexture {
+  return cachedTexture('balloon', buildBalloonTexture)
+}
+
+function buildBalloonTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = 256
   c.height = 256
@@ -1288,6 +1334,10 @@ export function balloonTexture(): THREE.CanvasTexture {
 
 // ───────────────────────────────────────────── lighthouse banding texture ───
 export function lighthouseTexture(): THREE.CanvasTexture {
+  return cachedTexture('lighthouse', buildLighthouseTexture)
+}
+
+function buildLighthouseTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = 128
   c.height = 512
@@ -1303,6 +1353,10 @@ export function lighthouseTexture(): THREE.CanvasTexture {
 
 // ────────────────────────────────────────────────────────── checker (race) ──
 export function checkerTexture(): THREE.CanvasTexture {
+  return cachedTexture('checker', buildCheckerTexture)
+}
+
+function buildCheckerTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = 240
   c.height = 120
@@ -1321,6 +1375,10 @@ export function checkerTexture(): THREE.CanvasTexture {
 
 // ───────────────────────────── Chale Wote street-art murals (3 variants) ────
 export function muralTexture(variant = 0): THREE.CanvasTexture {
+  return cachedTexture(`mural:${variant}`, () => buildMuralTexture(variant))
+}
+
+function buildMuralTexture(variant: number): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = 512
   c.height = 256
@@ -1416,6 +1474,10 @@ export function muralTexture(variant = 0): THREE.CanvasTexture {
 
 // ───────────────────────── festival bunting strip (transparent background) ──
 export function buntingTexture(): THREE.CanvasTexture {
+  return cachedTexture('bunting', buildBuntingTexture)
+}
+
+function buildBuntingTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = 512
   c.height = 48
@@ -1446,6 +1508,10 @@ export function buntingTexture(): THREE.CanvasTexture {
 
 // ─────────────────────────────────────────────────────────────── sun glow ──
 export function glowTexture(color = '#ffb46b'): THREE.CanvasTexture {
+  return cachedTexture(`glow:${color}`, () => buildGlowTexture(color))
+}
+
+function buildGlowTexture(color: string): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = 256
   c.height = 256

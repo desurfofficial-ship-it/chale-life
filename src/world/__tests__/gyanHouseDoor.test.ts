@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { circleHitsAny } from '../../engine/collision';
 import { colliders, GYAN_HOUSE_WORLD } from '../colliders';
+import { loadColliderFixture } from '../../test-support/colliderFixture';
+// P2-2: the capture is fetched (not bundled) — node tests ingest from disk
+loadColliderFixture();
 
 describe('Gyan house door', () => {
   it('door centre is walkable (no collider hit for player radius)', () => {

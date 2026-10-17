@@ -6,7 +6,7 @@
  * (starts 09:00, 1 real min = 10 game min). ?hour= and ?weather= override.
  */
 
-import { Suspense, useSyncExternalStore, useEffect, useState } from 'react';
+import { Suspense, useSyncExternalStore } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CameraRig } from '../engine/CameraRig';
@@ -15,11 +15,7 @@ import { ObjectiveMarker } from '../engine/ObjectiveMarker';
 import { Player } from '../player/Player';
 import { INITIAL_ZOOM } from '../store/gameStore';
 import { getTycoonState, subscribeTycoon } from '../store/tycoonStore';
-import {
-  getAmbientHour,
-  getAmbientWeather,
-  tickAmbientClock,
-} from '../store/ambientClock';
+import { getWorldTime, subscribeWorldTime, tickAmbientClock } from '../store/ambientClock';
 import { AccraWorld } from '../world';
 import {
   buildTycoonDemoProps,
@@ -90,34 +86,22 @@ function toProps(s: ReturnType<typeof getTycoonState>): TycoonWorldProps | null 
 
 /** Resolve display hour/weather for the world (tycoon clock or ambient). */
 function useWorldTime(tycoon: TycoonWorldProps | null): { hour: number; weather: WeatherKind } {
-  const [tick, setTick] = useState(0);
-  useEffect(() => {
-    let id = 0;
-    const loop = () => {
-      tickAmbientClock(1 / 30); // coarse; AmbientTick does precise
-      setTick((n) => n + 1);
-      id = window.setTimeout(loop, 2000); // UI hour changes slowly
-    };
-    id = window.setTimeout(loop, 2000);
-    return () => clearTimeout(id);
-  }, []);
-  void tick;
-
-  if (typeof window !== 'undefined') {
-    const q = new URLSearchParams(window.location.search);
-    const h = q.get('hour');
-    if (h != null && h !== '' && Number.isFinite(Number(h))) {
-      const weather = (q.get('weather') as WeatherKind) || getAmbientWeather();
-      return { hour: Number(h), weather: weather === 'rain' || weather === 'cloudy' ? weather : 'clear' };
-    }
-  }
+  // Ambient hour/weather live in an external store that only emits when the
+  // lighting bucket (quarter game-hour) or weather changes — the world tree
+  // no longer re-renders on a 2 s timer. URL ?hour/?weather are parsed once
+  // at module load inside ambientClock (its init()).
+  const ambient = useSyncExternalStore(
+    subscribeWorldTime,
+    getWorldTime,
+    getWorldTime,
+  );
   if (tycoon) {
     const w = tycoon.weather;
     const weather: WeatherKind =
       w === 'rain' || w === 'cloudy' ? w : 'clear';
     return { hour: tycoon.hour, weather };
   }
-  return { hour: getAmbientHour(), weather: getAmbientWeather() };
+  return ambient;
 }
 
 function AmbientTick() {

@@ -15,7 +15,6 @@ const WORLD_MIN_X = -280;
 const WORLD_MAX_X = 340;
 const WORLD_MIN_Z = -116;
 const WORLD_MAX_Z = 116;
-const RADIUS = 0.45;
 
 async function readPos(page: import('@playwright/test').Page) {
   const text = await page.locator('[aria-hidden]').first().innerText().catch(() => '');

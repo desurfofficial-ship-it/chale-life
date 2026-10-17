@@ -14,9 +14,9 @@
 // (z ≥ −116). The land is a separate textured slab at y 0.05 (3 cm above the
 // apron plinth, so no z-fighting) — extending PLATE north later would make it
 // walkable without moving anything here.
-import { useLayoutEffect, useMemo, useRef } from 'react'
+import { useLayoutEffect, useMemo, useRef, useEffect } from 'react'
 import * as THREE from 'three'
-import { Hospital, Mall, Factory, OfficeBlock, PropertyListing, FarmHut, Hills, Sign, Box } from '../../scene/Businesses'
+import { Hospital, Mall, Factory, PropertyListing, FarmHut, Hills, Sign, Box } from '../../scene/Businesses'
 import type { PropItem } from '../InstancedNature'
 import { InstancedTrees, InstancedPalms } from '../InstancedNature'
 
@@ -139,6 +139,8 @@ const HILLS: { x: number; z: number; r: number; h: number; seed: number }[] = ((
 
 export function NorthReach() {
   const tex = useMemo(() => buildSlabTexture(), [])
+  // P2-4: the district's slab canvas texture is owned here — free on unmount
+  useEffect(() => () => tex.dispose(), [tex])
   const { x0, x1, z0, z1 } = NORTH_REACH
   const { crops, posts } = useMemo(() => {
     const crops: PropItem[] = []
@@ -157,6 +159,14 @@ export function NorthReach() {
   }, [])
   const cGeo = useMemo(() => cropGeo(), [])
   const pGeo = useMemo(() => postGeo(), [])
+  // P2-4: instanced crop/post geometries are owned here — free on unmount
+  useEffect(
+    () => () => {
+      cGeo.dispose()
+      pGeo.dispose()
+    },
+    [cGeo, pGeo],
+  )
   const fieldColors = useMemo(() => {
     const cols: string[] = []
     FIELDS.forEach(([a, b, c0, c1, col]) => {

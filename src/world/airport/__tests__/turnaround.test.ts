@@ -25,9 +25,7 @@ describe('turnaround', () => {
   });
 
   it('stagger keeps gates out of sync', () => {
-    const a = phaseAt(100, 0).phase;
-    const b = phaseAt(100, 1).phase;
-    // not always different but usually — check cycle offset works
+    // gate 1 runs the same cycle on an offset — check the sequence itself
     expect(phaseAt(0, 0).phase).toBe('arrive');
     expect(phaseAt(PHASE_DURATION.arrive + 1, 0).phase).toBe('deboard');
   });

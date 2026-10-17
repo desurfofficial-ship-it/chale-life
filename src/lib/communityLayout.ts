@@ -2,7 +2,7 @@
 // Task 14 community realism pass (Chorkor West / Daavi Street West): every
 // footprint audited against roads, DAAVI_PLOT, land plots, kept businesses,
 // each other and the vehicle loop lanes (see the script).
-/* eslint-disable */
+ 
 export type Facing = 'N' | 'S' | 'E' | 'W'
 export interface CRes { id: string; type: 'compound' | 'house2' | 'bungalow' | 'unfinished' | 'unfinished1' | 'walled' | 'flats' | 'mixed' | 'colonial'; x: number; z: number; w: number; d: number; f: Facing; wall: string; wallHex: string; roof: 'rust' | 'alu' | 'slab' | 'none'; rot: number; census: string; floors?: number; wear?: number; gate?: string; name?: string; shop?: string; shopBg?: string }
 export interface CBiz { id: string; kind: string; name: string; x: number; z: number; w: number; d: number; f: Facing; rot: number; bg?: string; fg?: string; wall?: string; wallHex?: string; goods?: string; census: string; biz: string }

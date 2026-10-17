@@ -19,7 +19,7 @@ import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { movementStep, type Kinematics } from './movement';
 import { projectedPlayerScreen } from './CameraRig';
-import { colliders, worldBounds } from '../world/colliders';
+import { colliders, collidersReady, worldBounds } from '../world/colliders';
 import { MAX_TICK_SECONDS } from '../rules/needs';
 import { nearestLocationId } from '../rules/proximity';
 import {
@@ -79,9 +79,16 @@ export function GameLoop() {
     }
     tickAmbient(dt);
 
-    kin.current = movementStep(kin.current, movementInput, dt, colliders, {
-      bounds: worldBounds,
-    });
+    // P2-2: colliders.json is fetched at boot, not bundled — hold input-driven
+    // movement until the capture lands (walking before it arrives would cross
+    // walls: the walker would see an empty world). Teleports still re-seed
+    // kinematics above, and a failed fetch goes ready-but-degraded, never a
+    // deadlock.
+    if (collidersReady()) {
+      kin.current = movementStep(kin.current, movementInput, dt, colliders, {
+        bounds: worldBounds,
+      });
+    }
     const k = kin.current;
     setPlayerTransform(k.x, k.z, k.yaw);
 

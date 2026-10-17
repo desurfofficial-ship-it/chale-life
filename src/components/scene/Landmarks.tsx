@@ -63,7 +63,12 @@ export function BlackStar({ position, size = 1, rotation = 0 }: { position: [num
   )
 }
 
+const starGeoCache = new Map<number, THREE.ExtrudeGeometry>()
+/** Black Star silhouette, cached per size (P2-4: shared geometry, never
+ *  disposed — callers must not free the returned instance). */
 export function starGeo(size: number): THREE.ExtrudeGeometry {
+  const hit = starGeoCache.get(size)
+  if (hit) return hit
   const shape = new THREE.Shape()
   for (let i = 0; i < 5; i++) {
     const a = -Math.PI / 2 + (i * 2 * Math.PI) / 5
@@ -75,6 +80,7 @@ export function starGeo(size: number): THREE.ExtrudeGeometry {
   shape.closePath()
   const g = new THREE.ExtrudeGeometry(shape, { depth: size * 0.22, bevelEnabled: false })
   g.center()
+  starGeoCache.set(size, g)
   return g
 }
 

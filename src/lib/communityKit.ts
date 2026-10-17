@@ -11,18 +11,27 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 
 type V3 = [number, number, number]
 
+// P3-4: Kit.add runs per part during kit baking (hundreds of calls per
+// mount batch) — the transform temps are module-scope, not per-call.
+const _kitM = new THREE.Matrix4()
+const _kitP = new THREE.Vector3()
+const _kitQ = new THREE.Quaternion()
+const _kitE = new THREE.Euler()
+const _kitS = new THREE.Vector3()
+const _kitC = new THREE.Color()
+
 export class Kit {
   parts: THREE.BufferGeometry[] = []
   add(g: THREE.BufferGeometry, color: string, pos: V3, rot: V3 = [0, 0, 0], scale: V3 = [1, 1, 1]) {
-    const m = new THREE.Matrix4().compose(
-      new THREE.Vector3(...pos),
-      new THREE.Quaternion().setFromEuler(new THREE.Euler(rot[0], rot[1], rot[2], 'YXZ')),
-      new THREE.Vector3(...scale),
+    const m = _kitM.compose(
+      _kitP.set(pos[0], pos[1], pos[2]),
+      _kitQ.setFromEuler(_kitE.set(rot[0], rot[1], rot[2], 'YXZ')),
+      _kitS.set(scale[0], scale[1], scale[2]),
     )
     g.applyMatrix4(m)
     const ng = g.index ? g.toNonIndexed() : g
     for (const k of Object.keys(ng.attributes)) if (k !== 'position' && k !== 'normal') ng.deleteAttribute(k)
-    const c = new THREE.Color(color)
+    const c = _kitC.set(color)
     const n = ng.attributes.position.count
     const arr = new Float32Array(n * 3)
     for (let i = 0; i < n; i++) { arr[i * 3] = c.r; arr[i * 3 + 1] = c.g; arr[i * 3 + 2] = c.b }

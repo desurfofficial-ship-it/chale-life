@@ -17,6 +17,9 @@ import {
 import { DAAVI_BENCH, DAAVI_JOB_SPOT, nearestLocationId } from '../proximity';
 // ACCRA MAP: the plot's solid geometry comes from the captured collider set
 import { colliders } from '../../world/colliders';
+import { loadColliderFixture } from '../../test-support/colliderFixture';
+// P2-2: the capture is fetched (not bundled) — node tests ingest from disk
+loadColliderFixture();
 
 /** The kiosk shell on the DAAVI_PLOT (Jamestown, −126.5,−3.6). */
 const KIOSK = colliders.find(

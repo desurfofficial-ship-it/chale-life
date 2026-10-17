@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { flagTexture } from '@/lib/mapTextures'
+import { seededSpanAt } from '@/lib/seeded'
 import { markAnimated, unmarkAnimated } from '../world/SceneBatcher'
 
 // ─────────────────────────────────────────────────────────────── palm tree ──
@@ -58,10 +59,6 @@ export function Tree({ position, scale = 1 }: { position: [number, number, numbe
   )
 }
 
-// ───────────────────────────────────────────────────────── people (silhouette)
-const SKIN_TONES = ['#8a5a3b', '#6e4226', '#a06a42', '#5b3520']
-const CLOTH_COLORS = ['#ce1126', '#fcd116', '#2e7fa8', '#4f9e4f', '#e08a3c', '#d97b8f', '#f4f1ea', '#3aa08f']
-
 /** Static capsule people removed (looked unfinished). CommunityLife has the proper NPCs. */
 export function Person(_props: { position: [number, number, number]; rotation?: number }) {
   return null
@@ -71,7 +68,7 @@ export function Person(_props: { position: [number, number, number]; rotation?: 
 export function GhanaFlag({ position, scale = 1, rotation = 0 }: { position: [number, number, number]; scale?: number; rotation?: number }) {
   const tex = useMemo(() => flagTexture(), [])
   const ref = useRef<THREE.Group>(null)
-  const phase = useMemo(() => Math.random() * Math.PI * 2, [])
+  const phase = useMemo(() => seededSpanAt(position, Math.PI * 2), [position])
   useEffect(() => {
     markAnimated(ref.current)
     return () => unmarkAnimated(ref.current)
@@ -118,6 +115,8 @@ export function StreetLamp({ position, rotation = 0 }: { position: [number, numb
     const t = new THREE.CanvasTexture(c)
     return t
   }, [])
+  // P2-4: per-lamp glow texture — free it when the lamp unmounts
+  useEffect(() => () => glow.dispose(), [glow])
   return (
     <group position={position} rotation={[0, rotation, 0]}>
       <mesh position={[0, 2.6, 0]}>

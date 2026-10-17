@@ -4,8 +4,7 @@
  * Soft highlight rings + tappable hit planes for every LAND_PLOTS entry.
  * Emits plotSelected via worldEvents — no store imports.
  */
-import { useMemo, useRef } from 'react';
-import * as THREE from 'three';
+import { useMemo } from 'react';
 import { LAND_PLOTS } from '@/lib/mapConfig';
 import { emitWorldEvent } from './worldEvents';
 

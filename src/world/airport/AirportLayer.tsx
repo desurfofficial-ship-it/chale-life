@@ -12,16 +12,6 @@ import { phaseAt, bridgeExtended, planeOnStand } from './turnaround';
 import { getAmbientGameTime, registerAmbient } from '../../engine/ambient';
 import { signTexture } from '@/lib/mapTextures';
 
-const _m = new THREE.Matrix4();
-const _p = new THREE.Vector3();
-const _q = new THREE.Quaternion();
-const _s = new THREE.Vector3(1, 1, 1);
-const _e = new THREE.Euler();
-const _c = new THREE.Color();
-
-const LIVERIES = ['#f6f4ee', '#e8f0ff', '#fff5e6', '#f0fff4'] as const;
-const TAIL_GREEN = '#006b3f';
-
 function Terminal() {
   const { x, z, w, d, h } = AIRPORT.terminal;
   const sign = useMemo(() => signTexture('KOTOKA INTL', '#0a3d4a', '#ffd98f'), []);
@@ -561,7 +551,7 @@ function ServiceVehicle({ kind, gateIndex }: { kind: (typeof TRUCK_KINDS)[number
       let x = depot.x + (kind === 'fuel' ? 0 : kind === 'baggage' ? 4 : kind === 'cater' ? 8 : kind === 'pushback' ? 12 : 16);
       let z = depot.z;
       let yaw = 0;
-      let show = true;
+      const show = true;
 
       const slotX = g.x + (kind === 'fuel' || kind === 'cater' ? 5.2 : -5.2);
       const slotZ = g.z + (kind === 'baggage' ? 3.2 : kind === 'pushback' ? -2.5 : 1.2);

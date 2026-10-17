@@ -10,19 +10,12 @@
 // the south fishing jetty over the water, two jetty huts, palms and people.
 import { BannerGate, BeachStall } from '../../scene/Expansion3'
 import { Guardrail } from '../../scene/Expansion5'
-import { plotProps } from './LandForSale'
 import {
   InstancedPeople, InstancedPalms, InstancedShrubs, InstancedGrassTufts, InstancedTrees,
   type PropItem,
 } from '../InstancedNature'
 
-// the five island plots (mirrors the mapTextures paint exactly)
-const ISLAND_PLOTS = [
-  { x: -68, z: 75.5, w: 16, d: 10 }, { x: -24, z: 75.5, w: 16, d: 10 }, { x: -68, z: 92, w: 16, d: 10 },
-]
-
-const ISL_PROPS = plotProps(ISLAND_PLOTS, 77)
-
+// palm/tuft dressing along the island shore
 const ISL_PALMS: PropItem[] = [
   { p: [-74, 68.5] as [number, number], s: 1.05 }, { p: [-16.5, 69] as [number, number], s: 0.95 },
   { p: [-74.5, 95.5] as [number, number], s: 1 }, { p: [-14.5, 95] as [number, number], s: 1.1 },

@@ -37,6 +37,16 @@ function useSlotMaterials(mats: RoomMats, selected: Slot | null) {
     for (const s of Object.keys(REPEAT) as Slot[]) m[s] = new THREE.MeshStandardMaterial({ roughness: 0.8 })
     return m
   }, [])
+  // P2-4: slot materials + their cloned maps live per room mount — free them
+  // when the room unmounts (entering/leaving the house used to leak both).
+  useEffect(() => {
+    return () => {
+      for (const s of Object.keys(REPEAT) as Slot[]) {
+        set[s].map?.dispose()
+        set[s].dispose()
+      }
+    }
+  }, [set])
   useEffect(() => {
     for (const s of Object.keys(REPEAT) as Slot[]) {
       const sw = SWATCH[mats[s]]
@@ -135,6 +145,18 @@ export function GyanRoom({
     // desk lamp: glow follows its own toggle (plus a daylight floor)
     deskShadeMat.emissiveIntensity = dev.desk ? 0.5 + lampsOn * 1.7 : 0.04
   }, [lampsOn, dev, shadeMat, fixed.bulb, bulbMat, deskShadeMat])
+  // P2-4: the whole fixture material set is per-mount — dispose on unmount
+  useEffect(() => {
+    return () => {
+      for (const v of Object.values(fixed)) {
+        if (Array.isArray(v)) {
+          for (const m of v) m.dispose()
+        } else {
+          v.dispose()
+        }
+      }
+    }
+  }, [fixed])
 
   const pick = (slot: Slot) => (e: ThreeEvent<MouseEvent>) => {
     if (!onPick) return
@@ -159,7 +181,7 @@ export function GyanRoom({
   })
 
   return (
-    <group>
+    <group userData={{ noBatch: true }}>
       {/* ── floor ── */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]} receiveShadow material={M.floor} {...tag('floor')}>
         <planeGeometry args={[w, d]} />

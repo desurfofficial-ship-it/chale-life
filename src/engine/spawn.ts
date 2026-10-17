@@ -17,7 +17,7 @@
  */
 
 import { locations } from '../data/locations';
-import { colliders, worldBounds } from '../world/colliders';
+import { colliders, collidersReady, loadColliders, worldBounds } from '../world/colliders';
 import { circleHitsAny, clampToBounds, type Box } from './collision';
 import { DEFAULT_MOVEMENT } from './movement';
 import {
@@ -111,4 +111,18 @@ export function initializePlayerSpawn(): void {
   setPlayerPosition(spawn.x, 0, spawn.z);
   setPlayerYaw(SPAWN_YAW);
   publishHud({ ...getHud(), x: spawn.x, z: spawn.z, yaw: SPAWN_YAW });
+}
+
+// P2-2: at boot the captured collider set is still in flight, so the resolve
+// above sees only the code-derived house walls. Once the fetch lands, re-run
+// the resolve — movement is gated on collidersReady() until then, so the
+// walker is guaranteed to still be standing exactly at the boot spawn and
+// the nudge fallback (which needs the real capture) stays honest.
+if (typeof window !== 'undefined' && !collidersReady()) {
+  void loadColliders().then(() => {
+    const spawn = resolveSpawn();
+    setPlayerPosition(spawn.x, 0, spawn.z);
+    setPlayerYaw(SPAWN_YAW);
+    publishHud({ ...getHud(), x: spawn.x, z: spawn.z, yaw: SPAWN_YAW });
+  });
 }

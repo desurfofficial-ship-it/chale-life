@@ -371,7 +371,7 @@ export function plotAskingPrice(p: {
   if (p.price != null && Number.isFinite(p.price)) return p.price
   const area = Math.max(1, p.w * p.d)
   const zoneMult = ZONE_PRICE_MULT[p.zone ?? ''] ?? 1.2
-  let base = Math.round((area * 520 * zoneMult) / 100) * 100
+  const base = Math.round((area * 520 * zoneMult) / 100) * 100
   // Landmark proximity premium
   let premium = 0
   for (const lm of LANDMARKS) {

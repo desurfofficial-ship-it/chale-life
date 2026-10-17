@@ -14,6 +14,7 @@ import { useFrame } from '@react-three/fiber'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { LANDMARKS, type LandmarkDef } from '@/lib/mapConfig'
 import { checkerTexture } from '@/lib/mapTextures'
+import { seededSpan, seededSpanAt } from '@/lib/seeded'
 import { markAnimated, unmarkAnimated } from '../world/SceneBatcher'
 import { starGeo } from './Landmarks'
 
@@ -343,10 +344,16 @@ export function LandmarkLabels({
     () =>
       LANDMARKS.map((lm) => {
         const { tex, aspect } = makeLabelTexture(lm.label)
-        return { tex, aspect, phase: Math.random() * Math.PI * 2 }
+        return { tex, aspect, phase: seededSpan(lm.id, Math.PI * 2) }
       }),
     []
   )
+  // P2-4: label canvas textures are per-mount — release them on unmount
+  useEffect(() => {
+    return () => {
+      for (const s of statics) s.tex.dispose()
+    }
+  }, [statics])
   const rtRef = useRef<LabelRuntime[]>([])
   const scratchRef = useRef<LabelScratch | null>(null)
   useEffect(() => {
@@ -365,7 +372,7 @@ export function LandmarkLabels({
 // ───────────────────────────────────────────────────── map pin (mission) ────
 // One merged geometry (cone + sphere + highlight dot, vertex-colored) so each
 // pin is a single draw call. The pin still bobs/spins as a group.
-let pinGeo: THREE.BufferGeometry | null = null
+const pinGeo: THREE.BufferGeometry | null = null
 function getPinGeometry(): THREE.BufferGeometry {
   if (pinGeo) return pinGeo
   const cone = new THREE.ConeGeometry(0.55, 1.4, 12)
@@ -404,7 +411,14 @@ export function MapPin({
       }),
     [color]
   )
-  const phase = useMemo(() => Math.random() * Math.PI * 2, [])
+  const phase = useMemo(() => seededSpanAt(position, Math.PI * 2), [position])
+  // P2-4: pin material is per-instance (tinted) — free it on unmount
+  // (the pin GEOMETRY is a module singleton — never dispose that)
+  useEffect(() => {
+    return () => {
+      mat.dispose()
+    }
+  }, [mat])
   useEffect(() => {
     markAnimated(ref.current)
     return () => unmarkAnimated(ref.current)
@@ -427,7 +441,7 @@ export function MapPin({
 export function CollectibleStar({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
   const ref = useRef<THREE.Group>(null)
   const geo = useMemo(() => starGeo(1), [])
-  const phase = useMemo(() => Math.random() * Math.PI * 2, [])
+  const phase = useMemo(() => seededSpanAt(position, Math.PI * 2), [position])
   useEffect(() => {
     markAnimated(ref.current)
     return () => unmarkAnimated(ref.current)

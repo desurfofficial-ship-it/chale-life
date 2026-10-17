@@ -79,10 +79,6 @@ export function createBusinessSim(def: BusinessDef): BusinessSimState {
   };
 }
 
-function pushLog(log: readonly string[], line: string): readonly string[] {
-  return [...log.slice(-20), line];
-}
-
 /** Tick one business by dtGameMin game-minutes at hour. */
 
 /**
@@ -108,7 +104,7 @@ export function tickBusiness(
   let seated = state.seated;
   let revenue = state.dayRevenueGHS;
   let stock = state.stock;
-  let log = state.log;
+  const log = state.log;
   let customers = state.customers.map((c) => ({ ...c, sinceMin: c.sinceMin + dtGameMin }));
 
   // Preserve player onShift roster always. While closed, capacity/arrivals use
@@ -135,9 +131,7 @@ export function tickBusiness(
       : staffForOps.filter((s) => s.onShift).length / staffForOps.length;
   const rate = customerArrivalRate(def, hour) * staffRatio; // per hour, staff-scaled
   const arrive = (rate * dtGameMin) / 60;
-  // poisson-ish: accumulate fractional via hash of time is overkill — use floor+random-free fractional bank
-  const add = Math.floor(arrive + (state.queue % 1));
-  // use deterministic fractional from revenue cents
+  // deterministic fractional from revenue cents (floor + frac, no Math.random)
   const frac = (revenue * 10 + seated * 3 + queue) % 1;
   const nNew = Math.floor(arrive + frac);
   if (nNew > 0) {

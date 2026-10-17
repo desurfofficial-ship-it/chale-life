@@ -175,6 +175,8 @@ export function TerraceHotel({ position }: { position: [number, number, number] 
     roughness: 0.12,
     metalness: 0.3,
   }), [])
+  // P2-4: per-mount material — free it on unmount
+  useEffect(() => () => poolWater.dispose(), [poolWater])
   return (
     <group position={position} userData={{ bldg: 'hotel' }}>
       {/* pink mid-rise body — depth trimmed 10→7.6 so the whole footprint

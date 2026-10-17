@@ -4,8 +4,6 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
 
-const PALETTE = ['#8999A3', '#B76544', '#8DA69A', '#E4C782', '#F0AB70'];
-
 type Edge =
   | { kind: 'hz'; z: number; x0: number; x1: number }
   | { kind: 'vt'; x: number; z0: number; z1: number };

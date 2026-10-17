@@ -74,6 +74,7 @@ import { CameraRail } from '../ui/tycoon/CameraRail';
 import type { PlotRef } from '../rules/business';
 import { DebugOverlay } from './DebugOverlay';
 import { OfficePanel } from '../ui/office/OfficePanel';
+import { travelToOffice } from '../ui/office/OfficesMenu';
 import { BusinessPanel } from '../ui/business/BusinessPanel';
 import { PlacesPanel } from '../ui/business/PlacesPanel';
 import { isWebGLAvailable } from './webgl';
@@ -124,6 +125,10 @@ function applyPromptOverride(
   };
 }
 
+// P3-1 (rules-of-hooks): the mood-mode gate used to early-return INSIDE App
+// above the play shell's hooks, making every play hook conditional. App is
+// now a hook-free mode router; the play shell lives in <PlayApp /> with an
+// unconditional hook order.
 export function App() {
   // Room dresser (Gyan house interior) — standalone mode from onboarding CTA
   // Set-the-Mood is room editing — only from inside the house (or first-run onboarding).
@@ -142,7 +147,10 @@ export function App() {
     }
     return <SetTheMood />;
   }
+  return <PlayApp />;
+}
 
+function PlayApp() {
   const [webglOk] = useState(isWebGLAvailable);
 
   // E-010: ?tycoon=1 enables the overlay; World emits plotSelected (W-007)
@@ -365,6 +373,7 @@ export function App() {
           alerts={tycoonAlerts}
           activeTab={tycoonTab}
           onTab={setActiveTab}
+          onGoToOffice={travelToOffice}
           onBuyPlot={requestBuyPlot}
           onOpenBusiness={requestOpenBusiness}
           onCloseSheet={() => setSelectedPlotId(null)}

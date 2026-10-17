@@ -24,6 +24,7 @@ import {
 } from '../../store/officeStore';
 import { markAnimated, unmarkAnimated } from '../../components/world/SceneBatcher';
 import { signTexture } from '../../lib/mapTextures';
+import { seededSpan } from '../../lib/seeded';
 import { furnitureFor, roomSeats, visitorSpots, type Part } from './officeFurniture';
 import { OfficeModels } from './OfficeModels';
 import {
@@ -404,16 +405,24 @@ function Furniture({ layout, officeId }: { layout: FloorLayout; officeId: string
   const models = useMemo(() => rooms.flatMap((f) => f.models), [rooms]);
   const solid = useMemo(() => parts.filter((p) => !p.glow), [parts]);
   const glow = useMemo(() => parts.filter((p) => p.glow), [parts]);
+  // O-002: screens / server LEDs / ON AIR glow at night like the facade
+  // windows do (offices that are open after 18:00). The GLB desks bake the
+  // monitor into one vertex-coloured mesh, so the emissive batch is the
+  // stand-in screens until a split-screen asset lands.
+  const nightLit = useSel(() => {
+    const hr = getAmbientHour();
+    return hr < 6.5 || hr >= 18 ? 1 : 0;
+  });
   return (
     <>
       <PartBatch parts={solid} />
-      <PartBatch parts={glow} emissive />
+      <PartBatch parts={glow} emissive nightLit={nightLit === 1} />
       <OfficeModels models={models} fallback={(boxes) => <PartBatch parts={boxes} />} />
     </>
   );
 }
 
-function PartBatch({ parts, emissive }: { parts: Part[]; emissive?: boolean }) {
+function PartBatch({ parts, emissive, nightLit = false }: { parts: Part[]; emissive?: boolean; nightLit?: boolean }) {
   const ref = useRef<THREE.InstancedMesh>(null);
   useLayoutEffect(() => {
     const m = ref.current;
@@ -434,7 +443,12 @@ function PartBatch({ parts, emissive }: { parts: Part[]; emissive?: boolean }) {
   return (
     <instancedMesh ref={ref} args={[SHARED.box, undefined, parts.length]} castShadow={!emissive}>
       {emissive ? (
-        <meshStandardMaterial color="#ffffff" emissive="#9ad7ff" emissiveIntensity={0.55} roughness={0.3} />
+        <meshStandardMaterial
+          color="#ffffff"
+          emissive="#9ad7ff"
+          emissiveIntensity={nightLit ? 1.1 : 0.12}
+          roughness={0.3}
+        />
       ) : (
         <meshStandardMaterial color="#ffffff" roughness={0.7} />
       )}
@@ -550,7 +564,16 @@ function People({ def, layouts, viewFloor }: { def: OfficeDef; layouts: FloorLay
   const ring = useRef<THREE.Mesh>(null);
   const pills = useRef<(THREE.Sprite | null)[]>([]);
   const walkers = useRef<Walker[]>(
-    Array.from({ length: total }, () => ({ x: 0, z: 0, y: 0, yaw: 0, phase: Math.random() * 6, visible: false })),
+    // P2-3: walk-cycle phase seeded from the stable office id + walker index —
+    // Math.random() here re-scrambled every reload (and every Fast Refresh).
+    Array.from({ length: total }, (_, i) => ({
+      x: 0,
+      z: 0,
+      y: 0,
+      yaw: 0,
+      phase: seededSpan(`${def.id}:walker:${i}`, 6),
+      visible: false,
+    })),
   );
   const ldef = useMemo(() => liftDefFor(def), [def]);
   const core = layouts[0].core;

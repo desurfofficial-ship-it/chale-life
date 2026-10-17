@@ -29,7 +29,7 @@ import {
   objectiveFor,
   starterHustleCoolingDown,
 } from '../../rules/jobs';
-import { isLow, lowNeedsHints, LOW_THRESHOLD } from '../../rules/needs';
+import { isLow, lowNeedsHints } from '../../rules/needs';
 import { useCountdownNow } from '../useTicker';
 import { isInsideGyanHouse } from '../../world/colliders';
 import { OfficesMenu } from '../office/OfficesMenu';

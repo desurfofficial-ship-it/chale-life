@@ -11,7 +11,7 @@
 // world room) + localStorage ('chale-room-v1').
 import { Suspense, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import * as THREE from 'three'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls, ContactShadows } from '@react-three/drei'
 import { create } from 'zustand'
 import { listHomeFurniture, findFurnitureById, comfortPctFromOwned } from '../data/furniture'
@@ -26,7 +26,7 @@ import {
 import { findHousingTierById } from '../data/housing'
 import { GyanRoom, ROOM } from './GyanRoom'
 import {
-  MOODS, SLOTS, SWATCH, SWATCHES, moodScores, moodSentence, swatchURL,
+  MOODS, SLOTS, SWATCH, SWATCHES, moodScores, moodSentence,
   type MatKind, type MoodId, type RoomMats, type Slot,
 } from './materials'
 import { loadRoomMats, saveRoomMats, loadRoomDevices, saveRoomDevices, type RoomDevices } from './roomPrefs'
@@ -93,25 +93,35 @@ const SKY: [number, string, string][] = [
   [20, '#141a36', '#3a2c4a'],
   [24, '#070b18', '#131a30'],
 ]
+// P3-4: the hour slider calls daylight() on every drag tick — the returned
+// Colors/Vector3 are reusable module temps (callers copy out of them).
+const _skyTop = new THREE.Color()
+const _skyBottom = new THREE.Color()
+const _skyA = new THREE.Color()
+const _skyB = new THREE.Color()
+const _sunPos = new THREE.Vector3()
+const _sunColor = new THREE.Color()
+const _SUN_WARM_FROM = new THREE.Color('#fff6e8')
+const _SUN_WARM_TO = new THREE.Color('#ff9a4a')
 function lerpSky(h: number): [THREE.Color, THREE.Color] {
   for (let i = 0; i < SKY.length - 1; i++) {
     const [h0, a0, b0] = SKY[i]
     const [h1, a1, b1] = SKY[i + 1]
     if (h >= h0 && h <= h1) {
       const t = (h - h0) / (h1 - h0)
-      return [new THREE.Color(a0).lerp(new THREE.Color(a1), t), new THREE.Color(b0).lerp(new THREE.Color(b1), t)]
+      return [_skyTop.set(a0).lerp(_skyA.set(a1), t), _skyBottom.set(b0).lerp(_skyB.set(b1), t)]
     }
   }
-  return [new THREE.Color(SKY[0][1]), new THREE.Color(SKY[0][2])]
+  return [_skyTop.set(SKY[0][1]), _skyBottom.set(SKY[0][2])]
 }
 export function daylight(h: number) {
   const dayT = (h - 6) / 12 // 0 sunrise … 1 sunset
   const elev = Math.sin(Math.PI * Math.min(1, Math.max(0, dayT)))
   const isDay = dayT > 0 && dayT < 1
   const az = Math.PI * (0.15 + 0.7 * Math.min(1, Math.max(0, dayT))) // east → west
-  const sunPos = new THREE.Vector3(-Math.cos(az) * 14, 2 + elev * 14, 6 - Math.sin(az) * 4)
+  const sunPos = _sunPos.set(-Math.cos(az) * 14, 2 + elev * 14, 6 - Math.sin(az) * 4)
   const warm = 1 - elev // low sun = warm
-  const sunColor = new THREE.Color('#fff6e8').lerp(new THREE.Color('#ff9a4a'), Math.pow(warm, 1.6))
+  const sunColor = _sunColor.copy(_SUN_WARM_FROM).lerp(_SUN_WARM_TO, Math.pow(warm, 1.6))
   const sunI = isDay ? 0.4 + elev * 2.6 : 0
   const dark = isDay ? Math.max(0, 1 - elev * 3.2) : 1
   return { sunPos, sunColor, sunI, ambient: 0.18 + elev * 0.55, lamps: dark, sky: lerpSky(h) }
@@ -146,6 +156,14 @@ function DaylightRig() {
     }
     if (amb.current) amb.current.intensity = d.ambient
   }, [hour, bg, scene])
+  // P2-4: the mood editor mounts per visit — release its background texture
+  // and don't leave the scene pointing at disposed GPU memory
+  useEffect(() => {
+    return () => {
+      if (scene.background === bg.tex) scene.background = null
+      bg.tex.dispose()
+    }
+  }, [bg, scene])
   return (
     <>
       <hemisphereLight ref={amb} args={['#cfd8ff', '#3a2e28', 0.5]} />
@@ -175,21 +193,6 @@ function Bridge() {
     r3f.el = gl.domElement
     ;(window as unknown as Record<string, unknown>).__MOOD = { gl, scene, camera }
   }, [camera, scene, gl])
-  return null
-}
-function slotAt(clientX: number, clientY: number): Slot | null {
-  if (!r3f.camera || !r3f.scene || !r3f.el) return null
-  const r = r3f.el.getBoundingClientRect()
-  const ndc = new THREE.Vector2(((clientX - r.left) / r.width) * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1)
-  const rc = new THREE.Raycaster()
-  rc.setFromCamera(ndc, r3f.camera)
-  for (const hit of rc.intersectObjects(r3f.scene.children, true)) {
-    let o: THREE.Object3D | null = hit.object
-    while (o) {
-      if (o.userData?.slot) return o.userData.slot as Slot
-      o = o.parent
-    }
-  }
   return null
 }
 
