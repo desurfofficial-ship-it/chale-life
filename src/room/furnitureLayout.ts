@@ -122,11 +122,22 @@ const CATEGORY: Record<string, string> = {
   lp_mop_bucket_00: 'mop_bucket',
   lp_laundry_basket_00: 'laundry_basket',
   lp_water_heater_00: 'water_heater',
+  // decor pack (20-decor-2)
+  lp_book_stack_00: 'decor',
+  lp_candle_holder_00: 'decor',
+  lp_kente_throw_roll_00: 'kente',
+  lp_picture_frame_00: 'wall_art',
+  lp_plant_hanger_00: 'plant',
+  lp_sculpture_00: 'decor',
+  lp_table_lamp_00: 'table_lamp',
+  lp_vase_00: 'decor',
+  lp_wall_clock_00: 'wall_art',
+  lp_wall_mask_00: 'wall_art',
 }
 
 /** Flat / soft pieces that may sit on the mat or rug. */
 const SOFT_CATEGORIES = new Set([
-  'rug', 'chair', 'stool', 'pouf', 'speaker', 'mop_bucket', 'laundry_basket', 'plant', 'floor_lamp',
+  'rug', 'chair', 'stool', 'pouf', 'speaker', 'mop_bucket', 'laundry_basket', 'plant', 'floor_lamp', 'decor', 'table_lamp', 'wall_art', 'kente',
 ])
 
 export function categoryOf(id: string): string {
