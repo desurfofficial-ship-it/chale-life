@@ -75,6 +75,7 @@ const CATEGORIES_KNOWN = [
   'side_table', 'pouf', 'dresser', 'nightstand', 'mirror', 'mattress_roll', 'cot',
   'clothes_rack', 'trunk', 'net', 'sink', 'shower_stall', 'bathtub', 'towel_rail',
   'bath_cabinet', 'mop_bucket', 'laundry_basket', 'water_heater',
+  'decor', 'wall_art', 'table_lamp',
 ];
 
 function fsAccess(modelPath: string): void {
