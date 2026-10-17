@@ -18,7 +18,7 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { DEFAULT_MOVEMENT, movementStep, type Kinematics } from './movement';
-import { projectedPlayerScreen } from './CameraRig';
+import { getSmoothedCameraYaw, projectedPlayerScreen } from './CameraRig';
 import { colliders, collidersReady, worldBounds } from '../world/colliders';
 import { MAX_TICK_SECONDS } from '../rules/needs';
 import { nearestLocationId } from '../rules/proximity';
@@ -87,6 +87,9 @@ export function GameLoop() {
     if (collidersReady()) {
       kin.current = movementStep(kin.current, movementInput, dt, colliders, {
         bounds: worldBounds,
+        // Joystick/keyboard are screen-space; rotate into the camera frame so
+        // "stick up" always walks away from the viewer.
+        cameraYaw: getSmoothedCameraYaw(),
         // Reality-check P3: sprint = 1.5× the walk top speed. The character
         // animator blends idle→walk→run from the measured ground speed, so
         // the animation transitions smoothly through this change.

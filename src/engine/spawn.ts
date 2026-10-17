@@ -23,6 +23,7 @@ import { DEFAULT_MOVEMENT } from './movement';
 import {
   getHud,
   publishHud,
+  requestTeleport,
   setPlayerPosition,
   setPlayerYaw,
 } from '../store/gameStore';
@@ -121,7 +122,10 @@ export function initializePlayerSpawn(): void {
 if (typeof window !== 'undefined' && !collidersReady()) {
   void loadColliders().then(() => {
     const spawn = resolveSpawn();
-    setPlayerPosition(spawn.x, 0, spawn.z);
+    // Must go through requestTeleport — GameLoop owns kinematics and would
+    // clobber a bare setPlayerPosition on the next frame (player stuck at the
+    // pre-capture point, often inside a solid once the full set lands).
+    requestTeleport(spawn.x, spawn.z);
     setPlayerYaw(SPAWN_YAW);
     publishHud({ ...getHud(), x: spawn.x, z: spawn.z, yaw: SPAWN_YAW });
   });

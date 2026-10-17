@@ -18,13 +18,22 @@ function useSkipChar(): boolean {
   return q.get('e2e') === '1' || q.get('nochar') === '1';
 }
 
-/** Invisible stand-in for e2e / nochar — never a yellow circle. */
-function InvisibleMarker() {
+/**
+ * e2e/nochar: fully invisible (collision tests only).
+ * Load/error fallback: a short dark figure so the player is never "gone".
+ */
+function InvisibleMarker({ visible = false }: { visible?: boolean }) {
   return (
-    <mesh visible={false} userData={{ chalePlayer: true }}>
-      <boxGeometry args={[0.4, 1.6, 0.4]} />
-      <meshBasicMaterial />
-    </mesh>
+    <group userData={{ chalePlayer: true }}>
+      <mesh visible={visible} position={[0, 0.9, 0]} castShadow>
+        <capsuleGeometry args={[0.28, 1.0, 4, 8]} />
+        <meshStandardMaterial color="#2a2430" roughness={0.85} metalness={0.05} />
+      </mesh>
+      <mesh visible={visible} position={[0, 1.55, 0.05]}>
+        <sphereGeometry args={[0.22, 12, 12]} />
+        <meshStandardMaterial color="#5c4033" roughness={0.9} />
+      </mesh>
+    </group>
   );
 }
 
@@ -48,7 +57,7 @@ class CharErrorBoundary extends React.Component<
     this.props.onError();
   }
   render() {
-    if (this.state.failed) return <InvisibleMarker />;
+    if (this.state.failed) return <InvisibleMarker visible />;
     return this.props.children;
   }
 }
@@ -90,7 +99,7 @@ export function Player() {
   return (
     <group ref={group} name="player">
       {useChar ? (
-        <Suspense fallback={<InvisibleMarker />}>
+        <Suspense fallback={<InvisibleMarker visible />}>
           <CharErrorBoundary onError={() => setUseChar(false)}>
             <CharacterAvatar />
           </CharErrorBoundary>
