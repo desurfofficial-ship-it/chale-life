@@ -11,7 +11,7 @@
 // world room) + localStorage ('chale-room-v1').
 import { Suspense, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import * as THREE from 'three'
-import { Canvas, useThree } from '@react-three/fiber'
+import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls, ContactShadows } from '@react-three/drei'
 import { create } from 'zustand'
 import { listHomeFurniture, findFurnitureById, comfortPctFromOwned } from '../data/furniture'
@@ -24,7 +24,7 @@ import {
   type ZoneId,
 } from '../data/roomZones'
 import { findHousingTierById } from '../data/housing'
-import { GyanRoom } from './GyanRoom'
+import { GyanRoom, ROOM } from './GyanRoom'
 import {
   MOODS, SLOTS, SWATCH, SWATCHES, moodScores, moodSentence,
   type MatKind, type MoodId, type RoomMats, type Slot,
@@ -193,21 +193,6 @@ function Bridge() {
     r3f.el = gl.domElement
     ;(window as unknown as Record<string, unknown>).__MOOD = { gl, scene, camera }
   }, [camera, scene, gl])
-  return null
-}
-function slotAt(clientX: number, clientY: number): Slot | null {
-  if (!r3f.camera || !r3f.scene || !r3f.el) return null
-  const r = r3f.el.getBoundingClientRect()
-  const ndc = new THREE.Vector2(((clientX - r.left) / r.width) * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1)
-  const rc = new THREE.Raycaster()
-  rc.setFromCamera(ndc, r3f.camera)
-  for (const hit of rc.intersectObjects(r3f.scene.children, true)) {
-    let o: THREE.Object3D | null = hit.object
-    while (o) {
-      if (o.userData?.slot) return o.userData.slot as Slot
-      o = o.parent
-    }
-  }
   return null
 }
 

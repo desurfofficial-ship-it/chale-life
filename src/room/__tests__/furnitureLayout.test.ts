@@ -12,7 +12,7 @@ import {
   type Rect,
   type RoomMode,
 } from '../furnitureLayout';
-import { listHomeFurniture, furnitureSizeMeters, findFurnitureById } from '../../data/furniture';
+import { listHomeFurniture, findFurnitureById } from '../../data/furniture';
 
 const MODES: RoomMode[] = ['dollhouse', 'world'];
 
