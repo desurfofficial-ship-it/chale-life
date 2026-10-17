@@ -194,7 +194,7 @@ function Cutaway({ def, richProps }: { def: BusinessDef; richProps: boolean }) {
 export function BusinessBuilding({ def }: { def: BusinessDef }) {
   const root = useRef<THREE.Group>(null);
   const camera = useThree((s) => s.camera);
-  const [detail, setDetail] = useState(false);
+  const [, setDetail] = useState(false);
   const selected = useBiz(() => getBusinessState().selectedBusinessId);
   // Cutaway only when selected — keeps earnAndEat draw-call budget (<450).
   const open = selected === def.id;
