@@ -12,6 +12,9 @@ import {
   createChapter1Quest,
   districtDemand,
   openBusiness,
+  moveFurniture,
+  rotateFurniture,
+  removeFurniture,
   tick,
   type BudgetTier,
   type BusinessState,
@@ -66,6 +69,8 @@ export interface TycoonState {
   tycoonMode: boolean;
   selectedPlotId: string | null;
   activeTab: TycoonTab;
+  /** When set, HUD furniture-edit mode is active for this business. */
+  furnitureEditBusinessId: string | null;
 }
 
 /** localStorage key — dotted form avoids gitleaks generic-api-key false positive */
@@ -86,6 +91,7 @@ let state: TycoonState = {
   tycoonMode: false,
   selectedPlotId: null,
   activeTab: 'property',
+  furnitureEditBusinessId: null,
 };
 
 function notify(): void {
@@ -176,6 +182,7 @@ export function __resetTycoonForTests(): void {
     tycoonMode: false,
     selectedPlotId: null,
     activeTab: 'property',
+    furnitureEditBusinessId: null,
   };
   notify();
 }
@@ -216,6 +223,13 @@ export function setTycoonMode(on: boolean): void {
 export function setSelectedPlotId(id: string | null): void {
   if (state.selectedPlotId === id) return;
   state.selectedPlotId = id;
+  notify();
+}
+
+
+export function setFurnitureEditBusinessId(id: string | null): void {
+  if (state.furnitureEditBusinessId === id) return;
+  state = { ...state, furnitureEditBusinessId: id };
   notify();
 }
 
@@ -476,6 +490,66 @@ function canvasSize(): { w: number; h: number } {
 }
 
 /** Fit the whole city plate into view (tycoon overview). */
+
+/** Move a placement on a player-owned business; persists via saveTycoon. */
+export function requestMoveFurniture(
+  businessId: string,
+  placementId: string,
+  tx: number,
+  tz: number,
+  plotTiles: { w: number; d: number },
+): boolean {
+  const biz = state.businesses.find((b) => b.id === businessId);
+  if (!biz) return false;
+  const r = moveFurniture(biz.layout, placementId, tx, tz, plotTiles);
+  if (!r.ok) return false;
+  state = {
+    ...state,
+    businesses: state.businesses.map((b) =>
+      b.id === businessId ? { ...b, layout: r.layout } : b,
+    ),
+  };
+  notify();
+  saveTycoon();
+  return true;
+}
+
+export function requestRotateFurniture(
+  businessId: string,
+  placementId: string,
+  rot: 0 | 90 | 180 | 270,
+): boolean {
+  const biz = state.businesses.find((b) => b.id === businessId);
+  if (!biz) return false;
+  const r = rotateFurniture(biz.layout, placementId, rot);
+  if (!r.ok) return false;
+  state = {
+    ...state,
+    businesses: state.businesses.map((b) =>
+      b.id === businessId ? { ...b, layout: r.layout } : b,
+    ),
+  };
+  notify();
+  saveTycoon();
+  return true;
+}
+
+export function requestRemoveFurniture(businessId: string, placementId: string): boolean {
+  const biz = state.businesses.find((b) => b.id === businessId);
+  if (!biz) return false;
+  const r = removeFurniture(biz.layout, placementId);
+  if (!r.ok) return false;
+  state = {
+    ...state,
+    businesses: state.businesses.map((b) =>
+      b.id === businessId ? { ...b, layout: r.layout } : b,
+    ),
+  };
+  notify();
+  saveTycoon();
+  return true;
+}
+
 export function requestFitCity(): void {
   const { w, h } = canvasSize();
   const z = zoomToFitBox(CITY_BOUNDS, w, h, DEFAULT_HUD_INSETS);

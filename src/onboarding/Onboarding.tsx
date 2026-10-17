@@ -15,8 +15,9 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { create } from 'zustand'
 import { GyanRoom, ROOM, FRONT_WINDOW } from '../room/GyanRoom'
 import { MOODS, type RoomMats } from '../room/materials'
+import { loadRoomMats, loadRoomDevices } from '../room/roomPrefs'
 import { COLORS } from '@/lib/mapConfig'
-import { getState } from '../store/gameStore'
+import { getState, useStoreSnapshot } from '../store/gameStore'
 import { isInsideGyanHouse } from '../world/colliders'
 import { useAnimatedRef } from '../components/world/SceneBatcher'
 import { getTycoonState } from '../store/tycoonStore'
@@ -193,7 +194,13 @@ export function OnboardingCamera() {
 
 // ── Gyan's house (exterior shell + the room inside) ──────────────────────────
 export function GyanHouse({ mats }: { mats?: RoomMats }) {
-  const roomMats = mats ?? MOODS[0].mats
+  // the walkable room honours what the player set up in the Room editor:
+  // saved surfaces, saved device toggles and every piece of bought furniture
+  const saved = useMemo(() => loadRoomMats(), [])
+  const roomMats = mats ?? saved.mats
+  const devices = useMemo(() => loadRoomDevices(), [])
+  const owned = useStoreSnapshot((s) => s.home.furnitureIds)
+  const lampsOn = devices.ceiling || devices.desk ? 1 : 0.15
   const t = ROOM.wall
   const W = ROOM.w + 2 * t
   const D = ROOM.d + 2 * t
@@ -339,7 +346,7 @@ export function GyanHouse({ mats }: { mats?: RoomMats }) {
 
       {/* interior always present — visible when exterior hides (cutaway) or through door */}
       <group position={[0, 0, 0]}>
-        <GyanRoom mode="world" mats={roomMats} lampsOn={1} />
+        <GyanRoom mode="world" mats={roomMats} lampsOn={lampsOn} owned={owned} devices={devices} />
       </group>
     </group>
   )

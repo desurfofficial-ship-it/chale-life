@@ -86,6 +86,8 @@ function renderTycoonHud(overrides: {
       onBuyPlot={onBuyPlot}
       onOpenBusiness={onOpenBusiness}
       onCloseSheet={() => {}}
+      furnitureEditBusiness={null}
+      onEditFurniture={() => {}}
     />,
   );
   return { ...utils, onBuyPlot, onOpenBusiness };
@@ -263,6 +265,8 @@ describe('TycoonHud PlotSheet — close button clears the error banner', () => {
         onBuyPlot={onBuyPlot}
         onOpenBusiness={vi.fn(() => true)}
         onCloseSheet={onCloseSheet}
+        furnitureEditBusiness={null}
+        onEditFurniture={() => {}}
       />,
     );
 

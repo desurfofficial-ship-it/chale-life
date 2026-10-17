@@ -27,11 +27,23 @@ export type ShopSub =
   | 'supermarket'
   | 'boutique'
   | 'electronics'
-  | 'pharmacy';
+  | 'pharmacy'
+  | 'barber'
+  | 'salon'
+  | 'gym';
 
 export type BusinessSub = RestaurantSub | ShopSub;
 
-export type StaffRole = 'cook' | 'waiter' | 'cashier' | 'stocker' | 'pharmacist' | 'bartender';
+export type StaffRole =
+  | 'cook'
+  | 'waiter'
+  | 'cashier'
+  | 'stocker'
+  | 'pharmacist'
+  | 'bartender'
+  | 'barber'
+  | 'stylist'
+  | 'trainer';
 
 export interface MenuItem {
   readonly id: string;
@@ -528,6 +540,154 @@ export const BUSINESSES: readonly BusinessDef[] = [
       },
     ],
   },
+  // ── service vertical slice (barber near spawn) ─────────────────────
+  {
+    id: 'BIZ_KWAME_BARBER',
+    name: "Kwame's Barber",
+    kind: 'shop',
+    sub: 'barber',
+    ownership: 'world',
+    ownerName: 'Kwame Mensah',
+    site: {
+      x: -132,
+      z: 18,
+      w: 6,
+      d: 5,
+      yaw: 0,
+      replaces: 'Service cutaway near Daavi (barber vertical slice)',
+      district: 'dansoman',
+    },
+    facade: {
+      wall: '#f5f0e6',
+      roof: '#3d3d3d',
+      sign: "KWAME'S BARBER",
+      signBg: '#1a1a1a',
+      awning: '#c8102e',
+    },
+    openHour: 8,
+    closeHour: 20,
+    staffRoles: [
+      { role: 'barber', count: 2, names: ['Kwame', 'Kojo'] },
+      { role: 'cashier', count: 1, names: ['Ama'] },
+    ],
+    menu: [
+      { id: 'fade', name: 'Fade cut', priceGHS: 25, category: 'goods' },
+      { id: 'trim', name: 'Beard trim', priceGHS: 12, category: 'goods' },
+      { id: 'kids', name: 'Kids cut', priceGHS: 15, category: 'goods' },
+      { id: 'shampoo', name: 'Wash & style', priceGHS: 30, category: 'goods' },
+    ],
+    capacity: 4,
+    customersPerHour: 3.5,
+    jobs: [
+      {
+        id: 'BJOB_BARBER_CUT',
+        businessId: 'BIZ_KWAME_BARBER',
+        role: 'barber',
+        title: 'Barber shift',
+        payGHS: 35,
+        shiftMinutes: 120,
+      },
+    ],
+  },
+
+  {
+    id: 'BIZ_AUNTIE_SALON',
+    name: "Auntie Efua Salon",
+    kind: 'shop',
+    sub: 'salon',
+    ownership: 'world',
+    ownerName: 'Efua Asante',
+    site: {
+      x: -108,
+      z: 32,
+      w: 6,
+      d: 5,
+      yaw: 0,
+      replaces: 'Service shell near Daavi (salon)',
+      district: 'dansoman',
+    },
+    facade: {
+      wall: '#fce4ec',
+      roof: '#4a4a4a',
+      sign: 'EFUA SALON',
+      signBg: '#ad1457',
+      awning: '#f8bbd0',
+    },
+    openHour: 9,
+    closeHour: 19,
+    staffRoles: [
+      { role: 'stylist', count: 2, names: ['Efua', 'Akosua'] },
+      { role: 'cashier', count: 1, names: ['Yaw'] },
+    ],
+    menu: [
+      { id: 'braids', name: 'Braids', priceGHS: 80, category: 'goods' },
+      { id: 'relaxer', name: 'Relaxer', priceGHS: 60, category: 'goods' },
+      { id: 'manicure', name: 'Manicure', priceGHS: 35, category: 'goods' },
+      { id: 'wash', name: 'Wash & set', priceGHS: 40, category: 'goods' },
+    ],
+    capacity: 5,
+    customersPerHour: 2.8,
+    jobs: [
+      {
+        id: 'BJOB_SALON_STYLIST',
+        businessId: 'BIZ_AUNTIE_SALON',
+        role: 'stylist',
+        title: 'Stylist shift',
+        payGHS: 40,
+        shiftMinutes: 120,
+      },
+    ],
+  },
+  {
+    id: 'BIZ_FIT_ZONE_GYM',
+    name: 'Fit Zone Gym',
+    kind: 'shop',
+    sub: 'gym',
+    ownership: 'world',
+    ownerName: 'Kojo Boateng',
+    site: {
+      x: -155,
+      z: -30,
+      w: 7,
+      d: 6,
+      yaw: 0,
+      replaces: 'Service shell near Daavi (gym)',
+      district: 'dansoman',
+    },
+    facade: {
+      wall: '#e8f5e9',
+      roof: '#2e7d32',
+      sign: 'FIT ZONE',
+      signBg: '#1b5e20',
+      awning: '#81c784',
+    },
+    openHour: 6,
+    closeHour: 21,
+    staffRoles: [
+      { role: 'trainer', count: 2, names: ['Kojo', 'Ama'] },
+      { role: 'cashier', count: 1, names: ['Kofi'] },
+    ],
+    menu: [
+      { id: 'day_pass', name: 'Day pass', priceGHS: 20, category: 'goods' },
+      { id: 'week_pass', name: 'Week pass', priceGHS: 80, category: 'goods' },
+      { id: 'protein', name: 'Protein shake', priceGHS: 18, hungerRestore: 15, category: 'snack' },
+      { id: 'water', name: 'Water bottle', priceGHS: 5, thirstRestore: 12, category: 'drink' },
+    ],
+    capacity: 8,
+    customersPerHour: 4,
+    jobs: [
+      {
+        id: 'BJOB_GYM_TRAINER',
+        businessId: 'BIZ_FIT_ZONE_GYM',
+        role: 'trainer',
+        title: 'Floor trainer',
+        payGHS: 45,
+        shiftMinutes: 150,
+      },
+    ],
+  },
+
+
 ];
 
 export function findBusiness(id: string): BusinessDef | undefined {

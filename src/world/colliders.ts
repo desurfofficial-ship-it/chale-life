@@ -165,10 +165,14 @@ if (typeof window !== 'undefined') {
   void loadColliders();
 }
 
-/** The playable plate — PLATE from the map config (x −280…340, z −116…116). */
+/**
+ * Playable plate. PLATE is x −280…340, z −116…116, but NorthReach offices
+ * sit at z ≈ −152 (O-001). Bounds extend north so Offices Go + walking stay
+ * valid there (P1 map integrity).
+ */
 export const worldBounds: ColliderBox = {
   minX: -280,
-  minZ: -140,
+  minZ: -170,
   maxX: 340,
   maxZ: 116,
 };

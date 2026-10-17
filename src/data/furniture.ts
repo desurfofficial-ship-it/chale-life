@@ -797,6 +797,7 @@ export const FURNITURE_CATALOG: ReadonlyArray<FurnitureCatalogItem> = [
     effects: { comfort: 0 },
     dimensions: { widthMeters: 1.6, depthMeters: 0.6 },
     summary: 'Serve customers across this counter.',
+        modelPath: 'models/furniture/office/reception-counter/reception-counter-00.glb',
     businessKit: true,
   },
   {
@@ -807,6 +808,7 @@ export const FURNITURE_CATALOG: ReadonlyArray<FurnitureCatalogItem> = [
     effects: { comfort: 0 },
     dimensions: { widthMeters: 1.4, depthMeters: 0.45 },
     summary: 'Customers sit while they wait.',
+        modelPath: 'models/furniture/market/chop-bar-bench/chop-bar-bench-00.glb',
     businessKit: true,
   },
   {
@@ -817,6 +819,7 @@ export const FURNITURE_CATALOG: ReadonlyArray<FurnitureCatalogItem> = [
     effects: { comfort: 0 },
     dimensions: { widthMeters: 0.4, depthMeters: 0.4 },
     summary: 'Staff or customer stool.',
+        modelPath: 'models/furniture/kitchen/dining-chair/dining-chair-00.glb',
     businessKit: true,
   },
   {
@@ -827,6 +830,7 @@ export const FURNITURE_CATALOG: ReadonlyArray<FurnitureCatalogItem> = [
     effects: { comfort: 0 },
     dimensions: { widthMeters: 0.5, depthMeters: 0.5 },
     summary: 'Simple indoor chair.',
+        modelPath: 'models/furniture/office/office-chair/office-chair-00.glb',
     businessKit: true,
   },
   {
@@ -837,6 +841,7 @@ export const FURNITURE_CATALOG: ReadonlyArray<FurnitureCatalogItem> = [
     effects: { comfort: 0, enablesCooking: true },
     dimensions: { widthMeters: 0.9, depthMeters: 0.7 },
     summary: 'Chop-bar and waakye heat.',
+        modelPath: 'models/furniture/kitchen/gas-cooker/gas-cooker-00.glb',
     businessKit: true,
   },
   {
@@ -847,6 +852,7 @@ export const FURNITURE_CATALOG: ReadonlyArray<FurnitureCatalogItem> = [
     effects: { comfort: 0 },
     dimensions: { widthMeters: 1.2, depthMeters: 0.4 },
     summary: 'Goods on display.',
+        modelPath: 'models/furniture/kitchen/kitchen-shelf/kitchen-shelf-00.glb',
     businessKit: true,
   },
   {
@@ -857,6 +863,7 @@ export const FURNITURE_CATALOG: ReadonlyArray<FurnitureCatalogItem> = [
     effects: { comfort: 0 },
     dimensions: { widthMeters: 1.0, depthMeters: 0.5 },
     summary: 'Glass case for phones, meds, or accessories.',
+        modelPath: 'models/furniture/market/display-table/display-table-00.glb',
     businessKit: true,
   },
   {
@@ -867,6 +874,7 @@ export const FURNITURE_CATALOG: ReadonlyArray<FurnitureCatalogItem> = [
     effects: { comfort: 0, foodStorage: true },
     dimensions: { widthMeters: 0.8, depthMeters: 0.8 },
     summary: 'Cold drinks and perishables.',
+        modelPath: 'models/furniture/kitchen/fridge/fridge-00.glb',
     businessKit: true,
   },
   {
@@ -877,6 +885,7 @@ export const FURNITURE_CATALOG: ReadonlyArray<FurnitureCatalogItem> = [
     effects: { comfort: 0 },
     dimensions: { widthMeters: 0.7, depthMeters: 0.8 },
     summary: 'Hydraulic seat for the cut.',
+        modelPath: 'models/furniture/office/office-chair/office-chair-00.glb',
     businessKit: true,
   },
   {
@@ -887,6 +896,7 @@ export const FURNITURE_CATALOG: ReadonlyArray<FurnitureCatalogItem> = [
     effects: { comfort: 0 },
     dimensions: { widthMeters: 0.7, depthMeters: 0.8 },
     summary: 'Styling chair with headrest.',
+        modelPath: 'models/furniture/office/office-chair/office-chair-02.glb',
     businessKit: true,
   },
   {
@@ -897,6 +907,7 @@ export const FURNITURE_CATALOG: ReadonlyArray<FurnitureCatalogItem> = [
     effects: { comfort: 0 },
     dimensions: { widthMeters: 0.8, depthMeters: 0.1 },
     summary: 'Barber and salon mirror.',
+        modelPath: 'models/furniture/bedroom/mirror-stand/mirror-stand-00.glb',
     businessKit: true,
   },
   {
@@ -927,6 +938,7 @@ export const FURNITURE_CATALOG: ReadonlyArray<FurnitureCatalogItem> = [
     effects: { comfort: 0 },
     dimensions: { widthMeters: 1.5, depthMeters: 1.5 },
     summary: 'Waakye stand shade.',
+        modelPath: 'models/furniture/market/beach-umbrella-stall/beach-umbrella-stall-00.glb',
     businessKit: true,
   },
 ];

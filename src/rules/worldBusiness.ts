@@ -80,6 +80,19 @@ export function createBusinessSim(def: BusinessDef): BusinessSimState {
 }
 
 /** Tick one business by dtGameMin game-minutes at hour. */
+
+/**
+ * Staff on shift scales service capacity. Zero on-shift staff → capacity 0
+ * (no seating). Full roster → catalogue capacity. Linear in between.
+ */
+export function effectiveCapacity(def: BusinessDef, state: BusinessSimState): number {
+  const total = state.staff.length;
+  if (total === 0) return def.capacity;
+  const on = state.staff.filter((s) => s.onShift).length;
+  if (on <= 0) return 0;
+  return Math.max(1, Math.round((def.capacity * on) / total));
+}
+
 export function tickBusiness(
   def: BusinessDef,
   state: BusinessSimState,
@@ -94,11 +107,15 @@ export function tickBusiness(
   const log = state.log;
   let customers = state.customers.map((c) => ({ ...c, sinceMin: c.sinceMin + dtGameMin }));
 
-  // staff on-shift only when open
-  const staff = state.staff.map((s) => ({ ...s, onShift: open }));
+  // Preserve player onShift roster always. While closed, capacity/arrivals use
+  // an effective off-shift view without wiping the saved roster.
+  const staff = state.staff;
+  const staffForOps = open
+    ? staff
+    : staff.map((s) => ({ ...s, onShift: false }));
 
   if (!open) {
-    // clear floor slowly
+    // clear floor slowly — keep roster for next open
     queue = 0;
     seated = Math.max(0, seated - dtGameMin * 0.5);
     customers = customers
@@ -108,7 +125,11 @@ export function tickBusiness(
   }
 
   // arrivals
-  const rate = customerArrivalRate(def, hour); // per hour
+  const staffRatio =
+    staffForOps.length === 0
+      ? 1
+      : staffForOps.filter((s) => s.onShift).length / staffForOps.length;
+  const rate = customerArrivalRate(def, hour) * staffRatio; // per hour, staff-scaled
   const arrive = (rate * dtGameMin) / 60;
   // deterministic fractional from revenue cents (floor + frac, no Math.random)
   const frac = (revenue * 10 + seated * 3 + queue) % 1;
@@ -128,14 +149,15 @@ export function tickBusiness(
   }
 
   // seat from queue
-  const free = Math.max(0, def.capacity - seated);
+  const cap = effectiveCapacity(def, { ...state, staff: staffForOps });
+  const free = Math.max(0, cap - seated);
   const seatN = Math.min(free, queue, Math.max(1, Math.floor(dtGameMin / 2)));
   if (seatN > 0 && queue > 0) {
     let left = seatN;
     customers = customers.map((c) => {
       if (c.phase === 'queue' && left > 0) {
         left--;
-        return { ...c, phase: 'seated' as const, sinceMin: 0, seat: def.capacity - free + (seatN - left) };
+        return { ...c, phase: 'seated' as const, sinceMin: 0, seat: cap - free + (seatN - left) };
       }
       return c;
     });
@@ -190,7 +212,12 @@ export function canBuyItem(
   hour: number,
 ): { ok: true } | { ok: false; reason: string } {
   if (!isBusinessOpen(def, hour)) return { ok: false, reason: 'Closed' };
-  if (walletGHS < item.priceGHS) return { ok: false, reason: 'Need cash' };
+  if (!Number.isFinite(item.priceGHS) || item.priceGHS < 0) {
+    return { ok: false, reason: 'Invalid item price' };
+  }
+  if (!Number.isFinite(walletGHS) || walletGHS < item.priceGHS) {
+    return { ok: false, reason: 'Need cash' };
+  }
   if (def.kind === 'shop' && (state.stock[item.id] ?? 0) <= 0) return { ok: false, reason: 'Out of stock' };
   return { ok: true };
 }
@@ -218,4 +245,18 @@ export function footprintsOverlap(
   const bz0 = b.z - b.d / 2;
   const bz1 = b.z + b.d / 2;
   return ax0 < bx1 && ax1 > bx0 && az0 < bz1 && az1 > bz0;
+}
+
+
+/** Toggle one staff member on/off shift (player management). */
+export function setStaffOnShift(
+  state: BusinessSimState,
+  staffId: string,
+  onShift: boolean,
+): BusinessSimState {
+  if (!state.staff.some((s) => s.id === staffId)) return state;
+  return {
+    ...state,
+    staff: state.staff.map((s) => (s.id === staffId ? { ...s, onShift } : s)),
+  };
 }

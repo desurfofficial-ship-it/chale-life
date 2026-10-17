@@ -56,7 +56,12 @@ export function PlacesPanel() {
       x: b.site.x,
       z: b.site.z,
       open: isBusinessOpen(b, hour),
-      tag: b.kind === 'restaurant' ? 'Eat' : 'Shop',
+      tag:
+        b.kind === 'restaurant'
+          ? 'Eat'
+          : b.sub === 'barber' || b.sub === 'salon' || b.sub === 'gym'
+            ? 'Service'
+            : 'Shop',
     })),
   ].sort((a, b) => a.name.localeCompare(b.name));
 

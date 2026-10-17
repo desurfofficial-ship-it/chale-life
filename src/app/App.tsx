@@ -57,6 +57,7 @@ import {
   requestBuyPlot,
   requestOpenBusiness,
   setActiveTab,
+  setFurnitureEditBusinessId,
   setSelectedPlotId,
   setTycoonMode,
   requestFitCity,
@@ -278,6 +279,11 @@ function PlayApp() {
   const tycoonBiz = useTycoonValue((s) => s.businesses);
   const tycoonAlerts = useTycoonValue((s) => s.alerts);
   const tycoonTab = useTycoonValue((s) => s.activeTab);
+  const furnitureEditId = useTycoonValue((s) => s.furnitureEditBusinessId);
+  const furnitureEditBusiness =
+    furnitureEditId == null
+      ? null
+      : tycoonBiz.find((b) => b.id === furnitureEditId) ?? null;
   const selectedPlot = plotById(tycoonSelectedId);
 
   if (!webglOk) return <WebGLFallback />;
@@ -371,6 +377,8 @@ function PlayApp() {
           onBuyPlot={requestBuyPlot}
           onOpenBusiness={requestOpenBusiness}
           onCloseSheet={() => setSelectedPlotId(null)}
+          furnitureEditBusiness={furnitureEditBusiness}
+          onEditFurniture={(id) => setFurnitureEditBusinessId(id)}
         />
       ) : null}
       {!isOnboardingActive() ? (

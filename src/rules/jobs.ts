@@ -264,6 +264,16 @@ export function completeJob(state: JobState, wallet: WalletState, nowMs?: number
       message: `Shift not finished — step ${state.step + 1}/${def.steps.length} pending.`,
     };
   }
+  // P0: refuse non-finite / non-positive payout definitions.
+  if (!Number.isFinite(def.payGHS) || def.payGHS <= 0) {
+    return {
+      ok: false,
+      job: state,
+      wallet,
+      payoutGHS: 0,
+      message: 'Job payout is invalid.',
+    };
+  }
   const completed = completedIdsOf(state);
   const nextCompleted = completed.includes(def.id)
     ? completed

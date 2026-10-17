@@ -9,6 +9,7 @@
  */
 
 import { useMemo, useState, type CSSProperties } from 'react';
+import { FurnitureEditPanel } from './FurnitureEditPanel';
 import {
   BUSINESS_CATEGORIES,
   BUSINESS_TYPES,
@@ -119,6 +120,8 @@ export interface TycoonHudProps {
   readonly onOpenBusiness: (plot: PlotRef, typeId: string, budget: BudgetTier) => boolean;
   readonly onCloseSheet: () => void;
   readonly onEstimate?: (typeId: string, plot: PlotRef, budget: BudgetTier) => void;
+  readonly furnitureEditBusiness: BusinessState | null;
+  readonly onEditFurniture: (businessId: string) => void;
 }
 
 function Stars({ n }: { n: number }) {
@@ -700,7 +703,13 @@ function PlotSheet({
   );
 }
 
-function ManagePanel({ businesses }: { businesses: readonly BusinessState[] }) {
+function ManagePanel({
+  businesses,
+  onEditFurniture,
+}: {
+  businesses: readonly BusinessState[];
+  onEditFurniture: (businessId: string) => void;
+}) {
   if (businesses.length === 0) {
     return (
       <div style={{ ...sheet, maxHeight: '50%' }} data-testid="manage-panel">
@@ -727,6 +736,25 @@ function ManagePanel({ businesses }: { businesses: readonly BusinessState[] }) {
           <div style={{ fontSize: 12, color: MUTED, marginTop: 4 }}>
             Staff {b.staff} · Today {formatGHS(b.revenueToday)} rev / {formatGHS(b.costsToday)} cost
           </div>
+          <button
+            type="button"
+            data-testid={`edit-furniture-${b.id}`}
+            onClick={() => onEditFurniture(b.id)}
+            style={{
+              marginTop: 10,
+              minHeight: 40,
+              width: '100%',
+              borderRadius: 10,
+              border: 'none',
+              background: FOREST,
+              color: CREAM,
+              fontWeight: 600,
+              fontSize: 14,
+              cursor: 'pointer',
+            }}
+          >
+            Edit furniture
+          </button>
         </div>
       ))}
     </div>
@@ -771,6 +799,8 @@ export function TycoonHud(props: TycoonHudProps) {
     onBuyPlot,
     onOpenBusiness,
     onCloseSheet,
+    furnitureEditBusiness,
+    onEditFurniture,
   } = props;
 
   const comingSoon = activeTab === 'shop' || activeTab === 'finance' || activeTab === 'report';
@@ -844,7 +874,15 @@ export function TycoonHud(props: TycoonHudProps) {
           )}
         </div>
       )}
-      {!selectedPlot && activeTab === 'manage' && <ManagePanel businesses={businesses} />}
+      {!selectedPlot && activeTab === 'manage' && !furnitureEditBusiness && (
+        <ManagePanel
+          businesses={businesses}
+          onEditFurniture={(id) => onEditFurniture(id)}
+        />
+      )}
+      {furnitureEditBusiness && (
+        <FurnitureEditPanel business={furnitureEditBusiness} />
+      )}
       {!selectedPlot && activeTab === 'alerts' && <AlertsPanel alerts={alerts} />}
       {!selectedPlot && comingSoon && (
         <div style={{ ...sheet, maxHeight: '30%', textAlign: 'center' }}>

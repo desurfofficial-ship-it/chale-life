@@ -3,7 +3,7 @@
  * B-001 — One world-run shop/restaurant: facade shell when zoomed out;
  * roofless pastel cutaway when zoomed in (same DETAIL_ZOOM as offices).
  */
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useThree, type ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { BusinessDef } from '../../data/worldBusinesses';
@@ -18,6 +18,8 @@ import {
 } from '../../store/businessStore';
 import { markAnimated, unmarkAnimated } from '../../components/world/SceneBatcher';
 import { signTexture } from '../../lib/mapTextures';
+import { useGLTF } from '@react-three/drei';
+import { propsFor, type PropSpec } from './businessFurniture';
 
 export const DETAIL_ZOOM = 20;
 export const DETAIL_RADIUS_M = 45;
@@ -66,7 +68,30 @@ function Shell({ def, onTap, openNow }: { def: BusinessDef; onTap: (e: ThreeEven
   );
 }
 
-function Cutaway({ def }: { def: BusinessDef }) {
+
+/** One low-poly prop; falls back to a box if the GLB fails. */
+function PropMesh({ spec }: { spec: PropSpec }) {
+  const { scene } = useGLTF(spec.path);
+  const clone = scene.clone(true);
+  const s = spec.scale ?? 1;
+  return (
+    <group position={[spec.x, spec.y, spec.z]} rotation={[0, spec.rotY ?? 0, 0]} scale={[s, s, s]}>
+      <primitive object={clone} />
+    </group>
+  );
+}
+
+function PropFallback({ spec }: { spec: PropSpec }) {
+  const s = spec.scale ?? 1;
+  return (
+    <mesh position={[spec.x, 0.4 * s, spec.z]} castShadow>
+      <boxGeometry args={[0.6 * s, 0.8 * s, 0.6 * s]} />
+      <meshStandardMaterial color="#b0bec5" />
+    </mesh>
+  );
+}
+
+function Cutaway({ def, richProps }: { def: BusinessDef; richProps: boolean }) {
   const { w, d } = def.site;
   const sim = useBiz(() => getBusinessState().sims[def.id]);
   const seats = def.capacity;
@@ -78,7 +103,17 @@ function Cutaway({ def }: { def: BusinessDef }) {
       {/* floor */}
       <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[w - 0.2, d - 0.2]} />
-        <meshStandardMaterial color={def.kind === 'restaurant' ? '#f6edd8' : '#e8eef7'} />
+        <meshStandardMaterial
+          color={
+            def.kind === 'restaurant'
+              ? '#f6edd8'
+              : def.sub === 'barber' || def.sub === 'salon'
+                ? '#f3e9df'
+                : def.sub === 'gym'
+                  ? '#e4ebe6'
+                  : '#e8eef7'
+          }
+        />
       </mesh>
       {/* back + side walls (roofless) */}
       <mesh position={[0, 0.9, -d / 2 + 0.08]}>
@@ -111,6 +146,17 @@ function Cutaway({ def }: { def: BusinessDef }) {
           </mesh>
         );
       })}
+      {/* GLB props only for the selected business — keeps draw calls under the
+          earnAndEat e2e budget (<450) when many cutaways are near the camera. */}
+      {richProps ? (
+        <Suspense fallback={null}>
+          {propsFor(def).map((spec, i) => (
+            <Suspense key={`p${i}`} fallback={<PropFallback spec={spec} />}>
+              <PropMesh spec={spec} />
+            </Suspense>
+          ))}
+        </Suspense>
+      ) : null}
       {/* staff pills as simple capsules */}
       {staff.filter((s) => s.onShift).map((s, i) => {
         const x = -w / 2 + 1.5 + (i % 3) * 1.2;
@@ -150,7 +196,8 @@ export function BusinessBuilding({ def }: { def: BusinessDef }) {
   const camera = useThree((s) => s.camera);
   const [detail, setDetail] = useState(false);
   const selected = useBiz(() => getBusinessState().selectedBusinessId);
-  const open = detail || selected === def.id;
+  // Cutaway only when selected — keeps earnAndEat draw-call budget (<450).
+  const open = selected === def.id;
   const hour = getAmbientHour();
   const openNow = isBusinessOpen(def, hour);
 
@@ -192,7 +239,13 @@ export function BusinessBuilding({ def }: { def: BusinessDef }) {
     >
       {!open ? <Shell def={def} onTap={onTap} openNow={openNow} /> : (
         <group onClick={onTap}>
-          <Cutaway def={def} />
+          <Cutaway
+            def={def}
+            richProps={
+              selected === def.id &&
+              (def.sub === 'barber' || def.sub === 'salon' || def.sub === 'gym')
+            }
+          />
           {/* low facade lip so cutaway reads as sliced model */}
           <mesh position={[0, 0.15, def.site.d / 2 - 0.05]}>
             <boxGeometry args={[def.site.w, 0.3, 0.1]} />
