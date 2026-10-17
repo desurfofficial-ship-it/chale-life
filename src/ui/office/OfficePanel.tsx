@@ -225,6 +225,22 @@ export function OfficePanel() {
             ) : null}
           </div>
 
+          {/* visitor floor picker: ride the lift (or stairs) without a shift.
+              requestPlayerFloor already handles no-lift offices ("Took the stairs")
+              and drives the same lift rules the on-shift card uses. */}
+          {def.floors.length > 1 && !(shift && shiftJob && shiftOffice && shiftOffice.id === def.id) ? (
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginTop: 2 }} data-testid="office-visit-floors">
+              <span style={{ fontSize: 12, color: '#666', fontWeight: 700 }}>
+                {def.hasLift ? 'Take the lift:' : 'Take the stairs:'}
+              </span>
+              {def.floors.map((f) => (
+                <Btn key={f.level} testId={`office-visit-${f.level}`} onClick={() => say(requestPlayerFloor(def.id, f.level).message)}>
+                  {f.level === 0 ? 'G' : `Floor ${f.level}`}
+                </Btn>
+              ))}
+            </div>
+          ) : null}
+
           {/* staff list */}
           <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 4 }}>
             {st.sims[def.id].staff.map((s) => {

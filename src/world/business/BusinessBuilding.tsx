@@ -22,7 +22,15 @@ import { useGLTF } from '@react-three/drei';
 import { propsFor, type PropSpec } from './businessFurniture';
 
 export const DETAIL_ZOOM = 20;
-export const DETAIL_RADIUS_M = 45;
+/**
+ * Businesses open closer than offices (45 m): every open cutaway dresses
+ * with GLB props, and this strip of Chorkor packs shops tightly — at 45 m
+ * three or four interiors opened together and stacked to 536-579 draw calls
+ * (measured live, over the 450 e2e budget). 30 m keeps the walk-up moment
+ * ("I can see straight into the barber") while usually leaving one interior
+ * open at a time.
+ */
+export const DETAIL_RADIUS_M = 30;
 
 const useBiz = <T,>(pick: () => T) => useSyncExternalStore(subscribeBusiness, pick, pick);
 
@@ -194,10 +202,13 @@ function Cutaway({ def, richProps }: { def: BusinessDef; richProps: boolean }) {
 export function BusinessBuilding({ def }: { def: BusinessDef }) {
   const root = useRef<THREE.Group>(null);
   const camera = useThree((s) => s.camera);
-  const [, setDetail] = useState(false);
+  const [detail, setDetail] = useState(false);
   const selected = useBiz(() => getBusinessState().selectedBusinessId);
-  // Cutaway only when selected — keeps earnAndEat draw-call budget (<450).
-  const open = selected === def.id;
+  // AUDIT FIX: `detail` was computed by the ambient probe but thrown away —
+  // the cutaway only ever opened on tap-select, so walking up to a shop at
+  // street zoom showed a sealed box (the "interiors need excessive zooming"
+  // report). Offices open on proximity+zoom; businesses now do too.
+  const open = selected === def.id || detail;
   const hour = getAmbientHour();
   const openNow = isBusinessOpen(def, hour);
 
@@ -241,10 +252,12 @@ export function BusinessBuilding({ def }: { def: BusinessDef }) {
         <group onClick={onTap}>
           <Cutaway
             def={def}
-            richProps={
-              selected === def.id &&
-              (def.sub === 'barber' || def.sub === 'salon' || def.sub === 'gym')
-            }
+            // AUDIT FIX: GLB props used to render for barber/salon/gym only —
+            // restaurants and shops fell back to bare boxes (the "coloured
+            // floor + box placeholders" report). Every open cutaway now dresses
+            // from the same GLB packs; the earnAndEat dc guard (<450) watches
+            // the draw-call cost.
+            richProps={open}
           />
           {/* low facade lip so cutaway reads as sliced model */}
           <mesh position={[0, 0.15, def.site.d / 2 - 0.05]}>
