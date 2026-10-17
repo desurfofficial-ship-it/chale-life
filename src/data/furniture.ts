@@ -940,7 +940,7 @@ export const FURNITURE_CATALOG: ReadonlyArray<FurnitureCatalogItem> = [
     summary: 'Waakye stand shade.',
         modelPath: 'models/furniture/market/beach-umbrella-stall/beach-umbrella-stall-00.glb',
     businessKit: true,
-  },,
+  },
   // ── Decor pack (20-decor-2) ──────────────────────────────────────────
   {
     id: 'lp_book_stack_00',
