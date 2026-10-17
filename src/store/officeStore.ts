@@ -161,6 +161,8 @@ const listeners = new Set<() => void>();
 let clockS = 0;
 let simAcc = 0;
 let lastHour = getAmbientHour();
+/** e2e-only wall-clock multiplier for tickOffices (default 1 = real time). */
+let officeTimeScale = 1;
 
 function notify(): void {
   for (const l of listeners) l();
@@ -187,8 +189,12 @@ function floorOfRoom(officeId: string, roomId: string | null): number | null {
  * transit and the player's shift. Exported for tests / the ambient registry.
  */
 export function tickOffices(dtReal: number, hourOverride?: number): void {
-  clockS += dtReal;
-  simAcc += dtReal;
+  // e2e lever: software-GL boxes run <2 fps, and GameLoop clamps dt at 50 ms —
+  // a 9 s lift call would need hundreds of real frames. Tests may run the
+  // same loop at a faster wall-clock (opt-in via __chaleOffice.setTimeScale).
+  const dt = dtReal * officeTimeScale;
+  clockS += dt;
+  simAcc += dt;
   let changed = false;
 
   // lifts every frame (cheap) — board/alight events drive NPC transit
@@ -197,7 +203,7 @@ export function tickOffices(dtReal: number, hourOverride?: number): void {
     let transit: Record<string, Transit> | null = null;
     for (const id of Object.keys(lifts)) {
       const o = findOffice(id)!;
-      const r = stepLift(lifts[id], liftDefFor(o), dtReal);
+      const r = stepLift(lifts[id], liftDefFor(o), dt);
       if (r.state !== lifts[id]) lifts[id] = r.state;
       for (const e of r.events) {
         if (e.type === 'arrive') continue;
@@ -403,4 +409,35 @@ export function __resetOfficesForTests(): void {
   clockS = 0;
   simAcc = 0;
   notify();
+  if (typeof window !== 'undefined') (window as unknown as Record<string, unknown>).__chaleOffice = undefined;
+}
+
+// e2e / probe surface (mirrors __chaleTest / __chaleTycoon) — read-only probe
+// plus the same selection/ride entry points the UI buttons call, so the robot
+// playtest can drive interiors + the lift without pixel-hunting meshes.
+if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('e2e') === '1') {
+  (window as unknown as Record<string, unknown>).__chaleOffice = {
+    probe: (): {
+      selected: string | null;
+      viewFloor: number | null;
+      playerFloor: number | null;
+      inLift: boolean;
+      liftPos: number | null;
+    } => {
+      const id = state.selectedOfficeId;
+      return {
+        selected: id,
+        viewFloor: id ? (state.viewFloor[id] ?? 0) : null,
+        playerFloor: state.player.floor,
+        inLift: state.player.inLift,
+        liftPos: id ? (state.lifts[id]?.pos ?? null) : null,
+      };
+    },
+    select: (id: string | null): void => selectOffice(id),
+    ride: (id: string, floor: number): string => requestPlayerFloor(id, floor).message,
+    /** Run the office/lift loop at n× wall-clock (e2e only). */
+    setTimeScale: (n: number): void => {
+      officeTimeScale = Number.isFinite(n) && n >= 1 ? n : 1;
+    },
+  };
 }

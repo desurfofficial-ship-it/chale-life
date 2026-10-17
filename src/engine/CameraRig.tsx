@@ -26,6 +26,7 @@ import {
 } from '../store/gameStore';
 import { isTycoonCamera } from '../store/tycoonStore';
 import {
+  clampMarginForZoom,
   clampTarget,
   CITY_BOUNDS,
   panDeltaWorld,
@@ -144,8 +145,15 @@ export function CameraRig() {
       }
     }
 
-    // Clamp pan to city
-    const clamped = clampTarget(target.current.x, target.current.z);
+    // Clamp pan/follow to the city. The margin scales with zoom so the
+    // walker stays on screen at street zoom even at the map edge (fixed 20 m
+    // margin parked the camera 20 m short of a NorthReach player).
+    const clamped = clampTarget(
+      target.current.x,
+      target.current.z,
+      CITY_BOUNDS,
+      clampMarginForZoom(z, gl.domElement.clientHeight || 844),
+    );
     target.current.x = clamped.x;
     target.current.z = clamped.z;
 

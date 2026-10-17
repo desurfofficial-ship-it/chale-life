@@ -7,6 +7,8 @@ import {
   CITY_BOUNDS,
   DEFAULT_HUD_INSETS,
   detailLodFromRelativeZoom,
+  clampMarginForZoom,
+  clampTarget,
 } from '../zoomFit';
 
 describe('zoomToFitBox', () => {
@@ -69,9 +71,39 @@ describe('detailLodFromRelativeZoom', () => {
 });
 
 describe('boxCenter', () => {
-  it('centres city', () => {
+  it('centres city (asymmetric plate: NorthReach reaches z −170)', () => {
     const c = boxCenter(CITY_BOUNDS);
     expect(c.x).toBeCloseTo(30, 5);
-    expect(c.z).toBeCloseTo(0, 5);
+    expect(c.z).toBeCloseTo((CITY_BOUNDS.minZ + CITY_BOUNDS.maxZ) / 2, 5);
+  });
+
+  it('camera bounds cover the walker-reachable worldBounds floor', () => {
+    // REGRESSION (audit 2026-10-17): CITY_BOUNDS.minZ −116 + a 20 m clamp
+    // margin parked the follow camera at z −96 while offices sit at
+    // z −139…−152 — the walker left the screen and no office cutaway could
+    // open by proximity. The camera floor must reach the business park.
+    expect(CITY_BOUNDS.minZ).toBeLessThanOrEqual(-152);
+    expect(CITY_BOUNDS.minZ).toBe(-170); // mirrors worldBounds.minZ
+  });
+});
+
+describe('clampMarginForZoom', () => {
+  it('shrinks with zoom so an edge walker stays on screen', () => {
+    // zoom 14 → viewH ≈ 60.3 m → margin 18.1 m (cap 20 engages below zoom ~12.6)
+    expect(clampMarginForZoom(14, 844)).toBeCloseTo(18.086, 2);
+    // zoom 30 → viewH ≈ 28 m → margin ≈ 8.4 m (was hard 20 m — parked camera)
+    expect(clampMarginForZoom(30, 844)).toBeCloseTo(8.44, 2);
+    // zoom 70 → viewH ≈ 12 m → margin ≈ 3.6 m
+    expect(clampMarginForZoom(70, 844)).toBeCloseTo(3.617, 2);
+    // floor of 3 m never lets the camera frame past the bound
+    expect(clampMarginForZoom(500, 844)).toBe(3);
+  });
+
+  it('clamped target keeps a zoom-30 walker inside the viewport at the bound', () => {
+    // worst case from the audit: player at the bank (z −152), zoom 30.
+    const margin = clampMarginForZoom(30, 844);
+    const t = clampTarget(163, -152, CITY_BOUNDS, margin);
+    // viewH 28 m: target z ≥ player z − viewH/2 keeps the player on screen
+    expect(t.z).toBeGreaterThanOrEqual(-152 - (844 / 30) / 2);
   });
 });

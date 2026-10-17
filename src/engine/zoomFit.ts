@@ -27,13 +27,34 @@ export const DEFAULT_HUD_INSETS: HudInsets = {
   right: 12,
 };
 
-/** Plate / playable city bounds (mapConfig PLATE). */
+/**
+ * Camera look-at bounds. MUST cover everything the walker can reach —
+ * worldBounds (colliders.ts) lets the player walk to z −170 (NorthReach
+ * offices at z −139…−152), so a −116 floor here stranded the follow camera
+ * 56 m short of the Gold Coast Bank: the walker left the screen and the
+ * office cutaway's 45 m proximity probe could never fire (audit 2026-10-17,
+ * live __CAM probe: tz frozen at −96 with the player at z −139).
+ * The plate apron (AccraWorld plinths) renders ground to z −366, so framing
+ * slightly past the plate edge is safe.
+ */
 export const CITY_BOUNDS: WorldBox = {
   minX: -280,
   maxX: 340,
-  minZ: -116,
+  minZ: -170,
   maxZ: 116,
 };
+
+/**
+ * Pan/follow clamp margin that scales with zoom. A fixed 20 m margin pushed
+ * the walker off-screen at street zoom (viewH ≈ 28 m at zoom 30): the camera
+ * stopped 20 m short of the player near a bound and the follow ease parked
+ * there. Margin = 30 % of the visible height keeps the player on screen at
+ * any zoom while still never framing past the plate at overview zooms.
+ */
+export function clampMarginForZoom(zoom: number, canvasH: number): number {
+  const viewH = canvasH / Math.max(1e-3, zoom);
+  return Math.min(20, Math.max(3, viewH * 0.3));
+}
 
 /**
  * Ortho zoom that fits `box` into the canvas minus HUD insets.
