@@ -65,6 +65,10 @@ function syncKeyboard(): void {
 }
 
 function onKeyDown(e: KeyboardEvent): void {
+  if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
+    movementInput.sprint = true;
+    return;
+  }
   if (ACT_KEYS.has(e.code)) {
     // Space would scroll the page or re-click a focused button — eat it.
     e.preventDefault();
@@ -84,6 +88,10 @@ function onKeyDown(e: KeyboardEvent): void {
 }
 
 function onKeyUp(e: KeyboardEvent): void {
+  if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
+    movementInput.sprint = false;
+    return;
+  }
   const dir = KEY_MAP[e.code];
   if (!dir) return;
   pressed.delete(dir);
@@ -100,6 +108,7 @@ export function initKeyboardInput(): () => void {
     stick.active = false;
     stick.x = 0;
     stick.z = 0;
+    movementInput.sprint = false; // a held Shift must not survive a blur
     syncKeyboard();
   };
   window.addEventListener('blur', onBlur);
@@ -118,6 +127,7 @@ export function initKeyboardInput(): () => void {
     stick.active = false;
     stick.x = 0;
     stick.z = 0;
+    movementInput.sprint = false;
     publish();
   };
 }

@@ -22,9 +22,13 @@
 //   <PlayerCharacter position={[-141, 0, -5]} rotationY={Math.PI} />
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
+import { useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import { clone as skeletonClone } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import { markAnimated, unmarkAnimated } from './SceneBatcher'
+import { buildRig, makeAnimState, stepCharacterAnim, CHAR_MOTION } from '../../player/characterAnim'
+import { buildGarments, collectBones, getOutfitId, subscribeOutfit, OUTFITS, DEFAULT_OUTFIT_ID } from '../../player/outfits'
+import { useSyncExternalStore } from 'react'
 // publicUrl() (E-007 guardrail): the app deploys under vite base
 // '/chale-life/' (vite preview + GitHub Pages) — a bare '/models/…'
 // resolves against the ORIGIN ROOT and 404s in every built deploy.
@@ -64,6 +68,8 @@ export function PlayerCharacter({
   rotationY?: number
 }) {
   const group = useRef<THREE.Group>(null)
+  // live wardrobe: HUD chips notify → garments re-apply (same skeleton)
+  const outfitId = useSyncExternalStore(subscribeOutfit, getOutfitId, getOutfitId)
 
   useEffect(() => {
     markAnimated(group.current)
@@ -76,9 +82,11 @@ export function PlayerCharacter({
   const model = useMemo(() => {
     const c = skeletonClone(gltf.scene) as THREE.Group
     let feetLift = CHARACTER.feetOffset // measured fallback
+    let skinned: THREE.SkinnedMesh | null = null
     c.traverse((o) => {
       const mesh = o as THREE.Mesh
       if ((o as THREE.SkinnedMesh).isSkinnedMesh) {
+        skinned = o as THREE.SkinnedMesh
         mesh.frustumCulled = false // skinned bounds lag the skeleton — never cull
         const g = mesh.geometry
         if (!g.boundingBox) g.computeBoundingBox()
@@ -91,8 +99,35 @@ export function PlayerCharacter({
     const inner = new THREE.Group()
     inner.position.y = feetLift // feet on the ground (origin is at the hips)
     inner.add(c)
+
+    // Reality-check P3: procedural locomotion + clothing. The rig drives the
+    // joints every frame; garments (tee/trousers) share the clone's skeleton
+    // so they follow every pose. Everything degrades silently to the plain
+    // bind-pose mannequin if a bone is missing from a future model.
+    const rigInfo = buildRig(c)
+    if (rigInfo) {
+      const anim = makeAnimState()
+      inner.userData.__stepAnim = (dt: number, time: number): void => {
+        stepCharacterAnim(rigInfo.rig, rigInfo.base, rigInfo.hipsY, anim, CHAR_MOTION.speed, time, dt)
+      }
+    }
+    const skeleton = skinned ? (skinned as THREE.SkinnedMesh).skeleton : null
+    if (skeleton) {
+      const garments = buildGarments(collectBones(c), skeleton)
+      if (garments) {
+        const chosen = OUTFITS.find((o) => o.id === outfitId) ?? OUTFITS.find((o) => o.id === DEFAULT_OUTFIT_ID)!
+        garments.apply(chosen)
+        inner.add(garments.group)
+      }
+    }
     return inner
-  }, [gltf])
+  }, [gltf, outfitId])
+
+  // drive the armature from the game loop's frame clock
+  useFrame(({ clock }, dt) => {
+    const step = model.userData.__stepAnim as ((dt: number, time: number) => void) | undefined
+    if (step) step(Math.min(dt, 0.1), clock.elapsedTime)
+  })
 
   return (
     <group ref={group} position={position} rotation={[0, rotationY, 0]} dispose={null}>

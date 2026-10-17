@@ -22,7 +22,8 @@
  */
 
 import { useEffect, useState, useSyncExternalStore, type CSSProperties } from 'react';
-import { getState, subscribe, type GameState } from '../../store/gameStore';
+import { getState, subscribe, requestSprint, type GameState } from '../../store/gameStore';
+import { getOutfitId, subscribeOutfit, setOutfitId, OUTFITS } from '../../player/outfits';
 import { formatGHS } from '../../rules/economy';
 import {
   idleObjectiveFor,
@@ -347,6 +348,86 @@ function ActButton({
 // ── Root ─────────────────────────────────────────────────────────────────────
 
 
+/**
+ * Reality-check P3 — player-character controls in walk mode: a RUN toggle
+ * (1.5× top speed; the character anim blends to the run cycle from the
+ * measured speed) and a wardrobe button that opens the outfit chips. The
+ * outfit choice persists across reloads via localStorage.
+ */
+function PlayerControls() {
+  const [sprint, setSprint] = useState(false);
+  const [wardrobe, setWardrobe] = useState(false);
+  const outfit = useSyncExternalStore(subscribeOutfit, getOutfitId, getOutfitId);
+  const chip: CSSProperties = {
+    ...GLASS,
+    border: 'none',
+    cursor: 'pointer',
+    padding: '10px 14px',
+    borderRadius: 12,
+    color: TEXT,
+    fontSize: 13,
+    fontWeight: 700,
+    pointerEvents: 'auto',
+    touchAction: 'manipulation',
+  };
+  return (
+    <div
+      style={{
+        alignSelf: 'stretch',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+        paddingLeft: JOYSTICK_CLEAR_PX,
+      }}
+    >
+      {wardrobe ? (
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', maxWidth: 'min(72vw, 320px)' }} data-testid="wardrobe">
+          {OUTFITS.map((o) => (
+            <button
+              key={o.id}
+              type="button"
+              data-testid={`outfit-${o.id}`}
+              onClick={() => setOutfitId(o.id)}
+              style={{
+                ...chip,
+                padding: '8px 10px',
+                fontSize: 12,
+                border: o.id === outfit ? '1px solid #facc15' : '1px solid rgba(255,255,255,0.12)',
+                background: o.id === outfit ? 'rgba(250,204,21,0.16)' : GLASS.background,
+              }}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <button
+          type="button"
+          data-testid="run-toggle"
+          onClick={() => {
+            const next = !sprint;
+            setSprint(next);
+            requestSprint(next);
+          }}
+          style={{
+            ...chip,
+            background: sprint ? 'rgba(250,204,21,0.18)' : GLASS.background,
+            border: sprint ? '1px solid #facc15' : 'none',
+            minWidth: 44,
+            minHeight: 44,
+          }}
+        >
+          {sprint ? 'Running' : 'Run'}
+        </button>
+        <button type="button" data-testid="wardrobe-toggle" onClick={() => setWardrobe((w) => !w)} style={{ ...chip, minWidth: 44, minHeight: 44 }}>
+          Outfit
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function RoomChip() {
   const x = useStoreValue((s) => s.player.position.x);
   const z = useStoreValue((s) => s.player.position.z);
@@ -459,6 +540,7 @@ export function Hud({ onAct, actLabel, actEnabled = true, actReason = null, toas
         >
           <ObjectiveCard />
           <RoomChip />
+          <PlayerControls />
           {toast !== null && toastVisible && (
             <div
               role="status"
